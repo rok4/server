@@ -39,7 +39,7 @@ COPY ./config/tileMatrixSet /sources/config/tileMatrixSet
 RUN mkdir -p /build
 WORKDIR /build
 
-RUN cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_OBJECT=1 -DBUILD_DOC=0 -DUNITTEST=0 -DDEBUG_BUILD=0 -DBUILD_BE4=0 /sources/
+RUN cmake -DCMAKE_INSTALL_PREFIX=/ -DOBJECT_ENABLED=1 /sources/
 RUN make && make install
 
 #### Image de run à partir des libs et de l'exécutable compilé

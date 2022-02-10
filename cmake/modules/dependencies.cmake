@@ -88,22 +88,4 @@ if(NOT TARGET thread)
     set_property(TARGET thread PROPERTY IMPORTED_LOCATION ${CMAKE_THREAD_LIBS_INIT})
 endif(NOT TARGET thread)
 
-####### Required if unit tests are enabled
-
-if(UNITTEST)
-    
-    # Extern libraries, shared
-
-    if(NOT TARGET cppunit)
-        find_package(CppUnit)
-        if(CPPUNIT_FOUND)
-            add_library(cppunit SHARED IMPORTED)
-            set_property(TARGET cppunit PROPERTY IMPORTED_LOCATION ${CPPUNIT_LIBRARY})
-        else(CPPUNIT_FOUND)
-            message(FATAL_ERROR "Cannot find extern library cppunit")
-        endif(CPPUNIT_FOUND)
-    endif(NOT TARGET cppunit)
-
-endif(UNITTEST)
-
 set(ROK4SERVERDEPENDENCIES_FOUND TRUE BOOL)
