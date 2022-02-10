@@ -1,0 +1,69 @@
+{
+    "title": "Service de visualisation WMS/WMTS/TMS",
+    "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux WMS, WMTS ou TMS",
+    "provider": "Local",
+    "site": "http://localhost",
+    "keywords": [
+        "WMS", "WMTS", "TMS"
+    ],
+    "fee": "none",
+    "access_constraint": "none",
+    "contact": {
+        "name": "SAV",
+        "position": "custodian",
+        "voice": "",
+        "facsimile": "",
+        "address_type": "",
+        "delivery_point": "",
+        "city": "",
+        "administrative_area": "",
+        "post_code": "",
+        "country": "",
+        "email": ""
+    },
+    "common": {
+        "info_formats": [
+            "text/plain",
+            "text/html",
+            "text/xml",
+            "application/xml",
+            "application/json"
+        ],
+        "styling": true,
+        "reprojection": true,
+        "crs_restrictions": "/usr/local/etc/rok4/config/restrictedCRSList.txt",
+        "crs_equivalency": "/usr/local/etc/rok4/config/listofequalscrs.txt",
+        "inspire": false,
+        "post_mode": false
+    },
+    "wms": {
+        "active": true,
+        "endpoint_uri": "http://localhost/rok4/wms",
+        "name": "WMS",
+        "max_width": 10000,
+        "max_height": 10000,
+        "layer_limit": 1,
+        "max_tile_x": 256,
+        "max_tile_y": 256,
+        "formats": [
+            "image/jpeg",
+            "image/png",
+            "image/tiff",
+            "image/geotiff",
+            "image/x-bil;bits=32"
+        ],
+        "crs": [
+            "CRS:84",
+            "EPSG:3857",
+            "EPSG:4326"
+        ]
+    },
+    "wmts": {
+        "active": true,
+	    "endpoint_uri": "http://localhost/rok4/wmts"
+    },
+    "tms": {
+        "active": true,
+        "endpoint_uri": "http://localhost/rok4/tms"
+    }
+}

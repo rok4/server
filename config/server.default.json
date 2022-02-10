@@ -1,0 +1,22 @@
+{
+    "logger": {
+        "output": "rolling_file",
+        "level": "error",
+        "file_prefix": "/var/log/rok4",
+        "file_period": 3600
+    },
+    "threads": 4,
+    "port": ":9000",
+    "backlog": 0,
+    "api": true,
+    "cache": {
+        "size": 1000,
+        "validity": 60
+    },
+    "configurations": {
+        "services": "/usr/local/etc/rok4/config/services.json",
+        "layers": "/usr/local/etc/rok4/config/layers",
+        "styles": "/usr/local/etc/rok4/config/styles",
+        "tile_matrix_sets": "/usr/local/etc/rok4/config/tileMatrixSet"
+    }
+}

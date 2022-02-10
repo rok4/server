@@ -1,0 +1,81 @@
+#### Couche de base
+
+FROM debian:bullseye-slim as libs
+
+# Librairies
+
+RUN apt update && apt -y install gettext \
+    libfcgi-dev \
+    libtinyxml-dev \
+    zlib1g-dev \
+    libcurl4-openssl-dev \
+    libproj-dev \
+    libssl-dev \
+    libturbojpeg0-dev \
+    libjpeg-dev \
+    libc6-dev \
+    libjson11-1-dev \
+    libboost-log-dev libboost-filesystem-dev libboost-system-dev
+
+#### Compilation de l'application
+
+FROM libs AS builder
+
+# Environnement de compilation
+
+RUN apt -y install  \
+    build-essential cmake
+
+# Compilation et installation
+
+COPY ./CMakeLists.txt /sources/CMakeLists.txt
+COPY ./cmake /sources/cmake
+COPY ./lib /sources/lib
+COPY ./src /sources/src
+COPY ./config.h.in /sources/config.h.in
+COPY ./config/styles /sources/config/styles
+COPY ./config/tileMatrixSet /sources/config/tileMatrixSet
+
+RUN mkdir -p /build
+WORKDIR /build
+
+RUN cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_OBJECT=1 -DBUILD_DOC=0 -DUNITTEST=0 -DDEBUG_BUILD=0 -DBUILD_BE4=0 /sources/
+RUN make && make install
+
+#### Image de run à partir des libs et de l'exécutable compilé
+
+FROM libs
+
+# Configuration par variables d'environnement par défaut
+ENV IMPORT_LAYERS_FROM_PYRAMIDS=""
+ENV SERVER_LOGLEVEL="error" SERVER_NBTHREAD="4" SERVER_CACHE_SIZE="1000" SERVER_CACHE_VALIDITY="10"
+ENV SERVICE_TITLE="WMS/WMTS/TMS server"  SERVICE_ABSTRACT="This server provide WMS, WMTS and TMS raster and vector data broadcast"  SERVICE_PROVIDERNAME="ROK4 Team" SERVICE_PROVIDERSITE="https://github.com/rok4/rok4" SERVICE_KEYWORDS="WMS,WMTS,TMS,Docker"
+ENV SERVICE_FEE="none" SERVICE_ACCESSCONSTRAINT="none"
+ENV SERVICE_WMS="WMS service" SERVICE_MAXWIDTH="10000" SERVICE_MAXHEIGHT="10000" SERVICE_LAYERLIMIT="2" SERVICE_MAXTILEX="256" SERVICE_MAXTILEY="256" SERVICE_FORMATLIST="image/jpeg,image/png,image/tiff,image/geotiff,image/x-bil;bits=32"
+ENV SERVICE_GLOBALCRSLIST="CRS:84,EPSG:3857" SERVICE_FULLYSTYLING="true" SERVICE_INSPIRE="false"
+ENV SERVICE_WMTSSUPPORT="true" SERVICE_TMSSUPPORT="true" SERVICE_WMSSUPPORT="true"
+ENV SERVICE_WMTS_ENDPOINT="http://localhost/wmts" SERVICE_TMS_ENDPOINT="http://localhost/tms" SERVICE_WMS_ENDPOINT="http://localhost/wms"
+
+WORKDIR /
+
+# Récupération de l'exécutable
+COPY --from=builder /bin/rok4 /bin/rok4
+COPY --from=builder /etc/rok4/config/tileMatrixSet /etc/rok4/config/tileMatrixSet
+COPY --from=builder /etc/rok4/config/styles /etc/rok4/config/styles
+
+# Configuration
+COPY ./config/server.docker.json /etc/rok4/config/server.docker.json
+COPY ./config/services.docker.json /etc/rok4/config/services.docker.json
+
+COPY ./docker/rok4server/docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+
+RUN mkdir /layers /pyramids
+
+VOLUME /layers
+VOLUME /pyramids
+
+EXPOSE 9000
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/bin/rok4", "-f", "/etc/rok4/config/server.json"]
