@@ -1,0 +1,71 @@
+{
+    "title": "${SERVICE_TITLE}",
+    "abstract": "${SERVICE_ABSTRACT}",
+    "provider": "${SERVICE_PROVIDERNAME}",
+    "site": "${SERVICE_PROVIDERSITE}",
+    "keywords": [
+        "${SERVICE_KEYWORDS_JSON}"
+    ],
+    "fee": "${SERVICE_FEE}",
+    "access_constraint": "${SERVICE_ACCESSCONSTRAINT}",
+    "contact": {
+        "name": "${SERVICE_INDIVIDUALNAME}",
+        "position": "${SERVICE_INDIVIDUALPOSITION}",
+        "voice": "${SERVICE_VOICE}",
+        "facsimile": "${SERVICE_FACSIMILE}",
+        "address_type": "${SERVICE_ADDRESSTYPE}",
+        "delivery_point": "${SERVICE_DELIVERYPOINT}",
+        "city": "${SERVICE_CITY}",
+        "administrative_area": "${SERVICE_ADMINISTRATIVEAREA}",
+        "post_code": "${SERVICE_POSTCODE}",
+        "country": "${SERVICE_COUNTRY}",
+        "email": "${SERVICE_ELECTRONICMAILADDRESS}"
+    },
+    "common": {
+        "info_formats": [
+            "text/plain",
+            "text/html",
+            "text/xml",
+            "application/xml",
+            "application/json"
+        ],
+        "styling": ${SERVICE_FULLYSTYLING},
+        "reprojection": true,
+        "inspire": ${SERVICE_INSPIRE},
+        "post_mode": false
+    },
+    "wms": {
+        "active": ${SERVICE_WMSSUPPORT},
+        "endpoint_uri": "${SERVICE_WMS_ENDPOINT}",
+        "name": "${SERVICE_WMS}",
+        "max_width": ${SERVICE_MAXWIDTH},
+        "max_height": ${SERVICE_MAXHEIGHT},
+        "layer_limit": ${SERVICE_LAYERLIMIT},
+        "max_tile_x": ${SERVICE_MAXTILEX},
+        "max_tile_y": ${SERVICE_MAXTILEY},
+        "formats": [
+            "${SERVICE_FORMATLIST_JSON}"
+        ],
+        "crs": [
+            "${SERVICE_GLOBALCRSLIST_JSON}"
+        ],
+        "metadata": {
+            "url": "${SERVICE_METADATAWMS_URL}",
+            "type": "${SERVICE_METADATAWMS_TYPE}",
+            "format": "simple"
+        }
+    },
+    "wmts": {
+        "active": ${SERVICE_WMTSSUPPORT},
+	    "endpoint_uri": "${SERVICE_WMTS_ENDPOINT}",
+        "metadata": {
+            "url": "${SERVICE_METADATAWMTS_URL}",
+            "type": "${SERVICE_METADATAWMTS_TYPE}",
+            "format": "simple"
+        }
+    },
+    "tms": {
+        "active": ${SERVICE_TMSSUPPORT},
+        "endpoint_uri": "${SERVICE_TMS_ENDPOINT}"
+    }
+}

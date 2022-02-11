@@ -47,8 +47,6 @@
 // Variable issues du cmake
 #cmakedefine ROK4_VERSION "@ROK4_VERSION@"
 #cmakedefine OBJECT_ENABLED @OBJECT_ENABLED@
-#cmakedefine KDU_ENABLED @KDU_ENABLED@
-#cmakedefine KDU_THREADING @KDU_THREADING@
 
 #include <cassert>
 // Pour déactiver tous les assert, décommenter la ligne suivante
@@ -56,11 +54,6 @@
 
 #include <iostream>
 #include <boost/log/trivial.hpp>
-
-#define ROK4_IMAGE_HEADER_SIZE 2048
-#define ROK4_SYMLINK_SIGNATURE_SIZE 8
-#define ROK4_SYMLINK_SIGNATURE "SYMLINK#"
-#define JPEG_BLOC_SIZE 16
 
 #define MAX_IMAGE_WIDTH  65536
 #define MAX_IMAGE_HEIGHT 65536

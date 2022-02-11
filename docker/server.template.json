@@ -1,0 +1,22 @@
+{
+    "logger": {
+        "output": "static_file",
+        "level": "${SERVER_LOGLEVEL}",
+        "file_prefix": "/rok4-logs",
+        "file_period": 3600
+    },
+    "threads": ${SERVER_NBTHREAD},
+    "port": ":9000",
+    "backlog": 0,
+    "api": true,
+    "cache": {
+        "size": ${SERVER_CACHE_SIZE},
+        "validity": ${SERVER_CACHE_VALIDITY}
+    },
+    "configurations": {
+        "services": "/etc/rok4/config/services.json",
+        "layers": "/layers",
+        "styles": "/styles",
+        "tile_matrix_sets": "/tilematrixsets"
+    }
+}

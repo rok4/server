@@ -1,4 +1,4 @@
-################### VERSIONS
+################### INITIALISATION
 
 # check the cmake version
 cmake_minimum_required(VERSION 3.10)
@@ -15,17 +15,15 @@ set(CPACK_PACKAGE_VERSION ${ROK4_VERSION})
 set(CPACK_PACKAGE_DESCRIPTION "WMS/WMTS/TMS server")
 set(CPACK_PACKAGE_VENDOR "IGN")
 
-# Définit la version du projet
-set(ROK4_VERSION ${BUILD_VERSION})
-
-message("Version ${ROK4_VERSION}")
-
 ################### PARAMÈTRES
 
 option(BUILD_VERSION "Build version" 0.0.0)
 option(OBJECT_ENABLED "Build with object storage" 0)
-option(KDU_ENABLED "Build with kakadu" 0)
-option(KDU_THREADING "Build with kakadu" 0)
+
+################### VERSION
+set(ROK4_VERSION ${BUILD_VERSION})
+
+message("Version ${ROK4_VERSION}")
 
 ################### DÉPENDANCES
 

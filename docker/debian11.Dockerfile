@@ -4,7 +4,7 @@ FROM debian:bullseye-slim as libs
 
 # Librairies
 
-RUN apt update && apt -y install gettext \
+RUN apt update && apt -y install git gettext \
     libfcgi-dev \
     libtinyxml-dev \
     zlib1g-dev \
@@ -28,18 +28,20 @@ RUN apt -y install  \
 
 # Compilation et installation
 
+ARG VERSION
+
 COPY ./CMakeLists.txt /sources/CMakeLists.txt
 COPY ./cmake /sources/cmake
 COPY ./lib /sources/lib
 COPY ./src /sources/src
+COPY ./service /sources/service
 COPY ./config.h.in /sources/config.h.in
-COPY ./config/styles /sources/config/styles
-COPY ./config/tileMatrixSet /sources/config/tileMatrixSet
+COPY ./config /sources/config
 
 RUN mkdir -p /build
 WORKDIR /build
 
-RUN cmake -DCMAKE_INSTALL_PREFIX=/ -DOBJECT_ENABLED=1 /sources/
+RUN cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_VERSION=$VERSION -DOBJECT_ENABLED=0 /sources/
 RUN make && make install
 
 #### Image de run à partir des libs et de l'exécutable compilé
@@ -60,14 +62,15 @@ WORKDIR /
 
 # Récupération de l'exécutable
 COPY --from=builder /bin/rok4 /bin/rok4
-COPY --from=builder /etc/rok4/config/tileMatrixSet /etc/rok4/config/tileMatrixSet
-COPY --from=builder /etc/rok4/config/styles /etc/rok4/config/styles
 
-# Configuration
-COPY ./config/server.docker.json /etc/rok4/config/server.docker.json
-COPY ./config/services.docker.json /etc/rok4/config/services.docker.json
+# Déploiement des configurations
+COPY ./docker/server.template.json /etc/rok4/config/server.template.json
+COPY ./docker/services.template.json /etc/rok4/config/services.template.json
 
-COPY ./docker/rok4server/docker-entrypoint.sh /
+RUN git clone http://gitlab.forge-geoportail.ign.fr/rok4/styles.git /styles
+RUN git clone http://gitlab.forge-geoportail.ign.fr/rok4/tilematrixsets.git /tilematrixsets
+
+COPY ./docker/docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
 
 RUN mkdir /layers /pyramids
