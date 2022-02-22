@@ -1,3 +1,0 @@
-[submodule "lib/core"]
-	path = lib/core
-	url = ssh://git@gitlab.forge-geoportail.ign.fr:10022/rok4/core-cpp.git
