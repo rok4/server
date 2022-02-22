@@ -11,19 +11,34 @@ set(BUILD_SHARED_LIBS OFF)
 # Définit le nom du projet 
 project(ROK4SERVER)
 
-set(CPACK_PACKAGE_VERSION ${ROK4_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION "WMS/WMTS/TMS server")
-set(CPACK_PACKAGE_VENDOR "IGN")
-
 ################### PARAMÈTRES
 
 option(BUILD_VERSION "Build version" 0.0.0)
 option(OBJECT_ENABLED "Build with object storage" 0)
 
 ################### VERSION
-set(ROK4_VERSION ${BUILD_VERSION})
+set(VERSION ${BUILD_VERSION})
 
-message("Version ${ROK4_VERSION}")
+message("Version ${VERSION}")
+
+################### PACKAGE CONFIGURATION
+
+set(CPACK_PACKAGE_NAME "ROK4SERVER")
+set(CPACK_PACKAGE_VERSION ${VERSION})
+set(CPACK_PACKAGE_DESCRIPTION "WMS/WMTS/TMS server")
+set(CPACK_PACKAGE_VENDOR "IGN")
+set(CPACK_GENERATOR "TGZ")
+
+################### MODE DEBUG
+
+if(DEBUG_BUILD)
+  set(CMAKE_BUILD_TYPE debugbuild)
+  set(CMAKE_CXX_FLAGS_DEBUGBUILD "-g -O0")
+  set(CMAKE_C_FLAGS_DEBUGBUILD "-g")
+else(DEBUG_BUILD)
+  set(CMAKE_BUILD_TYPE specificbuild)
+  set(CMAKE_CXX_FLAGS_SPECIFICBUILD "-O3")
+endif(DEBUG_BUILD)
 
 ################### DÉPENDANCES
 
