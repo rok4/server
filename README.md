@@ -1,6 +1,6 @@
 # Serveur de diffusion WMS, WMTS et TMS
 
-Le serveur ROK4 fait partie d'un projet open-source (sous licence CeCILL-C) développé par les équipes du projet [Géoportail](https://www.geoportail.gouv.fr)([@Geoportail](https://twitter.com/Geoportail)) de l’[Institut National de l’Information Géographique et Forestière](https://ign.fr) ([@IGNFrance](https://twitter.com/IGNFrance)). Il est écrit en C++ et permet la diffusion de données raster ou vecteur.
+Le serveur fait partie du projet open-source ROK4 (sous licence CeCILL-C) développé par les équipes du projet [Géoportail](https://www.geoportail.gouv.fr)([@Geoportail](https://twitter.com/Geoportail)) de l’[Institut National de l’Information Géographique et Forestière](https://ign.fr) ([@IGNFrance](https://twitter.com/IGNFrance)). Il est écrit en C++ et permet la diffusion de données raster ou vecteur.
 
 Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (OGC) WMS 1.3.0 et WMTS 1.0.0, ainsi que le TMS (Tile Map Service). Il vise deux objectifs principaux :
 
@@ -9,7 +9,7 @@ Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (
 * La diffusion de tuiles vecteur telles qu'elles sont stockées, sans transformation (TMS uniquement)
 * La diffusion en WMTS selon des Tile Matrix Sets différents de celui de la pyramide utilisée.
 
-Les pyramides de données utilisées sont produites via les outils implémentés dans les projets [PREGENERATION](https://github.com/rok4/pregeneration) et [GENERATION](https://github.com/rok4/pregeneration).
+Les pyramides de données utilisées sont produites via les outils de [prégénération](https://github.com/rok4/pregeneration) et de [génération](https://github.com/rok4/generation).
 
 - [Récupération du projet](#récupération-du-projet)
 - [Variables CMake](#variables-cmake)
