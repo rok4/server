@@ -1,0 +1,1136 @@
+openapi: 3.0.1
+info:
+  title: Serveur ROK4 WMS / WMTS / TMS
+  description: Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (OGC) WMS 1.3.0 et WMTS 1.0.0, ainsi que le TMS (Tile Map Service).
+  version: "@VERSION@"
+servers:
+- url: http://localhost/rok4server
+
+tags:
+- name: Global
+  description: Informations globales du serveur 
+- name: Web Map Tile Service
+  description: Diffusion de tuiles raster et vecteur selon le standard OGC WMTS
+- name: Web Map Service
+  description: Diffusion d'images raster selon le standard OGC WMS
+- name: Tile Map Service
+  description: Diffusion de tuiles raster et vecteur selon la convention TMS
+- name: Administration
+  description: API d'ajout et de suppression de couches disponibles
+
+paths:
+
+  ######################################### GLOBAL
+
+  /:
+    get:
+      tags:
+      - Global
+      summary: Retourne la liste des services disponibles
+      operationId: global_get_services
+      x-query: "{&parameters*}" # changed the prefix to &
+      responses:
+        200:
+          description: Liste des services disponibles
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/global_services'
+
+  ######################################### WMS
+
+  /wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0:
+    get:
+      tags:
+      - Web Map Service
+      summary: Récupère la liste des couches disponibles selon le service WMS
+      operationId: wms_get_capabilities
+      x-query: "{&parameters*}" # changed the prefix to &
+      responses:
+        200:
+          description: Liste des couches disponibles selon le service WMS
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wms_capabilities'
+
+  /wms?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0:
+    get:
+      tags:
+      - Web Map Service
+      summary: Télécharge une image
+      operationId: wms_get_map
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: LAYERS
+          required: true
+          in: query
+          description: liste des couches demandées
+          schema:
+            type: array
+            minItems: 1
+            items:
+              type: string
+            example:
+              - SCAN1000
+              - BDORTHO
+          explode: false
+
+        - name: WIDTH
+          required: true
+          in: query
+          description: largeur de l'image demandée
+          schema:
+            type: integer
+            example:
+              256
+
+        - name: HEIGHT
+          required: true
+          in: query
+          description: hauteur de l'image demandée
+          schema:
+            type: integer
+            example:
+              256
+
+        - name: CRS
+          required: true
+          in: query
+          description: système de coordonnées d'interrogation
+          schema:
+            type: string
+            example:
+              EPSG:3857
+
+        - name: FORMAT
+          required: true
+          in: query
+          description: format de la réponse
+          schema:
+            type: string
+            example:
+              image/jpeg
+
+        - name: BBOX
+          required: true
+          in: query
+          description: rectangle englobant de l'image demandée
+          schema:
+            type: array
+            minItems: 4
+            maxItems: 4
+            items:
+              type: number
+            example:
+              - 450000
+              - 560000
+              - 455000
+              - 565000
+          explode: false
+
+        - name: EXCEPTION
+          required: false
+          in: query
+          description: format de la réponse
+          schema:
+            type: string
+            enum:
+              - XML
+              - ""
+
+        - name: STYLES
+          required: true
+          in: query
+          description: liste des styles à appliqer aux couches demandées
+          schema:
+            type: array
+            minItems: 1
+            items:
+              type: string
+            example:
+              - normal
+              - normal
+          explode: false
+
+        - name: FORMAT_OPTIONS
+          required: false
+          in: query
+          description: Options complémentaires de format
+          schema:
+            type: string
+
+        - name: DPI
+          required: false
+          in: query
+          description: Résolution pixel
+          schema:
+            type: integer
+            example:
+              90
+
+      responses:
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wms_error'
+
+        404:
+          description: Pas de données
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wms_error'
+
+        200:
+          description: Image demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /wms?SERVICE=WMS&REQUEST=GetFeatureInfo&VERSION=1.3.0:
+    get:
+      tags:
+      - Web Map Service
+      summary: Demande des informations sur un pixel
+      operationId: wms_get_feature_info
+      x-query: "{&parameters*}" # changed the prefix to &
+      
+      parameters:
+
+        - name: QUERY_LAYERS
+          required: true
+          in: query
+          description: liste des couches dont on veut les informations
+          schema:
+            type: array
+            minItems: 1
+            items:
+              type: string
+            example:
+              - SCAN1000
+          explode: false
+
+        - name: FEATURE_COUNT
+          required: false
+          in: query
+          description: nombre maximum d'objets dont on veut les informations
+          schema:
+            type: integer
+            example:
+              10
+            default:
+              1
+
+        - name: I
+          required: true
+          in: query
+          description: colonne du pixel dont on veut les informations
+          schema:
+            type: integer
+            example:
+              123
+
+        - name: J
+          required: true
+          in: query
+          description: ligne du pixel dont on veut les informations
+          schema:
+            type: integer
+            example:
+              208
+
+        - name: INFO_FORMAT
+          required: true
+          in: query
+          description: format des informations retournées
+          schema:
+            type: string
+            example:
+              application/xml
+
+        - name: LAYERS
+          required: true
+          in: query
+          description: liste des couches demandées
+          schema:
+            type: array
+            minItems: 1
+            items:
+              type: string
+            example:
+              - SCAN1000
+              - BDORTHO
+          explode: false
+
+        - name: WIDTH
+          required: true
+          in: query
+          description: largeur de l'image demandée
+          schema:
+            type: integer
+            example:
+              256
+
+        - name: HEIGHT
+          required: true
+          in: query
+          description: hauteur de l'image demandée
+          schema:
+            type: integer
+            example:
+              256
+
+        - name: CRS
+          required: true
+          in: query
+          description: système de coordonnées d'interrogation
+          schema:
+            type: string
+            example:
+              EPSG:3857
+
+        - name: FORMAT
+          required: true
+          in: query
+          description: format de la réponse
+          schema:
+            type: string
+            example:
+              image/jpeg
+
+        - name: BBOX
+          required: true
+          in: query
+          description: rectangle englobant de l'image demandée
+          schema:
+            type: array
+            minItems: 4
+            maxItems: 4
+            items:
+              type: number
+            example:
+              - 450000
+              - 560000
+              - 455000
+              - 565000
+          explode: false
+
+        - name: EXCEPTION
+          required: false
+          in: query
+          description: format de la réponse
+          schema:
+            type: string
+            enum:
+              - XML
+              - ""
+
+        - name: STYLES
+          required: true
+          in: query
+          description: liste des styles à appliqer aux couches demandées
+          schema:
+            type: array
+            minItems: 1
+            items:
+              type: string
+            example:
+              - normal
+              - normal
+          explode: false
+
+        - name: FORMAT_OPTIONS
+          required: false
+          in: query
+          description: Options complémentaires de format
+          schema:
+            type: string
+
+        - name: DPI
+          required: false
+          in: query
+          description: Résolution pixel
+          schema:
+            type: integer
+            example:
+              90
+
+      responses:
+        200:
+          description: Informations sur le pixel
+          content:
+            application/xml:
+              schema:
+                type: string
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wms_error'
+
+  ######################################### WMTS
+
+  /wmts?SERVICE=WMTS&REQUEST=GetCapabilities&VERSION=1.0.0:
+    get:
+      tags:
+      - Web Map Tile Service
+      summary: Récupère la liste des couches disponibles selon le service WMTS
+      operationId: wmts_get_capabilities
+      x-query: "{&parameters*}" # changed the prefix to &
+      responses:
+        200:
+          description: Liste des couches disponibles selon le service WMTS
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wmts_capabilities'
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wmts_error'
+
+  /wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0:
+    get:
+      tags:
+      - Web Map Tile Service
+      summary: Télécharge une tuile
+      operationId: wmts_get_tile
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: LAYER
+          required: true
+          in: query
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: TILEMATRIXSET
+          required: true
+          in: query
+          description: Quadrillage d'interrogation
+          schema:
+            type: string
+
+        - name: TILEMATRIX
+          required: true
+          in: query
+          description: Niveau de la tuile demandée
+          schema:
+            type: string
+
+        - name: TILEROW
+          required: true
+          in: query
+          description: Ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: TILECOL
+          required: true
+          in: query
+          description: Colonne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: FORMAT
+          required: true
+          in: query
+          description: Format de la tuile demandée
+          schema:
+            type: string
+
+        - name: STYLE
+          required: true
+          in: query
+          description: Style à appliquer à la tuile demandée
+          schema:
+            type: string
+
+      responses:
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wmts_error'
+
+        404:
+          description: Pas de données
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wmts_error'
+
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /wmts?SERVICE=WMS&REQUEST=GetFeatureInfo&VERSION=1.0.0:
+    get:
+      tags:
+      - Web Map Tile Service
+      summary: Demande des informations sur un pixel
+      operationId: wmts_get_feature_info
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: INFOFORMAT
+          required: true
+          in: query
+          description: Format des informations retournées
+          schema:
+            type: string
+
+        - name: I
+          required: true
+          in: query
+          description: colonne du pixel dont on veut les informations
+          schema:
+            type: integer
+            example:
+              123
+
+        - name: J
+          required: true
+          in: query
+          description: ligne du pixel dont on veut les informations
+          schema:
+            type: integer
+            example:
+              208
+
+        - name: LAYER
+          required: true
+          in: query
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: TILEMATRIXSET
+          required: true
+          in: query
+          description: Quadrillage d'interrogation
+          schema:
+            type: string
+
+        - name: TILEMATRIX
+          required: true
+          in: query
+          description: Niveau de la tuile demandée
+          schema:
+            type: string
+
+        - name: TILEROW
+          required: true
+          in: query
+          description: Ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: TILECOL
+          required: true
+          in: query
+          description: Colonne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: FORMAT
+          required: true
+          in: query
+          description: Format de la tuile demandée
+          schema:
+            type: string
+
+        - name: STYLE
+          required: true
+          in: query
+          description: Style à appliquer à la tuile demandée
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Informations sur le pixel
+          content:
+            application/xml:
+              schema:
+                type: string
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/wmts_error'
+
+  ######################################### TMS
+  
+  /tms/1.0.0:
+    get:
+      tags:
+      - Tile Map Service
+      summary: Récupère la liste des couches disponibles selon le service TMS
+      operationId: tms_get_capabilities
+      responses:
+        200:
+          description: Liste des couches disponibles selon le service TMS
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_capabilities'
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_error'
+
+  /tms/1.0.0/{layer}:
+    get:
+      tags:
+      - Tile Map Service
+      summary: Récupère les informations générales sur une couche
+      operationId: tms_get_layer
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Informations générales sur la couche
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_layer'
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_error'
+
+  /tms/1.0.0/{layer}/metadata.json:
+    get:
+      tags:
+      - Tile Map Service
+      summary: Récupère les métadonnées d'une couche au format JSON
+      operationId: tms_get_metadata_json
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Liste des couches disponibles selon le service TMS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tms_metadata_json'
+
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_error'
+
+  /tms/1.0.0/{layer}/gdal.xml:
+    get:
+      tags:
+      - Tile Map Service
+      summary: Récupère le descripteur de couche GDAL
+      operationId: tms_get_gdal_xml
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Descripteur GDAL de la couche
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_gdal_xml'
+
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_error'
+
+  /tms/1.0.0/{layer}/{level}/{column}/{row}.{extension}:
+    get:
+      tags:
+      - Tile Map Service
+      summary: Télécharge une tuile
+      operationId: wmts_get_tile
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: string
+
+        - name: column
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: extension
+          required: true
+          in: path
+          description: extension de la tuile demandée
+          schema:
+            type: string
+
+      responses:
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_error'
+
+        404:
+          description: Pas de données
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/tms_error'
+
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  
+  ######################################### ADMIN
+
+  /admin/layers/{layername}:
+    post:
+      tags:
+      - Administration
+      summary: Création d'une nouvelle couche
+      operationId: admin_create_layer
+      parameters:
+        - name: layername
+          required: true
+          in: path
+          description: Identifiant de la nouvelle couche
+          schema:
+            type: string
+
+
+      requestBody:
+        content:  
+          application/json:
+            schema:
+              $ref: '#/components/schemas/admin_layer'
+
+      responses:
+        204:
+          description: Couche créée
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/admin_error'
+        409:
+          description: Couche déjà existante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/admin_error'
+    put:
+      tags:
+      - Administration
+      summary: Modification d'une couche
+      description: L'identifiant de la couche doit rester le même
+      operationId: admin_update_layer
+      parameters:
+        - name: layername
+          required: true
+          in: path
+          description: Identifiant de la couche à modifier
+          schema:
+            type: string
+
+      requestBody:
+        content:  
+          application/json:
+            schema:
+              $ref: '#/components/schemas/admin_layer'
+
+      responses:
+        204:
+          description: Couche modifiée
+        400:
+          description: Paramètre manquant ou erroné
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/admin_error'
+        404:
+          description: Couche inexistante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/admin_error'
+
+    delete:
+      tags:
+      - Administration
+      summary: Suppression d'une couche
+      operationId: admin_delete_layer
+      parameters:
+        - name: layername
+          required: true
+          in: path
+          description: Identifiant de la couche à supprimer
+          schema:
+            type: string
+
+      responses:
+        204:
+          description: Couche supprimée
+        404:
+          description: Couche inexistante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/admin_error'
+
+components:
+  schemas:
+
+    global_services:
+      xml:
+        name: 'Services'
+      type: object
+      additionalProperties: false
+      properties:
+        TileMapService:
+          type: object
+          properties:
+            title:
+              type: string
+              xml:
+                attribute: true
+            version:
+              type: string
+              xml:
+                attribute: true
+            href:
+              type: string
+              xml:
+                attribute: true
+        WebMapService:
+          type: object
+          properties:
+            title:
+              type: string
+              xml:
+                attribute: true
+            version:
+              type: string
+              xml:
+                attribute: true
+            href:
+              type: string
+              xml:
+                attribute: true
+        WebMapTileService:
+          type: object
+          properties:
+            title:
+              type: string
+              xml:
+                attribute: true
+            version:
+              type: string
+              xml:
+                attribute: true
+            href:
+              type: string
+              xml:
+                attribute: true
+
+    wms_error:
+      xml:
+        name: 'ServiceExceptionReport'
+      type: object
+      additionalProperties: false
+      properties:
+        ServiceException:
+          type: string
+
+    wms_capabilities:
+      xml:
+        name: 'WMS_Capabilities'
+      type: object
+      additionalProperties: false
+
+    wmts_error:
+      xml:
+        name: 'ExceptionReport'
+      type: object
+      additionalProperties: false
+      properties:
+        Exception:
+          type: string
+
+    wmts_capabilities:
+      xml:
+        name: 'Capabilities'
+      type: object
+      additionalProperties: false
+
+    tms_error:
+      xml:
+        name: 'ServiceExceptionReport'
+      type: object
+      additionalProperties: false
+      properties:
+        ServiceException:
+          type: string
+
+    tms_capabilities:
+      xml:
+        name: 'WMS_Capabilities'
+      type: object
+      additionalProperties: false
+
+    tms_layer:
+      xml:
+        name: 'WMS_Capabilities'
+      type: object
+      additionalProperties: false
+
+    tms_metadata_json:
+      xml:
+        name: 'WMS_Capabilities'
+      type: object
+      additionalProperties: false
+
+    tms_gdal_xml:
+      xml:
+        name: 'WMS_Capabilities'
+      type: object
+      additionalProperties: false
+
+
+    admin_error:
+      type: object
+      additionalProperties: false
+      properties:
+        error_status:
+          type: string
+        error_message:
+          type: string
+
+    admin_layer:
+      type: object
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+        abstract:
+          type: string
+        keyword:
+          type: array
+          items: 
+            type: string
+        styles:
+          type: array
+          items: 
+            type: string
+        bbox:
+          type: object
+          required:
+            - east
+            - west
+            - north
+            - south
+          properties: 
+            east:
+              type: number
+            west:
+              type: number
+            north:
+              type: number
+            south:
+              type: number
+        attribution:
+          type: object
+          properties:
+            title:
+              type: string
+            url:
+              type: string
+            logo:
+              type: object
+              properties:
+                format:
+                  type: string
+                url:
+                  type: string
+                width:
+                  type: integer
+                height:
+                  type: integer
+              required:
+                - format
+                - url
+                - width
+                - height
+          required:
+            - title
+            - url
+            
+        metadata:
+          type: array
+          items: 
+            type: object
+            properties:
+              format:
+                type: string
+              url:
+                type: string
+              type:
+                type: string
+            required:
+              - format
+              - url
+              - type
+
+        pyramids:
+          type: array
+          items: 
+            type: object
+            properties:
+              path:
+                type: string
+              bottom_level:
+                type: string
+              top_level:
+                type: string
+              pool_name:
+                type: string
+              bucket_name:
+                type: string
+              container_name:
+                type: string
+
+            required:
+              - path
+              - bottom_level
+              - top_level
+
+        resampling:
+          type: string
+
+        get_feature_info:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - EXTERNALWMS
+                - PYRAMID
+            url:
+              type: string
+            layers:
+              type: string
+            query_layers:
+              type: string
+            version:
+              type: string
+            service:
+              type: string
+            force_epsg:
+              type: boolean
+          required:
+            - type
+            
+        wms:
+          type: object
+          properties:
+            authorized:
+              type: boolean
+            crs:
+              type: array
+              items: 
+                type: string
+            
+        wmts:
+          type: object
+          properties:
+            authorized:
+              type: boolean
+            tms:
+              type: array
+              items: 
+                type: string
+            
+        tms:
+          type: object
+          properties:
+            authorized:
+              type: boolean
+
+      required:
+        - title
+        - abstract
+        - pyramids
+

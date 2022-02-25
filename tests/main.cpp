@@ -1,5 +1,5 @@
 /*
- * Copyright © (2011-2013) Institut national de l'information
+ * Copyright © (2011) Institut national de l'information
  *                    géographique et forestière
  *
  * Géoportail SAV <contact.geoservices@ign.fr>
@@ -35,42 +35,57 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-/**
- * \file UtilsGlobal.cpp
- * \~french
- * \brief Implémentation des fonctions de générations des GetCapabilities
- * \~english
- * \brief Implement the GetCapabilities generation function
- */
-
-#include "Rok4Server.h"
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/CompilerOutputter.h>
+#include <cppunit/XmlOutputter.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/TestResult.h>
+#include <cppunit/TestResultCollector.h>
+#include <cppunit/TestRunner.h>
 #include <iostream>
-#include <algorithm>
-#include <iomanip>
-#include <vector>
-#include <map>
-#include <set>
-#include <functional>
-#include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
-#include "config.h"
+#include <fstream>
+#include "TimedTestListener.h"
+#include "XmlTimedTestOutputterHook.h"
 
-DataStream* Rok4Server::GlobalGetServices ( Request* request ) {
+int main ( int argc, char* argv[] ) {
+    // Create the event manager and test controller
+    CPPUNIT_NS::TestResult controller;
+    TimedTestListener ttlistener;
 
-    std::ostringstream res;
-    res << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-    res << "<Services>\n";
-    if (servicesConf->supportTMS) {
-        res << "  <TileMapService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->tmsPublicUrl << "/1.0.0/\" />\n";
-    }
-    if (servicesConf->supportWMS) {
-        res << "  <WebMapService title=\"" << servicesConf->title << "\" version=\"1.3.0\" href=\"" << servicesConf->wmsPublicUrl << "?SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    if (servicesConf->supportWMTS) {
-        res << "  <WebMapTileService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->wmtsPublicUrl << "?SERVICE=WMTS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    res << "</Services>\n";
+    // Add a listener that colllects test result
+    CPPUNIT_NS::TestResultCollector result;
+    controller.addListener ( &result );
+    controller.addListener ( &ttlistener );
 
-    return new MessageDataStream ( res.str(),"application/xml" );
+    // Add a listener that print dots as test run.
+    //CPPUNIT_NS::BriefTestProgressListener progress;
+    //controller.addListener( &progress );
+
+    //controller.push
+
+    // Add the top suite to the test runner
+    CPPUNIT_NS::TestRunner runner;
+
+    if ( argc == 1 ) {
+        runner.addTest ( CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest() );
+    }
+    if ( argc == 2 ) {
+        runner.addTest ( CPPUNIT_NS::TestFactoryRegistry::getRegistry ( argv[1] ).makeTest() );
+    }
+
+    runner.run ( controller );
+
+    // Print test in a compiler compatible format.
+    CPPUNIT_NS::CompilerOutputter outputter ( &result, std::cerr );
+    outputter.write();
+
+    //XML Output
+    std::ofstream xmlFileOut ( "cpptestresults.xml" );
+    CPPUNIT_NS::XmlOutputter xmlOut ( &result, xmlFileOut );
+    XmlTimedTestOutputterHook *xmlTimeHook = new XmlTimedTestOutputterHook ( &ttlistener );
+    xmlOut.addHook ( xmlTimeHook );
+    xmlOut.write();
+
+    return result.wasSuccessful() ? 0 : 1;
 }
+

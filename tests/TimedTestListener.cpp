@@ -1,5 +1,5 @@
 /*
- * Copyright © (2011-2013) Institut national de l'information
+ * Copyright © (2011) Institut national de l'information
  *                    géographique et forestière
  *
  * Géoportail SAV <contact.geoservices@ign.fr>
@@ -35,42 +35,55 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-/**
- * \file UtilsGlobal.cpp
- * \~french
- * \brief Implémentation des fonctions de générations des GetCapabilities
- * \~english
- * \brief Implement the GetCapabilities generation function
- */
-
-#include "Rok4Server.h"
-#include <iostream>
-#include <algorithm>
-#include <iomanip>
-#include <vector>
+#include "TimedTestListener.h"
+#include <cppunit/Test.h>
+#include <cppunit/TestResult.h>
 #include <map>
-#include <set>
-#include <functional>
-#include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
-#include "config.h"
+#include <time.h>
 
-DataStream* Rok4Server::GlobalGetServices ( Request* request ) {
+TimedTestListener::TimedTestListener() {
+}
 
-    std::ostringstream res;
-    res << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-    res << "<Services>\n";
-    if (servicesConf->supportTMS) {
-        res << "  <TileMapService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->tmsPublicUrl << "/1.0.0/\" />\n";
-    }
-    if (servicesConf->supportWMS) {
-        res << "  <WebMapService title=\"" << servicesConf->title << "\" version=\"1.3.0\" href=\"" << servicesConf->wmsPublicUrl << "?SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    if (servicesConf->supportWMTS) {
-        res << "  <WebMapTileService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->wmtsPublicUrl << "?SERVICE=WMTS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    res << "</Services>\n";
+// Test Listener
+void TimedTestListener::startTest ( CppUnit::Test *test ) {
+    setStartTime ( test );;
+}
 
-    return new MessageDataStream ( res.str(),"application/xml" );
+void TimedTestListener::endTest ( CppUnit::Test *test ) {
+    setEndTime ( test );
+}
+
+void TimedTestListener::startTestRun ( CppUnit::Test* test, CppUnit::TestResult* eventManager ) {
+    gettimeofday ( &testrunstart, NULL );
+}
+
+void TimedTestListener::endTestRun ( CppUnit::Test* test, CppUnit::TestResult* eventManager ) {
+    gettimeofday ( &testrunend, NULL );
+}
+
+// Time
+double TimedTestListener::getTotalTime() {
+    double time = testrunend.tv_sec - testrunstart.tv_sec + ( testrunend.tv_usec - testrunstart.tv_usec ) /1000000.;
+    return time;
+}
+
+double TimedTestListener::getTime ( std::string testName ) {
+    timeval teststart,testend ;
+    teststart = testStartTime[testName];
+    testend = testEndTime[testName];
+    double time = testend.tv_sec - teststart.tv_sec + ( testend.tv_usec - teststart.tv_usec ) /1000000.;
+    return time;
+
+}
+
+void TimedTestListener::setStartTime ( CppUnit::Test *test ) {
+    timeval teststart;
+    gettimeofday ( &teststart, NULL );
+    testStartTime[test->getName()]=teststart;
+}
+
+void TimedTestListener::setEndTime ( CppUnit::Test *test ) {
+    timeval testend;
+    gettimeofday ( &testend, NULL );
+    testEndTime[test->getName()]=testend;
 }

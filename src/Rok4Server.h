@@ -57,14 +57,14 @@ class Rok4Server;
 #include <vector>
 #include "Layer.h"
 #include <stdio.h>
-#include "TileMatrixSet.h"
+#include "utils/TileMatrixSet.h"
 #include "fcgiapp.h"
 #include <csignal>
 #include "ServerConf.h"
 #include "ServicesConf.h"
 #include "GetFeatureInfoEncoder.h"
 #include "utils/BoundingBox.h"
-#include "ContextBook.h"
+#include "storage/ContextBook.h"
 
 /**
  * \author Institut national de l'information géographique et forestière

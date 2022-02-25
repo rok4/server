@@ -44,7 +44,7 @@
  */
 
 #include "Layer.h"
-#include "Pyramid.h"
+#include "utils/Pyramid.h"
 #include "ConfLoader.h"
 
 #include <boost/log/trivial.hpp>
@@ -52,6 +52,8 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+
+#include "utils/Utils.h"
 
 bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servicesConf) {
 
@@ -590,7 +592,7 @@ Layer::Layer(std::string path, ServerConf* serverConf, ServicesConf* servicesCon
     /********************** Id */
     id = Configuration::getFileName(filePath, ".json");
 
-    if ( Request::containForbiddenChars(id) ) {
+    if ( containForbiddenChars(id) ) {
         errorMessage =  "Layer identifier contains forbidden chars" ;
         return;
     }
@@ -630,7 +632,7 @@ Layer::Layer(std::string layerName, std::string content, ServerConf* serverConf,
 
     /********************** Id */
 
-    if ( Request::containForbiddenChars(id) ) {
+    if ( containForbiddenChars(id) ) {
         errorMessage =  "Layer identifier contains forbidden chars" ;
         return;
     }
@@ -693,7 +695,10 @@ bool Layer::removeFile(ServerConf* serverConf) {
 
 Image* Layer::getbbox (ServicesConf* servicesConf, BoundingBox<double> bbox, int width, int height, CRS* dst_crs, int dpi, int& error ) {
     error=0;
-    return dataPyramid->getbbox (servicesConf, bbox, width, height, dst_crs, resampling, dpi, error );
+
+    bool crs_equals = servicesConf->are_the_two_CRS_equal( dataPyramid->getTms()->getCrs()->getProjCode(), dst_crs->getProjCode() );
+
+    return dataPyramid->getbbox (servicesConf->getMaxTileX(), servicesConf->getMaxTileY(), bbox, width, height, dst_crs, crs_equals, resampling, dpi, error );
 }
 
 std::string Layer::getId() {

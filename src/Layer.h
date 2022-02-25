@@ -51,7 +51,7 @@ class Layer;
 #include <vector>
 #include <string>
 
-#include "Pyramid.h"
+#include "utils/Pyramid.h"
 #include "utils/CRS.h"
 #include "style/Style.h"
 #include "ServerConf.h"

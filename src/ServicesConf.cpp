@@ -716,7 +716,6 @@ ServicesConf::~ServicesConf(){
 
     for ( unsigned int l = 0; l < listofequalsCRS.size(); l++ ) {
         for ( unsigned int c = 0; c < listofequalsCRS.at(l).size(); c++ ) {
-            BOOST_LOG_TRIVIAL(error) <<  "delete " << listofequalsCRS.at(l).at(c)->getRequestCode() ;
             delete listofequalsCRS.at(l).at(c);
         }
     }

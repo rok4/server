@@ -58,6 +58,8 @@
 #include "ConfLoader.h"
 #include "Request.h"
 
+#include "utils/Utils.h"
+
 
 /**********************************************************************************************************/
 /***************************************** SERVER & SERVICES **********************************************/
@@ -90,7 +92,7 @@ bool ConfLoader::buildStylesList ( ServerConf* serverConf, ServicesConf* service
         if ( style ) {
             serverConf->addStyle ( style );
         } else {
-            BOOST_LOG_TRIVIAL(error) <<  "Cannot load style " << styleFiles[i] ;
+            BOOST_LOG_TRIVIAL(warning) <<  "Cannot load style " << styleFiles[i] ;
         }
     }
 
@@ -112,7 +114,7 @@ Style* ConfLoader::buildStyle ( std::string fileName, ServicesConf* servicesConf
         return NULL;
     }
 
-    if ( Request::containForbiddenChars(style->getIdentifier()) ) {
+    if ( containForbiddenChars(style->getIdentifier()) ) {
         BOOST_LOG_TRIVIAL(error) << "Style identifier contains forbidden chars" ;
         delete style;
         return NULL;
@@ -220,7 +222,7 @@ Layer * ConfLoader::buildLayer ( std::string fileName, ServerConf* serverConf, S
 
 Pyramid* ConfLoader::buildPyramid ( Context* context, std::string fileName, ServerConf* serverConf ) {
     
-    Pyramid* pyramid = new Pyramid(context, fileName, serverConf );
+    Pyramid* pyramid = new Pyramid( context, fileName, serverConf->getContextBook(), serverConf->getTmsList() );
     if ( ! pyramid->isOk() ) {
         BOOST_LOG_TRIVIAL(error) << pyramid->getErrorMessage();
         delete pyramid;

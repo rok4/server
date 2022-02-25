@@ -1,5 +1,5 @@
 /*
- * Copyright © (2011-2013) Institut national de l'information
+ * Copyright © (2011) Institut national de l'information
  *                    géographique et forestière
  *
  * Géoportail SAV <contact.geoservices@ign.fr>
@@ -35,42 +35,37 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-/**
- * \file UtilsGlobal.cpp
- * \~french
- * \brief Implémentation des fonctions de générations des GetCapabilities
- * \~english
- * \brief Implement the GetCapabilities generation function
- */
-
-#include "Rok4Server.h"
-#include <iostream>
-#include <algorithm>
+#include "XmlTimedTestOutputterHook.h"
+#include <string>
+#include <sstream>
 #include <iomanip>
-#include <vector>
-#include <map>
-#include <set>
-#include <functional>
-#include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
-#include "config.h"
 
-DataStream* Rok4Server::GlobalGetServices ( Request* request ) {
+XmlTimedTestOutputterHook::XmlTimedTestOutputterHook ( TimedTestListener* _ttlisten ) : ttlisten ( _ttlisten ) {
 
-    std::ostringstream res;
-    res << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-    res << "<Services>\n";
-    if (servicesConf->supportTMS) {
-        res << "  <TileMapService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->tmsPublicUrl << "/1.0.0/\" />\n";
-    }
-    if (servicesConf->supportWMS) {
-        res << "  <WebMapService title=\"" << servicesConf->title << "\" version=\"1.3.0\" href=\"" << servicesConf->wmsPublicUrl << "?SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    if (servicesConf->supportWMTS) {
-        res << "  <WebMapTileService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->wmtsPublicUrl << "?SERVICE=WMTS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    res << "</Services>\n";
+}
 
-    return new MessageDataStream ( res.str(),"application/xml" );
+void XmlTimedTestOutputterHook::successfulTestAdded ( CppUnit::XmlDocument* document, CppUnit::XmlElement* testElement, CppUnit::Test* test ) {
+    std::ostringstream sstream;
+    sstream << std::setprecision ( 4 ) << std::fixed << ttlisten->getTime ( test->getName() );
+    testElement->addElement ( new CppUnit::XmlElement ( "Duration", sstream.str() ) ) ;
+}
+
+void XmlTimedTestOutputterHook::failTestAdded ( CppUnit::XmlDocument* document, CppUnit::XmlElement* testElement, CppUnit::Test* test, CppUnit::TestFailure* failure ) {
+    std::ostringstream sstream;
+    sstream << std::setprecision ( 4 ) << std::fixed << ttlisten->getTime ( test->getName() );
+    testElement->addElement ( new CppUnit::XmlElement ( "Duration", sstream.str() ) ) ;
+}
+
+void XmlTimedTestOutputterHook::statisticsAdded ( CppUnit::XmlDocument* document, CppUnit::XmlElement* statisticsElement ) {
+    char timestamp[20];
+    tm * putctime;
+    time_t unixtime;
+    time ( &unixtime );
+    putctime = gmtime ( &unixtime );
+    strftime ( timestamp,20,"%Y-%m-%dT%H:%M:%S",putctime );
+    std::ostringstream sstream;
+    sstream << std::setprecision ( 4 ) << std::fixed << ttlisten->getTotalTime();
+
+    statisticsElement->addElement ( new CppUnit::XmlElement ( "Duration", sstream.str() ) );
+    statisticsElement->addElement ( new CppUnit::XmlElement ( "Timestamp", timestamp ) );
 }

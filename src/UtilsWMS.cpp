@@ -51,10 +51,10 @@
 #include <vector>
 #include <map>
 #include <cmath>
-#include "TileMatrixSet.h"
-#include "Pyramid.h"
+#include "utils/TileMatrixSet.h"
+#include "utils/Pyramid.h"
 #include "utils/BoundingBox.h"
-
+#include "utils/Utils.h"
 
 int Rok4Server::GetDecimalPlaces ( double dbVal ) {
     dbVal = fmod(dbVal, 1);
@@ -98,7 +98,7 @@ DataStream* Rok4Server::getMapParamWMS (
     }
 
     for (unsigned int i = 0 ; i < vector_layers.size(); i++ ) {
-        if ( Request::containForbiddenChars(vector_layers.at(i)) ) {
+        if ( containForbiddenChars(vector_layers.at(i)) ) {
             // On a détecté un caractère interdit, on ne met pas le layer fourni dans la réponse pour éviter une injection
             BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMS layers: " << vector_layers.at(i) ;
             return new SERDataStream ( new ServiceException ( "",WMS_LAYER_NOT_DEFINED,"Layer inconnu.","wms" ) );
@@ -142,7 +142,7 @@ DataStream* Rok4Server::getMapParamWMS (
         return new SERDataStream ( new ServiceException ( "",OWS_MISSING_PARAMETER_VALUE,"Parametre CRS absent.","wms" ) );
 
 
-    if ( Request::containForbiddenChars(str_crs) ) {
+    if ( containForbiddenChars(str_crs) ) {
         // On a détecté un caractère interdit, on ne met pas le crs fourni dans la réponse pour éviter une injection
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMS crs: " << str_crs ;
         return new SERDataStream ( new ServiceException ( "",WMS_INVALID_CRS,"CRS  inconnu","wms" ) );
@@ -162,7 +162,7 @@ DataStream* Rok4Server::getMapParamWMS (
     if ( format == "" )
         return new SERDataStream ( new ServiceException ( "",OWS_MISSING_PARAMETER_VALUE,"Parametre FORMAT absent.","wms" ) );
 
-    if ( Request::containForbiddenChars(format) ) {
+    if ( containForbiddenChars(format) ) {
         // On a détecté un caractère interdit, on ne met pas le format fourni dans la réponse pour éviter une injection
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMS format: " << format ;
         return new SERDataStream ( new ServiceException ( "",WMS_INVALID_FORMAT,"Format non gere par le service.","wms" ) );
@@ -209,7 +209,7 @@ DataStream* Rok4Server::getMapParamWMS (
     std::string str_exception = request->getParam ( "exception" );
     if ( str_exception != "" && str_exception != "XML" ) {
 
-        if ( Request::containForbiddenChars(str_exception) ) {
+        if ( containForbiddenChars(str_exception) ) {
             // On a détecté un caractère interdit, on ne met pas le str_exception fourni dans la réponse pour éviter une injection
             BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMS exception: " << str_exception ;
             return new SERDataStream ( new ServiceException ( "",OWS_INVALID_PARAMETER_VALUE,"Format d'exception non pris en charge","wms" ) );
@@ -242,7 +242,7 @@ DataStream* Rok4Server::getMapParamWMS (
         }
 
 
-        if ( Request::containForbiddenChars(vector_styles.at ( k )) ) {
+        if ( containForbiddenChars(vector_styles.at ( k )) ) {
             // On a détecté un caractère interdit, on ne met pas le style fourni dans la réponse pour éviter une injection
             BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMS styles: " << vector_styles.at ( k ) ;
             return new SERDataStream ( new ServiceException ( "",WMS_STYLE_NOT_DEFINED,"Le style n'est pas gere pour la couche " +vector_layers.at ( k ),"wms" ) );
@@ -320,7 +320,7 @@ DataStream* Rok4Server::getFeatureInfoParamWMS (
 
     for (unsigned u1 = 0; u1 < queryLayersString.size(); u1++) {
 
-        if ( Request::containForbiddenChars(queryLayersString.at(u1))) {
+        if ( containForbiddenChars(queryLayersString.at(u1))) {
             BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMS query_layer : " << queryLayersString.at(u1) ;
             return new SERDataStream ( new ServiceException ( "",WMS_LAYER_NOT_DEFINED,"Query_Layer inconnu.","wms" ) );
         }
@@ -400,7 +400,7 @@ DataStream* Rok4Server::getFeatureInfoParamWMS (
     if ( info_format == "" ){
         return new SERDataStream ( new ServiceException ( "",OWS_MISSING_PARAMETER_VALUE,"Parametre INFO_FORMAT vide.","wms" ) );
     } else {
-        if ( Request::containForbiddenChars(info_format)) {
+        if ( containForbiddenChars(info_format)) {
             BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMS info_format: " << info_format ;
             return new SERDataStream ( new ServiceException ( "",WMS_INVALID_FORMAT,"Info_Format non gere par le service.","wms" ) );
         }

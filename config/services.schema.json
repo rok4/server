@@ -1,0 +1,183 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "title": "ROK4 Services configuration",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string"
+        },
+        "abstract": {
+            "type": "string"
+        },
+        "provider": {
+            "type": "string"
+        },
+        "site": {
+            "type": "string"
+        },
+        "keywords": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "fee": {
+            "type": "string"
+        },
+        "access_constraint": {
+            "type": "string"
+        },
+        "contact": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "voice": {
+                    "type": "string"
+                },
+                "facsimile": {
+                    "type": "string"
+                },
+                "address_type": {
+                    "type": "string"
+                },
+                "delivery_point": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "administrative_area": {
+                    "type": "string"
+                },
+                "post_code": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            }
+
+        },
+        "common": {
+            "type": "object",
+            "properties": {
+                "info_formats": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "styling": {
+                    "type": "boolean"
+                },
+                "reprojection": {
+                    "type": "boolean"
+                },
+                "inspire": {
+                    "type": "boolean"
+                },
+                "post_mode": {
+                    "type": "boolean"
+                },
+                "crs_restrictions": {
+                    "type": "string"
+                },
+                "crs_equivalency": {
+                    "type": "string"
+                }
+            }
+
+        },
+        "wms": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "endpoint_uri": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "max_width": {
+                    "type": "integer"
+                },
+                "max_height": {
+                    "type": "integer"
+                },
+                "layer_limit": {
+                    "type": "integer"
+                },
+                "max_tile_x": {
+                    "type": "integer"
+                },
+                "max_tile_y": {
+                    "type": "integer"
+                },
+                "formats": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "crs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "metadata": { "$ref": "#/$defs/metadata" }
+            }
+
+        },
+        "wmts": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "endpoint_uri": {
+                    "type": "string"
+                },
+                "metadata": { "$ref": "#/$defs/metadata" }
+            }
+        },
+        "tms": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "endpoint_uri": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "$defs": {
+        "metadata": {
+            "type": "object",
+            "required": [ "url", "type", "format"],
+            "properties": {
+                "url": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "format": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -44,14 +44,14 @@ class ServerConf;
 #include <string>
 #include <map>
 #include "Rok4Server.h"
-#include "TileMatrixSet.h"
+#include "utils/TileMatrixSet.h"
 
 #include "utils/Configuration.h"
 #include "Layer.h"
 #include "style/Style.h"
 
 #include "config.h"
-#include "ContextBook.h"
+#include "storage/ContextBook.h"
 
 class ServerConf : public Configuration
 {

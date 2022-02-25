@@ -173,25 +173,6 @@ public:
         if ( str ) for ( int i = 0; str[i]; i++ ) str[i] = tolower ( str[i] );
     }
 
-
-    /**
-     * \~french
-     * \brief Recherche des caractères interdits pour éviter l'injection
-     * \param[in] str la chaîne
-     * \~english
-     * \brief Search forbidden chars to avoid code injection
-     * \param[in] str the string
-     */
-    static bool containForbiddenChars ( std::string str ) {
-        const char* forbidden = "<>";
-        
-        for ( int i = 0; forbidden[i]; i++ )
-            if (str.find(forbidden[i]) != std::string::npos)
-                return true;
-
-        return false;
-    }
-
     /**
      * \~french
      * \brief Test de la présence d'un paramètre dans la requête

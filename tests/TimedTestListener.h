@@ -1,5 +1,5 @@
 /*
- * Copyright © (2011-2013) Institut national de l'information
+ * Copyright © (2011) Institut national de l'information
  *                    géographique et forestière
  *
  * Géoportail SAV <contact.geoservices@ign.fr>
@@ -35,42 +35,37 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-/**
- * \file UtilsGlobal.cpp
- * \~french
- * \brief Implémentation des fonctions de générations des GetCapabilities
- * \~english
- * \brief Implement the GetCapabilities generation function
- */
+#ifndef TIMEDTESTRESULTCOLLECTOR_H
+#define TIMEDTESTRESULTCOLLECTOR_H
 
-#include "Rok4Server.h"
-#include <iostream>
-#include <algorithm>
-#include <iomanip>
-#include <vector>
+#include <cppunit/TestListener.h>
+#include <cppunit/Test.h>
+#include <sys/time.h>
+#include <string>
 #include <map>
-#include <set>
-#include <functional>
-#include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
-#include "config.h"
 
-DataStream* Rok4Server::GlobalGetServices ( Request* request ) {
+class TimedTestListener : public CppUnit::TestListener
 
-    std::ostringstream res;
-    res << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-    res << "<Services>\n";
-    if (servicesConf->supportTMS) {
-        res << "  <TileMapService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->tmsPublicUrl << "/1.0.0/\" />\n";
-    }
-    if (servicesConf->supportWMS) {
-        res << "  <WebMapService title=\"" << servicesConf->title << "\" version=\"1.3.0\" href=\"" << servicesConf->wmsPublicUrl << "?SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    if (servicesConf->supportWMTS) {
-        res << "  <WebMapTileService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->wmtsPublicUrl << "?SERVICE=WMTS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    res << "</Services>\n";
+{
+public:
+    TimedTestListener();
 
-    return new MessageDataStream ( res.str(),"application/xml" );
-}
+    //TestListener implementation
+    virtual void startTest ( CppUnit::Test *test );
+    virtual void endTest ( CppUnit::Test *test );
+    virtual void startTestRun ( CppUnit::Test *test, CppUnit::TestResult *eventManager );
+    virtual void endTestRun ( CppUnit::Test *test, CppUnit::TestResult *eventManager );
+
+    //Time function
+    virtual double getTotalTime();
+    virtual double getTime ( std::string testName );
+
+protected:
+    inline void setStartTime ( CppUnit::Test *test );
+    inline void setEndTime ( CppUnit::Test *test );
+    std::map<std::string,timeval> testStartTime;
+    std::map<std::string,timeval> testEndTime;
+    timeval testrunstart;
+    timeval testrunend;
+};
+#endif //TIMEDTESTRESULTCOLLECTOR_H

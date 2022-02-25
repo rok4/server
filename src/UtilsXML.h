@@ -45,6 +45,7 @@ class Attribute;
 #include <tinyxml.h>
 
 #include "utils/Keyword.h"
+#include "utils/TileMatrixLimits.h"
 
 class UtilsXML
 {
@@ -93,6 +94,24 @@ class UtilsXML
             }
             
             return el;
+        }
+
+
+        /**
+         * \~french \brief Export XML du mot clé pour le GetCapabilities
+         * \param[in] elName Nom de l'élément XML
+         * \~english \brief Keyword XML export for GetCapabilities
+         * \param[in] elName XML element name
+         */
+        static TiXmlElement* getXml(TileMatrixLimits tml) {
+            TiXmlElement* tmLimitsEl = new TiXmlElement ( "TileMatrixLimits" );
+            tmLimitsEl->LinkEndChild ( buildTextNode ( "TileMatrix", tml.tileMatrixId ) );
+            tmLimitsEl->LinkEndChild ( buildTextNode ( "MinTileRow", std::to_string(tml.minTileRow) ) );
+            tmLimitsEl->LinkEndChild ( buildTextNode ( "MaxTileRow", std::to_string(tml.maxTileRow) ) );
+            tmLimitsEl->LinkEndChild ( buildTextNode ( "MinTileCol", std::to_string(tml.minTileCol) ) );
+            tmLimitsEl->LinkEndChild ( buildTextNode ( "MaxTileCol", std::to_string(tml.maxTileCol) ) );
+            
+            return tmLimitsEl;
         }
 
 };

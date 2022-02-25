@@ -47,8 +47,6 @@
 #include <boost/log/trivial.hpp>
 #include <iostream>
 
-
-
 inline std::string tagName ( std::string t ) {
     return ( t=="wms"?"ServiceExceptionReport":"ExceptionReport" ) ;
 }

@@ -52,8 +52,8 @@
 #include <set>
 #include <functional>
 #include <cmath>
-#include "TileMatrixSet.h"
-#include "Pyramid.h"
+#include "utils/TileMatrixSet.h"
+#include "utils/Pyramid.h"
 #include "config.h"
 
 

@@ -46,7 +46,7 @@
 #include "Request.h"
 #include "Message.h"
 #include "utils/CRS.h"
-#include "Pyramid.h"
+#include "utils/Pyramid.h"
 #include <cstdlib>
 #include <climits>
 #include <vector>

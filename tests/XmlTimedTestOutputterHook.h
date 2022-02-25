@@ -1,5 +1,5 @@
 /*
- * Copyright © (2011-2013) Institut national de l'information
+ * Copyright © (2011) Institut national de l'information
  *                    géographique et forestière
  *
  * Géoportail SAV <contact.geoservices@ign.fr>
@@ -35,42 +35,26 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-/**
- * \file UtilsGlobal.cpp
- * \~french
- * \brief Implémentation des fonctions de générations des GetCapabilities
- * \~english
- * \brief Implement the GetCapabilities generation function
- */
+#ifndef XMLTIMEDTESTOUTPUTTERHOOK_H
+#define XMLTIMEDTESTOUTPUTTERHOOK_H
 
-#include "Rok4Server.h"
-#include <iostream>
-#include <algorithm>
-#include <iomanip>
-#include <vector>
-#include <map>
-#include <set>
-#include <functional>
-#include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
-#include "config.h"
 
-DataStream* Rok4Server::GlobalGetServices ( Request* request ) {
+#include <cppunit/XmlOutputterHook.h>
+#include <cppunit/tools/XmlElement.h>
+#include <cppunit/tools/StringTools.h>
+#include "TimedTestListener.h"
 
-    std::ostringstream res;
-    res << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-    res << "<Services>\n";
-    if (servicesConf->supportTMS) {
-        res << "  <TileMapService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->tmsPublicUrl << "/1.0.0/\" />\n";
-    }
-    if (servicesConf->supportWMS) {
-        res << "  <WebMapService title=\"" << servicesConf->title << "\" version=\"1.3.0\" href=\"" << servicesConf->wmsPublicUrl << "?SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    if (servicesConf->supportWMTS) {
-        res << "  <WebMapTileService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->wmtsPublicUrl << "?SERVICE=WMTS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    res << "</Services>\n";
+class XmlTimedTestOutputterHook : public CppUnit::XmlOutputterHook {
+public:
+    XmlTimedTestOutputterHook ( TimedTestListener *_ttlisten );
 
-    return new MessageDataStream ( res.str(),"application/xml" );
-}
+    virtual void failTestAdded ( CppUnit::XmlDocument *document, CppUnit::XmlElement *testElement, CppUnit::Test *test, CppUnit::TestFailure *failure );
+    virtual void successfulTestAdded ( CppUnit::XmlDocument *document, CppUnit::XmlElement *testElement, CppUnit::Test *test );
+    virtual void statisticsAdded ( CppUnit::XmlDocument *document, CppUnit::XmlElement *statisticsElement );
+
+protected:
+    TimedTestListener * ttlisten;
+
+};
+
+#endif //XMLTIMEDTESTOUTPUTTERHOOK_H

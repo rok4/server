@@ -82,7 +82,7 @@
 #include "image/StyledImage.h"
 #include "utils/Cache.h"
 #include "datastream/TiffEncoder.h"
-#include "TileMatrixSet.h"
+#include "utils/TileMatrixSet.h"
 #include "WebService.h"
 #include "config.h"
 #include "curl/curl.h"
@@ -500,11 +500,16 @@ DataSource* Rok4Server::getTile(Request* request) {
         // TMS d'interrogation natif
         Level* level = L->getDataPyramid()->getLevel(tm->getId());
 
+        DataSource* d = level->getTile(tileCol, tileRow);
+        if (d == NULL) {
+            return new SERDataSource ( new ServiceException ( "", HTTP_NOT_FOUND,"No data found", "wmts" ) );
+        }
+
         // Avoid using unnecessary palette
         if (format == "image/png") {
-            return new PaletteDataSource(level->getTile(tileCol, tileRow), style->getPalette());
+            return new PaletteDataSource(d, style->getPalette());
         } else {
-            return level->getTile(tileCol, tileRow);
+            return d;
         }
     } else {
         // TMS d'interrogation à la demande

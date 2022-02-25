@@ -54,7 +54,7 @@
 #include "ServerConf.h"
 #include "ServicesConf.h"
 
-#include "TileMatrixSet.h"
+#include "utils/TileMatrixSet.h"
 
 #include "style/Style.h"
 #include "Layer.h"
