@@ -295,16 +295,16 @@ Image* Rok4Server::mergeImages(std::vector<Image*> images, Rok4Format::eformat_d
     if (style && !style->getPalette()->getColoursMap()->empty()) {
         switch (pyrType) {
             case Rok4Format::TIFF_RAW_FLOAT32:
-                pyrType = Rok4Format::TIFF_RAW_INT8;
+                pyrType = Rok4Format::TIFF_RAW_UINT8;
                 break;
             case Rok4Format::TIFF_ZIP_FLOAT32:
-                pyrType = Rok4Format::TIFF_ZIP_INT8;
+                pyrType = Rok4Format::TIFF_ZIP_UINT8;
                 break;
             case Rok4Format::TIFF_LZW_FLOAT32:
-                pyrType = Rok4Format::TIFF_LZW_INT8;
+                pyrType = Rok4Format::TIFF_LZW_UINT8;
                 break;
             case Rok4Format::TIFF_PKB_FLOAT32:
-                pyrType = Rok4Format::TIFF_PKB_INT8;
+                pyrType = Rok4Format::TIFF_PKB_UINT8;
                 break;
             default:
                 break;
@@ -346,10 +346,10 @@ Image* Rok4Server::mergeImages(std::vector<Image*> images, Rok4Format::eformat_d
                 }
                 memccpy(transparentColor, bg, spp, sizeof(int));
                 break;
-            case Rok4Format::TIFF_RAW_INT8:
-            case Rok4Format::TIFF_ZIP_INT8:
-            case Rok4Format::TIFF_LZW_INT8:
-            case Rok4Format::TIFF_PKB_INT8:
+            case Rok4Format::TIFF_RAW_UINT8:
+            case Rok4Format::TIFF_ZIP_UINT8:
+            case Rok4Format::TIFF_LZW_UINT8:
+            case Rok4Format::TIFF_PKB_UINT8:
             default:
                 switch (spp) {
                     case 1:
@@ -422,38 +422,38 @@ DataStream* Rok4Server::formatImage(Image* image, std::string format, Rok4Format
                     return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_PKB_FLOAT32, isGeoTiff);
                 }
                 return TiffEncoder::getTiffEncoder(image, pyrType, isGeoTiff);
-            case Rok4Format::TIFF_RAW_INT8:
-            case Rok4Format::TIFF_ZIP_INT8:
-            case Rok4Format::TIFF_LZW_INT8:
-            case Rok4Format::TIFF_PKB_INT8:
+            case Rok4Format::TIFF_RAW_UINT8:
+            case Rok4Format::TIFF_ZIP_UINT8:
+            case Rok4Format::TIFF_LZW_UINT8:
+            case Rok4Format::TIFF_PKB_UINT8:
                 if (getParam(format_option, "compression").compare("lzw") == 0) {
-                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_LZW_INT8, isGeoTiff);
+                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_LZW_UINT8, isGeoTiff);
                 }
                 if (getParam(format_option, "compression").compare("deflate") == 0) {
-                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_ZIP_INT8, isGeoTiff);
+                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_ZIP_UINT8, isGeoTiff);
                 }
                 if (getParam(format_option, "compression").compare("raw") == 0) {
-                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_RAW_INT8, isGeoTiff);
+                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_RAW_UINT8, isGeoTiff);
                 }
                 if (getParam(format_option, "compression").compare("packbits") == 0) {
-                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_PKB_INT8, isGeoTiff);
+                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_PKB_UINT8, isGeoTiff);
                 }
                 return TiffEncoder::getTiffEncoder(image, pyrType, isGeoTiff);
             default:
                 if (getParam(format_option, "compression").compare("lzw") == 0) {
-                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_LZW_INT8, isGeoTiff);
+                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_LZW_UINT8, isGeoTiff);
                 }
                 if (getParam(format_option, "compression").compare("deflate") == 0) {
-                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_ZIP_INT8, isGeoTiff);
+                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_ZIP_UINT8, isGeoTiff);
                 }
                 if (getParam(format_option, "compression").compare("packbits") == 0) {
-                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_PKB_INT8, isGeoTiff);
+                    return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_PKB_UINT8, isGeoTiff);
                 }
-                return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_RAW_INT8, isGeoTiff);
+                return TiffEncoder::getTiffEncoder(image, Rok4Format::TIFF_RAW_UINT8, isGeoTiff);
         }
     } else if (format == "image/jpeg") {
         int quality = 75;
-        if (pyrType == Rok4Format::TIFF_JPG90_INT8 || getParam(format_option, "quality").compare("90") == 0) {
+        if (pyrType == Rok4Format::TIFF_JPG90_UINT8 || getParam(format_option, "quality").compare("90") == 0) {
             quality = 90;
         }
 
@@ -633,12 +633,12 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
         Rok4Format::eformat_data pyrType = layer->getDataPyramid()->getFormat();
         int n = image->getChannels();
         switch (pyrType) {
-            case Rok4Format::TIFF_RAW_INT8:
-            case Rok4Format::TIFF_JPG_INT8:
-            case Rok4Format::TIFF_PNG_INT8:
-            case Rok4Format::TIFF_LZW_INT8:
-            case Rok4Format::TIFF_ZIP_INT8:
-            case Rok4Format::TIFF_PKB_INT8: {
+            case Rok4Format::TIFF_RAW_UINT8:
+            case Rok4Format::TIFF_JPG_UINT8:
+            case Rok4Format::TIFF_PNG_UINT8:
+            case Rok4Format::TIFF_LZW_UINT8:
+            case Rok4Format::TIFF_ZIP_UINT8:
+            case Rok4Format::TIFF_PKB_UINT8: {
                 uint8_t* intbuffer = new uint8_t[n * sizeof(uint8_t)];
                 image->getline(intbuffer, 0);
                 for (int i = 0; i < n; i++) {
