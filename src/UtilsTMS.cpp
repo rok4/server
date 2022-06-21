@@ -271,8 +271,8 @@ DataStream* Rok4Server::TMSGetLayerMetadata ( Request* request ) {
             if ( it == mins.end() ) {
                 tablesNames.push_back(t);
                 tablesInfos.insert ( std::pair<std::string, Table*> ( t, &(levelTables->at(i)) ) );
-                maxs.insert ( std::pair<std::string, std::string> ( t, level->getId(); ) );
-                mins.insert ( std::pair<std::string, std::string> ( t, level->getId(); ) );
+                maxs.insert ( std::pair<std::string, std::string> ( t, level->getId() ) );
+                mins.insert ( std::pair<std::string, std::string> ( t, level->getId() ) );
             } else {
                 it->second = minzoom;
             }

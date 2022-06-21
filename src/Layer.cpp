@@ -155,28 +155,29 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
 
                 Context* context;
                 if (pyr["bucket_name"].is_string()) {
-                    context = serverConf->getContextBook()->addContext(ContextType::S3CONTEXT, pyr["bucket_name"].string_value());
+
+                    context = StoragePool::addContext(ContextType::S3CONTEXT, pyr["bucket_name"].string_value());
                     if (context == NULL) {
                         errorMessage = "Cannot add s3 storage context to load pyramid's descriptor";
                         return false;
                     }
                 }
                 else if (pyr["pool_name"].is_string()) {
-                    context = serverConf->getContextBook()->addContext(ContextType::CEPHCONTEXT, pyr["pool_name"].string_value());
+                    context = StoragePool::addContext(ContextType::CEPHCONTEXT, pyr["pool_name"].string_value());
                     if (context == NULL) {
                         errorMessage = "Cannot add ceph storage context to load pyramid's descriptor";
                         return false;
                     }
                 }
                 else if (pyr["container_name"].is_string()) {
-                    context = serverConf->getContextBook()->addContext(ContextType::SWIFTCONTEXT, pyr["container_name"].string_value());
+                    context = StoragePool::addContext(ContextType::SWIFTCONTEXT, pyr["container_name"].string_value());
                     if (context == NULL) {
                         errorMessage = "Cannot add swift storage context to load pyramid's descriptor";
                         return false;
                     }
                 }
                 else {
-                    context = serverConf->getContextBook()->addContext(ContextType::FILECONTEXT, "");
+                    context = StoragePool::addContext(ContextType::FILECONTEXT, "");
                     if (context == NULL) {
                         errorMessage = "Cannot add file storage context to load pyramid's descriptor";
                         return false;

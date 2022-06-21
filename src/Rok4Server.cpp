@@ -830,8 +830,6 @@ std::map<std::string, Layer*>& Rok4Server::getLayerList() { return serverConf->l
 std::map<std::string, TileMatrixSet*>& Rok4Server::getTmsList() { return serverConf->tmsList; }
 std::map<std::string, Style*>& Rok4Server::getStylesList() { return serverConf->stylesList; }
 
-ContextBook* Rok4Server::getObjectBook() { return serverConf->getContextBook(); }
-
 int Rok4Server::getFCGISocket() { return sock; }
 void Rok4Server::setFCGISocket(int sockFCGI) { sock = sockFCGI; }
 bool Rok4Server::isRunning() { return running; }

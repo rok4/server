@@ -222,7 +222,7 @@ Layer * ConfLoader::buildLayer ( std::string fileName, ServerConf* serverConf, S
 
 Pyramid* ConfLoader::buildPyramid ( Context* context, std::string fileName, ServerConf* serverConf ) {
     
-    Pyramid* pyramid = new Pyramid( context, fileName, serverConf->getContextBook(), serverConf->getTmsList() );
+    Pyramid* pyramid = new Pyramid( context, fileName, serverConf->getTmsList() );
     if ( ! pyramid->isOk() ) {
         BOOST_LOG_TRIVIAL(error) << pyramid->getErrorMessage();
         delete pyramid;

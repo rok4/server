@@ -215,9 +215,6 @@ bool ServerConf::parse(json11::Json& doc) {
         }
     }
 
-    // on créé systématiquement le contextbook()
-    objectBook = new ContextBook();
-
     return true;
 }
 
@@ -264,10 +261,6 @@ ServerConf::~ServerConf(){
     std::map<std::string, Layer*>::iterator itLay;
     for ( itLay=layersList.begin(); itLay!=layersList.end(); itLay++ )
         delete itLay->second;
-
-    if (objectBook != NULL) {
-        delete objectBook;
-    }
 
 }
 
@@ -348,8 +341,6 @@ void ServerConf::removeLayer(std::string id) {
         layersList.erase(itLay);
     }
 }
-
-ContextBook* ServerConf::getContextBook(){return objectBook;}
 
 int ServerConf::getNbThreads() {return nbThread;}
 std::string ServerConf::getSocket() {return socket;}

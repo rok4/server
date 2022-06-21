@@ -64,7 +64,6 @@ class Rok4Server;
 #include "ServicesConf.h"
 #include "GetFeatureInfoEncoder.h"
 #include "utils/BoundingBox.h"
-#include "storage/ContextBook.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -605,11 +604,6 @@ public:
      * \~english Return the styles list
      */
     std::map<std::string, Style*>& getStylesList() ;
-
-    /**
-     * \~french Retourne l'annuaire de contextes 
-     */
-    ContextBook* getObjectBook() ;
 
     /**
      * \~french

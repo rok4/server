@@ -51,7 +51,6 @@ class ServerConf;
 #include "style/Style.h"
 
 #include "config.h"
-#include "storage/ContextBook.h"
 
 class ServerConf : public Configuration
 {
@@ -88,7 +87,6 @@ class ServerConf : public Configuration
         int getNbLayers() ;
         Layer* getLayer(std::string id) ;
 
-        ContextBook* getContextBook();
         
         int getNbThreads() ;
         std::string getSocket() ;
@@ -159,12 +157,6 @@ class ServerConf : public Configuration
          * \~english \brief Socket listen queue depth
          */
         int backlog;
-
-        /**
-         * \~french \brief Annuaire des contextes de stockage
-         * \~english \brief Storage context's book
-         */
-        ContextBook* objectBook;
 
 
         /**

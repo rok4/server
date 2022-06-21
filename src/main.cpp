@@ -366,6 +366,7 @@ int main ( int argc, char** argv ) {
 
     CurlPool::cleanCurlPool();
     ProjPool::cleanProjPool();
+    StoragePool::cleanStoragePool();
     IndexCache::cleanCache();
 
     //CRYPTO clean - one time for the whole program
