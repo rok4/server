@@ -80,6 +80,7 @@ endif(NOT TARGET proj)
 # Extern libraries, static
 
 if(NOT TARGET thread)
+
     find_package(Threads REQUIRED)
     if(NOT CMAKE_USE_PTHREADS_INIT)
         message(FATAL_ERROR "Need the PThread library")
@@ -89,8 +90,7 @@ if(NOT TARGET thread)
 endif(NOT TARGET thread)
 
 if(UNITTEST_ENABLED)
-  
-  # Extern libraries, shared
+    # Extern libraries, shared
 
     if(NOT TARGET cppunit)
         find_package(CppUnit)

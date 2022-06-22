@@ -11,13 +11,14 @@ Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (
 
 Les pyramides de données utilisées sont produites via les outils de [prégénération](https://github.com/rok4/pregeneration) et de [génération](https://github.com/rok4/generation).
 
-- [Récupération du projet](#récupération-du-projet)
-- [Variables CMake](#variables-cmake)
-- [Dépendances à la compilation](#dépendances-à-la-compilation)
-- [Compilation et installation](#compilation-et-installation)
-- [Dépendances à l'exécution](#dépendances-à-lexécution)
+- [Installation via le paquet debian](#installation-via-le-paquet-debian)
+- [Installation depuis les sources](#installation-depuis-les-sources)
+  - [Récupération du projet](#récupération-du-projet)
+  - [Variables CMake](#variables-cmake)
+  - [Dépendances à la compilation](#dépendances-à-la-compilation)
+  - [Compilation et installation](#compilation-et-installation)
 - [Variables d'environnement utilisées dans les librairies de core-cpp](#variables-denvironnement-utilisées-dans-les-librairies-de-core-cpp)
-- [Déploiement du serveur](#déploiement-du-serveur)
+- [Utilisation du serveur](#utilisation-du-serveur)
   - [Configurer le serveur](#configurer-le-serveur)
   - [Lancer le serveur](#lancer-le-serveur)
     - [En ligne de commande](#en-ligne-de-commande)
@@ -30,11 +31,26 @@ Les pyramides de données utilisées sont produites via les outils de [prégén�
   - [Gestion des configurations](#gestion-des-configurations)
   - [Personnalisation des points d'accès aux services](#personnalisation-des-points-daccès-aux-services)
 
-## Récupération du projet
+## Installation via le paquet debian
+
+Télécharger les paquets sur GitHub :
+* (le serveur)[https://github.com/rok4/server/releases/]
+* (les styles)[https://github.com/rok4/styles/releases/]
+* (les TMS)[https://github.com/rok4/tilematrixsets/releases/]
+
+```
+apt install ./rok4-styles_<version>_all.deb
+apt install ./rok4-tilematrixsets_<version>_all.deb
+apt install ./ROK4SERVER-<version>-Linux-64bit.deb
+```
+
+## Installation depuis les sources
+
+### Récupération du projet
 
 `git clone --recursive https://github.com/rok4/server`
 
-## Variables CMake
+### Variables CMake
 
 * `CMAKE_INSTALL_PREFIX` : dossier d'installation du serveur. Valeur par défaut : `/usr/local`
 * `BUILD_VERSION` : version du serveur compilé. Valeur par défaut : `0.0.0`
@@ -42,7 +58,7 @@ Les pyramides de données utilisées sont produites via les outils de [prégén�
 * `DEBUG_BUILD` : active la compilation en mode debug. Valeur par défaut : `0`, `1` pour activer.
 * `UNITTEST_ENABLED` : active la compilation des tests unitaires. Valeur par défaut : `0`, `1` pour activer.
 
-## Dépendances à la compilation
+### Dépendances à la compilation
 
 * Submodule GIT
   * `https://github.com/rok4/core-cpp`
@@ -63,8 +79,10 @@ Les pyramides de données utilisées sont produites via les outils de [prégén�
   * libsqlite3-dev
   * Si `OBJECT_ENABLED` à `1`
     * librados-dev
+  * Si `UNITTEST_ENABLED` à `1`
+    * libcppunit-dev
 
-## Compilation et installation
+### Compilation et installation
 
 ```bash
 mkdir build && cd build
@@ -72,12 +90,6 @@ cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_VERSION=0.0.1 -DOBJECT_ENABLED=1 ..
 make
 make install
 ```
-
-## Dépendances à l'exécution
-
-* Dépôt GIT
-    * `https://github.com/rok4/tilematrixsets`
-    * `https://github.com/rok4/styles`
 
 ## Variables d'environnement utilisées dans les librairies de core-cpp
 
@@ -108,7 +120,7 @@ Leur définition est contrôlée à l'usage.
     - `HTTPS_PROXY`
     - `NO_PROXY`
 
-## Déploiement du serveur
+## Utilisation du serveur
 
 Le serveur ROK4 est lancé en mode stand alone. Nous utiliserons ici Nginx comme serveur front pour "traduire" les requêtes HTTP en FCGI et les rediriger vers le serveur ROK4.
 

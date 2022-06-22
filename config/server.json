@@ -14,9 +14,9 @@
         "validity": 60
     },
     "configurations": {
-        "services": "/usr/local/etc/rok4/config/services.json",
-        "layers": "/usr/local/etc/rok4/config/layers",
-        "styles": "/usr/local/etc/rok4/config/styles",
-        "tile_matrix_sets": "/usr/local/etc/rok4/config/tileMatrixSet"
+        "services": "/etc/rok4/services.json",
+        "layers": "/etc/rok4/layers",
+        "styles": "/etc/rok4/styles",
+        "tile_matrix_sets": "/etc/rok4/tilematrixsets"
     }
 }
