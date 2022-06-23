@@ -78,7 +78,11 @@ namespace RequestType {
         GETVERSION,
         ADDLAYER,
         UPDATELAYER,
-        DELETELAYER
+        DELETELAYER,
+        GETHEALTHSTATUS,
+        GETINFOSTATUS,
+        GETTHREADSTATUS,
+        GETDEPENDSTATUS
     };
 
 
@@ -107,7 +111,8 @@ namespace ServiceType {
         WMS,
         TMS,
         GLOBAL,
-        ADMIN
+        ADMIN,
+        HEALTHCHECK
     };
 
     /**

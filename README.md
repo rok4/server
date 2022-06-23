@@ -11,28 +11,35 @@ Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (
 
 Les pyramides de données utilisées sont produites via les outils de [prégénération](https://github.com/rok4/pregeneration) et de [génération](https://github.com/rok4/generation).
 
-- [Récupération du projet](#récupération-du-projet)
-- [Variables CMake](#variables-cmake)
-- [Dépendances à la compilation](#dépendances-à-la-compilation)
-- [Compilation et installation](#compilation-et-installation)
-- [Dépendances à l'exécution](#dépendances-à-lexécution)
-- [Variables d'environnement utilisées dans les librairies de core-cpp](#variables-denvironnement-utilisées-dans-les-librairies-de-core-cpp)
-- [Déploiement du serveur](#déploiement-du-serveur)
-  - [Configurer le serveur](#configurer-le-serveur)
-  - [Lancer le serveur](#lancer-le-serveur)
-    - [En ligne de commande](#en-ligne-de-commande)
-    - [En tant que service systemctl](#en-tant-que-service-systemctl)
-  - [Installer et configurer NGINX](#installer-et-configurer-nginx)
-- [Accès aux capacités du serveur](#accès-aux-capacités-du-serveur)
-- [Fonctionnement général du serveur](#fonctionnement-général-du-serveur)
-  - [Identification du service et du type de requête](#identification-du-service-et-du-type-de-requête)
-  - [Accès aux données](#accès-aux-données)
-  - [Gestion des configurations](#gestion-des-configurations)
-  - [Personnalisation des points d'accès aux services](#personnalisation-des-points-daccès-aux-services)
+- [Serveur de diffusion WMS, WMTS et TMS](#serveur-de-diffusion-wms-wmts-et-tms)
+  - [Récupération du projet](#récupération-du-projet)
+  - [Variables CMake](#variables-cmake)
+  - [Dépendances à la compilation](#dépendances-à-la-compilation)
+  - [Compilation et installation](#compilation-et-installation)
+  - [Dépendances à l'exécution](#dépendances-à-lexécution)
+  - [Variables d'environnement utilisées dans les librairies de core-cpp](#variables-denvironnement-utilisées-dans-les-librairies-de-core-cpp)
+  - [Déploiement du serveur](#déploiement-du-serveur)
+    - [Configurer le serveur](#configurer-le-serveur)
+    - [Lancer le serveur](#lancer-le-serveur)
+      - [En ligne de commande](#en-ligne-de-commande)
+      - [En tant que service systemctl](#en-tant-que-service-systemctl)
+    - [Installer et configurer NGINX](#installer-et-configurer-nginx)
+  - [Accès aux capacités du serveur](#accès-aux-capacités-du-serveur)
+  - [Fonctionnement général du serveur](#fonctionnement-général-du-serveur)
+    - [Identification du service et du type de requête](#identification-du-service-et-du-type-de-requête)
+    - [Accès aux données](#accès-aux-données)
+    - [Gestion des configurations](#gestion-des-configurations)
+    - [Personnalisation des points d'accès aux services](#personnalisation-des-points-daccès-aux-services)
 
 ## Récupération du projet
 
 `git clone --recursive https://github.com/rok4/server`
+ou
+
+```bash
+git clone https://github.com/rok4/server
+git submodule update --init --recursive
+```
 
 ## Variables CMake
 
