@@ -18,6 +18,7 @@ option(CMAKE_INSTALL_PREFIX "Installation location" "/usr/local")
 option(OBJECT_ENABLED "Build with object storage" 0)
 option(DEBUG_BUILD "Build with debug mode" 0)
 option(UNITTEST_ENABLED "Unit tests compilation" 0)
+option(DEB_PACKAGE "Debian package compilation" 0)
 
 ################### VERSION
 set(VERSION ${BUILD_VERSION})
@@ -88,7 +89,7 @@ endif(UNITTEST_ENABLED)
 
 ################### INSTALLATION
 
-install(TARGETS rok4 rok4core
+install(TARGETS rok4
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

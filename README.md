@@ -34,9 +34,9 @@ Les pyramides de données utilisées sont produites via les outils de [prégén�
 ## Installation via le paquet debian
 
 Télécharger les paquets sur GitHub :
-* (le serveur)[https://github.com/rok4/server/releases/]
-* (les styles)[https://github.com/rok4/styles/releases/]
-* (les TMS)[https://github.com/rok4/tilematrixsets/releases/]
+* [le serveur](https://github.com/rok4/server/releases/)
+* [les styles](https://github.com/rok4/styles/releases/)
+* [les TMS](https://github.com/rok4/tilematrixsets/releases/)
 
 ```
 apt install ./rok4-styles_<version>_all.deb
@@ -57,6 +57,7 @@ apt install ./ROK4SERVER-<version>-Linux-64bit.deb
 * `OBJECT_ENABLED` : active la compilation des classes de gestion des stockages objet. Valeur par défaut : `0`, `1` pour activer.
 * `DEBUG_BUILD` : active la compilation en mode debug. Valeur par défaut : `0`, `1` pour activer.
 * `UNITTEST_ENABLED` : active la compilation des tests unitaires. Valeur par défaut : `0`, `1` pour activer.
+* `DEB_PACKAGE` : active la compilation du paquet debian lors de l'appel à `make package`, plutôt qu'un tarball. Valeur par défaut : `0`, `1` pour activer.
 
 ### Dépendances à la compilation
 
@@ -157,7 +158,7 @@ rok4 -f /chemin/vers/fichier/server.json &
 
 #### En tant que service systemctl
 
-Selon l'emplacement d'installation, le fichier dans `service/rok4.service` peut déjà être à un endroit pris en compte par systemctl (comme `/usr/lib/systemd/system`). Celui ci est écrit pour un déploiement à la racine, modifiez les chemins pour qu'il soit adapté à votre déploiement. 
+Selon l'emplacement d'installation, le fichier dans `service/rok4.service` peut déjà être à un endroit pris en compte par systemctl (comme `/usr/lib/systemd/system`). Celui ci est écrit pour un déploiement à la racine, modifiez les chemins pour qu'il soit adapté à votre déploiement. Si l'installation a été faite via le paquet debian, le service est déjà correctement installé, et les configurations sont dans `/etc/rok4`.
 
 ```
 EnvironmentFile=/etc/rok4/config/env
