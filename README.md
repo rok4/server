@@ -49,6 +49,12 @@ apt install ./ROK4SERVER-<version>-Linux-64bit.deb
 ### Récupération du projet
 
 `git clone --recursive https://github.com/rok4/server`
+ou
+
+```bash
+git clone https://github.com/rok4/server
+git submodule update --init --recursive
+```
 
 ### Variables CMake
 

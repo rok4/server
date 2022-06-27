@@ -88,6 +88,7 @@
 #include "curl/curl.h"
 #include "fcgiapp.h"
 #include "utils/Cache.h"
+#include "healthcheck/Threads.h"
 
 void hangleSIGALARM(int id) {
     if (id == SIGALRM) {
@@ -119,6 +120,7 @@ void* Rok4Server::thread_loop(void* arg) {
         }
 
         BOOST_LOG_TRIVIAL(debug) << "Thread " << pthread_self() << " traite une requete";
+        Threads::status(ThreadStatus::RUNNING);
 
         Request* request = new Request(fcgxRequest);
         server->processRequest(request, fcgxRequest);
@@ -128,6 +130,7 @@ void* Rok4Server::thread_loop(void* arg) {
         FCGX_Free(&fcgxRequest, 1);
 
         BOOST_LOG_TRIVIAL(debug) << "Thread " << pthread_self() << " en a fini avec la requete";
+        Threads::status(ThreadStatus::AVAILABLE);
     }
 
     BOOST_LOG_TRIVIAL(debug) << "Extinction du thread";
@@ -180,6 +183,7 @@ void Rok4Server::run(sig_atomic_t signal_pending) {
 
     for (int i = 0; i < threads.size(); i++) {
         pthread_create(&(threads[i]), NULL, Rok4Server::thread_loop, (void*)this);
+	    Threads::add(threads[i]);
     }
 
     if (signal_pending != 0) {
@@ -790,6 +794,103 @@ void Rok4Server::processAdmin(Request* request, FCGX_Request& fcgxRequest) {
     }
 }
 
+void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
+{
+    std::ostringstream res;
+    if (request->request == RequestType::GETHEALTHSTATUS) {
+        res << "{\n";
+        res << "  \"status\": \"OK\",\n";
+        res << "  \"version\": \"" << VERSION << "\",\n";
+        res << "  \"pid\": " << this->getPID() << ",\n";
+        res << "  \"time\": " << this->getTime() << "\n";
+        res << "}\n";
+        
+        S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
+    }
+    else if (request->request == RequestType::GETINFOSTATUS)
+    {
+        res << "{\n";
+
+        // Informations :
+        //      layers : []
+        //      tms : []
+        //      styles : []
+
+        // layers
+        auto layers = this->getLayerList();
+        std::map<std::string, Layer *>::iterator itl = layers.begin();
+        res << "    \"layers\": [\n";
+        while(itl != layers.end()) {
+            res << "      \"" << itl->first << "\"";
+            if (++itl != layers.end()) {
+                res << ",";
+            }
+            res << "\n";
+        }
+        res << "    ],\n";
+
+        // tms
+        auto tms = this->getTmsList();
+        std::map<std::string, TileMatrixSet *>::iterator itt = tms.begin();
+        res << "    \"tms\": [\n";
+        while(itt != tms.end()) {
+            res << "      \"" << itt->first << "\"";
+            if (++itt != tms.end()) {
+                res << ",";
+            }
+            res << "\n";
+        }
+        res << "    ],\n";
+
+        // styles
+        auto styles = this->getStylesList();
+        std::map<std::string, Style *>::iterator its = styles.begin();
+        res << "    \"styles\": [\n";
+        while(its != styles.end()) {
+            res << "      \"" << its->first << "\"";
+            if (++its != styles.end()) {
+                res << ",";
+            }
+            res << "\n";
+        }
+        res << "    ]\n";
+
+        res << "}\n";
+        S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
+    }
+    else if (request->request == RequestType::GETTHREADSTATUS)
+    {
+        res << "{\n";
+        res << "  \"number\": " << this->threads.size() << ",\n";
+        res << "  \"threads\": [\n";
+        res << Threads::print();
+        res << "  ]\n";
+        res << "}\n";
+        S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
+    }
+    else if (request->request == RequestType::GETDEPENDSTATUS)
+    {
+        res << "{\n";
+        res << "    \"storage\": {\n";
+
+        int file_count, s3_count, ceph_count, swift_count;
+        StoragePool::getStorageCounts(file_count, s3_count, ceph_count, swift_count);
+        
+        res << "      \"file\": " << file_count << ",\n";
+        res << "      \"s3\": " << s3_count << ",\n";
+        res << "      \"swift\": " << swift_count << ",\n";
+        res << "      \"ceph\": " << ceph_count << "\n";
+
+        res << "    }\n";
+        res << "}\n";
+        S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
+    }
+    else
+    {
+        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "healthcheck")), &fcgxRequest);
+    }
+}
+
 void Rok4Server::processWMS(Request* request, FCGX_Request& fcgxRequest) {
     if (request->request == RequestType::GETCAPABILITIES) {
         S.sendresponse(WMSGetCapabilities(request), &fcgxRequest);
@@ -817,6 +918,8 @@ void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
         processTMS(request, fcgxRequest);
     } else if (serverConf->supportAdmin && request->service == ServiceType::ADMIN) {
         processAdmin(request, fcgxRequest);
+    } else if (request->service == ServiceType::HEALTHCHECK) {
+        processHealthCheck(request, fcgxRequest);
     } else {
         S.sendresponse(new SERDataSource(new ServiceException("", OWS_INVALID_PARAMETER_VALUE, "Le service est inconnu pour ce serveur.", "global")), &fcgxRequest);
     }
@@ -832,4 +935,8 @@ std::map<std::string, Style*>& Rok4Server::getStylesList() { return serverConf->
 
 int Rok4Server::getFCGISocket() { return sock; }
 void Rok4Server::setFCGISocket(int sockFCGI) { sock = sockFCGI; }
+int Rok4Server::getPID() { return pid; }
+void Rok4Server::setPID(int processID) { pid = processID; }
+long Rok4Server::getTime() { return time; }
+void Rok4Server::setTime(long processTime) { time = processTime; }
 bool Rok4Server::isRunning() { return running; }

@@ -9,6 +9,8 @@ servers:
 tags:
 - name: Global
   description: Informations globales du serveur 
+- name: Santé du serveur
+  description: Informations de santé sur les serveur 
 - name: Web Map Tile Service
   description: Diffusion de tuiles raster et vecteur selon le standard OGC WMTS
 - name: Web Map Service
@@ -36,6 +38,60 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/global_services'
+
+  ######################################### SANTÉ DU SERVEUR
+  
+  /healthcheck:
+    get:
+      tags:
+      - Santé du serveur
+      summary: ...
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/healthcheck'
+                
+  /healthcheck/info:
+    get:
+      tags:
+      - Santé du serveur
+      summary: ...
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/healthcheck_info"
+                
+  /healthcheck/threads:
+    get:
+      tags:
+      - Santé du serveur
+      summary: ...
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/healthcheck_threads"
+  
+  /healthcheck/depends:
+    get:
+      tags:
+      - Santé du serveur
+      summary: ...
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/healthcheck_depends"
 
   ######################################### WMS
 
@@ -969,7 +1025,76 @@ components:
       type: object
       additionalProperties: false
 
+    healthcheck:
+      type: object
+      properties:
+        status:
+          type: string
+        version:
+          type: string
+        pid:
+          type: integer
+        time:
+          type: integer
 
+    healthcheck_info:
+      type: object
+      properties:
+        layers:
+          type: array
+          items:
+            type: string
+        tms:
+          type: array
+          items:
+            type: string
+        styles:
+          type: array
+          items:
+            type: string
+    
+    healthcheck_threads:
+      type: object
+      properties:
+        number:
+          type: number
+        threads:
+          type: array
+          items:
+            type: object
+            properties:
+              pid:
+                type: integer
+              time:
+                type: integer
+              duration: 
+                type: string
+              count:
+                type: number
+              status:
+                type: string
+                enum: ['RUNNING', 'PENDING', 'AVAILABLE']
+
+    healthcheck_depends:
+      type: object
+      properties:
+        storage:
+          type: object
+          properties:
+            file: 
+              type: integer
+            s3: 
+              type: integer
+            swift: 
+              type: integer
+            ceph: 
+              type: integer
+          required:
+            - file
+            - s3
+            - swift
+            - ceph
+    
     admin_error:
       type: object
       additionalProperties: false

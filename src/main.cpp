@@ -72,6 +72,7 @@
 #include <sys/time.h>
 #include <locale>
 #include <limits>
+#include <chrono>
 #include "config.h"
 #include "curl/curl.h"
 #include <time.h>
@@ -328,8 +329,9 @@ int main ( int argc, char** argv ) {
     // Demarrage du serveur
     while ( reload ) {
         reload = false;
-        std::cout<<  "Server start " << "["<< getpid() <<"]" <<std::endl;
-       
+        int pid = getpid();
+        std::cout<<  "Server start " << "["<< pid <<"]" <<std::endl;
+
         if ( firstStart ) {
             W = loadConfiguration ( serverConfigFile.c_str() );
             if ( !W ) {
@@ -338,14 +340,19 @@ int main ( int argc, char** argv ) {
             W->initFCGI();
             firstStart = false;
         } else {
-            std::cout<<  "Configuration update " << "["<< getpid() <<"]" <<std::endl;
+            std::cout<<  "Configuration update " << "["<< pid <<"]" <<std::endl;
             if ( Wtmp ) {
-                std::cout<<  "Servers switch " << "["<< getpid() <<"]" <<std::endl;
+                std::cout<<  "Servers switch " << "["<< pid <<"]" <<std::endl;
                 W = Wtmp;
                 Wtmp = 0;
             }
             W->setFCGISocket ( sock );
         }
+
+        auto start = std::chrono::system_clock::now();
+        std::time_t time = std::chrono::system_clock::to_time_t(start);
+        W->setPID(pid);
+        W->setTime(time);
 
         // Remove Event Lock
         defer_signal--;

@@ -103,6 +103,18 @@ private:
     int sock;
 
     /**
+     * \~french \brief Identifiant du process
+     * \~english \brief Process identifier
+     */
+    int pid;
+
+    /**
+     * \~french \brief TimeStamp du process
+     * \~english \brief Process timestamp
+     */
+    long time;
+
+    /**
      * \~french \brief Configurations globales des services
      * \~english \brief Global services configuration
      */
@@ -504,6 +516,11 @@ private:
      */
     void processAdmin ( Request *request, FCGX_Request&  fcgxRequest );
     /**
+     * \~french Traite les requêtes d'administration
+     * \~english Process administration request
+     */
+    void processHealthCheck ( Request *request, FCGX_Request&  fcgxRequest );
+    /**
      * \~french Traite les requêtes globales
      * \~english Process global request
      */
@@ -642,6 +659,38 @@ public:
      */
     void setFCGISocket ( int sockFCGI ) ;
     
+    /**
+     * \~french
+     * \brief Stocke le PId du process principal
+     * \~english
+     * \brief Set the main process PID
+     */
+    void setPID ( int processID );
+
+    /**
+     * \~french
+     * \brief Obtient le PID du process principal
+     * \~english
+     * \brief Get the main process PID
+     */
+    int getPID();
+
+    /**
+     * \~french
+     * \brief Stocke la date du process principal
+     * \~english
+     * \brief Set the main process time
+     */
+    void setTime ( long processTime );
+
+    /**
+     * \~french
+     * \brief Obtient la date du process principal
+     * \~english
+     * \brief Get the main process time
+     */
+    long getTime();
+
      /**
      * \~french
      * \brief Demande l'arrêt du serveur

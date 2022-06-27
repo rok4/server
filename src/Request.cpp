@@ -72,7 +72,11 @@ namespace RequestType {
         "GetVersion",
         "AddLayer",
         "UpdateLayer",
-        "DeleteLayer"
+        "DeleteLayer",
+        "GetStatus",
+        "GetInfos"
+        "GetThreads",
+        "GetDepends"
     };
 
     std::string toString ( eRequestType rt ) {
@@ -89,7 +93,8 @@ namespace ServiceType {
         "WMS",
         "TMS",
         "GLOBAL",
-        "ADMIN"
+        "ADMIN",
+        "HEALTHCHECK"
     };
 
     std::string toString ( eServiceType st ) {
@@ -773,6 +778,37 @@ void Request::determineServiceAndRequest() {
             //--> DELETE /admin/layers/{layername}
             request = RequestType::DELETELAYER;
 
+        } else {
+            // La profondeur de requête ne permet pas de savoir l'action demandée -> ERREUR
+            request = RequestType::REQUEST_UNKNOWN;
+        }
+    }
+    // ************************ HEALTHCHECK
+    else if (pathParts.at(0) == "healthcheck") {
+        // Uniquement du GET !
+        if (method != "GET") {
+            return;
+        }
+
+        // Service
+        service = ServiceType::HEALTHCHECK;
+        // Requête
+
+        if (pathParts.size() == 1) {
+            //--> GET /healthcheck/
+            request = RequestType::GETHEALTHSTATUS;
+        }
+        else if (pathParts.size() == 2 && pathParts.at(1) == "info") {
+            //--> GET /healthcheck/threads
+            request = RequestType::GETINFOSTATUS;
+        }
+        else if (pathParts.size() == 2 && pathParts.at(1) == "threads") {
+            //--> GET /healthcheck/threads
+            request = RequestType::GETTHREADSTATUS;
+        }
+        else if (pathParts.size() == 2 && pathParts.at(1) == "depends") {
+            //--> GET /healthcheck/depends
+            request = RequestType::GETDEPENDSTATUS;
         } else {
             // La profondeur de requête ne permet pas de savoir l'action demandée -> ERREUR
             request = RequestType::REQUEST_UNKNOWN;

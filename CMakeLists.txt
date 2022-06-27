@@ -64,9 +64,10 @@ message(STATUS "Building ROK4 Server")
 
 # Dossiers contenant les headers nécessaires
 include_directories(lib/core/src)
+include_directories(lib/core/src/healthcheck)
 include_directories(${PROJECT_BINARY_DIR} ${BOOSTLOG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${FCGI_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${PROJ_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
 
-file(GLOB ROK4SERVER_SRCS "${PROJECT_SOURCE_DIR}/src/*.cpp")
+file(GLOB ROK4SERVER_SRCS "${PROJECT_SOURCE_DIR}/src/*.cpp" "${PROJECT_SOURCE_DIR}/src/healthcheck/*.cpp")
 add_executable(rok4 ${ROK4SERVER_SRCS})
 
 # Lien des librairies dépendantes
@@ -153,4 +154,3 @@ endif()
 set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${BUILD_ARCHITECTURE}")
 
 include(CPack)
-
