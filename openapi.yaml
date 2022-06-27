@@ -9,6 +9,8 @@ servers:
 tags:
 - name: Global
   description: Informations globales du serveur 
+- name: Santé du serveur
+  description: Informations de santé sur les serveur 
 - name: Web Map Tile Service
   description: Diffusion de tuiles raster et vecteur selon le standard OGC WMTS
 - name: Web Map Service
@@ -37,12 +39,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/global_services'
 
-  ######################################### HEALTHCHECK
+  ######################################### SANTÉ DU SERVEUR
   
   /healthcheck:
     get:
       tags:
-      - Healthcheck
+      - Santé du serveur
       summary: ...
       responses:
         200:
@@ -55,7 +57,7 @@ paths:
   /healthcheck/info:
     get:
       tags:
-      - Healthcheck
+      - Santé du serveur
       summary: ...
       responses:
         200:
@@ -68,7 +70,7 @@ paths:
   /healthcheck/threads:
     get:
       tags:
-      - Healthcheck
+      - Santé du serveur
       summary: ...
       responses:
         200:
@@ -81,7 +83,7 @@ paths:
   /healthcheck/depends:
     get:
       tags:
-      - Healthcheck
+      - Santé du serveur
       summary: ...
       responses:
         200:
@@ -1071,14 +1073,27 @@ components:
                 type: number
               status:
                 type: string
-    
+                enum: ['RUNNING', 'PENDING', 'AVAILABLE']
+
     healthcheck_depends:
       type: object
       properties:
         storage:
-          type: array
-          items:
-            type: string
+          type: object
+          properties:
+            file: 
+              type: integer
+            s3: 
+              type: integer
+            swift: 
+              type: integer
+            ceph: 
+              type: integer
+          required:
+            - file
+            - s3
+            - swift
+            - ceph
     
     admin_error:
       type: object

@@ -183,7 +183,7 @@ void Rok4Server::run(sig_atomic_t signal_pending) {
 
     for (int i = 0; i < threads.size(); i++) {
         pthread_create(&(threads[i]), NULL, Rok4Server::thread_loop, (void*)this);
-	Threads::add(threads[i]);
+	    Threads::add(threads[i]);
     }
 
     if (signal_pending != 0) {
@@ -871,21 +871,17 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
     else if (request->request == RequestType::GETDEPENDSTATUS)
     {
         res << "{\n";
-        res << "    \"storage\": [\n";
+        res << "    \"storage\": {\n";
 
-        auto pool = StoragePool::getPool();
+        int file_count, s3_count, ceph_count, swift_count;
+        StoragePool::getStorageCounts(file_count, s3_count, ceph_count, swift_count);
         
-        std::map<std::pair<ContextType::eContextType,std::string>, Context*>::iterator it = pool.begin();
-        while (it != pool.end()) {
-            std::pair<ContextType::eContextType, std::string> key = it->first;
-            res << "      \"" << ContextType::toString(key.first) << "\"";
-            if (++it != pool.end()) {
-                res << ",";
-            }
-            res << "\n";
-        }
+        res << "      \"file\": " << file_count << ",\n";
+        res << "      \"s3\": " << s3_count << ",\n";
+        res << "      \"swift\": " << swift_count << ",\n";
+        res << "      \"ceph\": " << ceph_count << "\n";
 
-        res << "    ]\n";
+        res << "    }\n";
         res << "}\n";
         S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
     }

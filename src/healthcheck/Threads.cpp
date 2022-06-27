@@ -69,7 +69,7 @@ void Threads::status(long unsigned int i, ThreadStatus::eStatus value) {
         auto end = std::chrono::system_clock::now();
         std::time_t time = it->second.getTime();
         auto start = std::chrono::system_clock::from_time_t(time);
-        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::chrono::duration<double> elapsed_seconds = end - start;
         double duration = elapsed_seconds.count();
         it->second.setDuration(duration);
         BOOST_LOG_TRIVIAL(debug) << "duration update : " << it->second.getDuration();
