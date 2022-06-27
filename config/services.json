@@ -31,8 +31,8 @@
         ],
         "styling": true,
         "reprojection": true,
-        "crs_restrictions": "/usr/local/etc/rok4/config/restrictedCRSList.txt",
-        "crs_equivalency": "/usr/local/etc/rok4/config/listofequalscrs.txt",
+        "crs_restrictions": "/etc/rok4/restrictedCRSList.txt",
+        "crs_equivalency": "/etc/rok4/listofequalscrs.txt",
         "inspire": false,
         "post_mode": false
     },

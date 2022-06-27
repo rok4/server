@@ -18,6 +18,7 @@ option(CMAKE_INSTALL_PREFIX "Installation location" "/usr/local")
 option(OBJECT_ENABLED "Build with object storage" 0)
 option(DEBUG_BUILD "Build with debug mode" 0)
 option(UNITTEST_ENABLED "Unit tests compilation" 0)
+option(DEB_PACKAGE "Debian package compilation" 0)
 
 ################### VERSION
 set(VERSION ${BUILD_VERSION})
@@ -89,40 +90,67 @@ endif(UNITTEST_ENABLED)
 
 ################### INSTALLATION
 
-INSTALL(TARGETS rok4 rok4core
+install(TARGETS rok4
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
 
+################### PACKAGES
+
 if(DEB_PACKAGE)
 
+    message(STATUS "Building a debian package")
+
+    set(CPACK_DEBIAN_PACKAGE_NAME "rok4-server")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "IGN, Géoportail (<tout_rdev@ign.fr>)")
+    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "WMS/WMTS/TMS server")
+    set(CPACK_DEBIAN_PACKAGE_SECTION "science")
+    set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "rok4-styles, rok4-tilematrixsets, libfcgi-dev ,libtinyxml-dev ,zlib1g-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libturbojpeg0-dev ,libjpeg-dev ,libc6-dev ,librados-dev ,libjson11-1-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
+
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+    else()
+        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
+    endif()
+
+    set( CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${ROK4SERVER_SOURCE_DIR}/cmake/debian/postinst;" )
+
+    set(CPACK_BINARY_DEB "ON")
+    set(CPACK_GENERATOR "DEB")
+
     # Installe les fichiers de configurations
-    INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config/" DESTINATION /etc/rok4/config)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config/" DESTINATION /etc/rok4)
 
     # Installe le fichier de service
-    INSTALL(FILES "${CMAKE_CURRENT_SOURCE_DIR}/service/rok4.service" 
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/service/rok4.service" 
         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
         DESTINATION /usr/lib/systemd/system
     )
 
-else(DEB_PACKAGE)
+else()
+
+    message(STATUS "Building a tarball package")
 
     # Installe les fichiers de configurations
-    INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config/" DESTINATION etc/rok4/config)
+    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config/" DESTINATION etc/rok4)
   
     # Installe le fichier de service
-    INSTALL(FILES "${CMAKE_CURRENT_SOURCE_DIR}/service/rok4.service" 
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/service/rok4.service" 
         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-        DESTINATION usr/lib/systemd/system
+        DESTINATION lib/systemd/system
     )
 
-endif(DEB_PACKAGE)
+endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(BUILD_ARCHITECTURE "64bit")
 else()
     set(BUILD_ARCHITECTURE "32bit")
 endif()
+
 set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${BUILD_ARCHITECTURE}")
+
 include(CPack)

@@ -1,2 +1,5 @@
 #!/bin/bash
-echo "ROK4 installed"
+useradd rok4
+usermod -a -G syslog rok4
+systemctl daemon-reload
+echo "ROK4 server installed"
