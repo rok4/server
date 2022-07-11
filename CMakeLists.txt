@@ -8,9 +8,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(BUILD_SHARED_LIBS OFF)
 
-# Définit le nom du projet 
-project(ROK4SERVER)
-
 ################### PARAMÈTRES
 
 option(BUILD_VERSION "Build version" 0.0.0)
@@ -18,20 +15,17 @@ option(CMAKE_INSTALL_PREFIX "Installation location" "/usr/local")
 option(OBJECT_ENABLED "Build with object storage" 0)
 option(DEBUG_BUILD "Build with debug mode" 0)
 option(UNITTEST_ENABLED "Unit tests compilation" 0)
-option(DEB_PACKAGE "Debian package compilation" 0)
 
 ################### VERSION
 set(VERSION ${BUILD_VERSION})
 
 message("Version ${VERSION}")
 
-################### PACKAGE CONFIGURATION
-
-set(CPACK_PACKAGE_NAME "ROK4SERVER")
-set(CPACK_PACKAGE_VERSION ${VERSION})
-set(CPACK_PACKAGE_DESCRIPTION "WMS/WMTS/TMS server")
-set(CPACK_PACKAGE_VENDOR "IGN")
-set(CPACK_GENERATOR "TGZ")
+# Définit le projet 
+project(rok4-server
+        VERSION ${VERSION}
+        DESCRIPTION "WMS/WMTS/TMS server"
+        LANGUAGES CXX)
 
 ################### MODE DEBUG
 
@@ -96,61 +90,39 @@ install(TARGETS rok4
     ARCHIVE DESTINATION lib
 )
 
-################### PACKAGES
+# Installe les fichiers de configurations
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config/" DESTINATION etc/rok4)
 
-if(DEB_PACKAGE)
+# Installe le fichier de service
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/service/rok4.service" 
+    PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+    DESTINATION lib/systemd/system
+)
 
-    message(STATUS "Building a debian package")
-
-    set(CPACK_DEBIAN_PACKAGE_NAME "rok4-server")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "IGN, Géoportail (<tout_rdev@ign.fr>)")
-    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "WMS/WMTS/TMS server")
-    set(CPACK_DEBIAN_PACKAGE_SECTION "science")
-    set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "rok4-styles, rok4-tilematrixsets, libfcgi-dev ,libtinyxml-dev ,zlib1g-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libturbojpeg0-dev ,libjpeg-dev ,libc6-dev ,librados-dev ,libjson11-1-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
-
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-    else()
-        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
-    endif()
-
-    set( CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${ROK4SERVER_SOURCE_DIR}/cmake/debian/postinst;" )
-
-    set(CPACK_BINARY_DEB "ON")
-    set(CPACK_GENERATOR "DEB")
-
-    # Installe les fichiers de configurations
-    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config/" DESTINATION /etc/rok4)
-
-    # Installe le fichier de service
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/service/rok4.service" 
-        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-        DESTINATION /usr/lib/systemd/system
-    )
-
-else()
-
-    message(STATUS "Building a tarball package")
-
-    # Installe les fichiers de configurations
-    install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/config/" DESTINATION etc/rok4)
-  
-    # Installe le fichier de service
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/service/rok4.service" 
-        PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-        DESTINATION lib/systemd/system
-    )
-
-endif()
+################### PACKAGE CONFIGURATION
+message(STATUS "Configuring packages")
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(BUILD_ARCHITECTURE "64bit")
+    set(BUILD_ARCHITECTURE "amd64")
 else()
-    set(BUILD_ARCHITECTURE "32bit")
+    set(BUILD_ARCHITECTURE "i386")
 endif()
 
-set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${BUILD_ARCHITECTURE}")
+set(CPACK_GENERATOR "DEB;TGZ")
+set(CPACK_SYSTEM_NAME "linux")
+set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VERSION}-${CPACK_SYSTEM_NAME}-${BUILD_ARCHITECTURE}")
+set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+
+set(CPACK_PACKAGE_VERSION ${VERSION})
+set(CPACK_PACKAGE_VENDOR "IGN")
+set(CPACK_PACKAGE_CONTACT "IGN - Géoportail (<tout_rdev@ign.fr>)")
+
+# Debian
+set(CPACK_DEBIAN_PACKAGE_SECTION "science")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "rok4-styles, rok4-tilematrixsets, libfcgi-dev ,libtinyxml-dev ,zlib1g-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libturbojpeg0-dev ,libjpeg-dev ,libc6-dev ,librados-dev ,libjson11-1-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${ROK4GENERATION_SOURCE_DIR}/cmake/debian/postinst;" )
+set(CPACK_BINARY_DEB "ON")
 
 include(CPack)
+

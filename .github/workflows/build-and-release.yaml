@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
 
       - uses: actions/checkout@v2
@@ -18,13 +18,13 @@ jobs:
         run: |
           sudo apt update
           sudo apt -y install gettext libfcgi-dev libtinyxml-dev zlib1g-dev libcurl4-openssl-dev libproj-dev libssl-dev libturbojpeg0-dev \
-            libjpeg-dev libc6-dev librados-dev libjson11-1-dev libboost-log-dev libboost-filesystem-dev libboost-system-dev libopenjp2-7-dev \
+            libjpeg-dev libc6-dev librados-dev libboost-log-dev libboost-filesystem-dev libboost-system-dev libopenjp2-7-dev \
             libproj-dev libsqlite3-dev build-essential cmake
 
       - name: Build debian package
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DDEB_PACKAGE=1 -DBUILD_VERSION=${{ github.ref_name }} -DOBJECT_ENABLED=1 ..
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_VERSION=${{ github.ref_name }} -DOBJECT_ENABLED=1 ..
           make -j2
           make package
 
@@ -47,6 +47,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/ROK4SERVER-${{ github.ref_name }}-Linux-64bit.deb
-          asset_name: rok4-server_${{ github.ref_name }}_amd64.deb
+          asset_path: ./build/rok4-server-${{ github.ref_name }}-linux-amd64.deb
+          asset_name: rok4-server-${{ github.ref_name }}-ubuntu20.04-amd64.deb
+          asset_content_type: application/vnd.debian.binary-package
+
+      - name: Add TGZ package to release
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/rok4-server-${{ github.ref_name }}-linux-amd64.tar.gz
+          asset_name: rok4-server-${{ github.ref_name }}-ubuntu20.04-amd64.tar.gz
           asset_content_type: application/vnd.debian.binary-package

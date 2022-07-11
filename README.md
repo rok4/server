@@ -63,7 +63,6 @@ git submodule update --init --recursive
 * `OBJECT_ENABLED` : active la compilation des classes de gestion des stockages objet. Valeur par défaut : `0`, `1` pour activer.
 * `DEBUG_BUILD` : active la compilation en mode debug. Valeur par défaut : `0`, `1` pour activer.
 * `UNITTEST_ENABLED` : active la compilation des tests unitaires. Valeur par défaut : `0`, `1` pour activer.
-* `DEB_PACKAGE` : active la compilation du paquet debian lors de l'appel à `make package`, plutôt qu'un tarball. Valeur par défaut : `0`, `1` pour activer.
 
 ### Dépendances à la compilation
 
