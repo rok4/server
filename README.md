@@ -11,44 +11,28 @@ Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (
 
 Les pyramides de données utilisées sont produites via les outils de [prégénération](https://github.com/rok4/pregeneration) et de [génération](https://github.com/rok4/generation).
 
-- [Installation via le paquet debian](#installation-via-le-paquet-debian)
-- [Installation depuis les sources](#installation-depuis-les-sources)
-  - [Récupération du projet](#récupération-du-projet)
-  - [Variables CMake](#variables-cmake)
-  - [Dépendances à la compilation](#dépendances-à-la-compilation)
-  - [Compilation et installation](#compilation-et-installation)
-- [Variables d'environnement utilisées dans les librairies de core-cpp](#variables-denvironnement-utilisées-dans-les-librairies-de-core-cpp)
-- [Utilisation du serveur](#utilisation-du-serveur)
-  - [Configurer le serveur](#configurer-le-serveur)
-  - [Lancer le serveur](#lancer-le-serveur)
-    - [En ligne de commande](#en-ligne-de-commande)
-    - [En tant que service systemctl](#en-tant-que-service-systemctl)
-  - [Installer et configurer NGINX](#installer-et-configurer-nginx)
-- [Accès aux capacités du serveur](#accès-aux-capacités-du-serveur)
-- [Fonctionnement général du serveur](#fonctionnement-général-du-serveur)
-  - [Identification du service et du type de requête](#identification-du-service-et-du-type-de-requête)
-  - [Accès aux données](#accès-aux-données)
-  - [Gestion des configurations](#gestion-des-configurations)
-  - [Personnalisation des points d'accès aux services](#personnalisation-des-points-daccès-aux-services)
-
 ## Installation via le paquet debian
 
 Télécharger les paquets sur GitHub :
+
 * [le serveur](https://github.com/rok4/server/releases/)
 * [les styles](https://github.com/rok4/styles/releases/)
 * [les TMS](https://github.com/rok4/tilematrixsets/releases/)
 
-```
-apt install ./rok4-styles_<version>_all.deb
-apt install ./rok4-tilematrixsets_<version>_all.deb
-apt install ./ROK4SERVER-<version>-Linux-64bit.deb
+```bash
+apt install ./rok4-styles-<version>-linux-all.deb
+apt install ./rok4-tilematrixsets-<version>-linux-all.deb
+apt install ./rok4-server-<version>-ubuntu20.04-amd64.deb
 ```
 
 ## Installation depuis les sources
 
 ### Récupération du projet
 
-`git clone --recursive https://github.com/rok4/server`
+```bash
+git clone --recursive https://github.com/rok4/server
+```
+
 ou
 
 ```bash
