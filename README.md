@@ -227,6 +227,8 @@ Une fois que l'on a récupéré l'index, et grâce au numéro de la tuile dans l
 
 Au démarrage du serveur, toutes les configurations (serveur, services, tile matrix sets, styles et couches) sont chargées depuis les fichiers. Lors du fonctionnement, si une requête d'administration modifie cette configuration, les fichiers sont mis à jour (écrits, écrasés ou supprimés).
 
+![Chargement du serveur](./docs/images/rok4server-layer-pyramid.png)
+
 ### Personnalisation des points d'accès aux services
 
 Pour que les URLs présentes dans les réponses des services soient correctes malgré des réecritures, il est important de bien renseigner les champs suivant dans le fichier `services.json`:
