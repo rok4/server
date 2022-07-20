@@ -161,6 +161,17 @@
                     "type": "string"
                 }
             }
+        },
+        "ogctiles": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "endpoint_uri": {
+                    "type": "string"
+                }
+            }
         }
     },
     "$defs": {

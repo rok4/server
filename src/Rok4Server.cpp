@@ -87,7 +87,6 @@
 #include "config.h"
 #include "curl/curl.h"
 #include "fcgiapp.h"
-#include "utils/Cache.h"
 #include "healthcheck/Threads.h"
 
 void hangleSIGALARM(int id) {
@@ -164,6 +163,10 @@ Rok4Server::Rok4Server(ServerConf* svr, ServicesConf* svc) {
     if (servicesConf->supportTMS) {
         BOOST_LOG_TRIVIAL(debug) << "Build TMS Capabilities";
         buildTMSCapabilities();
+    }
+    if (servicesConf->supportOGCTILES) {
+        BOOST_LOG_TRIVIAL(debug) << "Build OGC Tiles Capabilities";
+        buildOGCTILESCapabilities();
     }
 }
 
@@ -486,13 +489,18 @@ DataSource* Rok4Server::getTile(Request* request) {
     int tileCol, tileRow;
     Style* style = 0;
 
-    // Récupération des parametres de la requete
+    // Récupération des parametres de la requete de type GetTile
     DataSource* errorResp;
     if (request->service == ServiceType::WMTS) {
         errorResp = getTileParamWMTS(request, L, tms, tm, tileCol, tileRow, format, style);
-    } else {
-        // TMS
+    } else if (request->service == ServiceType::TMS) {
         errorResp = getTileParamTMS(request, L, tms, tm, tileCol, tileRow, format, style);
+    } else if (request->service == ServiceType::OGCTILES) {
+        errorResp = getTileParamOGCTILES(request, L, tms, tm, tileCol, tileRow, format, style);
+    } else {
+        // FIXME exception ?
+        std::string message = "L'operation GetTile sur ce service n'est pas prise en charge par ce serveur.";
+        errorResp = new SERDataSource ( new ServiceException ( "", OWS_OPERATION_NOT_SUPORTED, message, "" ) );
     }
 
     if (errorResp) {
@@ -603,6 +611,12 @@ DataStream* Rok4Server::WMTSGetFeatureInfo(Request* request) {
     int height = tm->getTileH();
     int width = tm->getTileW();
     return CommonGetFeatureInfo("wmts", layer, bbox, width, height, tms->getCrs(), info_format, X, Y, format, 1);
+}
+
+DataStream* Rok4Server::OGCTILESGetFeatureInfo(Request* request) {
+    // TODO [OGC] process OGC getfeatureinfo...
+    BOOST_LOG_TRIVIAL(warning) <<  "Not yet implemented !";
+    return new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, "GFI sur l'OGC API Tiles non géré.", "ogctiles"));
 }
 
 DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, BoundingBox<double> bbox, int width, int height, CRS* crs, std::string info_format, int X, int Y, std::string format, int feature_count) {
@@ -907,6 +921,20 @@ void Rok4Server::processWMS(Request* request, FCGX_Request& fcgxRequest) {
     }
 }
 
+void Rok4Server::processOGCTILES(Request* request, FCGX_Request& fcgxRequest) {
+    if (request->request == RequestType::GETCAPABILITIES) {
+        S.sendresponse(OGCTILESGetCapabilities(request), &fcgxRequest);
+    } else if (request->request == RequestType::GETMAPTILE) {
+        S.sendresponse(getTile(request), &fcgxRequest);
+    } else if (request->request == RequestType::GETTILE) {
+        S.sendresponse(getTile(request), &fcgxRequest);
+    } else if (request->request == RequestType::GETFEATUREINFO) {
+        S.sendresponse(OGCTILESGetFeatureInfo(request), &fcgxRequest);
+    } else {
+        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "ogctiles")), &fcgxRequest);
+    }
+}
+
 void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
     if (request->service == ServiceType::GLOBAL) {
         processGlobal(request, fcgxRequest);
@@ -916,6 +944,8 @@ void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
         processWMS(request, fcgxRequest);
     } else if (servicesConf->supportTMS && request->service == ServiceType::TMS) {
         processTMS(request, fcgxRequest);
+    } else if (servicesConf->supportOGCTILES && request->service == ServiceType::OGCTILES) {
+        processOGCTILES(request, fcgxRequest);
     } else if (serverConf->supportAdmin && request->service == ServiceType::ADMIN) {
         processAdmin(request, fcgxRequest);
     } else if (request->service == ServiceType::HEALTHCHECK) {

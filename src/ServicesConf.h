@@ -154,6 +154,15 @@ class ServicesConf : public Configuration
         std::string tmsPublicUrl;
         MetadataURL* mtdTMS;
 
+        // ----------------------- OGC Tiles
+
+        /**
+         * \~french \brief Définit si le serveur doit honorer les requêtes OGC
+         * \~english \brief Define whether OGC request should be honored
+         */
+        bool supportOGCTILES;
+        std::string ogctilesPublicUrl;
+
         // ----------------------- WMS 
         /**
          * \~french \brief Définit si le serveur doit honorer les requêtes WMS

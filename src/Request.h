@@ -74,6 +74,7 @@ namespace RequestType {
         GETLAYERGDAL,
         GETMAP,
         GETTILE,
+        GETMAPTILE,
         GETFEATUREINFO,
         GETVERSION,
         ADDLAYER,
@@ -110,6 +111,7 @@ namespace ServiceType {
         WMTS,
         WMS,
         TMS,
+        OGCTILES,
         GLOBAL,
         ADMIN,
         HEALTHCHECK
@@ -126,6 +128,29 @@ namespace ServiceType {
     std::string toString ( eServiceType st );
 }
 
+namespace TemplateOGC {
+    /**
+     * \~french \brief Énumération des templates d'URL OGC
+     */
+    enum eTemplateOGC {
+        // raster tile
+        GETTILERASTERSTYLED,
+        GETTILERASTER,
+        GETTILERASTERSTYLEDBYCOLLECTION,
+        GETTILERASTERBYCOLLECTION,
+        // vector tile
+        GETTILEVECTOR,
+        GETTILEVECTORBYCOLLECTION,
+        // capabilities
+        GETCAPABILITIESBYCOLLECTION,
+        GETCAPABILITIESRASTERBYCOLLECTION,
+        GETCAPABILITIESVECTORBYCOLLECTION
+    };
+    /**
+     * \~french \brief Conversion d'un type vers une chaîne de caractères
+     */
+    std::string toString ( eTemplateOGC r );
+}
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -189,6 +214,7 @@ public:
      * \return true if present
      */
     bool hasParam ( std::string paramName );
+
     /**
      * \~french
      * \brief Récupération de la valeur d'un paramètre dans la requête
@@ -221,11 +247,16 @@ public:
      * \~english \brief OGC request name
      */
     RequestType::eRequestType request;
-    /*
-     * \~french \brief Type de service (WMS,WMTS,TMS)
-     * \~english \brief Service type (WMS,WMTS,TMS)
+    /**
+     * \~french \brief Type de service (WMS,WMTS,TMS,OGC)
+     * \~english \brief Service type (WMS,WMTS,TMS,OGC)
      */
     ServiceType::eServiceType service;
+    /**
+     * \~french \brief Type de templates OGC
+     * \~english \brief Templates OGC
+     */
+    TemplateOGC::eTemplateOGC tmpl;
 
     /**
      * \~french \brief Liste des paramètres de la requête
@@ -245,12 +276,17 @@ public:
      */
     std::string body;
 
+    /**
+     * \~french \brief Affichage (debug)
+     * \~english \brief Display (debug)
+     */
     void print() {
         BOOST_LOG_TRIVIAL(info) << "path = " << path;
         BOOST_LOG_TRIVIAL(info) << "method = " << method;
         BOOST_LOG_TRIVIAL(info) << "service = " << ServiceType::toString(service);
         BOOST_LOG_TRIVIAL(info) << "request = " << RequestType::toString(request);
     }
+    
     /**
      * \~french
      * \brief Constructeur d'une requête

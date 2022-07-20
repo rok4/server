@@ -420,7 +420,7 @@ bool ServicesConf::parse(json11::Json& doc) {
             errorMessage = "wms.endpoint_uri have to be a string";
             return false;
         } else {
-            tmsPublicUrl = "/wms";
+            wmsPublicUrl = "/wms";
         }
         if (wmsSection["name"].is_string()) {
             name = wmsSection["name"].string_value();
@@ -606,7 +606,7 @@ bool ServicesConf::parse(json11::Json& doc) {
             errorMessage = "wmts.endpoint_uri have to be a string";
             return false;
         } else {
-            tmsPublicUrl = "/wmts";
+            wmtsPublicUrl = "/wmts";
         }
 
         // Métadonnée
@@ -651,6 +651,32 @@ bool ServicesConf::parse(json11::Json& doc) {
                 errorMessage = "Invalid TMS metadata: have to own a field " + mtdTMS->getMissingField();
                 return false;
             }
+        }
+        
+    }
+
+    // ----------------------- OGC 
+    json11::Json ogcSection = doc["ogctiles"];
+    if (ogcSection.is_null()) {
+        supportOGCTILES = false;
+    } else if (! ogcSection.is_object()) {
+        errorMessage = "ogctiles have to be an object";
+        return false;
+    } else {
+
+        if (ogcSection["active"].is_bool()) {
+            supportOGCTILES = ogcSection["active"].bool_value();
+        } else if (! ogcSection["active"].is_null()) {
+            errorMessage = "ogctiles.active have to be a boolean";
+            return false;
+        }
+        if (ogcSection["endpoint_uri"].is_string()) {
+            ogctilesPublicUrl = ogcSection["endpoint_uri"].string_value();
+        } else if (! ogcSection["endpoint_uri"].is_null()) {
+            errorMessage = "ogctiles.endpoint_uri have to be a string";
+            return false;
+        } else {
+            ogctilesPublicUrl = "/ogcapitiles";
         }
         
     }

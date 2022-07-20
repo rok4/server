@@ -131,16 +131,24 @@ private:
      * \~english \brief WMS GetCapabilities response
      */
     std::string wmsCapabilities;
+
     /**
      * \~french \brief Réponse au GetCapabilities WMTS
      * \~english \brief WMTS GetCapabilities response
      */
     std::string wmtsCapabilities;
+
     /**
      * \~french \brief Réponse au GetCapabilities TMS
      * \~english \brief TMS GetCapabilities response
      */
     std::string tmsCapabilities;
+
+    /**
+     * \~french \brief Réponse au GetCapabilities OGC Tiles
+     * \~english \brief OGC Tiles GetCapabilities response
+     */
+    std::string ogctilesCapabilities;
 
     /**
      * \~french
@@ -167,7 +175,7 @@ private:
      * \return int value
      */
     int GetDecimalPlaces ( double number );
-    //----
+
     /**
      * \~french
      * \brief Construit les fragments invariants du getCapabilities WMS
@@ -175,6 +183,7 @@ private:
      * \brief Build the invariant fragments of the WMS GetCapabilities
      */
     void buildWMSCapabilities();
+
     /**
      * \~french
      * \brief Construit les fragments invariants du getCapabilities WMS
@@ -182,6 +191,7 @@ private:
      * \brief Build the invariant fragments of the WMTS GetCapabilities
      */
     void buildWMTSCapabilities();
+
     /**
      * \~french
      * \brief Construit les fragments invariants du getCapabilities TMS
@@ -189,6 +199,14 @@ private:
      * \brief Build the invariant fragments of the TMS GetCapabilities
      */
     void buildTMSCapabilities();
+
+    /**
+     * \~french
+     * \brief Construit les fragments invariants du getCapabilities OGC Tiles
+     * \~english
+     * \brief Build the invariant fragments of the OGC Tiles GetCapabilities
+     */
+    void buildOGCTILESCapabilities();
 
     /**
      * \~french
@@ -212,6 +230,16 @@ private:
 
     /**
      * \~french
+     * \brief Récuperation et vérifications des paramètres d'une requête de tuile avec l'API OGC Tiles
+     * \return message d'erreur en cas d'erreur, NULL sinon
+     * \~english
+     * \brief Fetching and validating get tile OGC Tiles request parameters
+     * \return NULL or an error message if something went wrong
+     */
+    DataSource* getTileParamOGCTILES ( Request* request, Layer*& layer, TileMatrixSet*& tms, TileMatrix*& tm, int& tileCol, int& tileRow, std::string& format, Style*& style);
+
+    /**
+     * \~french
      * \brief Récuperation et vérifications des paramètres d'une requête GetMap
      * \return message d'erreur en cas d'erreur, NULL sinon
      * \~english
@@ -219,6 +247,7 @@ private:
      * \return NULL or an error message if something went wrong
      */
     DataStream* getMapParamWMS ( Request* request, std::vector<Layer*>& layers, BoundingBox< double >& bbox, int& width, int& height, CRS*& crs, std::string& format, std::vector<Style*>& styles, std::map< std::string, std::string >& format_option,int& dpi);
+       
     /**
      * \~french
      * \brief Récuperation et vérifications des paramètres d'une requête GetCapabilities WMS
@@ -228,6 +257,7 @@ private:
      * \return NULL or an error message if something went wrong
      */
     DataStream* getCapParamWMS ( Request* request, std::string& version );
+    
     /**
      * \~french
      * \brief Récuperation et vérifications des paramètres d'une requête GetTile WMTS
@@ -237,6 +267,7 @@ private:
      * \return NULL or an error message if something went wrong
      */
     DataStream* getCapParamWMTS ( Request* request, std::string& version );
+    
     /**
      * \~french
      * \brief Récuperation et vérifications des paramètres d'une requête GetLayer TMS
@@ -247,7 +278,6 @@ private:
      */
     DataStream* getLayerParamTMS ( Request* request, Layer*& layer );
 
-    //Greg
     /**
      * \~french
      * \brief Récuperation et vérifications des paramètres d'une requête GetFeatureInfoParam WMS
@@ -261,6 +291,7 @@ private:
         BoundingBox< double >& bbox, int& width, int& height, CRS*& crs, std::string& format,
         std::vector<Style*>& styles, std::string& info_format, int& X, int& Y, int& feature_count,std::map <std::string, std::string >& format_option
     );
+
     /**
      * \~french
      * \brief Récuperation et vérifications des paramètres d'une requête GetFeatureInfoParam WMTS
@@ -270,7 +301,6 @@ private:
      * \return NULL or an error message if something went wrong
      */
     DataStream* getFeatureInfoParamWMTS ( Request* request, Layer*& layer, TileMatrixSet*& tms, TileMatrix*& tm, int &tileCol, int &tileRow, std::string  &format, Style* &style, std::string& info_format, int& X, int& Y);
-
 
     /**
      * \~french
@@ -291,6 +321,7 @@ private:
      * \return requested and styled image
      */
     Image *styleImage(Image *curImage, Rok4Format::eformat_data pyrType, Style *style, std::string format, int size, Pyramid *pyr);
+    
     /**
      * \~french
      * \brief Fond un groupe d'image en une seule
@@ -310,6 +341,7 @@ private:
      * \return requested image or an error message
      */
     Image *mergeImages(std::vector<Image*> images, Rok4Format::eformat_data &pyrType, Style *style, CRS* crs, BoundingBox<double> bbox);
+    
     /**
      * \~french
      * \brief Convertie une image dans un format donné
@@ -343,6 +375,7 @@ private:
      * \return response stream
      */
     DataStream* WMSGetCapabilities ( Request* request );
+    
     /**
      * \~french
      * \brief Traitement d'une requête GetCapabilities WMTS
@@ -354,6 +387,7 @@ private:
      * \return response stream
      */
     DataStream* WMTSGetCapabilities ( Request* request );
+    
     /**
      * \~french
      * \brief Traitement d'une requête GetCapabilities TMS
@@ -365,6 +399,19 @@ private:
      * \return response stream
      */
     DataStream* TMSGetCapabilities ( Request* request );
+    
+    /**
+     * \~french
+     * \brief Traitement d'une requête GetCapabilities pour l'OGC Tiles
+     * \param[in] request représentation de la requête
+     * \return flux de la réponse
+     * \~english
+     * \brief Process a GetCapabilities OGC Tiles request
+     * \param[in] request request representation
+     * \return response stream
+     */
+    DataStream* OGCTILESGetCapabilities ( Request* request );
+
     /**
      * \~french
      * \brief Traitement d'une requête globale GetServices
@@ -376,6 +423,7 @@ private:
      * \return response stream
      */
     DataStream* GlobalGetServices ( Request* request );
+    
     /**
      * \~french
      * \brief Traitement d'une requête GetLayer TMS
@@ -387,6 +435,7 @@ private:
      * \return response stream
      */
     DataStream* TMSGetLayer ( Request* request );
+    
     /**
      * \~french
      * \brief Traitement d'une requête GetLayerMetadata TMS
@@ -398,6 +447,7 @@ private:
      * \return response stream
      */
     DataStream* TMSGetLayerMetadata ( Request* request );
+    
     /**
      * \~french
      * \brief Traitement d'une requête GetLayerGDAL TMS
@@ -481,6 +531,7 @@ private:
      * \return response stream
      */
     DataStream* WMSGetFeatureInfo ( Request* request );
+    
     /**
      * \~french
      * \brief Traitement d'une requête GetFeatureInfo WMTS
@@ -492,6 +543,18 @@ private:
      * \return response stream
      */
     DataStream* WMTSGetFeatureInfo ( Request* request );
+
+    /**
+     * \~french
+     * \brief Traitement d'une requête GetFeatureInfo OGC Tiles
+     * \param[in] request représentation de la requête
+     * \return flux de la réponse
+     * \~english
+     * \brief Process a GetFeatureInfo OGC Tiles request
+     * \param[in] request request representation
+     * \return response stream
+     */
+    DataStream* OGCTILESGetFeatureInfo ( Request* request );
 
     DataStream* CommonGetFeatureInfo ( std::string service, Layer* layer, BoundingBox<double> bbox, int width, int height, CRS* crs, std::string info_format , int X, int Y, std::string format, int feature_count);
 
@@ -510,6 +573,11 @@ private:
      * \~english Process TMS request
      */
     void processTMS ( Request *request, FCGX_Request&  fcgxRequest );
+    /**
+     * \~french Traite les requêtes de type OGC Tiles
+     * \~english Process OGC Tiles request
+     */
+    void processOGCTILES ( Request *request, FCGX_Request&  fcgxRequest );
     /**
      * \~french Traite les requêtes d'administration
      * \~english Process administration request

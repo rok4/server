@@ -85,6 +85,9 @@ DataStream* Rok4Server::AdminCreateLayer ( Request* request ) {
     if ( servicesConf->supportTMS ) {
         buildTMSCapabilities();
     }
+    if ( servicesConf->supportOGCTILES ) {
+        buildOGCTILESCapabilities();
+    }
 
     if (! layer->writeToFile(request->body, serverConf)) {
         serverConf->removeLayer ( layer->getId() );
@@ -117,6 +120,9 @@ DataStream* Rok4Server::AdminDeleteLayer ( Request* request ) {
     }
     if ( servicesConf->supportTMS ) {
         buildTMSCapabilities();
+    }
+    if ( servicesConf->supportOGCTILES ) {
+        buildOGCTILESCapabilities();
     }
 
     return new EmptyResponseDataStream ();
@@ -151,6 +157,9 @@ DataStream* Rok4Server::AdminUpdateLayer ( Request* request ) {
     }
     if ( servicesConf->supportTMS ) {
         buildTMSCapabilities();
+    }
+    if ( servicesConf->supportOGCTILES ) {
+        buildOGCTILESCapabilities();
     }
 
     if (! newLayer->writeToFile(request->body, serverConf)) {
