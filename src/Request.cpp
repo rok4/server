@@ -55,7 +55,6 @@
 #include "config.h"
 #include <algorithm>
 #include <regex>
-#include <boost/algorithm/string/join.hpp>
 
 
 namespace RequestType {

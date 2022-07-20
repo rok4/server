@@ -43,35 +43,259 @@
  * \brief Implement the GetCapabilities generation function
  */
 
+#include <regex>
 #include "Rok4Server.h"
 #include "utils/Utils.h"
 
 void Rok4Server::buildOGCTILESCapabilities() {
     // TODO [OGC] build collections...
     BOOST_LOG_TRIVIAL(warning) <<  "Not yet implemented !";
+    // plusieurs getCap possibles à construire en fonction de la requête !
+    //      "^/ogcapitiles/collections$",
+    //      "^/ogcapitiles/collections/(.*)/map/tiles$",
+    //      "^/ogcapitiles/collections/(.*)/tiles$"
+    // les getCap sont enregistrés dans un tableau : ogctilesCapabilities[]
 }
 
 DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
-    // TODO [OGC] get capabilities...
-    BOOST_LOG_TRIVIAL(warning) <<  "Not yet implemented !";
-    return new SERDataStream ( new ServiceException ( "", OWS_OPERATION_NOT_SUPORTED, "Not yet implemented !", "ogctiles" ) );
+    if (ogctilesCapabilities.size() == 0) {
+        std::string message = "Les requetes getCapabilities OGC Tiles pre-buildées sont vides !?";
+        BOOST_LOG_TRIVIAL(error) <<  message  ;
+        return new SERDataStream ( new ServiceException ( "", OWS_OPERATION_NOT_SUPORTED, message, "ogctiles" ) );
+    }
+
+    // on determine la bonne collections en fonction du template demandé.
+    std::string capabilities = "";
+    if (request->tmpl == TemplateOGC::GETCAPABILITIESBYCOLLECTION) {
+        capabilities = ogctilesCapabilities.at(0);
+    }
+    else if (request->tmpl == TemplateOGC::GETCAPABILITIESRASTERBYCOLLECTION) {
+        capabilities = ogctilesCapabilities.at(1);
+    }
+    else if (request->tmpl == TemplateOGC::GETCAPABILITIESVECTORBYCOLLECTION) {
+        capabilities = ogctilesCapabilities.at(2);
+    }
+    else {
+        std::string message = "Probleme dans la requete getCapabilities OGC Tiles";
+        BOOST_LOG_TRIVIAL(error) <<  message  ;
+        return new SERDataStream ( new ServiceException ( "", OWS_OPERATION_NOT_SUPORTED, message, "ogctiles" ) );
+    }
+
+    if (capabilities.empty()) {
+        std::string message = "La requete getCapabilities OGC Tiles est vide !?";
+        BOOST_LOG_TRIVIAL(error) <<  message  ;
+        return new SERDataStream ( new ServiceException ( "", OWS_OPERATION_NOT_SUPORTED, message, "ogctiles" ) );
+    }
+
+    return new MessageDataStream ( capabilities, "application/json" );
 }
 
 DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, TileMatrixSet*& tms, TileMatrix*& tm, int& tileCol, int& tileRow, std::string& format, Style*& style) {
-    // TODO [OGC] get tiles...
+    const std::regex re(TemplateOGC::toString(request->tmpl));
+    std::smatch m;
+ 
+    if (std::regex_match(request->path, m, re)) {
+
+        // Analyse generique du template :
+        //  1.les 5 derniers groupement sont toujours : tms, tm, tileCol, tileRow, (info)
+        //    le groupe (info) est toujours vide (getFeatureInfo)
+        //  2.les 2 autres groupes possibles :
+        //      si recherche /collections/(.*) isOk -> layer
+        //      sinon param collections -> request->getParam("collections");
+        //      et
+        //      si recherche styles/(.*) isOk -> style
+        //      sinon style par defaut
+        //  3.le format est toujours dans les param -> request->getParam("f");
+
+        int last = m.size() - 1;
+        std::string str_tileRow = m[last - 1].str();
+        std::string str_tileCol = m[last - 2].str();
+        std::string str_tm      = m[last - 3].str();
+        std::string str_tms     = m[last - 4].str();
+        
+        // LAYER (collections)
+        std::string str_layer;
+        if (request->tmpl == TemplateOGC::GETTILERASTERBYCOLLECTION || 
+            request->tmpl == TemplateOGC::GETTILEVECTORBYCOLLECTION) {
+            str_layer = m[1].str();
+        } else if (request->tmpl == TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION) {
+            str_layer = m[2].str();
+        } else {
+            str_layer = request->getParam("collections");
+        }
+
+        if ( str_layer.empty() ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre LAYER absent.", "ogcapitiles" ) 
+            );
+        }
+    
+        if ( containForbiddenChars(str_layer)) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMTS layer: " << str_layer ;
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "Layer inconnu.", "ogcapitiles" ) 
+            );
+        }
+
+        layer = serverConf->getLayer(str_layer);
+        if ( layer == NULL || ! layer->getWMTSAuthorized() ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "Layer " + str_layer + " inconnu.", "ogcapitiles" ) 
+            );
+        }
+
+        // FORMAT
+        std::string str_format = request->getParam("f");
+        if ( str_format.empty() ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre FORMAT absent.", "ogcapitiles" ) 
+            );
+        }
+
+        format = str_format;
+        if ( containForbiddenChars(str_format) ) {
+            // On a détecté un caractère interdit, on ne met pas le format fourni dans la réponse pour éviter une injection
+            BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMTS format: " << str_format ;
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "Le format n'est pas gere pour la couche " + str_layer, "ogcapitiles" ) 
+            );
+        }
+
+        if ( str_format.compare ( Rok4Format::toMimeType ( ( layer->getDataPyramid()->getFormat() ) ) ) != 0 ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "Le format " + str_format + " n'est pas gere pour la couche " + str_layer, "ogcapitiles" ) 
+            );
+        }
+
+        // STYLE
+        std::string str_style;
+        if (request->tmpl == TemplateOGC::GETTILERASTERSTYLED ||
+            request->tmpl == TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION) {
+               str_style = m[1].str();
+        } else {
+            str_style = "default"; // FIXME [OGC] style par defaut ?
+        }
+
+        if ( str_style.empty() ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre STYLE absent.", "ogcapitiles" ) 
+            );
+        }
+
+        if (Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
+            style = layer->getStyleByIdentifier(str_style);
+            if ( ! ( style ) ) {
+                return new SERDataSource ( 
+                    new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "Le style " + str_style + " n'est pas gere pour la couche " + str_layer, "ogcapitiles" ) 
+                );
+            }
+        }
+
+        // TILEMATRIXSET
+        if ( str_tms.empty() ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre TILEMATRIXSET absent.", "ogcapitiles" ) 
+            );
+        }
+
+        if ( containForbiddenChars(str_tms)) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMTS tilematrixset: " << str_tms ;
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TILEMATRIXSET inconnu.", "ogcapitiles" ) 
+            );
+        }
+
+        tms = serverConf->getTMS(str_tms);
+        if ( tms == NULL ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TILEMATRIXSET " + str_tms + " inconnu.", "ogcapitiles" ) 
+            );
+        }
+
+        if ( tms->getId() != layer->getDataPyramid()->getTms()->getId() && ! layer->isInWMTSTMSList(tms)) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TILEMATRIXSET " + str_tms + " inconnu pour le layer.", "ogcapitiles" ) 
+            );
+        }
+    
+        // TILEMATRIX
+        if ( str_tm.empty() ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre TILEMATRIX absent.", "ogcapitiles" )
+            );
+        }
+
+        if ( containForbiddenChars(str_tm)) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMTS tilematrix: " << str_tm ;
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TileMatrix inconnu pour le TileMatrixSet " + str_tms, "ogcapitiles" )
+            );
+        }
+
+        tm = tms->getTm(str_tm);
+        if ( tm == NULL ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TileMatrix " + str_tm + " inconnu pour le TileMatrixSet " + str_tms, "ogcapitiles" )
+            );
+        }
+
+        // TILEROW
+        if ( str_tileRow.empty() ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre TILEROW absent.", "ogcapitiles" ) 
+            );
+        }
+        
+        if ( sscanf ( str_tileRow.c_str(),"%d",&tileRow ) != 1 ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "La valeur du parametre TILEROW est incorrecte.", "ogcapitiles" ) 
+            );
+        }
+
+        // TILECOL
+        if ( str_tileCol.empty() ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre TILECOL absent.", "ogcapitiles" ) 
+            );
+        }
+        
+        if ( sscanf ( str_tileCol.c_str(),"%d",&tileCol ) != 1 ) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "La valeur du parametre TILECOL est incorrecte.", "ogcapitiles" ) 
+            );
+        }
+
+        if ( tms->getId() == layer->getDataPyramid()->getTms()->getId()) {
+            // TMS natif de la pyramide, les tuiles limites sont stockées dans le niveau
+            Level* level = layer->getDataPyramid()->getLevel(tm->getId());
+            if (level == NULL) {
+                // On est hors niveau -> erreur
+                return new SERDataSource ( new ServiceException ( "", HTTP_NOT_FOUND,"No data found", "ogcapitiles" ) );
+            }
+
+            if (! level->getTileLimits().containTile(tileCol, tileRow)) {
+                // On est hors tuiles -> erreur
+                return new SERDataSource ( new ServiceException ( "", HTTP_NOT_FOUND,"No data found", "ogcapitiles" ) );
+            }
+        } else if (layer->isInWMTSTMSList(tms)) {
+            // TMS supplémentaire, les tuiles limites sont stockées dans la couche
+            TileMatrixLimits* tml = layer->getTmLimits(tms, tm);
+            if (tml == NULL) {
+                // On est hors niveau -> erreur
+                return new SERDataSource ( 
+                    new ServiceException ( "", HTTP_NOT_FOUND, "No data found", "ogcapitiles" ) 
+                );
+            }
+            if (! tml->containTile(tileCol, tileRow)) {
+                // On est hors tuiles -> erreur
+                return new SERDataSource ( 
+                    new ServiceException ( "", HTTP_NOT_FOUND, "No data found", "ogcapitiles" ) 
+                );
+            }
+        }
+
+        return NULL;
+    }
+
     return new SERDataSource ( new ServiceException ( "", OWS_OPERATION_NOT_SUPORTED, "Not yet implemented !", "ogctiles" ) );
-    // request->tmpl;
-    // request->path;
-    // request->getParam("f");
-    // request->getParam("collections");
-
-    // pour le template :
-    // les 4 derniers groupement sont toujours : tms, tm, tileCol, tileRow
-    // si recherche /collections/(.*) isOk -> layer (unique!)
-    // sinon param collections
-    // si recherche styles/(.*) isOk -> style
-    // sinon style par defaut
-
-    // regex group name ? 
-    // ex. (?<tms>\d{1,}) puis match->get(tms)
 }
