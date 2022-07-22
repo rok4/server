@@ -148,7 +148,7 @@ private:
      * \~french \brief Réponse au GetCapabilities OGC Tiles
      * \~english \brief OGC Tiles GetCapabilities response
      */
-    std::vector<std::string> ogctilesCapabilities;
+    std::map<std::string, std::string> ogctilesCapabilities;
 
     /**
      * \~french
