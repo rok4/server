@@ -107,6 +107,10 @@ namespace ServiceType {
 
 namespace TemplateOGC {
 
+    // TODO [OGC] format vector with style : 
+    // ^/ogcapitiles/styles/(.*)/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?
+    // ^/ogcapitiles/collections/(.*)/styles/(.*)/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?
+
     const char* const regex[] = {
         "^/ogcapitiles/styles/(.*)/map/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
         "^/ogcapitiles/map/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
@@ -118,7 +122,6 @@ namespace TemplateOGC {
         "^/ogcapitiles/collections/(.*)/map/tiles$",
         "^/ogcapitiles/collections/(.*)/tiles$"
     };
-
     std::string toString ( eTemplateOGC r ) {
         return std::string ( regex[r] );
     }

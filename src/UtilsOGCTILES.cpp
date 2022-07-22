@@ -44,17 +44,58 @@
  */
 
 #include <regex>
+#include <boost/algorithm/string.hpp>
+
 #include "Rok4Server.h"
 #include "utils/Utils.h"
 
 void Rok4Server::buildOGCTILESCapabilities() {
     // TODO [OGC] build collections...
     BOOST_LOG_TRIVIAL(warning) <<  "Not yet implemented !";
-    // plusieurs getCap possibles à construire en fonction de la requête !
+    // plusieurs templates de getCap possibles à construire 
     //      "^/ogcapitiles/collections$",
-    //      "^/ogcapitiles/collections/(.*)/map/tiles$",
-    //      "^/ogcapitiles/collections/(.*)/tiles$"
-    // les getCap sont enregistrés dans un tableau : ogctilesCapabilities[]
+    //      "^/ogcapitiles/collections/(.*)/map/tiles$", <-- transmettre i'id du layer
+    //      "^/ogcapitiles/collections/(.*)/tiles$"      <-- transmettre i'id du layer
+
+    // schemas openapi tiles :
+    // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/collections.yaml
+    // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/collectionInfo.yaml
+    // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/responses/common-geodata/rCollectionsList.yaml
+    // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/responses/common-geodata/rCollection.yaml
+    // ex. impl. Geoserver : https://vtp2.geo-solutions.it/geoserver/ogc/features/collections?f=text%2Fhtml
+
+    std::ostringstream res_coll;
+    res_coll << "{\n";
+    res_coll << "  \"links\" : [\n";
+    // ...
+    res_coll << "  ],\n";
+    res_coll << "  \"collections\" : [\n";
+    // ...
+    res_coll << "  ]\n";
+    res_coll << "}\n";
+    ogctilesCapabilities.push_back(res_coll.str());
+
+    std::ostringstream res_coll_r;
+    res_coll_r << "{\n";
+    res_coll_r << "  \"links\" : [\n";
+    // ...
+    res_coll_r << "  ],\n";
+    res_coll_r << "  \"tilesets\" : [\n";
+    // ...
+    res_coll_r << "  ]\n";
+    res_coll_r << "}\n";
+    ogctilesCapabilities.push_back(res_coll_r.str());
+
+    std::ostringstream res_coll_v;
+    res_coll_v << "{\n";
+    res_coll_v << "  \"links\" : [\n";
+    // ...
+    res_coll_v << "  ],\n";
+    res_coll_v << "  \"tilesets\" : [\n";
+    // ...
+    res_coll_v << "  ]\n";
+    res_coll_v << "}\n";
+    ogctilesCapabilities.push_back(res_coll_v.str());
 }
 
 DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
@@ -98,14 +139,15 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
 
         // Analyse generique du template :
         //  1.les 5 derniers groupement sont toujours : tms, tm, tileCol, tileRow, (info)
-        //    le groupe (info) est toujours vide (getFeatureInfo)
+        //    le groupe (info) est toujours vide car c'est pour le getFeatureInfo
         //  2.les 2 autres groupes possibles :
-        //      si recherche /collections/(.*) isOk -> layer
-        //      sinon param collections -> request->getParam("collections");
+        //      si recherche /collections/ -> layer
+        //      sinon -> request->getParam("collections");
         //      et
-        //      si recherche styles/(.*) isOk -> style
+        //      si recherche /styles/ -> style
         //      sinon style par defaut
         //  3.le format est toujours dans les param -> request->getParam("f");
+        //  4.informer pour les parametres non gérés !
 
         int last = m.size() - 1;
         std::string str_tileRow = m[last - 1].str();
@@ -130,6 +172,14 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
             );
         }
     
+        std::vector<std::string> layers;
+        boost::split(layers, str_layer, boost::is_any_of(","));
+        if (layers.size() > 1) {
+            return new SERDataSource ( 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "Parametre LAYER multiple non géré.", "ogcapitiles" ) 
+            );
+        }
+
         if ( containForbiddenChars(str_layer)) {
             BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in WMTS layer: " << str_layer ;
             return new SERDataSource ( 
@@ -292,6 +342,32 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
                     new ServiceException ( "", HTTP_NOT_FOUND, "No data found", "ogcapitiles" ) 
                 );
             }
+        }
+
+        // OTHER PARAMS NOT YET IMPLEMENTED §
+        std::string str_crs = request->getParam("crs");
+        if ( !str_crs.empty() ) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre CRS non géré :" << str_crs;
+        }
+        std::string str_subset = request->getParam("subset");
+        if ( !str_subset.empty() ) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre SUBSET non géré :" << str_subset;
+        }
+        std::string str_bgcolor = request->getParam("bgcolor");
+        if ( !str_bgcolor.empty() ) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre BGCOLOR non géré :" << str_bgcolor;
+        }
+        std::string str_transparent = request->getParam("transparent");
+        if ( !str_transparent.empty() ) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre TRANSPARENT non géré :" << str_transparent;
+        }
+        std::string str_subset_crs = request->getParam("subset-crs");
+        if ( !str_subset_crs.empty() ) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre SUBSET-CRS non géré :" << str_subset_crs;
+        }
+        std::string str_datetime = request->getParam("datetime");
+        if ( !str_datetime.empty() ) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre DATETIME non géré :" << str_datetime;
         }
 
         return NULL;
