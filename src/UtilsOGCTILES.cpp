@@ -63,41 +63,85 @@ void Rok4Server::buildOGCTILESCapabilities() {
     std::ostringstream res_coll;
     res_coll << "{\n";
     res_coll << "  \"links\" : [\n";
-    // TODO [OGC] Links ...
+    // TODO [OGC] ex. de links ...
+    // {
+    //     href: "/ogcapitiles/collections?f=applicaiton/json",
+    //     rel: "item",
+    //     type: "applicaiton/json",
+    //     title: "",
+    //     templated: false
+    // },
     res_coll << "  ],\n";
     res_coll << "  \"collections\" : [\n";
     // Layers
     auto layers = this->getLayerList();
     std::map<std::string, Layer *>::iterator itl = layers.begin();
     while(itl != layers.end()) {
+        // Layer
+        Layer* childLayer = itl->second;
+
         res_coll << "    {\n";
 
         std::ostringstream res_coll_id;
         res_coll_id << "{\n";
         res_coll_id << "  \"links\" : [\n";
-        // TODO [OGC] Links ...
+        // TODO [OGC] ex. de links ...
+        // {
+        //     href: "/ogcapitiles/collections/{collectionId}/map/tiles?f=applicaiton/json",
+        //     rel: "item",
+        //     type: "applicaiton/json",
+        //     title: "",
+        //     templated: false
+        // },
         res_coll_id << "  ],\n";
         res_coll_id << "  \"tilesets\" : [\n";
         res_coll_id << "    {\n";
 
         std::ostringstream res;
-        res << "     \"id\": " << "\"" << itl->first << "\",\n";
-        res << "     \"title\": \"\",\n";
-        res << "     \"description\": \"\",\n";
-        res << "     \"extent\": {},\n";
-        res << "     \"crs\": [],\n";
-        res << "     \"dataType\": \"\",\n";
+        res << "     \"id\": " << "\"" << childLayer->getId() << "\",\n";
+        res << "     \"title\": \"" << childLayer->getTitle() << "\",\n";
+        res << "     \"description\": \"" << childLayer->getAbstract() << "\",\n";
+        res << "     \"extent\": {},\n"; // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/extent.yaml
+        // TODO [OGC] ex. de extent :
+        // spatial: {
+        //     crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
+        //     bbox: [
+        //         [
+        //             35.7212942,
+        //             32.3773922,
+        //             42.3704724,
+        //             37.3241435
+        //         ]
+        //     ]
+        // }
+        res << "     \"crs\": [],\n"; // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
+        res << "     \"dataType\": \"\",\n"; // TODO [OGC] map or vector
         res << "     \"geometryDimension\": \"\",\n";
-        res << "     \"minScaleDenominator\": \"\",\n";
-        res << "     \"maxScaleDenominator\": \"\",\n";
-        res << "     \"tileMatrixSetURI\": \"\",\n";
+        res << "     \"minScaleDenominator\": \"" << childLayer->getMinRes() * 1000/0.28 << "\",\n";
+        res << "     \"maxScaleDenominator\": \"" << childLayer->getMaxRes() * 1000/0.28 << "\",\n";
+        res << "     \"tileMatrixSetURI\": \"\",\n"; // TODO [OGC] URL vers /ogcapitiles/tileMatrixSet
         res << "     \"links\":[]\n";
+        // TODO [OGC] ex. de links :
+        // {
+        //     href: "/ogcapitiles/collections/{collectionId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=image/png",
+        //     rel: "item",
+        //     type: "image/png",
+        //     title: "",
+        //     templated: true
+        // },
+        // {
+        //     href: "/ogcapitiles/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=image/png&collections={collectionId}",
+        //     rel: "item",
+        //     type: "image/png",
+        //     title: "",
+        //     templated: true
+        // }
 
         res_coll_id << res.str();
         res_coll_id << "    }\n";
         res_coll_id << "  ]\n";
         res_coll_id << "}\n";
-        ogctilesCapabilities.insert(std::pair<std::string, std::string>(itl->first, res_coll_id.str()));
+        ogctilesCapabilities.insert(std::pair<std::string, std::string>("collections::" + itl->first, res_coll_id.str()));
 
         res_coll << res.str();
         res_coll << "    }";
@@ -109,6 +153,18 @@ void Rok4Server::buildOGCTILESCapabilities() {
     res_coll << "  ]\n";
     res_coll << "}\n";
     ogctilesCapabilities.insert(std::pair<std::string, std::string>("collections", res_coll.str()));
+
+    std::ostringstream res_tms;
+    res_tms << "{\n";
+    res_tms << "  \"tilematrixsets\" : [\n";
+    res_tms << "     {\n";
+    // TODO [OGC] build tms...
+    // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/tms/tileMatrixSet.yaml
+    // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/tms/tileMatrix.yaml
+    res_tms << "     }\n";
+    res_tms << "  ]\n";
+    res_tms << "}\n";
+    ogctilesCapabilities.insert(std::pair<std::string, std::string>("tilematrixsets", res_tms.str()));
 }
 
 DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
@@ -121,35 +177,46 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
     // on determine la bonne collections en fonction du template demandé.
     std::string capabilities = "";
     if (request->tmpl == TemplateOGC::GETCAPABILITIESBYCOLLECTION) {
+        // all-collections
         capabilities = ogctilesCapabilities.at("collections");
+    }
+    else if (request->tmpl == TemplateOGC::GETTILEMATRIXSET) {
+        // all-tilematrixsets
+        capabilities = ogctilesCapabilities.at("tilematrixsets");
     }
     else {
         const std::regex re(TemplateOGC::toString(request->tmpl));
         std::smatch m;
         
-        std::string str_layer;
+        std::string str_id; // layerId ou tmsId !
         if (std::regex_match(request->path, m, re)) {
-            str_layer = m[1].str();
+            str_id = m[1].str();
         }
 
-        if ( str_layer.empty() ) {
+        if ( str_id.empty() ) {
             return new SERDataStream ( 
-                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre LAYER absent.", "ogcapitiles" ) 
+                new ServiceException ( "", OWS_MISSING_PARAMETER_VALUE, "Parametre ID absent.", "ogcapitiles" ) 
             );
         }
 
-        Layer* layer = serverConf->getLayer(str_layer);
+        Layer* layer = serverConf->getLayer(str_id);
         if ( layer == NULL ) {
             return new SERDataStream ( 
-                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "Layer " + str_layer + " inconnu.", "ogcapitiles" ) 
+                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "ID " + str_id + " inconnu.", "ogcapitiles" ) 
             );
         }
 
         if (request->tmpl == TemplateOGC::GETCAPABILITIESRASTERBYCOLLECTION) {
-            capabilities = ogctilesCapabilities.at(str_layer);
+            // collections-id
+            capabilities = ogctilesCapabilities.at("collections::" + str_id);
         }
         else if (request->tmpl == TemplateOGC::GETCAPABILITIESVECTORBYCOLLECTION) {
-            capabilities = ogctilesCapabilities.at(str_layer);
+            // collections-id
+            capabilities = ogctilesCapabilities.at("collections::" + str_id);
+        }
+        else if (request->tmpl == TemplateOGC::GETTILEMATRIXSETBYID) {
+            // tilematrixsets-id
+            capabilities = ogctilesCapabilities.at("tilematrixsets::" + str_id);
         }
         else {
             std::string message = "Probleme dans la requete getCapabilities OGC Tiles";

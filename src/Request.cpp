@@ -120,7 +120,9 @@ namespace TemplateOGC {
         "^/ogcapitiles/collections/(.*)/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
         "^/ogcapitiles/collections$",
         "^/ogcapitiles/collections/(.*)/map/tiles$",
-        "^/ogcapitiles/collections/(.*)/tiles$"
+        "^/ogcapitiles/collections/(.*)/tiles$",
+        "^/ogcapitiles/tilematrixsets$",
+        "^/ogcapitiles/tilematrixsets/(.*)$"
     };
     std::string toString ( eTemplateOGC r ) {
         return std::string ( regex[r] );
@@ -849,6 +851,14 @@ void Request::determineServiceAndRequest() {
         }
         else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETCAPABILITIESVECTORBYCOLLECTION)))) {
             tmpl = TemplateOGC::GETCAPABILITIESVECTORBYCOLLECTION;
+            request = RequestType::GETCAPABILITIES;
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILEMATRIXSET)))) {
+            tmpl = TemplateOGC::GETTILEMATRIXSET;
+            request = RequestType::GETCAPABILITIES;
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILEMATRIXSETBYID)))) {
+            tmpl = TemplateOGC::GETTILEMATRIXSETBYID;
             request = RequestType::GETCAPABILITIES;
         }
         else {

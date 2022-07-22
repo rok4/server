@@ -144,7 +144,10 @@ namespace TemplateOGC {
         // capabilities
         GETCAPABILITIESBYCOLLECTION,
         GETCAPABILITIESRASTERBYCOLLECTION,
-        GETCAPABILITIESVECTORBYCOLLECTION
+        GETCAPABILITIESVECTORBYCOLLECTION,
+        // tilematrixset
+        GETTILEMATRIXSET,
+        GETTILEMATRIXSETBYID
     };
     /**
      * \~french \brief Conversion d'un type vers une chaîne de caractères
