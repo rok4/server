@@ -119,7 +119,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "     \"crs\": [],\n"; // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
         // FIXME [OGC] comment determiner le type de donnée ?
         // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
-        std::string dataType = "map"; // vector 
+        std::string dataType = "map"; // map / vector 
         res << "     \"dataType\": \"" << dataType << "\",\n";
         res << "     \"geometryDimension\": \"\",\n";
         res << "     \"minScaleDenominator\": \"" << layer->getMinRes() * 1000/0.28 << "\",\n";
@@ -175,7 +175,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res_tms << "       \"id\": \"" << otms->getId() << "\",\n";
         res_tms << "       \"title\": \"" << otms->getTitle() << "\",\n";
         res_tms << "       \"uri\": \"/ogcapitiles/tilematrixsets/" << otms->getId() << "\",\n";
-        res_tms << "       \"crs\": \"\",\n"; // TODO [OGC] getCrs();
+        res_tms << "       \"crs\": \"" << otms->getCrs()->getRequestCode() << "\",\n";
         res_tms << "       \"links\": [\n";
         res_tms << "          {\n";
         res_tms << "            \"href\": \"/ogcapitiles/tilematrixsets/" << otms->getId() << "\",\n";
@@ -191,7 +191,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res_tms_id << "{\n";
         res_tms_id << "  \"id\": \"" << otms->getId() << "\",\n";
         res_tms_id << "  \"title\": \"" << otms->getTitle() << "\",\n";
-        res_tms_id << "  \"crs\": \"\",\n"; // TODO [OGC] getCrs();
+        res_tms_id << "  \"crs\": \"" << otms->getCrs()->getRequestCode() << "\",\n";
         res_tms_id << "  \"description\": \"" << otms->getAbstract() << "\",\n";
         auto k = otms->getKeyWords();
         std::string keyWords;
@@ -201,9 +201,47 @@ void Rok4Server::buildOGCTILESCapabilities() {
                 keyWords += ",";
             }
         }
-        res_tms_id << "  \"keywords\":  [" << keyWords << "],\n"; 
-        res_tms_id << "  \"boundingBox\": {},\n";
-        res_tms_id << "  \"tileMatrices\": []\n"; // TODO [OGC] getTmList() / level->getTileLimits()
+        res_tms_id << "  \"keywords\":  [" << keyWords << "],\n";
+        // TODO [OGC] global tms limits with crs native !
+        // comment calculer la bbox du tms ?
+        res_tms_id << "  \"boundingBox\": {\n";
+        res_tms_id << "    \"lowerLeft\" : [],\n";
+        res_tms_id << "    \"upperRight\" : [],\n";
+        res_tms_id << "    \"crs\" : \"\",\n";
+        res_tms_id << "    \"orderedAxes\" : []\n";
+        res_tms_id << "   },\n";
+
+        // FIXME [OGC] gestion des getTileLimits()- ?
+        res_tms_id << "  \"tileMatrices\": [\n";
+        auto tmOrderd = otms->getOrderedTileMatrix(false);
+        auto ittm = tmOrderd.begin();
+        while(ittm != tmOrderd.end()) {
+            TileMatrix* otm = ittm->second;
+            res_tms_id << "     {\n";
+            res_tms_id << "      \"identifier\" : \"" << otm->getId() << "\",\n";
+            res_tms_id << "      \"title\" : \"\",\n";
+            res_tms_id << "      \"abstract\" : \"\",\n";
+            res_tms_id << "      \"keywords\" : [],\n";
+            double scaleDenominator = ( ( long double ) ( otm->getRes() * otms->getCrs()->getMetersPerUnit() ) /0.00028 );
+            res_tms_id << "      \"scaleDenominator\" : " << scaleDenominator << ",\n";
+            res_tms_id << "      \"cornerOfOrigin\" : \"topLeft\",\n";
+            res_tms_id << "      \"pointOfOrigin\" : [\n"; // FIXME [OGC] la norme n'est pas claire "topLeftCorner" !?
+            res_tms_id << "         " << otm->getX0() << ",\n";
+            res_tms_id << "         " << otm->getY0()  << "\n";
+            res_tms_id << "       ],\n";
+            res_tms_id << "      \"tileWidth\" : " << otm->getTileW() << ",\n";
+            res_tms_id << "      \"tileHeight\" : " << otm->getTileH() << ",\n";
+            res_tms_id << "      \"matrixHeight\" : " << otm->getMatrixW() << ",\n";
+            res_tms_id << "      \"matrixWidth\" : " << otm->getMatrixH() << "\n";
+            res_tms_id << "     }";
+
+            if (++ittm != tmOrderd.end()) {
+                res_tms_id << ",";
+            }
+            res_tms_id << "\n";
+        }
+
+        res_tms_id << "   ]\n";
         res_tms_id << "}";
         ogctilesCapabilities.insert(std::pair<std::string, std::string>("tilematrixsets::" + itt->first, res_tms_id.str()));
         
