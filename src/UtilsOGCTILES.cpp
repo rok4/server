@@ -59,7 +59,10 @@ void Rok4Server::buildOGCTILESCapabilities() {
     // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/collectionInfo.yaml
     // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/responses/common-geodata/rCollectionsList.yaml
     // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/responses/common-geodata/rCollection.yaml
-    // ex. impl. Geoserver : https://vtp2.geo-solutions.it/geoserver/ogc/features/collections?f=text%2Fhtml
+
+    // ex. impl. Geoserver : 
+    // https://vtp2.geo-solutions.it/geoserver/ogc/features?f=text%2Fhtml
+    // https://vtp2.geo-solutions.it/geoserver/ogc/tiles?f=text%2Fhtml
 
     std::ostringstream res_coll;
     res_coll << "{\n";
@@ -120,6 +123,9 @@ void Rok4Server::buildOGCTILESCapabilities() {
         // FIXME [OGC] comment determiner le type de donnée ?
         // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
         std::string dataType = "map"; // map / vector 
+        if (! Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
+            dataType = "vector";
+        }
         res << "     \"dataType\": \"" << dataType << "\",\n";
         res << "     \"geometryDimension\": \"\",\n";
         res << "     \"minScaleDenominator\": \"" << layer->getMinRes() * 1000/0.28 << "\",\n";
