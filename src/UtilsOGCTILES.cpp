@@ -50,6 +50,19 @@
 #include "Rok4Server.h"
 #include "utils/Utils.h"
 
+// FIXME [OGC] pour le getCapabilities (collections ou tilematrixsets), 
+// a t on besoin d'impl. les params 'limit' et 'bbox' ?
+
+// FIXME [OGC] quizz sur les getCapabilities : 
+// - CRS globales ?
+// - styles ?
+// - TMS supplementaires ?
+// - limites de TMS ?
+// - metadata ?
+// - GFI ou queryable ?
+
+// TODO [OGC] les metadata peuvent elles être mises dans les 'links' ?
+
 void Rok4Server::buildOGCTILESCapabilities() {
     BOOST_LOG_TRIVIAL(warning) <<  "Not completly implemented !";
 
@@ -67,6 +80,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
     std::ostringstream res_coll;
     res_coll << "{\n";
     res_coll << "  \"links\" : [\n";
+    // TODO [OGC] autre format de sortie en yaml ?
     // TODO [OGC] ex. de links ...
     // {
     //     href: "/ogcapitiles/collections?f=applicaiton/json",
@@ -75,7 +89,6 @@ void Rok4Server::buildOGCTILESCapabilities() {
     //     title: "",
     //     templated: false
     // },
-    // FIXME [OGC] format de sortie en html ou yaml ?
     res_coll << "  ],\n";
     res_coll << "  \"collections\" : [\n";
     // Layers
@@ -121,12 +134,12 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "      },\n";
         res << "     \"crs\": [],\n"; // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
         // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
-        std::string dataType = "map"; // map / vector 
+        std::string dataType = "map"; // TODO [OGC] format map / vector. libre ? 
         if (! Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
             dataType = "vector";
         }
         res << "     \"dataType\": \"" << dataType << "\",\n";
-        res << "     \"geometryDimension\": \"\",\n";
+        res << "     \"geometryDimension\": \"\",\n"; // TODO [OGC] utile ?
         res << "     \"minScaleDenominator\": \"" << layer->getMinRes() * 1000/0.28 << "\",\n";
         res << "     \"maxScaleDenominator\": \"" << layer->getMaxRes() * 1000/0.28 << "\",\n";
         res << "     \"tileMatrixSetURI\": \"/ogcapitiles/tileMatrixSets/"  << layer->getDataPyramid()->getTms()->getId() << "\",\n";
@@ -213,10 +226,10 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res_tms_id << "    \"lowerLeft\" : [],\n";
         res_tms_id << "    \"upperRight\" : [],\n";
         res_tms_id << "    \"crs\" : \"\",\n";
-        res_tms_id << "    \"orderedAxes\" : []\n";
+        res_tms_id << "    \"orderedAxes\" : []\n"; // FIXME [OGC] possibles ?
         res_tms_id << "   },\n";
 
-        // FIXME [OGC] gestion des getTileLimits()- ?
+        // FIXME [OGC] notion de getTileLimits() !?
         res_tms_id << "  \"tileMatrices\": [\n";
         auto tmOrderd = otms->getOrderedTileMatrix(false);
         auto ittm = tmOrderd.begin();
@@ -224,9 +237,9 @@ void Rok4Server::buildOGCTILESCapabilities() {
             TileMatrix* otm = ittm->second;
             res_tms_id << "     {\n";
             res_tms_id << "      \"identifier\" : \"" << otm->getId() << "\",\n";
-            res_tms_id << "      \"title\" : \"\",\n";
-            res_tms_id << "      \"abstract\" : \"\",\n";
-            res_tms_id << "      \"keywords\" : [],\n";
+            res_tms_id << "      \"title\" : \"\",\n"; // TODO [OGC] où obtenir l'info ?
+            res_tms_id << "      \"abstract\" : \"\",\n"; // TODO [OGC] où obtenir l'info ?
+            res_tms_id << "      \"keywords\" : [],\n"; // TODO [OGC] où obtenir l'info ?
             double scaleDenominator = ( ( long double ) ( otm->getRes() * otms->getCrs()->getMetersPerUnit() ) /0.00028 );
             res_tms_id << "      \"scaleDenominator\" : " << scaleDenominator << ",\n";
             res_tms_id << "      \"cornerOfOrigin\" : \"topLeft\",\n";

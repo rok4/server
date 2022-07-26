@@ -1373,15 +1373,33 @@ components:
 
     ogc_collections:
       type: object
+      allOf:
+        - $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/common-geodata/collections.yaml'
 
     ogc_collections_id:
       type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/common-core/link.yaml'
+        tilesets:
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/common-geodata/collectionInfo.yaml'
 
     ogc_tilematrixsets:
       type: object
+      properties:
+        tilematrixsets:
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/tms/tileMatrixSet-item.yaml'
 
     ogc_tilematrixsets_id:
       type: object
+      allOf:
+        - $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/tms/tileMatrixSet.yaml'
 
     healthcheck:
       type: object
