@@ -17,6 +17,8 @@ tags:
   description: Diffusion d'images raster selon le standard OGC WMS
 - name: Tile Map Service
   description: Diffusion de tuiles raster et vecteur selon la convention TMS
+- name: OGC API Tiles
+  description: Diffusion de tuiles raster et vecteur selon le standard l'API OGC - Tiles
 - name: Administration
   description: API d'ajout et de suppression de couches disponibles
 
@@ -809,7 +811,351 @@ paths:
                 type: string
                 format: binary
 
+  ######################################### OGC API Tiles
+
+  /ogcapitiles/collections:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère la liste des couches disponibles
+      operationId: ogc_get_collections
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
+
+      responses:
+        200:
+          description: Liste des couches disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_collections'
+
+  /ogcapitiles/collections/{layer}/map/tiles:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les informations sur une couche
+      operationId: ogc_get_collections_maptile_id
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+        
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
   
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_collections_id'
+  
+  /ogcapitiles/collections/{layer}/tiles:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les informations sur une couche
+      operationId: ogc_get_collections_tile_id
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
+  
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_collections_id'
+
+  /ogcapitiles/tilematrixsets:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère la liste des tileMatreixSet disponibles
+      operationId: ogc_get_tilematrixsets
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
+
+      responses:
+        200:
+          description: Liste des tileMatreixSet disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_tilematrixsets'
+    
+  /ogcapitiles/tilematrixsets/{tms}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les informations sur un tileMatrixSet
+      operationId: ogc_get_tilematrixsets_id
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: tms
+          required: true
+          in: path
+          description: tileMatrixSet demandée
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
+  
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_tilematrixsets_id'
+
+  /ogcapitiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: 
+      operationId: ogc_get_coll_maptile_default_style
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+        
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: 
+      operationId: ogc_get_coll_tile_default_style
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/map/tiles/{tms}/{level}/{row}/{col}?collections={layer}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: 
+      operationId: ogc_get_maptile_default_style
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: collections
+          required: true
+          in: query
+          description: couche demandée
+          schema:
+            type: string
+        
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}:
+   get:
+      tags:
+      - OGC API Tiles
+      summary: 
+      operationId: ogc_get_tile_default_style
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: collections
+          required: true
+          in: query
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}?collections={layer}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: 
+      operationId: ogc_get_maptile_style
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: collections
+          required: true
+          in: query
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: 
+      operationId: ogc_get_coll_maptile_style
+      x-query: "{&parameters*}" # changed the prefix to &
+      parameters:
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+      
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
   ######################################### ADMIN
 
   /admin/layers/{layername}:
@@ -1024,6 +1370,18 @@ components:
         name: 'WMS_Capabilities'
       type: object
       additionalProperties: false
+
+    ogc_collections:
+      type: object
+
+    ogc_collections_id:
+      type: object
+
+    ogc_tilematrixsets:
+      type: object
+
+    ogc_tilematrixsets_id:
+      type: object
 
     healthcheck:
       type: object

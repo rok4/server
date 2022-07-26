@@ -120,7 +120,6 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "        }\n";
         res << "      },\n";
         res << "     \"crs\": [],\n"; // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
-        // FIXME [OGC] comment determiner le type de donnée ?
         // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
         std::string dataType = "map"; // map / vector 
         if (! Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
