@@ -978,10 +978,45 @@ paths:
     get:
       tags:
       - OGC API Tiles
-      summary: 
+      summary: Télécharge une tuile
       operationId: ogc_get_coll_maptile_default_style
       x-query: "{&parameters*}" # changed the prefix to &
       parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
 
         - name: f
           required: true
@@ -1005,10 +1040,45 @@ paths:
     get:
       tags:
       - OGC API Tiles
-      summary: 
+      summary: Télécharge une tuile
       operationId: ogc_get_coll_tile_default_style
       x-query: "{&parameters*}" # changed the prefix to &
       parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
 
         - name: f
           required: true
@@ -1032,11 +1102,46 @@ paths:
     get:
       tags:
       - OGC API Tiles
-      summary: 
+      summary: Télécharge une tuile
       operationId: ogc_get_maptile_default_style
       x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+          
         - name: collections
           required: true
           in: query
@@ -1066,10 +1171,45 @@ paths:
    get:
       tags:
       - OGC API Tiles
-      summary: 
+      summary: Télécharge une tuile
       operationId: ogc_get_tile_default_style
       x-query: "{&parameters*}" # changed the prefix to &
       parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
 
         - name: collections
           required: true
@@ -1099,11 +1239,53 @@ paths:
     get:
       tags:
       - OGC API Tiles
-      summary: 
+      summary: Télécharge une tuile
       operationId: ogc_get_maptile_style
       x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: style
+          required: true
+          in: path
+          description: style demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+        
         - name: collections
           required: true
           in: query
@@ -1133,10 +1315,52 @@ paths:
     get:
       tags:
       - OGC API Tiles
-      summary: 
+      summary: Télécharge une tuile
       operationId: ogc_get_coll_maptile_style
       x-query: "{&parameters*}" # changed the prefix to &
       parameters:
+
+        - name: style
+          required: true
+          in: path
+          description: style demandée
+          schema:
+            type: string
+          
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
 
         - name: f
           required: true
