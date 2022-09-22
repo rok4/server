@@ -819,7 +819,6 @@ paths:
       - OGC API Tiles
       summary: Récupère la liste des couches disponibles
       operationId: ogc_get_collections
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
         - name: f
@@ -847,7 +846,6 @@ paths:
       - OGC API Tiles
       summary: Récupère les informations sur une couche
       operationId: ogc_get_collections_maptile_id
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
         - name: layer
@@ -882,7 +880,6 @@ paths:
       - OGC API Tiles
       summary: Récupère les informations sur une couche
       operationId: ogc_get_collections_tile_id
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
         - name: layer
@@ -917,7 +914,6 @@ paths:
       - OGC API Tiles
       summary: Récupère la liste des tileMatreixSet disponibles
       operationId: ogc_get_tilematrixsets
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
         - name: f
@@ -945,7 +941,6 @@ paths:
       - OGC API Tiles
       summary: Récupère les informations sur un tileMatrixSet
       operationId: ogc_get_tilematrixsets_id
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
         - name: tms
@@ -980,7 +975,6 @@ paths:
       - OGC API Tiles
       summary: Télécharge une tuile
       operationId: ogc_get_coll_maptile_default_style
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
         - name: layer
@@ -1042,7 +1036,6 @@ paths:
       - OGC API Tiles
       summary: Télécharge une tuile
       operationId: ogc_get_coll_tile_default_style
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
         - name: layer
@@ -1098,21 +1091,13 @@ paths:
                 type: string
                 format: binary
 
-  /ogcapitiles/map/tiles/{tms}/{level}/{row}/{col}?collections={layer}:
+  /ogcapitiles/map/tiles/{tms}/{level}/{row}/{col}:
     get:
       tags:
       - OGC API Tiles
       summary: Télécharge une tuile
       operationId: ogc_get_maptile_default_style
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
-
-        - name: layer
-          required: true
-          in: path
-          description: couche demandée
-          schema:
-            type: string
 
         - name: tms
           required: true
@@ -1167,21 +1152,13 @@ paths:
                 type: string
                 format: binary
 
-  /ogcapitiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}:
+  /ogcapitiles/tiles/{tms}/{level}/{row}/{col}:
    get:
       tags:
       - OGC API Tiles
       summary: Télécharge une tuile
       operationId: ogc_get_tile_default_style
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
-
-        - name: layer
-          required: true
-          in: path
-          description: couche demandée
-          schema:
-            type: string
 
         - name: tms
           required: true
@@ -1235,21 +1212,13 @@ paths:
                 type: string
                 format: binary
 
-  /ogcapitiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}?collections={layer}:
+  /ogcapitiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}:
     get:
       tags:
       - OGC API Tiles
       summary: Télécharge une tuile
       operationId: ogc_get_maptile_style
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
-
-        - name: layer
-          required: true
-          in: path
-          description: couche demandée
-          schema:
-            type: string
 
         - name: style
           required: true
@@ -1317,7 +1286,6 @@ paths:
       - OGC API Tiles
       summary: Télécharge une tuile
       operationId: ogc_get_coll_maptile_style
-      x-query: "{&parameters*}" # changed the prefix to &
       parameters:
 
         - name: style
