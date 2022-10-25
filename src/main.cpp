@@ -68,7 +68,6 @@
 #include "ConfLoader.h"
 #include <proj.h>
 #include <csignal>
-#include <bits/signum.h>
 #include <sys/time.h>
 #include <locale>
 #include <limits>
@@ -111,7 +110,7 @@ volatile timeval signal_timestamp;
  * \brief Display the command line parameters
  */
 void usage() {
-    std::cerr<< "Usage : rok4 [-f server_config_file]" <<std::endl;
+    std::cerr << "Usage : rok4 [-f server_config_file]" <<std::endl;
 }
 
 /**

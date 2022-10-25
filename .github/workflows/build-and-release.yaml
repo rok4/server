@@ -6,8 +6,10 @@ on:
       - '**'
 
 jobs:
-  build:
+  build_2004:
     runs-on: ubuntu-20.04
+    outputs:
+      release_upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
 
       - uses: actions/checkout@v2
@@ -18,13 +20,13 @@ jobs:
         run: |
           sudo apt update
           sudo apt -y install gettext libfcgi-dev libtinyxml-dev zlib1g-dev libcurl4-openssl-dev libproj-dev libssl-dev libturbojpeg0-dev \
-            libjpeg-dev libc6-dev librados-dev libboost-log-dev libboost-filesystem-dev libboost-system-dev libopenjp2-7-dev \
+            libjpeg-dev libc6-dev librados-dev libboost-log-dev libboost-filesystem-dev libboost-system-dev libopenjp2-7-dev libjson11-1-dev \
             libproj-dev libsqlite3-dev build-essential cmake
 
       - name: Build debian package
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_VERSION=${{ github.ref_name }} -DOBJECT_ENABLED=1 ..
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_VERSION=${{ github.ref_name }} -DPACKAGE_FORMAT=debian -DOBJECT_ENABLED=1 ..
           make -j2
           make package
 
@@ -60,4 +62,48 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./build/rok4-server-${{ github.ref_name }}-linux-amd64.tar.gz
           asset_name: rok4-server-${{ github.ref_name }}-ubuntu20.04-amd64.tar.gz
+          asset_content_type: application/gzip
+  build_2204:
+    runs-on: ubuntu-22.04
+    needs: build_2004
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt -y install gettext libfcgi-dev libtinyxml-dev zlib1g-dev libcurl4-openssl-dev libproj-dev libssl-dev libturbojpeg0-dev \
+            libjpeg-dev libc6-dev librados-dev libboost-log-dev libboost-filesystem-dev libboost-system-dev libopenjp2-7-dev libjson11-1-dev \
+            libproj-dev libsqlite3-dev build-essential cmake
+
+      - name: Build debian package
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_VERSION=${{ github.ref_name }} -DPACKAGE_FORMAT=debian -DOBJECT_ENABLED=1 ..
+          make -j2
+          make package
+
+      - name: Add debian package to release
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{needs.build_2004.outputs.release_upload_url}}
+          asset_path: ./build/rok4-server-${{ github.ref_name }}-ubuntu22.04-amd64.deb
+          asset_name: rok4-server-${{ github.ref_name }}-ubuntu22.04-amd64.deb
           asset_content_type: application/vnd.debian.binary-package
+
+      - name: Add TGZ package to release
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{needs.build_2004.outputs.release_upload_url}}
+          asset_path: ./build/rok4-server-${{ github.ref_name }}-ubuntu22.04-amd64.tar.gz
+          asset_name: rok4-server-${{ github.ref_name }}-ubuntu22.04-amd64.tar.gz
+          asset_content_type: application/gzip

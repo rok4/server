@@ -11,6 +11,7 @@ set(BUILD_SHARED_LIBS OFF)
 ################### PARAMÈTRES
 
 option(BUILD_VERSION "Build version" 0.0.0)
+option(CPACK_SYSTEM_NAME "System name for packaging" "linux")
 option(CMAKE_INSTALL_PREFIX "Installation location" "/usr/local")
 option(OBJECT_ENABLED "Build with object storage" 0)
 option(DEBUG_BUILD "Build with debug mode" 0)
@@ -45,6 +46,9 @@ message(STATUS "Modules CMake : ${CMAKE_MODULE_PATH}")
 
 include(cmake/modules/dependencies.cmake)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 ################### COMPILATION
 
 # Configuration du fichier (injection de la version et de la compilation objet)
@@ -58,7 +62,6 @@ message(STATUS "Building ROK4 Server")
 
 # Dossiers contenant les headers nécessaires
 include_directories(lib/core/src)
-include_directories(lib/core/src/healthcheck)
 include_directories(${PROJECT_BINARY_DIR} ${BOOSTLOG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${FCGI_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${PROJ_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
 
 file(GLOB ROK4SERVER_SRCS "${PROJECT_SOURCE_DIR}/src/*.cpp" "${PROJECT_SOURCE_DIR}/src/healthcheck/*.cpp")
@@ -66,6 +69,7 @@ add_executable(rok4 ${ROK4SERVER_SRCS})
 
 # Lien des librairies dépendantes
 target_link_libraries(rok4 PUBLIC rok4core fcgi tinyxml boostlogsetup boostthread boostfilesystem boostsystem curl openssl crypto proj)
+target_link_libraries(rok4 PRIVATE Threads::Threads)
 
 ################### TESTS
 
@@ -108,8 +112,7 @@ else()
     set(BUILD_ARCHITECTURE "i386")
 endif()
 
-set(CPACK_GENERATOR "DEB;TGZ")
-set(CPACK_SYSTEM_NAME "linux")
+set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-${VERSION}-${CPACK_SYSTEM_NAME}-${BUILD_ARCHITECTURE}")
 set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 
@@ -117,12 +120,20 @@ set(CPACK_PACKAGE_VERSION ${VERSION})
 set(CPACK_PACKAGE_VENDOR "IGN")
 set(CPACK_PACKAGE_CONTACT "IGN - Géoportail (<tout_rdev@ign.fr>)")
 
-# Debian
-set(CPACK_DEBIAN_PACKAGE_SECTION "science")
-set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "rok4-styles, rok4-tilematrixsets, libfcgi-dev ,libtinyxml-dev ,zlib1g-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libturbojpeg0-dev ,libjpeg-dev ,libc6-dev ,librados-dev ,libjson11-1-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
-set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${ROK4GENERATION_SOURCE_DIR}/cmake/debian/postinst;" )
-set(CPACK_BINARY_DEB "ON")
+if(CPACK_SYSTEM_NAME AND CPACK_SYSTEM_NAME STREQUAL "debian11" OR CPACK_SYSTEM_NAME STREQUAL "debian12")
+    set(CPACK_GENERATOR "DEB;TGZ")
+
+    # Debian
+    set(CPACK_DEBIAN_PACKAGE_SECTION "science")
+    set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "rok4-styles, rok4-tilematrixsets, libfcgi-dev ,libtinyxml-dev ,zlib1g-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libturbojpeg0-dev ,libjpeg-dev ,libc6-dev ,librados-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_SOURCE_DIR}/cmake/debian/postinst;" )
+    set(CPACK_BINARY_DEB "ON")
+endif()
+
+if(CPACK_SYSTEM_NAME AND CPACK_SYSTEM_NAME STREQUAL "alpine3")
+    set(CPACK_GENERATOR "TGZ")
+endif()
 
 include(CPack)
 

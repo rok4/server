@@ -22,7 +22,7 @@ Télécharger les paquets sur GitHub :
 ```bash
 apt install ./rok4-styles-<version>-linux-all.deb
 apt install ./rok4-tilematrixsets-<version>-linux-all.deb
-apt install ./rok4-server-<version>-ubuntu20.04-amd64.deb
+apt install ./rok4-server-<version>-<system>-amd64.deb
 ```
 
 ## Installation depuis les sources
