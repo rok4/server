@@ -66,7 +66,7 @@ DataStream* Rok4Server::AdminCreateLayer ( Request* request ) {
     if ( layer != NULL )
         return new SERDataStream ( new ServiceException ( "",ADMIN_CONFLICT,"Layer " +str_layer+" already exists.","admin", "application/json" ) );
 
-    layer = new Layer( str_layer, request->body, serverConf, servicesConf );
+    layer = new Layer( str_layer, request->body, servicesConf );
     if ( ! layer->isOk() ) {
         std::string msg = layer->getErrorMessage();
         delete layer;
@@ -132,7 +132,7 @@ DataStream* Rok4Server::AdminUpdateLayer ( Request* request ) {
     if ( layer == NULL )
         return new SERDataStream ( new ServiceException ( "",HTTP_NOT_FOUND,"Layer " +str_layer+" does not exists.","admin", "application/json" ) );
 
-    Layer* newLayer = new Layer( str_layer, request->body, serverConf, servicesConf );
+    Layer* newLayer = new Layer( str_layer, request->body, servicesConf );
     if ( ! newLayer->isOk() ) {
         std::string msg = newLayer->getErrorMessage();
         delete newLayer;

@@ -367,6 +367,7 @@ bool ServicesConf::parse(json11::Json& doc) {
             errorMessage = "common.inspire have to be a boolean";
             return false;
         }
+        StyleBook::set_inspire(inspire);
         if (commonSection["post_mode"].is_bool()) {
             postMode = commonSection["post_mode"].bool_value();
         } else if (! commonSection["post_mode"].is_null()) {

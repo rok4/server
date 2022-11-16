@@ -830,7 +830,7 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
         res << "    ],\n";
 
         // tms
-        auto tms = this->getTmsList();
+        auto tms = TmsBook::get_book();
         std::map<std::string, TileMatrixSet *>::iterator itt = tms.begin();
         res << "    \"tms\": [\n";
         while(itt != tms.end()) {
@@ -843,7 +843,7 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
         res << "    ],\n";
 
         // styles
-        auto styles = this->getStylesList();
+        auto styles = StyleBook::get_book();
         std::map<std::string, Style *>::iterator its = styles.begin();
         res << "    \"styles\": [\n";
         while(its != styles.end()) {
@@ -930,8 +930,6 @@ void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
 ServicesConf* Rok4Server::getServicesConf() { return servicesConf; }
 ServerConf* Rok4Server::getServerConf() { return serverConf; }
 std::map<std::string, Layer*>& Rok4Server::getLayerList() { return serverConf->layersList; }
-std::map<std::string, TileMatrixSet*>& Rok4Server::getTmsList() { return serverConf->tmsList; }
-std::map<std::string, Style*>& Rok4Server::getStylesList() { return serverConf->stylesList; }
 
 int Rok4Server::getFCGISocket() { return sock; }
 void Rok4Server::setFCGISocket(int sockFCGI) { sock = sockFCGI; }

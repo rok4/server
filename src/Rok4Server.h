@@ -611,16 +611,6 @@ public:
      * \~english Return the layers list
      */
     std::map<std::string, Layer*>& getLayerList() ;
-    /**
-     * \~french Retourne la liste des TileMatrixSets
-     * \~english Return the TileMatrixSets list
-     */
-    std::map<std::string, TileMatrixSet*>& getTmsList() ;
-    /**
-     * \~french Retourne la liste des styles
-     * \~english Return the styles list
-     */
-    std::map<std::string, Style*>& getStylesList() ;
 
     /**
      * \~french

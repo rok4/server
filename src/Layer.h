@@ -231,7 +231,7 @@ private:
     void calculateNativeTileMatrixLimits();
     void calculateExtraTileMatrixLimits();
 
-    bool parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servicesConf);
+    bool parse(json11::Json& doc, ServicesConf* servicesConf);
 
 public:
     /**
@@ -239,33 +239,29 @@ public:
     * Crée un Layer à partir d'un fichier JSON
     * \brief Constructeur
     * \param[in] path Chemin vers le descripteur de couche
-    * \param[in] serverConf Configuration du serveur
     * \param[in] servicesConf Configuration des services
     * \~english
     * Create a Layer from a JSON file
     * \brief Constructor
     * \param[in] path Path to layer descriptor
-    * \param[in] serverConf Server configuration
     * \param[in] servicesConf Services configuration
     */
-    Layer(std::string path, ServerConf* serverConf, ServicesConf* servicesConf );
+    Layer(std::string path, ServicesConf* servicesConf );
     /**
     * \~french
     * Crée un Layer à partir d'un contenu JSON
     * \brief Constructeur
     * \param[in] layerName Identifiant de la couche
     * \param[in] content Contenu JSON
-    * \param[in] serverConf Configuration du serveur
     * \param[in] servicesConf Configuration des services
     * \~english
     * Create a Layer from JSON content
     * \brief Constructor
     * \param[in] layerName Layer identifier
     * \param[in] content JSON content
-    * \param[in] serverConf Server configuration
     * \param[in] servicesConf Services configuration
     */
-    Layer(std::string layerName, std::string content, ServerConf* serverConf, ServicesConf* servicesConf );
+    Layer(std::string layerName, std::string content, ServicesConf* servicesConf );
 
     /**
      * \~french

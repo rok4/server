@@ -193,6 +193,7 @@ bool ServerConf::parse(json11::Json& doc) {
         }
 
         // styles
+        std::string styleDir;
         if (configurationsSection["styles"].is_null()) {
             std::cerr << "No configurations.styles, default value used" << std::endl;
             styleDir = DEFAULT_STYLE_DIR;
@@ -202,8 +203,10 @@ bool ServerConf::parse(json11::Json& doc) {
         } else {
             styleDir = configurationsSection["styles"].string_value();
         }
+        StyleBook::set_directory(styleDir);
 
         // tile_matrix_sets
+        std::string tmsDir;
         if (configurationsSection["tile_matrix_sets"].is_null()) {
             std::cerr << "No configurations.tile_matrix_sets, default value used" << std::endl;
             tmsDir = DEFAULT_TMS_DIR;
@@ -213,6 +216,7 @@ bool ServerConf::parse(json11::Json& doc) {
         } else {
             tmsDir = configurationsSection["tile_matrix_sets"].string_value();
         }
+        TmsBook::set_directory(tmsDir);
     }
 
     return true;
@@ -247,16 +251,6 @@ ServerConf::ServerConf(std::string path) : Configuration(path) {
 
 ServerConf::~ServerConf(){ 
 
-    // Les TMS
-    std::map<std::string, TileMatrixSet*>::iterator itTMS;
-    for ( itTMS=tmsList.begin(); itTMS!=tmsList.end(); itTMS++ )
-        delete itTMS->second;
-
-    // Les styles
-    std::map<std::string, Style*>::iterator itSty;
-    for ( itSty=stylesList.begin(); itSty!=stylesList.end(); itSty++ )
-        delete itSty->second;
-
     // Les couches
     std::map<std::string, Layer*>::iterator itLay;
     for ( itLay=layersList.begin(); itLay!=layersList.end(); itLay++ )
@@ -272,53 +266,6 @@ std::string ServerConf::getLogFilePrefix() {return logFilePrefix;}
 boost::log::v2_mt_posix::trivial::severity_level ServerConf::getLogLevel() {return logLevel;}
 
 std::string ServerConf::getServicesConfigFile() {return servicesConfigFile;}
-
-std::string ServerConf::getTmsDir() {return tmsDir;}
-std::map<std::string, TileMatrixSet*> ServerConf::getTmsList() {return tmsList;}
-void ServerConf::addTMS(TileMatrixSet* t) {
-    tmsList.insert ( std::pair<std::string, TileMatrixSet *> ( t->getId(), t ) );
-}
-int ServerConf::getNbTMS() {
-    return tmsList.size();
-}
-TileMatrixSet* ServerConf::getTMS(std::string id) {
-    std::map<std::string, TileMatrixSet*>::iterator tmsIt= tmsList.find ( id );
-    if ( tmsIt == tmsList.end() ) {
-        return NULL;
-    }
-    return tmsIt->second;
-}
-void ServerConf::removeTMS(std::string id) {
-    std::map<std::string, TileMatrixSet*>::iterator itTms= tmsList.find ( id );
-    if ( itTms != tmsList.end() ) {
-        delete itTms->second;
-        tmsList.erase(itTms);
-    }
-}
-
-
-std::string ServerConf::getStylesDir() {return styleDir;}
-std::map<std::string, Style*> ServerConf::getStylesList() {return stylesList;}
-void ServerConf::addStyle(Style* s) {
-    stylesList.insert ( std::pair<std::string, Style *> ( s->getId(), s ) );
-}
-int ServerConf::getNbStyles() {
-    return stylesList.size();
-}
-Style* ServerConf::getStyle(std::string id) {
-    std::map<std::string, Style*>::iterator styleIt= stylesList.find ( id );
-    if ( styleIt == stylesList.end() ) {
-        return NULL;
-    }
-    return styleIt->second;
-}
-void ServerConf::removeStyle(std::string id) {
-    std::map<std::string, Style*>::iterator styleIt= stylesList.find ( id );
-    if ( styleIt != stylesList.end() ) {
-        delete styleIt->second;
-        stylesList.erase(styleIt);
-    }
-}
 
 std::string ServerConf::getLayersDir() {return layerDir;}
 void ServerConf::addLayer(Layer* l) {

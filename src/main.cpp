@@ -65,7 +65,6 @@
  */
 
 #include "Rok4Server.h"
-#include "ConfLoader.h"
 #include <proj.h>
 #include <csignal>
 #include <sys/time.h>
@@ -77,6 +76,7 @@
 #include <time.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
+#include "utils/Cache.h"
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
@@ -123,7 +123,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
 
     std::string strServerConfigFile = serverConfigFile;
 
-    ServerConf* serverConf = ConfLoader::buildServerConf(strServerConfigFile);
+    ServerConf* serverConf = new ServerConf( strServerConfigFile );
     if ( ! serverConf->isOk() ) {
         std::cerr << "FATAL: Cannot load server configuration " << std::endl;
         std::cerr << "FATAL: " << serverConf->getErrorMessage() << std::endl;
@@ -162,7 +162,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
     }
 
     // Construction des parametres de service
-    ServicesConf* servicesConf = ConfLoader::buildServicesConf ( serverConf->getServicesConfigFile() );
+    ServicesConf* servicesConf = new ServicesConf ( serverConf->getServicesConfigFile() );
     if ( ! servicesConf->isOk() ) {
         BOOST_LOG_TRIVIAL(fatal) << "Cannot load services configuration " << std::endl;
         BOOST_LOG_TRIVIAL(fatal) << servicesConf->getErrorMessage() << std::endl;
@@ -170,29 +170,25 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
         return NULL;
     }
 
-    // Chargement des TMS
-    if ( ! ConfLoader::buildTMSList ( serverConf ) ) {
-        BOOST_LOG_TRIVIAL(fatal) <<   "Impossible de charger la conf des TileMatrix" ;
-        BOOST_LOG_TRIVIAL(fatal) <<   "Extinction du serveur ROK4" ;
-        sleep ( 1 );    // Pour laisser le temps au logger pour se vider
-        return NULL;
-    }
-
-    //Chargement des styles
-    if ( ! ConfLoader::buildStylesList ( serverConf, servicesConf ) ) {
-        BOOST_LOG_TRIVIAL(fatal) <<   "Impossible de charger la conf des Styles" ;
-        BOOST_LOG_TRIVIAL(fatal) <<   "Extinction du serveur ROK4" ;
-        sleep ( 1 );    // Pour laisser le temps au logger pour se vider
-        return NULL;
-    }
-
     // Chargement des layers
-    if ( ! ConfLoader::buildLayersList ( serverConf, servicesConf ) ) {
-        BOOST_LOG_TRIVIAL(fatal) <<   "Impossible de charger la conf des Layers/pyramides" ;
-        BOOST_LOG_TRIVIAL(fatal) <<   "Extinction du serveur ROK4" ;
-        sleep ( 1 );    // Pour laisser le temps au logger pour se vider
-        return NULL;
+
+    BOOST_LOG_TRIVIAL(info) << "LAYERS LOADING" ;
+    // lister les fichier du repertoire layerDir
+    std::string layerDir = serverConf->getLayersDir();
+    std::vector<std::string> layerFiles = Configuration::listFileFromDir(layerDir, ".json");
+
+    // generer les Layers decrits par les fichiers.
+    for ( unsigned int i = 0; i < layerFiles.size(); i++ ) {
+        Layer* layer = new Layer(layerFiles.at(i), servicesConf );
+        if ( layer->isOk() ) {
+            serverConf->addLayer ( layer );
+        } else {
+            BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layerFiles[i] << ": " << layer->getErrorMessage();
+            delete layer;
+        }
     }
+
+    BOOST_LOG_TRIVIAL(info) << serverConf->getNbLayers() << " layer(s) loaded" ;
 
     // Instanciation du serveur
     return new Rok4Server ( serverConf, servicesConf );
@@ -327,6 +323,7 @@ int main ( int argc, char** argv ) {
 
     // Demarrage du serveur
     while ( reload ) {
+
         reload = false;
         int pid = getpid();
         std::cout<<  "Server start " << "["<< pid <<"]" <<std::endl;
@@ -344,6 +341,8 @@ int main ( int argc, char** argv ) {
                 std::cout<<  "Servers switch " << "["<< pid <<"]" <<std::endl;
                 W = Wtmp;
                 Wtmp = 0;
+                TmsBook::empty_trash();
+                StyleBook::empty_trash();
             }
             W->setFCGISocket ( sock );
         }
@@ -357,6 +356,9 @@ int main ( int argc, char** argv ) {
         defer_signal--;
         
         W->run(signal_pending);
+
+        TmsBook::send_to_trash();
+        StyleBook::send_to_trash();
 
         if ( reload ) {
             // Rechargement du serveur

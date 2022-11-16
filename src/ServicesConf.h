@@ -45,7 +45,6 @@ class ServicesConf;
 
 #include "Rok4Server.h"
 #include "utils/Keyword.h"
-#include "ConfLoader.h"
 #include "MetadataURL.h"
 #include "utils/CRS.h"
 #include "utils/Configuration.h"

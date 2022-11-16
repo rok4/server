@@ -122,7 +122,7 @@ DataSource* Rok4Server::getTileParamTMS ( Request* request, Layer*& layer, TileM
     }
 
     // Le style
-    style = serverConf->getStyle(layer->getDefaultStyle());
+    style = StyleBook::get_style(layer->getDefaultStyle());
 
     // Le format : on vérifie la cohérence de l'extension avec le format des données
 

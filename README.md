@@ -133,6 +133,8 @@ On configure les logs de manière à les retrouver dans un fichier par jour :
 }
 ```
 
+Les répertoires dans lesquels sont les tile matrix sets et les styles peuvent être des dossiers (comme `file:///etc/rok4/tilematrixsets`) ou des préfixes objets  (comme `s3://tilematrixsets`). Sans préfixe précisant le type de stockage, le chemin est interprété en mode fichier.
+
 * Les paramètres possibles du fichier de configuration `server.json` sont décrits [ici](./config/server.schema.json)
 * Les paramètres possibles du fichier de configuration `services.json` sont décrits [ici](./config/services.schema.json)
 
@@ -204,6 +206,7 @@ On redémarre nginx : `systemctl restart nginx`
 Lorsque le serveur reçoit une requête, c'est le premier élément du chemin qui détermine le service :
 
 * `/` -> requête globale
+* `/healthcheck` -> requête d'état de santé ou statut du serveur
 * `/wmts` -> requête WMTS
 * `/wms` -> requête WMS
 * `/tms` -> requête TMS

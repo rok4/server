@@ -16,7 +16,7 @@
     "configurations": {
         "services": "/etc/rok4/services.json",
         "layers": "/etc/rok4/layers",
-        "styles": "/etc/rok4/styles",
-        "tile_matrix_sets": "/etc/rok4/tilematrixsets"
+        "styles": "file:///etc/rok4/styles",
+        "tile_matrix_sets": "file:///etc/rok4/tilematrixsets"
     }
 }

@@ -57,7 +57,7 @@
         },
         "cache": {
             "type": "object",
-            "description": "Paramètres du cahe des index des dalles",
+            "description": "Paramètres du cache des index des dalles",
             "properties": {
                 "size": {
                     "type": "integer",
@@ -81,15 +81,15 @@
                 },
                 "layers": {
                     "type": "string",
-                    "description": "Chemin vers le dossier des descripteurs de couches"
+                    "description": "Chemin vers la racine des descripteurs de couches (répertoire fichier ou préfixe objet)"
                 },
                 "styles": {
                     "type": "string",
-                    "description": "Chemin vers le dossier de configurations des styles"
+                    "description": "Chemin vers la racine de configurations des styles (répertoire fichier ou préfixe objet)"
                 },
                 "tile_matrix_sets": {
                     "type": "string",
-                    "description": "Chemin vers le dossier de définition des tile matrix sets"
+                    "description": "Chemin vers la racine de définition des tile matrix sets (répertoire fichier ou préfixe objet)"
                 }
             }
 

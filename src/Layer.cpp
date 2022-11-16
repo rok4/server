@@ -45,7 +45,7 @@
 
 #include "Layer.h"
 #include "utils/Pyramid.h"
-#include "ConfLoader.h"
+#include "utils/Cache.h"
 
 #include <boost/log/trivial.hpp>
 #include <libgen.h>
@@ -55,7 +55,7 @@
 
 #include "utils/Utils.h"
 
-bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servicesConf) {
+bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
 
     bool inspire = servicesConf->isInspire();
 
@@ -153,37 +153,6 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
                     return false;
                 }
 
-                Context* context;
-                if (pyr["bucket_name"].is_string()) {
-
-                    context = StoragePool::addContext(ContextType::S3CONTEXT, pyr["bucket_name"].string_value());
-                    if (context == NULL) {
-                        errorMessage = "Cannot add s3 storage context to load pyramid's descriptor";
-                        return false;
-                    }
-                }
-                else if (pyr["pool_name"].is_string()) {
-                    context = StoragePool::addContext(ContextType::CEPHCONTEXT, pyr["pool_name"].string_value());
-                    if (context == NULL) {
-                        errorMessage = "Cannot add ceph storage context to load pyramid's descriptor";
-                        return false;
-                    }
-                }
-                else if (pyr["container_name"].is_string()) {
-                    context = StoragePool::addContext(ContextType::SWIFTCONTEXT, pyr["container_name"].string_value());
-                    if (context == NULL) {
-                        errorMessage = "Cannot add swift storage context to load pyramid's descriptor";
-                        return false;
-                    }
-                }
-                else {
-                    context = StoragePool::addContext(ContextType::FILECONTEXT, "");
-                    if (context == NULL) {
-                        errorMessage = "Cannot add file storage context to load pyramid's descriptor";
-                        return false;
-                    }
-                }
-
                 if (pyr["top_level"].is_string()) {
                     topLevels.push_back(pyr["top_level"].string_value());
                 } else {
@@ -198,9 +167,11 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
                     return false;
                 }
 
-                Pyramid* p = ConfLoader::buildPyramid ( context, pyr_path, serverConf);
-                if ( ! p ) {
+                Pyramid* p = new Pyramid( pyr_path );
+                if ( ! p->isOk() ) {
+                    BOOST_LOG_TRIVIAL(error) << p->getErrorMessage();
                     errorMessage =  "Pyramid " + pyr_path +" cannot be loaded"  ;
+                    delete p;
                     return false;
                 }
 
@@ -221,7 +192,18 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
         return false;
     }
 
-    dataPyramid = ConfLoader::buildPyramid ( pyramids, bottomLevels, topLevels );
+    dataPyramid = new Pyramid(pyramids.at(0));
+
+    BOOST_LOG_TRIVIAL(debug) << "pyramide composée de " << pyramids.size() << " pyramide(s)";
+
+    for (int i = 0; i < pyramids.size(); i++) {
+        if (! dataPyramid->addLevels(pyramids.at(i), bottomLevels.at(i), topLevels.at(i))) {
+            BOOST_LOG_TRIVIAL(error) << "Cannot compose pyramid to broadcast with input pyramid " << i;
+            delete dataPyramid;
+            errorMessage = "Pyramid to broadcast cannot be loaded";
+            break;
+        }
+    }
     
     // Nettoyage des pyramides en entrée
     for (int i = 0; i < pyramids.size(); i++) {
@@ -229,7 +211,7 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
     }
 
     if ( ! dataPyramid ) {
-        errorMessage = "Pyramid to broadcast cannot be loaded";
+        // Une erreur de chargement a été rencontrée lors de la composition
         return false;
     }
 
@@ -328,9 +310,13 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
                 if (st.is_string()) {
                     std::string styleName = st.string_value();
                     
-                    Style* sty = serverConf->getStyle(styleName);
+                    Style* sty = StyleBook::get_style(styleName);
                     if ( sty == NULL ) {
-                        BOOST_LOG_TRIVIAL(warning) <<  "Style " << styleName <<" unknown"  ;
+                        BOOST_LOG_TRIVIAL(warning) <<  "Style " << styleName <<" unknown or unloadable"  ;
+                        continue;
+                    }
+                    if ( ! sty->isUsableForBroadcast() ) {
+                        BOOST_LOG_TRIVIAL(warning) << "Style " << styleName << " not usable for broadcast" ;
                         continue;
                     }
 
@@ -354,9 +340,13 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
             return false;
         } else {
             std::string styleName = ( inspire ? DEFAULT_STYLE_INSPIRE : DEFAULT_STYLE );
-            Style* sty = serverConf->getStyle(styleName);
+            Style* sty = StyleBook::get_style(styleName);
             if ( sty == NULL ) {
-                errorMessage =  "Default style unknown"  ;
+                errorMessage =  "Default style unknown or unloadable"  ;
+                return false;
+            }
+            if ( ! sty->isUsableForBroadcast() ) {
+                errorMessage = "Default style " + styleName + " not usable for broadcast" ;
                 return false;
             }
 
@@ -373,9 +363,13 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
 
         if ( inspire ) {
 
-            Style* sty = serverConf->getStyle(inspireStyleName);
+            Style* sty = StyleBook::get_style(inspireStyleName);
             if ( sty == NULL ) {
-                errorMessage =  "Style inspire unknown"  ;
+                errorMessage =  "Style inspire unknown or unloadable"  ;
+                return false;
+            }
+            if ( ! sty->isUsableForBroadcast() ) {
+                errorMessage = "Inspire style " + inspireStyleName + " not usable for broadcast" ;
                 return false;
             }
             // On insère le style inspire en tête
@@ -383,7 +377,7 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
         }
 
         if ( styles.size() ==0 ) {
-            errorMessage =  "Pas de Style defini, Layer non valide"  ;
+            errorMessage =  "No provided valid style, the layer is not valid"  ;
             return false;
         }
 
@@ -399,7 +393,7 @@ bool Layer::parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servi
                         errorMessage =  "wmts.tms have to be a string array"  ;
                         return false;
                     }
-                    TileMatrixSet* tms = serverConf->getTMS(t.string_value());
+                    TileMatrixSet* tms = TmsBook::get_tms(t.string_value());
                     if ( tms == NULL ) {
                         BOOST_LOG_TRIVIAL(warning) <<  "TMS " << t.string_value() <<" unknown"  ;
                         continue;
@@ -588,7 +582,7 @@ void Layer::calculateExtraTileMatrixLimits() {
     WMTSTMSList = newList;
 }
 
-Layer::Layer(std::string path, ServerConf* serverConf, ServicesConf* servicesConf ) : Configuration(path), dataPyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string path, ServicesConf* servicesConf ) : Configuration(path), dataPyramid(NULL), attribution(NULL) {
 
     /********************** Id */
     id = Configuration::getFileName(filePath, ".json");
@@ -613,7 +607,7 @@ Layer::Layer(std::string path, ServerConf* serverConf, ServicesConf* servicesCon
 
     /********************** Parse */
 
-    if (! parse(doc, serverConf, servicesConf)) {
+    if (! parse(doc, servicesConf)) {
         return;
     }
 
@@ -629,7 +623,7 @@ Layer::Layer(std::string path, ServerConf* serverConf, ServicesConf* servicesCon
 }
 
 
-Layer::Layer(std::string layerName, std::string content, ServerConf* serverConf, ServicesConf* servicesConf ) : Configuration(), id(layerName), dataPyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string layerName, std::string content, ServicesConf* servicesConf ) : Configuration(), id(layerName), dataPyramid(NULL), attribution(NULL) {
 
     /********************** Id */
 
@@ -649,7 +643,7 @@ Layer::Layer(std::string layerName, std::string content, ServerConf* serverConf,
 
     /********************** Parse */
 
-    if (! parse(doc, serverConf, servicesConf)) {
+    if (! parse(doc, servicesConf)) {
         return;
     }
 

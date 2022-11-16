@@ -1190,12 +1190,6 @@ components:
                 type: string
               top_level:
                 type: string
-              pool_name:
-                type: string
-              bucket_name:
-                type: string
-              container_name:
-                type: string
 
             required:
               - path

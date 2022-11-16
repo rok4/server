@@ -67,20 +67,6 @@ class ServerConf : public Configuration
 
         std::string getServicesConfigFile() ;
 
-        std::string getTmsDir() ;
-        std::map<std::string, TileMatrixSet*> getTmsList() ;
-        void addTMS(TileMatrixSet* t) ;
-        void removeTMS(std::string id) ;
-        int getNbTMS() ;
-        TileMatrixSet* getTMS(std::string id) ;
-
-        std::string getStylesDir() ;
-        std::map<std::string, Style*> getStylesList() ;
-        void addStyle(Style* s) ;
-        void removeStyle(std::string id) ;
-        int getNbStyles() ;
-        Style* getStyle(std::string id) ;
-
         std::string getLayersDir() ;
         void addLayer(Layer* l) ;
         void removeLayer(std::string id) ;
@@ -124,28 +110,6 @@ class ServerConf : public Configuration
          * \~english \brief Available layers list
          */
         std::map<std::string, Layer*> layersList;
-
-        /**
-         * \~french \brief Dossier contenant les Tile Matric Sets
-         * \~english \brief TMS files' directory
-         */
-        std::string tmsDir;
-        /**
-         * \~french \brief Liste des TileMatrixSet disponibles
-         * \~english \brief Available TileMatrixSet list
-         */
-        std::map<std::string,TileMatrixSet*> tmsList;
-
-        /**
-         * \~french \brief Dossier contenant les fichiers de style
-         * \~english \brief Style files' directory
-         */
-        std::string styleDir;
-        /**
-         * \~french \brief Liste des styles disponibles
-         * \~english \brief Available styles list
-         */
-        std::map<std::string, Style*> stylesList;
 
         /**
          * \~french \brief Adresse du socket d'écoute (vide si lancement géré par un tiers)

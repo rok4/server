@@ -91,7 +91,7 @@ DataSource* Rok4Server::getTileParamWMTS ( Request* request, Layer*& layer, Tile
         return new SERDataSource ( new ServiceException ( "",OWS_INVALID_PARAMETER_VALUE,"TileMatrixSet inconnu.","wmts" ) );
     }
 
-    tms = serverConf->getTMS(str_tms);
+    tms = TmsBook::get_tms(str_tms);
     if ( tms == NULL )
         return new SERDataSource ( new ServiceException ( "",OWS_INVALID_PARAMETER_VALUE,"TileMatrixSet " +str_tms+" inconnu.","wmts" ) );
 
