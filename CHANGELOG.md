@@ -14,6 +14,10 @@ Des routes de santé sont ajoutées afin de pouvoir surveiller l'activité du se
   * `/healthcheck/depends` : informations sur les stockages, nombres de contextes par type
   * `/healthcheck/threads` : informations sur les threads, statut, requêtes prises en charge, dernier temps de réponse
 
+### [Fixed]
+
+* Passage du nombre de jours sur 2 chiffres dans les appels S3
+
 <!-- 
 ### [Added]
 
