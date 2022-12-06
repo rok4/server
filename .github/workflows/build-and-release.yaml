@@ -26,7 +26,7 @@ jobs:
       - name: Build debian package
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_VERSION=${{ github.ref_name }} -DPACKAGE_FORMAT=debian -DOBJECT_ENABLED=1 ..
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_VERSION=${{ github.ref_name }} -DCPACK_SYSTEM_NAME=debian11 -DOBJECT_ENABLED=1 ..
           make -j2
           make package
 
@@ -43,24 +43,24 @@ jobs:
           prerelease: false
 
       - name: Add debian package to release
-        id: upload-release-asset 
+        id: upload-release-asset-deb
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/rok4-server-${{ github.ref_name }}-linux-amd64.deb
+          asset_path: ./build/rok4-server-${{ github.ref_name }}-debian11-amd64.deb
           asset_name: rok4-server-${{ github.ref_name }}-ubuntu20.04-amd64.deb
           asset_content_type: application/vnd.debian.binary-package
 
       - name: Add TGZ package to release
-        id: upload-release-asset 
+        id: upload-release-asset-tgz
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/rok4-server-${{ github.ref_name }}-linux-amd64.tar.gz
+          asset_path: ./build/rok4-server-${{ github.ref_name }}-debian11-amd64.tar.gz
           asset_name: rok4-server-${{ github.ref_name }}-ubuntu20.04-amd64.tar.gz
           asset_content_type: application/gzip
   build_2204:
@@ -82,28 +82,28 @@ jobs:
       - name: Build debian package
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_VERSION=${{ github.ref_name }} -DPACKAGE_FORMAT=debian -DOBJECT_ENABLED=1 ..
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_VERSION=${{ github.ref_name }} -DCPACK_SYSTEM_NAME=debian12 -DOBJECT_ENABLED=1 ..
           make -j2
           make package
 
       - name: Add debian package to release
-        id: upload-release-asset 
+        id: upload-release-asset-deb-22 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{needs.build_2004.outputs.release_upload_url}}
-          asset_path: ./build/rok4-server-${{ github.ref_name }}-ubuntu22.04-amd64.deb
+          asset_path: ./build/rok4-server-${{ github.ref_name }}-debian12-amd64.deb
           asset_name: rok4-server-${{ github.ref_name }}-ubuntu22.04-amd64.deb
           asset_content_type: application/vnd.debian.binary-package
 
       - name: Add TGZ package to release
-        id: upload-release-asset 
+        id: upload-release-asset-tgz-22 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{needs.build_2004.outputs.release_upload_url}}
-          asset_path: ./build/rok4-server-${{ github.ref_name }}-ubuntu22.04-amd64.tar.gz
+          asset_path: ./build/rok4-server-${{ github.ref_name }}-debian12-amd64.tar.gz
           asset_name: rok4-server-${{ github.ref_name }}-ubuntu22.04-amd64.tar.gz
           asset_content_type: application/gzip
