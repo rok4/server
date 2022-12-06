@@ -604,28 +604,6 @@ public:
      */
     ~Layer();
 
-    /**
-    * \~french
-    * Écrit le fichier JSON descripteur de couche
-    * \param[in] content contenu JSON
-    * \param[in] serverConf Configuration du serveur
-    * \~english
-    * Write the layer descriptor JSON file
-    * \param[in] content JSON content
-    * \param[in] serverConf Server configuration
-    */
-    bool writeToFile(std::string content, ServerConf* serverConf) ;
-
-    /**
-    * \~french
-    * Supprime le fichier JSON descripteur de couche
-    * \param[in] serverConf Configuration du serveur
-    * \~english
-    * Remove the layer descriptor JSON file
-    * \param[in] serverConf Server configuration
-    */
-    bool removeFile(ServerConf* serverConf) ;
-
 };
 
 #endif /* LAYER_H_ */

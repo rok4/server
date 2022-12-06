@@ -27,7 +27,7 @@
                     "type": "string",
                     "description": "Type de sortie",
                     "enum": [
-                        "standard_output_stream_for_errors",
+                        "standard_output",
                         "static_file",
                         "rolling_file"
                     ]
@@ -74,6 +74,7 @@
         "configurations": {
             "type": "object",
             "description": "Fichiers secondaires de configuration",
+            "required": ["services", "styles", "tile_matrix_sets"],
             "properties": {
                 "services": {
                     "type": "string",
@@ -81,7 +82,7 @@
                 },
                 "layers": {
                     "type": "string",
-                    "description": "Chemin vers la racine des descripteurs de couches (répertoire fichier ou préfixe objet)"
+                    "description": "Chemin vers le fichier ou objet contenant la liste des descripteurs de couches à considérer"
                 },
                 "styles": {
                     "type": "string",

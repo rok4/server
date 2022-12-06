@@ -67,7 +67,7 @@ class ServerConf : public Configuration
 
         std::string getServicesConfigFile() ;
 
-        std::string getLayersDir() ;
+        std::string getLayersList() ;
         void addLayer(Layer* l) ;
         void removeLayer(std::string id) ;
         int getNbLayers() ;
@@ -101,10 +101,10 @@ class ServerConf : public Configuration
         int cacheValidity;
 
         /**
-         * \~french \brief Dossier contenant les descripteurs de couche
-         * \~english \brief Layer descriptor files' directory
+         * \~french \brief Fichier ou objet contenant la liste des descipteurs de couche
+         * \~english \brief Fil or object containing layers' descriptors list
          */
-        std::string layerDir;
+        std::string layerList;
         /**
          * \~french \brief Liste des couches disponibles
          * \~english \brief Available layers list

@@ -585,6 +585,7 @@ void Layer::calculateExtraTileMatrixLimits() {
 Layer::Layer(std::string path, ServicesConf* servicesConf ) : Configuration(path), dataPyramid(NULL), attribution(NULL) {
 
     /********************** Id */
+
     id = Configuration::getFileName(filePath, ".json");
 
     if ( containForbiddenChars(id) ) {
@@ -592,18 +593,36 @@ Layer::Layer(std::string path, ServicesConf* servicesConf ) : Configuration(path
         return;
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Add layer " << id << " from file";
+    BOOST_LOG_TRIVIAL(debug) << "Add layer " << id << " from file or object";
 
-    std::ifstream is(filePath);
-    std::stringstream ss;
-    ss << is.rdbuf();
+    /********************** Read */
 
-    std::string err;
-    json11::Json doc = json11::Json::parse ( ss.str(), err );
-    if ( doc.is_null() ) {
-        errorMessage = "Cannot load JSON file "  + filePath + " : " + err ;
+    ContextType::eContextType storage_type;
+    std::string tray_name, fo_name;
+    ContextType::split_path(path, storage_type, fo_name, tray_name);
+
+    Context* context = StoragePool::get_context(storage_type, tray_name);
+    if (context == NULL) {
+        errorMessage = "Cannot add " + ContextType::toString(storage_type) + " storage context to read style";
         return;
     }
+
+    int size = -1;
+    uint8_t* data = context->readFull(size, fo_name);
+
+    if (size < 0) {
+        errorMessage = "Cannot read style "  + path ;
+        if (data != NULL) delete[] data;
+        return;
+    }
+
+    std::string err;
+    json11::Json doc = json11::Json::parse ( std::string((char*) data, size), err );
+    if ( doc.is_null() ) {
+        errorMessage = "Cannot load JSON file "  + path + " : " + err ;
+        return;
+    }
+    if (data != NULL) delete[] data;
 
     /********************** Parse */
 
@@ -656,35 +675,6 @@ Layer::Layer(std::string layerName, std::string content, ServicesConf* servicesC
     }
     
     return;
-}
-
-
-bool Layer::writeToFile(std::string content, ServerConf* serverConf) {
-
-    std::string path = serverConf->getLayersDir() + "/" + id + ".json";
-    BOOST_LOG_TRIVIAL(debug) << "Write layer descriptor " << path;
-
-    std::ofstream myfile;
-    myfile.open (path);
-    myfile << content << std::endl;
-    myfile.close();
-        
-    return true;
-}
-
-
-bool Layer::removeFile(ServerConf* serverConf) {
-
-    std::string path = serverConf->getLayersDir() + "/" + id + ".json";
-    BOOST_LOG_TRIVIAL(debug) << "Remove layer descriptor " << path;
-    
-	if (remove(path.c_str()) != 0) {
-		return false;
-	} else {
-		return true;
-    }
-        
-    return true;
 }
 
 

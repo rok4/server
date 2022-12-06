@@ -86,11 +86,6 @@ DataStream* Rok4Server::AdminCreateLayer ( Request* request ) {
         buildTMSCapabilities();
     }
 
-    if (! layer->writeToFile(request->body, serverConf)) {
-        serverConf->removeLayer ( layer->getId() );
-        return new SERDataStream ( new ServiceException ( "",INTERNAL_SERVER_ERROR, "Cannot write file to persist data", "admin", "application/json" ) );
-    }
-
     return new EmptyResponseDataStream ();
 }
 
@@ -105,7 +100,6 @@ DataStream* Rok4Server::AdminDeleteLayer ( Request* request ) {
     if ( layer == NULL )
         return new SERDataStream ( new ServiceException ( "",HTTP_NOT_FOUND,"Layer " +str_layer+" does not exists.","admin", "application/json" ) );
 
-    layer->removeFile(serverConf);
     serverConf->removeLayer ( layer->getId() );
 
     // On recalcule les GetCapabilities
@@ -151,11 +145,6 @@ DataStream* Rok4Server::AdminUpdateLayer ( Request* request ) {
     }
     if ( servicesConf->supportTMS ) {
         buildTMSCapabilities();
-    }
-
-    if (! newLayer->writeToFile(request->body, serverConf)) {
-        serverConf->removeLayer ( newLayer->getId() );
-        return new SERDataStream ( new ServiceException ( "",INTERNAL_SERVER_ERROR, "Cannot write file to persist data", "admin", "application/json" ) );
     }
 
     return new EmptyResponseDataStream ();

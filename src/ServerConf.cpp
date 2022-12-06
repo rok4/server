@@ -61,7 +61,7 @@ bool ServerConf::parse(json11::Json& doc) {
             return false;
         } else {
             logOutput = loggerSection["output"].string_value();
-            if ( logOutput != "rolling_file" && logOutput != "standard_output_stream_for_errors" && logOutput != "static_file" ) {
+            if ( logOutput != "rolling_file" && logOutput != "standard_output" && logOutput != "static_file" ) {
                 errorMessage = "logger.output '" + loggerSection["output"].string_value() + "' is unknown";
                 return false;
             }
@@ -171,11 +171,8 @@ bool ServerConf::parse(json11::Json& doc) {
         return false;
     } else {
         // services
-        if (configurationsSection["services"].is_null()) {
-            std::cerr << "No configurations.services, default value used" << std::endl;
-            servicesConfigFile = DEFAULT_SERVICES_CONF_PATH;
-        } else if (! configurationsSection["services"].is_string()) {
-            errorMessage = "configurations.services have to be a string";
+        if (configurationsSection["services"].is_null() || ! configurationsSection["services"].is_string()) {
+            errorMessage = "configurations.services have to be provided and be a string";
             return false;
         } else {
             servicesConfigFile = configurationsSection["services"].string_value();
@@ -183,40 +180,29 @@ bool ServerConf::parse(json11::Json& doc) {
 
         // layers
         if (configurationsSection["layers"].is_null()) {
-            std::cerr << "No configurations.layers, default value used" << std::endl;
-            layerDir = DEFAULT_LAYER_DIR;
+            layerList = "";
         } else if (! configurationsSection["layers"].is_string()) {
             errorMessage = "configurations.layers have to be a string";
             return false;
         } else {
-            layerDir = configurationsSection["layers"].string_value();
+            layerList = configurationsSection["layers"].string_value();
         }
 
         // styles
-        std::string styleDir;
-        if (configurationsSection["styles"].is_null()) {
-            std::cerr << "No configurations.styles, default value used" << std::endl;
-            styleDir = DEFAULT_STYLE_DIR;
-        } else if (! configurationsSection["styles"].is_string()) {
-            errorMessage = "configurations.styles have to be a string";
+        if (configurationsSection["styles"].is_null() || ! configurationsSection["styles"].is_string()) {
+            errorMessage = "configurations.styles have to be provided and be a string";
             return false;
         } else {
-            styleDir = configurationsSection["styles"].string_value();
+            StyleBook::set_directory(configurationsSection["styles"].string_value());
         }
-        StyleBook::set_directory(styleDir);
 
         // tile_matrix_sets
-        std::string tmsDir;
-        if (configurationsSection["tile_matrix_sets"].is_null()) {
-            std::cerr << "No configurations.tile_matrix_sets, default value used" << std::endl;
-            tmsDir = DEFAULT_TMS_DIR;
-        } else if (! configurationsSection["tile_matrix_sets"].is_string()) {
-            errorMessage = "configurations.tile_matrix_sets have to be a string";
+        if (configurationsSection["tile_matrix_sets"].is_null() || ! configurationsSection["tile_matrix_sets"].is_string()) {
+            errorMessage = "configurations.tile_matrix_sets have to be provided and be a string";
             return false;
         } else {
-            tmsDir = configurationsSection["tile_matrix_sets"].string_value();
+            TmsBook::set_directory(configurationsSection["tile_matrix_sets"].string_value());
         }
-        TmsBook::set_directory(tmsDir);
     }
 
     return true;
@@ -267,7 +253,7 @@ boost::log::v2_mt_posix::trivial::severity_level ServerConf::getLogLevel() {retu
 
 std::string ServerConf::getServicesConfigFile() {return servicesConfigFile;}
 
-std::string ServerConf::getLayersDir() {return layerDir;}
+std::string ServerConf::getLayersList() {return layerList;}
 void ServerConf::addLayer(Layer* l) {
     layersList.insert ( std::pair<std::string, Layer *> ( l->getId(), l ) );
 }

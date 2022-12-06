@@ -149,7 +149,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
                 keywords::format = "%TimeStamp%\t%ProcessID%\t%Severity%\t%Message%",
                 keywords::auto_flush = true
             );
-        } else if ( serverConf->getLogOutput() == "standard_output_stream_for_errors") {
+        } else if ( serverConf->getLogOutput() == "standard_output") {
             logging::add_console_log (
                 std::cout,
                 keywords::format = "%TimeStamp%\t%ProcessID%\t%Severity%\t%Message%"
@@ -173,18 +173,42 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
     // Chargement des layers
 
     BOOST_LOG_TRIVIAL(info) << "LAYERS LOADING" ;
-    // lister les fichier du repertoire layerDir
-    std::string layerDir = serverConf->getLayersDir();
-    std::vector<std::string> layerFiles = Configuration::listFileFromDir(layerDir, ".json");
+    
+    std::string list_path = serverConf->getLayersList();
 
-    // generer les Layers decrits par les fichiers.
-    for ( unsigned int i = 0; i < layerFiles.size(); i++ ) {
-        Layer* layer = new Layer(layerFiles.at(i), servicesConf );
-        if ( layer->isOk() ) {
-            serverConf->addLayer ( layer );
-        } else {
-            BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layerFiles[i] << ": " << layer->getErrorMessage();
-            delete layer;
+    if (list_path != "") {
+        // Lecture de la liste des couches
+
+        ContextType::eContextType storage_type;
+        std::string tray_name, fo_name;
+        ContextType::split_path(list_path, storage_type, fo_name, tray_name);
+
+        Context* context = StoragePool::get_context(storage_type, tray_name);
+        if (context == NULL) {
+            BOOST_LOG_TRIVIAL(fatal) << "Cannot add " + ContextType::toString(storage_type) + " storage context to read layers list" << std::endl;
+            return NULL;
+        }
+
+        int size = -1;
+        uint8_t* data = context->readFull(size, fo_name);
+
+        if (size < 0) {
+            BOOST_LOG_TRIVIAL(fatal) << "Cannot read layers list " + list_path << std::endl;
+            if (data != NULL) delete[] data;
+            return NULL;
+        }
+        
+        std::istringstream list_content(std::string((char*) data, size));
+        delete[] data; 
+        std::string layer_desc;    
+        while (std::getline(list_content, layer_desc)) {
+            Layer* layer = new Layer(layer_desc, servicesConf );
+            if ( layer->isOk() ) {
+                serverConf->addLayer ( layer );
+            } else {
+                BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layer_desc << ": " << layer->getErrorMessage();
+                delete layer;
+            }
         }
     }
 
@@ -372,6 +396,8 @@ int main ( int argc, char** argv ) {
         delete W;
     }
 
+    TmsBook::empty_trash();
+    StyleBook::empty_trash();
     CurlPool::cleanCurlPool();
     ProjPool::cleanProjPool();
     StoragePool::cleanStoragePool();
