@@ -156,11 +156,6 @@ private:
     /******************* PYRAMIDE RASTER *********************/
 
     /**
-     * \~french \brief Identifiant du style par défaut
-     * \~english \brief default style identifier
-     */
-    std::string defaultStyle;
-    /**
      * \~french \brief Liste des styles associés
      * \~english \brief Linked styles list
      */
@@ -383,13 +378,13 @@ public:
     
     /**
      * \~french
-     * \brief Retourne le style par défaut associé à la couche (identifiant public)
-     * \return identifier de style
+     * \brief Retourne le style par défaut associé à la couche
+     * \return style
      * \~english
-     * \brief Return the layer's default style (public identifier)
-     * \return style identifier
+     * \brief Return the layer's default style
+     * \return style
      */
-    std::string getDefaultStyle() ;
+    Style* getDefaultStyle() ;
     /**
      * \~french
      * \brief Retourne la liste des styles associés à la couche

@@ -381,8 +381,6 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
             return false;
         }
 
-        defaultStyle = styles[0]->getIdentifier();
-
         // Configuration des reprojections possibles
         if ( servicesConf->getReprojectionCapability() ) {
 
@@ -707,7 +705,13 @@ std::vector<Keyword>* Layer::getKeyWords() { return &keyWords; }
 double Layer::getMaxRes() { return dataPyramid->getHighestLevel()->getRes(); }
 double Layer::getMinRes() { return dataPyramid->getLowestLevel()->getRes(); }
 Pyramid* Layer::getDataPyramid() { return dataPyramid; }
-std::string Layer::getDefaultStyle() { return defaultStyle; }
+Style* Layer::getDefaultStyle() {
+    if (styles.size() > 0) {
+        return styles[0];
+    } else {
+        return NULL;
+    }
+}
 std::vector<Style*> Layer::getStyles() { return styles; }
 std::vector<TileMatrixSet*> Layer::getWMTSTMSList() { return WMTSTMSList; }
 std::vector<std::vector<TileMatrixLimits> > Layer::getWMTSTMSLimitsList() { return WMTSTMSLimitsList; }

@@ -224,10 +224,10 @@ DataStream* Rok4Server::getMapParamWMS (
 
     std::string str_styles = request->getParam ( "styles" );
     if ( str_styles == "" ) {
-        str_styles.append ( layers.at ( 0 )->getDefaultStyle() );
+        str_styles.append ( layers.at ( 0 )->getDefaultStyle()->getIdentifier() );
         for ( int i = 1;  i < layers.size(); i++ ) {
             str_styles.append ( "," );
-            str_styles.append ( layers.at ( i )->getDefaultStyle() );
+            str_styles.append ( layers.at ( i )->getDefaultStyle()->getIdentifier() );
         }
     }
 
@@ -238,7 +238,7 @@ DataStream* Rok4Server::getMapParamWMS (
     }
     for ( int k = 0 ; k  < vector_styles.size(); k++ ) {
         if ( vector_styles.at ( k ) == "" ) {
-            vector_styles.at (k) = layers.at ( k )->getDefaultStyle();
+            vector_styles.at (k) = layers.at ( k )->getDefaultStyle()->getIdentifier();
         }
 
 
