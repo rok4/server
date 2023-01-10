@@ -1,6 +1,7 @@
 #include <string>
 #include <map>
 #include <chrono>
+#include <pthread.h>
 
 #include "InfoThread.h"
 #include "../Request.h"
@@ -62,6 +63,7 @@ class Threads {
          */
         static void add();
         static void add(long unsigned int);
+        static void add(pthread_t);
 
         /**
          * @brief Update thread information (request, ...)
@@ -81,6 +83,7 @@ class Threads {
          */
         static void status(ThreadStatus::eStatus);
         static void status(long unsigned int, ThreadStatus::eStatus);
+        static void status(pthread_t, ThreadStatus::eStatus);
 
         /**
          * @brief Show status of all threads in JSON format

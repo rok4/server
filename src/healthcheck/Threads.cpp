@@ -30,6 +30,10 @@ void Threads::add() {
     Threads::add(i);
 }
 
+void Threads::add(pthread_t thread) {
+  const long unsigned int thread_id = (long unsigned int) thread;
+  Threads::add(thread_id);
+}
 void Threads::add(long unsigned int i) {
     BOOST_LOG_TRIVIAL(debug) << "add" << "(call thread " << i << ")";
     m_threads.insert(std::make_pair<long unsigned int, InfoThread>(std::move(i), InfoThread(i)));
@@ -38,6 +42,11 @@ void Threads::add(long unsigned int i) {
 void Threads::status(ThreadStatus::eStatus value) {
     pthread_t i = pthread_self();
     Threads::status(i, value);
+}
+
+void Threads::status(pthread_t thread, ThreadStatus::eStatus value) {
+  const long unsigned int thread_id = (long unsigned int) thread;
+  Threads::status(thread_id, value);
 }
 
 void Threads::status(long unsigned int i, ThreadStatus::eStatus value) {
