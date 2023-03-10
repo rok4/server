@@ -1,18 +1,12 @@
-# Serveur de diffusion ROK4
-
 ## Summary
 
-Correction de la gestion des styles d'une couche
+La lecture des header dans l'interrogation d'un stockage Swift se fait en mode insensible à la casse
 
 ## Changelog
 
-### [Changed]
-
-* Le style par défaut d'une couche est défini comme le premier style défini au niveau de la couche
-
 ### [Fixed]
 
-* Pas de récupération du style lors de l'interrogation en TMS d'une couche de tuiles vectorielles
+* SwiftContext : lecture des header insensable à la casse
 
 <!-- 
 ### [Added]
