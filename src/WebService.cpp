@@ -37,10 +37,10 @@
 
 #include "WebService.h"
 
-#include "datastream/DataStream.h"
-#include "datasource/Decoder.h"
-#include "enums/Format.h"
-#include "utils/Cache.h"
+#include <rok4/datastream/DataStream.h>
+#include <rok4/datasource/Decoder.h>
+#include <rok4/enums/Format.h>
+#include <rok4/utils/Cache.h>
 #include "config.h"
 
 WebService::WebService(std::string url, int retry = DEFAULT_RETRY, int interval = DEFAULT_INTERVAL,

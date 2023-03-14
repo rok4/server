@@ -52,8 +52,8 @@
 #include <set>
 #include <functional>
 #include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
+#include <rok4/utils/TileMatrixSet.h>
+#include <rok4/utils/Pyramid.h>
 #include "config.h"
 
 DataStream* Rok4Server::GlobalGetServices ( Request* request ) {

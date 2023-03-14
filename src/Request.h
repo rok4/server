@@ -42,9 +42,9 @@ class Request;
 
 #include <map>
 #include <vector>
-#include "utils/BoundingBox.h"
-#include "datasource/DataSource.h"
-#include "utils/CRS.h"
+#include <rok4/utils/BoundingBox.h>
+#include <rok4/datasource/DataSource.h>
+#include <rok4/utils/CRS.h>
 #include "Layer.h"
 #include "ServicesConf.h"
 #include "fcgiapp.h"
@@ -78,7 +78,11 @@ namespace RequestType {
         GETVERSION,
         ADDLAYER,
         UPDATELAYER,
-        DELETELAYER
+        DELETELAYER,
+        GETHEALTHSTATUS,
+        GETINFOSTATUS,
+        GETTHREADSTATUS,
+        GETDEPENDSTATUS
     };
 
 
@@ -107,7 +111,8 @@ namespace ServiceType {
         WMS,
         TMS,
         GLOBAL,
-        ADMIN
+        ADMIN,
+        HEALTHCHECK
     };
 
     /**

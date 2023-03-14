@@ -51,17 +51,17 @@ class Layer;
 #include <vector>
 #include <string>
 
-#include "utils/Pyramid.h"
-#include "utils/CRS.h"
+#include <rok4/utils/Pyramid.h>
+#include <rok4/utils/CRS.h>
 #include "style/Style.h"
 #include "ServerConf.h"
 #include "ServicesConf.h"
 #include "MetadataURL.h"
 #include "AttributionURL.h"
-#include "enums/Interpolation.h"
-#include "utils/Keyword.h"
-#include "utils/BoundingBox.h"
-#include "utils/Configuration.h"
+#include <rok4/enums/Interpolation.h>
+#include <rok4/utils/Keyword.h>
+#include <rok4/utils/BoundingBox.h>
+#include <rok4/utils/Configuration.h>
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -156,11 +156,6 @@ private:
     /******************* PYRAMIDE RASTER *********************/
 
     /**
-     * \~french \brief Identifiant du style par défaut
-     * \~english \brief default style identifier
-     */
-    std::string defaultStyle;
-    /**
      * \~french \brief Liste des styles associés
      * \~english \brief Linked styles list
      */
@@ -231,7 +226,7 @@ private:
     void calculateNativeTileMatrixLimits();
     void calculateExtraTileMatrixLimits();
 
-    bool parse(json11::Json& doc, ServerConf* serverConf, ServicesConf* servicesConf);
+    bool parse(json11::Json& doc, ServicesConf* servicesConf);
 
 public:
     /**
@@ -239,33 +234,29 @@ public:
     * Crée un Layer à partir d'un fichier JSON
     * \brief Constructeur
     * \param[in] path Chemin vers le descripteur de couche
-    * \param[in] serverConf Configuration du serveur
     * \param[in] servicesConf Configuration des services
     * \~english
     * Create a Layer from a JSON file
     * \brief Constructor
     * \param[in] path Path to layer descriptor
-    * \param[in] serverConf Server configuration
     * \param[in] servicesConf Services configuration
     */
-    Layer(std::string path, ServerConf* serverConf, ServicesConf* servicesConf );
+    Layer(std::string path, ServicesConf* servicesConf );
     /**
     * \~french
     * Crée un Layer à partir d'un contenu JSON
     * \brief Constructeur
     * \param[in] layerName Identifiant de la couche
     * \param[in] content Contenu JSON
-    * \param[in] serverConf Configuration du serveur
     * \param[in] servicesConf Configuration des services
     * \~english
     * Create a Layer from JSON content
     * \brief Constructor
     * \param[in] layerName Layer identifier
     * \param[in] content JSON content
-    * \param[in] serverConf Server configuration
     * \param[in] servicesConf Services configuration
     */
-    Layer(std::string layerName, std::string content, ServerConf* serverConf, ServicesConf* servicesConf );
+    Layer(std::string layerName, std::string content, ServicesConf* servicesConf );
 
     /**
      * \~french
@@ -387,13 +378,13 @@ public:
     
     /**
      * \~french
-     * \brief Retourne le style par défaut associé à la couche (identifiant public)
-     * \return identifier de style
+     * \brief Retourne le style par défaut associé à la couche
+     * \return style
      * \~english
-     * \brief Return the layer's default style (public identifier)
-     * \return style identifier
+     * \brief Return the layer's default style
+     * \return style
      */
-    std::string getDefaultStyle() ;
+    Style* getDefaultStyle() ;
     /**
      * \~french
      * \brief Retourne la liste des styles associés à la couche
@@ -607,28 +598,6 @@ public:
      * \brief Default destructor
      */
     ~Layer();
-
-    /**
-    * \~french
-    * Écrit le fichier JSON descripteur de couche
-    * \param[in] content contenu JSON
-    * \param[in] serverConf Configuration du serveur
-    * \~english
-    * Write the layer descriptor JSON file
-    * \param[in] content JSON content
-    * \param[in] serverConf Server configuration
-    */
-    bool writeToFile(std::string content, ServerConf* serverConf) ;
-
-    /**
-    * \~french
-    * Supprime le fichier JSON descripteur de couche
-    * \param[in] serverConf Configuration du serveur
-    * \~english
-    * Remove the layer descriptor JSON file
-    * \param[in] serverConf Server configuration
-    */
-    bool removeFile(ServerConf* serverConf) ;
 
 };
 

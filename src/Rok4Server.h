@@ -50,21 +50,20 @@ class Rok4Server;
 
 #include "config.h"
 #include "ResponseSender.h"
-#include "datasource/DataSource.h"
+#include <rok4/datasource/DataSource.h>
 #include "Request.h"
 #include <pthread.h>
 #include <map>
 #include <vector>
 #include "Layer.h"
 #include <stdio.h>
-#include "utils/TileMatrixSet.h"
+#include <rok4/utils/TileMatrixSet.h>
 #include "fcgiapp.h"
 #include <csignal>
 #include "ServerConf.h"
 #include "ServicesConf.h"
 #include "GetFeatureInfoEncoder.h"
-#include "utils/BoundingBox.h"
-#include "storage/ContextBook.h"
+#include <rok4/utils/BoundingBox.h>
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -102,6 +101,18 @@ private:
      * \~english \brief Socket identifier
      */
     int sock;
+
+    /**
+     * \~french \brief Identifiant du process
+     * \~english \brief Process identifier
+     */
+    int pid;
+
+    /**
+     * \~french \brief TimeStamp du process
+     * \~english \brief Process timestamp
+     */
+    long time;
 
     /**
      * \~french \brief Configurations globales des services
@@ -505,6 +516,11 @@ private:
      */
     void processAdmin ( Request *request, FCGX_Request&  fcgxRequest );
     /**
+     * \~french Traite les requêtes d'administration
+     * \~english Process administration request
+     */
+    void processHealthCheck ( Request *request, FCGX_Request&  fcgxRequest );
+    /**
      * \~french Traite les requêtes globales
      * \~english Process global request
      */
@@ -595,21 +611,6 @@ public:
      * \~english Return the layers list
      */
     std::map<std::string, Layer*>& getLayerList() ;
-    /**
-     * \~french Retourne la liste des TileMatrixSets
-     * \~english Return the TileMatrixSets list
-     */
-    std::map<std::string, TileMatrixSet*>& getTmsList() ;
-    /**
-     * \~french Retourne la liste des styles
-     * \~english Return the styles list
-     */
-    std::map<std::string, Style*>& getStylesList() ;
-
-    /**
-     * \~french Retourne l'annuaire de contextes 
-     */
-    ContextBook* getObjectBook() ;
 
     /**
      * \~french
@@ -648,6 +649,38 @@ public:
      */
     void setFCGISocket ( int sockFCGI ) ;
     
+    /**
+     * \~french
+     * \brief Stocke le PId du process principal
+     * \~english
+     * \brief Set the main process PID
+     */
+    void setPID ( int processID );
+
+    /**
+     * \~french
+     * \brief Obtient le PID du process principal
+     * \~english
+     * \brief Get the main process PID
+     */
+    int getPID();
+
+    /**
+     * \~french
+     * \brief Stocke la date du process principal
+     * \~english
+     * \brief Set the main process time
+     */
+    void setTime ( long processTime );
+
+    /**
+     * \~french
+     * \brief Obtient la date du process principal
+     * \~english
+     * \brief Get the main process time
+     */
+    long getTime();
+
      /**
      * \~french
      * \brief Demande l'arrêt du serveur

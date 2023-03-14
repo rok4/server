@@ -52,8 +52,8 @@
 #include <set>
 #include <functional>
 #include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
+#include <rok4/utils/TileMatrixSet.h>
+#include <rok4/utils/Pyramid.h>
 #include "config.h"
 
 
@@ -66,7 +66,7 @@ DataStream* Rok4Server::AdminCreateLayer ( Request* request ) {
     if ( layer != NULL )
         return new SERDataStream ( new ServiceException ( "",ADMIN_CONFLICT,"Layer " +str_layer+" already exists.","admin", "application/json" ) );
 
-    layer = new Layer( str_layer, request->body, serverConf, servicesConf );
+    layer = new Layer( str_layer, request->body, servicesConf );
     if ( ! layer->isOk() ) {
         std::string msg = layer->getErrorMessage();
         delete layer;
@@ -86,11 +86,6 @@ DataStream* Rok4Server::AdminCreateLayer ( Request* request ) {
         buildTMSCapabilities();
     }
 
-    if (! layer->writeToFile(request->body, serverConf)) {
-        serverConf->removeLayer ( layer->getId() );
-        return new SERDataStream ( new ServiceException ( "",INTERNAL_SERVER_ERROR, "Cannot write file to persist data", "admin", "application/json" ) );
-    }
-
     return new EmptyResponseDataStream ();
 }
 
@@ -105,7 +100,6 @@ DataStream* Rok4Server::AdminDeleteLayer ( Request* request ) {
     if ( layer == NULL )
         return new SERDataStream ( new ServiceException ( "",HTTP_NOT_FOUND,"Layer " +str_layer+" does not exists.","admin", "application/json" ) );
 
-    layer->removeFile(serverConf);
     serverConf->removeLayer ( layer->getId() );
 
     // On recalcule les GetCapabilities
@@ -132,7 +126,7 @@ DataStream* Rok4Server::AdminUpdateLayer ( Request* request ) {
     if ( layer == NULL )
         return new SERDataStream ( new ServiceException ( "",HTTP_NOT_FOUND,"Layer " +str_layer+" does not exists.","admin", "application/json" ) );
 
-    Layer* newLayer = new Layer( str_layer, request->body, serverConf, servicesConf );
+    Layer* newLayer = new Layer( str_layer, request->body, servicesConf );
     if ( ! newLayer->isOk() ) {
         std::string msg = newLayer->getErrorMessage();
         delete newLayer;
@@ -151,11 +145,6 @@ DataStream* Rok4Server::AdminUpdateLayer ( Request* request ) {
     }
     if ( servicesConf->supportTMS ) {
         buildTMSCapabilities();
-    }
-
-    if (! newLayer->writeToFile(request->body, serverConf)) {
-        serverConf->removeLayer ( newLayer->getId() );
-        return new SERDataStream ( new ServiceException ( "",INTERNAL_SERVER_ERROR, "Cannot write file to persist data", "admin", "application/json" ) );
     }
 
     return new EmptyResponseDataStream ();

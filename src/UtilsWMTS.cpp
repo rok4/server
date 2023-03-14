@@ -52,9 +52,9 @@
 #include <map>
 #include <set>
 #include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
-#include "utils/Utils.h"
+#include <rok4/utils/TileMatrixSet.h>
+#include <rok4/utils/Pyramid.h>
+#include <rok4/utils/Utils.h>
 
 DataSource* Rok4Server::getTileParamWMTS ( Request* request, Layer*& layer, TileMatrixSet*& tms, TileMatrix*& tm, int& tileCol, int& tileRow, std::string& format, Style*& style) {
     // VERSION
@@ -91,7 +91,7 @@ DataSource* Rok4Server::getTileParamWMTS ( Request* request, Layer*& layer, Tile
         return new SERDataSource ( new ServiceException ( "",OWS_INVALID_PARAMETER_VALUE,"TileMatrixSet inconnu.","wmts" ) );
     }
 
-    tms = serverConf->getTMS(str_tms);
+    tms = TmsBook::get_tms(str_tms);
     if ( tms == NULL )
         return new SERDataSource ( new ServiceException ( "",OWS_INVALID_PARAMETER_VALUE,"TileMatrixSet " +str_tms+" inconnu.","wmts" ) );
 

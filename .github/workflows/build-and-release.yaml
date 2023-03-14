@@ -1,0 +1,165 @@
+name: Test, build and publish artefacts and documentation
+
+on:
+  push:
+    tags:
+      - '**'
+
+jobs:
+
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      job_status: ${{ job.status }}
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }} 
+          release_name: Release ${{ github.ref_name }} 
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+
+  build_and_test:
+
+    name: Build artefacts
+    needs: create_release
+    outputs:
+      job_status: ${{ job.status }}
+    strategy:
+      max-parallel: 2
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-20.04
+          - os: ubuntu-22.04
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt -y install libcurl4-openssl-dev libproj-dev libssl-dev libfcgi-dev \
+            libboost-log-dev libboost-filesystem-dev libboost-system-dev libtinyxml-dev \
+            jq gettext build-essential cmake libcppunit-dev doxygen graphviz
+
+          core_cpp_version=$(curl --silent "https://api.github.com/repos/rok4/core-cpp/releases/latest" | jq -r ".tag_name")
+          curl -L -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/${core_cpp_version}/librok4-base-${core_cpp_version}-${{ matrix.os }}-amd64.deb
+          sudo apt install ./librok4-dev.deb
+
+      - name: Build packages
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_VERSION=${{ github.ref_name }} -DCPACK_SYSTEM_NAME=${{ matrix.os }} ..
+          make -j2
+          make package
+
+      - name: Run unit tests
+        if: "matrix.os == 'ubuntu-20.04'"
+        run: |
+          cd build
+          make test
+
+      - name: Upload packages to release
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: 'build/*.deb;build/*.tar.gz'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.ref_name }}
+
+      - name: Build documentation
+        if: "matrix.os == 'ubuntu-20.04'"
+        run: |
+          cd build
+          make doc
+          cd ..
+          cp -r README.md CHANGELOG.md docs/openapi.yaml docs/images docs/layer.schema.json config/*.schema.json dist/
+
+      - name: Upload documentation
+        if: "matrix.os == 'ubuntu-20.04'"
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-py3
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+
+  commit_documentation:
+    name: Add documentation into gh-pages branch
+    needs: build_and_test
+    if: "always()&&(needs.create_release.outputs.job_status=='success')&&(needs.build_and_test.outputs.job_status=='success')" 
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout project on gh-pages
+        uses: actions/checkout@v3
+        with:
+          ref: 'gh-pages'
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-py3
+          path: artifact/
+
+      - name: Copy version elements to final location
+        run: |
+          mkdir -p docs/versions/${{ github.ref_name }}/docs docs/versions/${{ github.ref_name }}/config
+          cp -r artifact/html artifact/layer.schema.json docs/versions/${{ github.ref_name }}/
+          cp -r artifact/images docs/versions/${{ github.ref_name }}/docs/
+          cp -r artifact/*.schema.json docs/versions/${{ github.ref_name }}/config/
+
+      - name: Add pages from templates
+        run: |
+          sed "s#__version__#${{ github.ref_name }}#" templates/DOCUMENTATION.template.md >docs/versions/${{ github.ref_name }}/DOCUMENTATION.md
+          sed "s#__version__#${{ github.ref_name }}#" templates/CHANGELOG.template.md >docs/versions/${{ github.ref_name }}/CHANGELOG.md
+          cat artifact/CHANGELOG.md >>docs/versions/${{ github.ref_name }}/CHANGELOG.md
+          sed "s#__version__#${{ github.ref_name }}#" templates/README.template.md >docs/versions/${{ github.ref_name }}/README.md
+          cat artifact/README.md >>docs/versions/${{ github.ref_name }}/README.md
+          sed -i "s#x.y.z#${{ github.ref_name }}#g" docs/versions/${{ github.ref_name }}/README.md
+          sed "s#__version__#${{ github.ref_name }}#" templates/DOCUMENTATION.template.md >docs/versions/${{ github.ref_name }}/DOCUMENTATION.md
+          sed "s#__version__#${{ github.ref_name }}#" templates/SWAGGER.template.md >docs/versions/${{ github.ref_name }}/SWAGGER.md
+          sed "s#__version__#${{ github.ref_name }}#" artifact/openapi.yaml >docs/versions/${{ github.ref_name }}/openapi.yaml
+          echo "# Versions" >docs/versions.md
+          echo "" >>docs/versions.md
+          for v in `ls -t docs/versions`; do sed "s#__version__#$v#" templates/versions.template.md >>docs/versions.md; done
+          sed "s#__version__#${{ github.ref_name }}#" templates/latest.template.html >docs/versions/latest/index.html
+          rm -r artifact
+
+      - name: Publish on gh-pages branch
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add -v docs/versions/${{ github.ref_name }}/ docs/versions/latest/ docs/index.md docs/versions.md
+          git commit -m "Add documentation for version ${{ github.ref_name }}"
+          git push
+
+  delete_version:
+    name: Remove release and tag if error occured
+    needs: build_and_test
+    if: "always()&&(needs.create_release.outputs.job_status=='success')&&(needs.build_and_test.outputs.job_status!='success')" 
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Remove release and tag
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          tag_name: ${{ github.ref_name }}
+          delete_release: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

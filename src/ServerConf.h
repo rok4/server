@@ -44,14 +44,13 @@ class ServerConf;
 #include <string>
 #include <map>
 #include "Rok4Server.h"
-#include "utils/TileMatrixSet.h"
+#include <rok4/utils/TileMatrixSet.h>
 
-#include "utils/Configuration.h"
+#include <rok4/utils/Configuration.h>
 #include "Layer.h"
 #include "style/Style.h"
 
 #include "config.h"
-#include "storage/ContextBook.h"
 
 class ServerConf : public Configuration
 {
@@ -68,27 +67,12 @@ class ServerConf : public Configuration
 
         std::string getServicesConfigFile() ;
 
-        std::string getTmsDir() ;
-        std::map<std::string, TileMatrixSet*> getTmsList() ;
-        void addTMS(TileMatrixSet* t) ;
-        void removeTMS(std::string id) ;
-        int getNbTMS() ;
-        TileMatrixSet* getTMS(std::string id) ;
-
-        std::string getStylesDir() ;
-        std::map<std::string, Style*> getStylesList() ;
-        void addStyle(Style* s) ;
-        void removeStyle(std::string id) ;
-        int getNbStyles() ;
-        Style* getStyle(std::string id) ;
-
-        std::string getLayersDir() ;
+        std::string getLayersList() ;
         void addLayer(Layer* l) ;
         void removeLayer(std::string id) ;
         int getNbLayers() ;
         Layer* getLayer(std::string id) ;
 
-        ContextBook* getContextBook();
         
         int getNbThreads() ;
         std::string getSocket() ;
@@ -117,37 +101,15 @@ class ServerConf : public Configuration
         int cacheValidity;
 
         /**
-         * \~french \brief Dossier contenant les descripteurs de couche
-         * \~english \brief Layer descriptor files' directory
+         * \~french \brief Fichier ou objet contenant la liste des descipteurs de couche
+         * \~english \brief Fil or object containing layers' descriptors list
          */
-        std::string layerDir;
+        std::string layerList;
         /**
          * \~french \brief Liste des couches disponibles
          * \~english \brief Available layers list
          */
         std::map<std::string, Layer*> layersList;
-
-        /**
-         * \~french \brief Dossier contenant les Tile Matric Sets
-         * \~english \brief TMS files' directory
-         */
-        std::string tmsDir;
-        /**
-         * \~french \brief Liste des TileMatrixSet disponibles
-         * \~english \brief Available TileMatrixSet list
-         */
-        std::map<std::string,TileMatrixSet*> tmsList;
-
-        /**
-         * \~french \brief Dossier contenant les fichiers de style
-         * \~english \brief Style files' directory
-         */
-        std::string styleDir;
-        /**
-         * \~french \brief Liste des styles disponibles
-         * \~english \brief Available styles list
-         */
-        std::map<std::string, Style*> stylesList;
 
         /**
          * \~french \brief Adresse du socket d'écoute (vide si lancement géré par un tiers)
@@ -159,12 +121,6 @@ class ServerConf : public Configuration
          * \~english \brief Socket listen queue depth
          */
         int backlog;
-
-        /**
-         * \~french \brief Annuaire des contextes de stockage
-         * \~english \brief Storage context's book
-         */
-        ContextBook* objectBook;
 
 
         /**

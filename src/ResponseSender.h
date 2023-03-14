@@ -46,8 +46,8 @@
 #ifndef _SENDER_
 #define _SENDER_
 
-#include "datastream/DataStream.h"
-#include "datasource/DataSource.h"
+#include <rok4/datastream/DataStream.h>
+#include <rok4/datasource/DataSource.h>
 #include "fcgiapp.h"
 
 /**
