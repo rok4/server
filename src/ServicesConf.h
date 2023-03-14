@@ -44,10 +44,10 @@ class ServicesConf;
 #include <string>
 
 #include "Rok4Server.h"
-#include "utils/Keyword.h"
+#include <rok4/utils/Keyword.h>
 #include "MetadataURL.h"
-#include "utils/CRS.h"
-#include "utils/Configuration.h"
+#include <rok4/utils/CRS.h>
+#include <rok4/utils/Configuration.h>
 
 #include "config.h"
 

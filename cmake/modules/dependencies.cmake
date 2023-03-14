@@ -1,8 +1,8 @@
-if(ROK4SERVERDEPENDENCIES_FOUND)
+if(DEPENDENCIES_FOUND)
     return()
-endif(ROK4SERVERDEPENDENCIES_FOUND)
+endif(DEPENDENCIES_FOUND)
 
-message("Search dependencies for ROK4 SERVER")
+message("Search dependencies...")
 
 # Extern libraries, shared
 
@@ -77,10 +77,19 @@ if(NOT TARGET proj)
     endif(PROJ_FOUND)
 endif(NOT TARGET proj)
 
-# Extern libraries, static
+if(NOT TARGET rok4)
+    find_package(Rok4)
+    if(ROK4_FOUND)
+        add_library(rok4 SHARED IMPORTED)
+        set_property(TARGET rok4 PROPERTY IMPORTED_LOCATION ${ROK4_LIBRARY})
+    else(ROK4_FOUND)
+        message(FATAL_ERROR "Cannot find extern library rok4")
+    endif(ROK4_FOUND)
+endif(NOT TARGET rok4)
 
 if(UNITTEST_ENABLED)
-    # Extern libraries, shared
+  
+  # Extern libraries, shared
 
     if(NOT TARGET cppunit)
         find_package(CppUnit)
@@ -94,4 +103,19 @@ if(UNITTEST_ENABLED)
 
 endif(UNITTEST_ENABLED)
 
-set(ROK4SERVERDEPENDENCIES_FOUND TRUE BOOL)
+if(DOC_ENABLED)
+  
+  # Extern libraries, shared
+
+    if(NOT TARGET Doxygen)
+        find_package(Doxygen REQUIRED dot)
+        if(DOXYGEN_FOUND)
+            message(STATUS "Doxygen ${DOXYGEN_VERSION} found")
+        else(DOXYGEN_FOUND)
+            message(FATAL_ERROR "Cannot find extern tool doxygen")
+        endif(DOXYGEN_FOUND)
+    endif(NOT TARGET Doxygen)
+
+endif(DOC_ENABLED)
+
+set(DEPENDENCIES_FOUND TRUE BOOL)

@@ -46,7 +46,6 @@
 
 // Variable issues du cmake
 #cmakedefine VERSION "@VERSION@"
-#cmakedefine OBJECT_ENABLED @OBJECT_ENABLED@
 
 #include <cassert>
 // Pour déactiver tous les assert, décommenter la ligne suivante

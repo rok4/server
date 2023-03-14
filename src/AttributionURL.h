@@ -48,7 +48,7 @@ class AttributionURL;
 #ifndef ATTRIBUTIONURL_H
 #define ATTRIBUTIONURL_H
 
-#include "utils/ResourceLocator.h"
+#include <rok4/utils/ResourceLocator.h>
 #include "UtilsXML.h"
 
 /**

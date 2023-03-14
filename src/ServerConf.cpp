@@ -37,6 +37,7 @@
 
 #include "ServerConf.h"
 #include <cmath>
+#include <fstream>
 
 bool ServerConf::parse(json11::Json& doc) {
 

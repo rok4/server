@@ -44,8 +44,8 @@
  */
 
 #include "Layer.h"
-#include "utils/Pyramid.h"
-#include "utils/Cache.h"
+#include <rok4/utils/Pyramid.h>
+#include <rok4/utils/Cache.h>
 
 #include <boost/log/trivial.hpp>
 #include <libgen.h>
@@ -53,7 +53,7 @@
 #include <string>
 #include <iostream>
 
-#include "utils/Utils.h"
+#include <rok4/utils/Utils.h>
 
 bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
 
@@ -604,6 +604,7 @@ Layer::Layer(std::string path, ServicesConf* servicesConf ) : Configuration(path
         errorMessage = "Cannot add " + ContextType::toString(storage_type) + " storage context to read style";
         return;
     }
+
 
     int size = -1;
     uint8_t* data = context->readFull(size, fo_name);

@@ -10,14 +10,13 @@ set(BUILD_SHARED_LIBS OFF)
 
 ################### PARAMÈTRES
 
-option(BUILD_VERSION "Build version" 0.0.0)
-option(CPACK_SYSTEM_NAME "System name for packaging" "linux")
-option(CMAKE_INSTALL_PREFIX "Installation location" "/usr/local")
-option(OBJECT_ENABLED "Build with object storage" 0)
-option(DEBUG_BUILD "Build with debug mode" 0)
-option(UNITTEST_ENABLED "Unit tests compilation" 0)
+set(BUILD_VERSION "0.0.0" CACHE STRING "Build version")
+set(CPACK_SYSTEM_NAME "ubuntu-20.04" CACHE STRING "Building OS, to deduce package format to generate")
+set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Installation location")
+set(DEBUG_BUILD 0 CACHE BOOL "Debug mode compilation")
+set(UNITTEST_ENABLED 1 CACHE BOOL "Unit tests compilation")
+set(DOC_ENABLED 1 CACHE BOOL "Documentation compilation")
 
-################### VERSION
 set(VERSION ${BUILD_VERSION})
 
 message("Version ${VERSION}")
@@ -27,6 +26,14 @@ project(rok4-server
         VERSION ${VERSION}
         DESCRIPTION "WMS/WMTS/TMS server"
         LANGUAGES CXX)
+
+configure_file(config.h.in config.h ESCAPE_QUOTES @ONLY)
+
+set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_HAVE_THREADS_LIBRARY 1)
+set(CMAKE_USE_PTHREADS_INIT 1)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 ################### MODE DEBUG
 
@@ -39,59 +46,81 @@ else(DEBUG_BUILD)
   set(CMAKE_CXX_FLAGS_SPECIFICBUILD "-O3")
 endif(DEBUG_BUILD)
 
-################### DÉPENDANCES
+################### RECHERCHE DES DÉPENDANCES
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 message(STATUS "Modules CMake : ${CMAKE_MODULE_PATH}")
 
 include(cmake/modules/dependencies.cmake)
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
+################### DÉFINITION DES FICHIERS SOURCES ET DES HEADERS
 
-################### COMPILATION
-
-# Configuration du fichier (injection de la version et de la compilation objet)
-configure_file(config.h.in config.h ESCAPE_QUOTES @ONLY)
-
-message(STATUS "Building ROK4 Core")
-set(FILEIMAGE_ENABLED 0)
-add_subdirectory(${PROJECT_SOURCE_DIR}/lib/core)
+# Dossiers contenant les headers nécessaires
+include_directories(${PROJECT_BINARY_DIR} ${ROK4_INCLUDE_DIR} ${BOOSTLOG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${FCGI_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${PROJ_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
 
 message(STATUS "Building ROK4 Server")
 
-# Dossiers contenant les headers nécessaires
-include_directories(lib/core/src)
-include_directories(${PROJECT_BINARY_DIR} ${BOOSTLOG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${FCGI_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${PROJ_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
+file(GLOB ROK4SERVER_SRCS 
+    "${PROJECT_SOURCE_DIR}/src/*.cpp" 
+    "${PROJECT_SOURCE_DIR}/src/healthcheck/*.cpp"
+)
 
-file(GLOB ROK4SERVER_SRCS "${PROJECT_SOURCE_DIR}/src/*.cpp" "${PROJECT_SOURCE_DIR}/src/healthcheck/*.cpp")
-add_executable(rok4 ${ROK4SERVER_SRCS})
+add_executable(${PROJECT_NAME} ${ROK4SERVER_SRCS})
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "rok4")
 
 # Lien des librairies dépendantes
-target_link_libraries(rok4 PUBLIC rok4core fcgi tinyxml boostlogsetup boostthread boostfilesystem boostsystem curl openssl crypto proj)
-target_link_libraries(rok4 PRIVATE Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PUBLIC rok4 fcgi tinyxml boostlog boostlogsetup boostthread boostfilesystem boostsystem curl openssl crypto proj)
 
-################### TESTS
+################### TESTS UNITAIRES
 
 if(UNITTEST_ENABLED)
+    message("${CPPUNIT_INCLUDE_DIR}")
     include_directories(${CPPUNIT_INCLUDE_DIR})
     enable_testing()
+    add_definitions(-DUNITTEST)
     file(GLOB UnitTests_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tests/CppUnit*.cpp" )
-    add_executable(UnitTester-rok4server tests/main.cpp ${UnitTests_SRCS} tests/TimedTestListener.cpp tests/XmlTimedTestOutputterHook.cpp )
-    target_link_libraries(UnitTester-rok4server cppunit)
+    add_executable(UnitTester-${PROJECT_NAME} tests/main.cpp ${UnitTests_SRCS} tests/TimedTestListener.cpp tests/XmlTimedTestOutputterHook.cpp )
+    target_link_libraries(UnitTester-${PROJECT_NAME} cppunit)
     foreach(test ${UnitTests_SRCS})
-            message("  - adding test ${test}")
-            get_filename_component(TestName ${test} NAME_WE)
-            add_test(${TestName} UnitTester-rok4server ${TestName})
+        message("  - adding test ${test}")
+        get_filename_component(TestName ${test} NAME_WE)
+        add_test(${TestName} UnitTester-${PROJECT_NAME} ${TestName})
     endforeach(test)
 endif(UNITTEST_ENABLED)
 
+################### DOCUMENTATION
+
+if(DOC_ENABLED)
+
+    set(DOXYGEN_DOXYFILE_ENCODING UTF-8)
+    set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dist)
+    set(DOXYGEN_OUTPUT_LANGUAGE french)
+    set(DOXYGEN_INPUT_ENCODING UTF-8)
+    set(DOXYGEN_IMAGE_PATH docs/images)
+    set(DOXYGEN_RECURSIVE YES)
+    set(DOXYGEN_GENERATE_HTML YES)
+    set(DOXYGEN_GENERATE_LATEX NO)
+    set(DOXYGEN_USE_MDFILE_AS_MAINPAGE docs/main.doxygen.md)
+    set(DOXYGEN_GENERATE_TREEVIEW YES)
+    set(DOXYGEN_DISABLE_INDEX NO)
+    set(DOXYGEN_HAVE_DOT NO)
+    set(DOXYGEN_FULL_SIDEBAR NO)
+    set(DOXYGEN_HTML_HEADER docs/doxygen/header.html)
+    set(DOXYGEN_HTML_EXTRA_STYLESHEET ${CMAKE_CURRENT_SOURCE_DIR}/docs/doxygen/doxygen-awesome.css)
+    set(DOXYGEN_HTML_COLORSTYLE LIGHT)
+        
+    doxygen_add_docs(doc ${CMAKE_CURRENT_SOURCE_DIR}/src/ ${CMAKE_CURRENT_SOURCE_DIR}/docs/doxygen/)
+
+endif(DOC_ENABLED)
+
 ################### INSTALLATION
 
-install(TARGETS rok4
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+# For access to standard installation directory variables (CMAKE_INSTALL_xDIR).
+include(GNUInstallDirs)
+
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 # Installe les fichiers de configurations
@@ -120,13 +149,13 @@ set(CPACK_PACKAGE_VERSION ${VERSION})
 set(CPACK_PACKAGE_VENDOR "IGN")
 set(CPACK_PACKAGE_CONTACT "IGN - Géoportail (<tout_rdev@ign.fr>)")
 
-if(CPACK_SYSTEM_NAME AND CPACK_SYSTEM_NAME STREQUAL "debian11" OR CPACK_SYSTEM_NAME STREQUAL "debian12")
+if(CPACK_SYSTEM_NAME AND CPACK_SYSTEM_NAME STREQUAL "ubuntu-20.04" OR CPACK_SYSTEM_NAME STREQUAL "ubuntu-22.04")
     set(CPACK_GENERATOR "DEB;TGZ")
 
     # Debian
     set(CPACK_DEBIAN_PACKAGE_SECTION "science")
     set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "rok4-styles, rok4-tilematrixsets, libfcgi-dev ,libtinyxml-dev ,zlib1g-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libturbojpeg0-dev ,libjpeg-dev ,libc6-dev ,librados-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "librok4-dev, libfcgi-dev ,libtinyxml-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_SOURCE_DIR}/cmake/debian/postinst;" )
     set(CPACK_BINARY_DEB "ON")
 endif()

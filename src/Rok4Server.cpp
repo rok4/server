@@ -65,29 +65,28 @@
 #include <sstream>
 #include <vector>
 
-#include "datastream/AscEncoder.h"
-#include "datastream/BilEncoder.h"
-#include "image/ConvertedChannelsImage.h"
-#include "image/EmptyImage.h"
-#include "storage/FileContext.h"
-#include "enums/Format.h"
-#include "image/Image.h"
-#include "datastream/JPEGEncoder.h"
+#include <rok4/datastream/AscEncoder.h>
+#include <rok4/datastream/BilEncoder.h>
+#include <rok4/image/ConvertedChannelsImage.h>
+#include <rok4/image/EmptyImage.h>
+#include <rok4/enums/Format.h>
+#include <rok4/image/Image.h>
+#include <rok4/datastream/JPEGEncoder.h>
 #include "Layer.h"
-#include "image/MergeImage.h"
+#include <rok4/image/MergeImage.h>
 #include "Message.h"
-#include "datastream/PNGEncoder.h"
-#include "datasource/PaletteDataSource.h"
+#include <rok4/datastream/PNGEncoder.h>
+#include <rok4/datasource/PaletteDataSource.h>
 #include "ServiceException.h"
-#include "image/StyledImage.h"
-#include "utils/Cache.h"
-#include "datastream/TiffEncoder.h"
-#include "utils/TileMatrixSet.h"
+#include <rok4/image/StyledImage.h>
+#include <rok4/utils/Cache.h>
+#include <rok4/datastream/TiffEncoder.h>
+#include <rok4/utils/TileMatrixSet.h>
 #include "WebService.h"
 #include "config.h"
-#include "curl/curl.h"
-#include "fcgiapp.h"
-#include "utils/Cache.h"
+#include <curl/curl.h>
+#include <fcgiapp.h>
+#include <rok4/utils/Cache.h>
 #include "healthcheck/Threads.h"
 
 void hangleSIGALARM(int id) {

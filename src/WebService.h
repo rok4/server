@@ -40,11 +40,11 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "utils/BoundingBox.h"
+#include <rok4/utils/BoundingBox.h>
 #include "curl/curl.h"
-#include "image/EstompageImage.h"
-#include "datasource/DataSource.h"
-#include "datastream/DataStream.h"
+#include <rok4/image/EstompageImage.h>
+#include <rok4/datasource/DataSource.h>
+#include <rok4/datastream/DataStream.h>
 
 struct MemoryStruct {
   uint8_t *memory;

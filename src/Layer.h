@@ -51,17 +51,17 @@ class Layer;
 #include <vector>
 #include <string>
 
-#include "utils/Pyramid.h"
-#include "utils/CRS.h"
+#include <rok4/utils/Pyramid.h>
+#include <rok4/utils/CRS.h>
 #include "style/Style.h"
 #include "ServerConf.h"
 #include "ServicesConf.h"
 #include "MetadataURL.h"
 #include "AttributionURL.h"
-#include "enums/Interpolation.h"
-#include "utils/Keyword.h"
-#include "utils/BoundingBox.h"
-#include "utils/Configuration.h"
+#include <rok4/enums/Interpolation.h>
+#include <rok4/utils/Keyword.h>
+#include <rok4/utils/BoundingBox.h>
+#include <rok4/utils/Configuration.h>
 
 /**
  * \author Institut national de l'information géographique et forestière

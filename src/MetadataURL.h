@@ -48,7 +48,7 @@ class MetadataURL;
 #ifndef METADATAURL_H
 #define METADATAURL_H
 
-#include "utils/ResourceLocator.h"
+#include <rok4/utils/ResourceLocator.h>
 
 /**
  * \author Institut national de l'information géographique et forestière
