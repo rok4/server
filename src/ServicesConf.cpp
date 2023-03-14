@@ -36,6 +36,7 @@
  */
 
 #include "ServicesConf.h"
+#include <fstream>
 
 bool ServicesConf::loadEqualsCRSList(std::string file) {
 

@@ -50,20 +50,20 @@ class Rok4Server;
 
 #include "config.h"
 #include "ResponseSender.h"
-#include "datasource/DataSource.h"
+#include <rok4/datasource/DataSource.h>
 #include "Request.h"
 #include <pthread.h>
 #include <map>
 #include <vector>
 #include "Layer.h"
 #include <stdio.h>
-#include "utils/TileMatrixSet.h"
+#include <rok4/utils/TileMatrixSet.h>
 #include "fcgiapp.h"
 #include <csignal>
 #include "ServerConf.h"
 #include "ServicesConf.h"
 #include "GetFeatureInfoEncoder.h"
-#include "utils/BoundingBox.h"
+#include <rok4/utils/BoundingBox.h>
 
 /**
  * \author Institut national de l'information géographique et forestière

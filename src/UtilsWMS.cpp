@@ -51,10 +51,10 @@
 #include <vector>
 #include <map>
 #include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
-#include "utils/BoundingBox.h"
-#include "utils/Utils.h"
+#include <rok4/utils/TileMatrixSet.h>
+#include <rok4/utils/Pyramid.h>
+#include <rok4/utils/BoundingBox.h>
+#include <rok4/utils/Utils.h>
 
 int Rok4Server::GetDecimalPlaces ( double dbVal ) {
     dbVal = fmod(dbVal, 1);

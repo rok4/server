@@ -53,10 +53,10 @@
 #include <set>
 #include <functional>
 #include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
+#include <rok4/utils/TileMatrixSet.h>
+#include <rok4/utils/Pyramid.h>
 #include "config.h"
-#include "utils/Utils.h"
+#include <rok4/utils/Utils.h>
 
 DataSource* Rok4Server::getTileParamTMS ( Request* request, Layer*& layer, TileMatrixSet*& tms, TileMatrix*& tm, int& tileCol, int& tileRow, std::string& format, Style*& style) {
     

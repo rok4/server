@@ -45,8 +45,8 @@
 
 #include "Request.h"
 #include "Message.h"
-#include "utils/CRS.h"
-#include "utils/Pyramid.h"
+#include <rok4/utils/CRS.h>
+#include <rok4/utils/Pyramid.h>
 #include <cstdlib>
 #include <climits>
 #include <vector>

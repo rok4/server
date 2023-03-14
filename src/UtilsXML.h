@@ -44,8 +44,8 @@ class Attribute;
 #include <string>
 #include <tinyxml.h>
 
-#include "utils/Keyword.h"
-#include "utils/TileMatrixLimits.h"
+#include <rok4/utils/Keyword.h>
+#include <rok4/utils/TileMatrixLimits.h>
 
 class UtilsXML
 {

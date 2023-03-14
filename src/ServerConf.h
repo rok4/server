@@ -44,9 +44,9 @@ class ServerConf;
 #include <string>
 #include <map>
 #include "Rok4Server.h"
-#include "utils/TileMatrixSet.h"
+#include <rok4/utils/TileMatrixSet.h>
 
-#include "utils/Configuration.h"
+#include <rok4/utils/Configuration.h>
 #include "Layer.h"
 #include "style/Style.h"
 
