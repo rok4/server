@@ -54,7 +54,7 @@ jobs:
           sudo apt update
           sudo apt -y install libcurl4-openssl-dev libproj-dev libssl-dev libfcgi-dev \
             libboost-log-dev libboost-filesystem-dev libboost-system-dev libtinyxml-dev \
-            jq gettext build-essential cmake doxygen graphviz
+            jq gettext build-essential cmake libcppunit-dev doxygen graphviz
 
           core_cpp_version=$(curl --silent "https://api.github.com/repos/rok4/core-cpp/releases/latest" | jq -r ".tag_name")
           curl -L -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/${core_cpp_version}/librok4-base-${core_cpp_version}-${{ matrix.os }}-amd64.deb
@@ -86,7 +86,7 @@ jobs:
           cd build
           make doc
           cd ..
-          cp -r README.md CHANGELOG.md docs/openapi.yaml docs/images docs/layer.schema.json config.*.schema.json dist/
+          cp -r README.md CHANGELOG.md docs/openapi.yaml docs/images docs/layer.schema.json config/*.schema.json dist/
 
       - name: Upload documentation
         if: "matrix.os == 'ubuntu-20.04'"

@@ -6,7 +6,7 @@ La lecture des header dans l'interrogation d'un stockage Swift se fait en mode i
 
 ### [Fixed]
 
-* SwiftContext : lecture des header insensable à la casse
+* SwiftContext : lecture des header insensible à la casse
 
 <!-- 
 ### [Added]
