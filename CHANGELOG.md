@@ -18,8 +18,6 @@
 
 Les configurations des couches, styles et tile matrix sets peuvent être des objets. Styles et TMS sont chargé à l'utilisation dans des couches, et les descripteurs des couches à charger sont listés.
 
-## Changelog
-
 ### [Changed]
 
 * Chargement des styles et des TMS au besoin : ce n'est que lors de l'utilisation du style dans une couche ou d'un TMS dans une pyramide que l'on charge le fichier correspondant.
