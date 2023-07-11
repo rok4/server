@@ -19,13 +19,12 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref_name }} 
-          release_name: Release ${{ github.ref_name }} 
-          body_path: CHANGELOG.md
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          generateReleaseNotes: true
           draft: false
           prerelease: false
 
@@ -134,9 +133,10 @@ jobs:
           sed "s#__version__#${{ github.ref_name }}#" templates/DOCUMENTATION.template.md >docs/versions/${{ github.ref_name }}/DOCUMENTATION.md
           sed "s#__version__#${{ github.ref_name }}#" templates/SWAGGER.template.md >docs/versions/${{ github.ref_name }}/SWAGGER.md
           sed "s#__version__#${{ github.ref_name }}#" artifact/openapi.yaml >docs/versions/${{ github.ref_name }}/openapi.yaml
+          sed "s#__version__#${{ github.ref_name }}#" templates/index.template.md >docs/index.md
           echo "# Versions" >docs/versions.md
           echo "" >>docs/versions.md
-          for v in `ls -t docs/versions`; do sed "s#__version__#$v#" templates/versions.template.md >>docs/versions.md; done
+          for v in `ls -t docs/versions | grep -v latest`; do sed "s#__version__#$v#" templates/versions.template.md >>docs/versions.md; done
           sed "s#__version__#${{ github.ref_name }}#" templates/latest.template.html >docs/versions/latest/index.html
           rm -r artifact
 

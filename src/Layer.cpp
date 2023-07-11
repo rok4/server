@@ -200,6 +200,7 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
         if (! dataPyramid->addLevels(pyramids.at(i), bottomLevels.at(i), topLevels.at(i))) {
             BOOST_LOG_TRIVIAL(error) << "Cannot compose pyramid to broadcast with input pyramid " << i;
             delete dataPyramid;
+            dataPyramid = NULL;
             errorMessage = "Pyramid to broadcast cannot be loaded";
             break;
         }
@@ -690,6 +691,7 @@ std::string Layer::getId() {
 }
 
 Layer::~Layer() {
+
     for (unsigned int l = 0 ; l < WMSCRSList.size() ; l++) {
         delete WMSCRSList.at(l);
     }
