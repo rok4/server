@@ -65,10 +65,8 @@
  */
 
 #include "Rok4Server.h"
-#include "ConfLoader.h"
 #include <proj.h>
 #include <csignal>
-#include <bits/signum.h>
 #include <sys/time.h>
 #include <locale>
 #include <limits>
@@ -78,6 +76,7 @@
 #include <time.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
+#include <rok4/utils/Cache.h>
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
@@ -111,7 +110,7 @@ volatile timeval signal_timestamp;
  * \brief Display the command line parameters
  */
 void usage() {
-    std::cerr<< "Usage : rok4 [-f server_config_file]" <<std::endl;
+    std::cerr << "Usage : rok4 [-f server_config_file]" <<std::endl;
 }
 
 /**
@@ -124,7 +123,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
 
     std::string strServerConfigFile = serverConfigFile;
 
-    ServerConf* serverConf = ConfLoader::buildServerConf(strServerConfigFile);
+    ServerConf* serverConf = new ServerConf( strServerConfigFile );
     if ( ! serverConf->isOk() ) {
         std::cerr << "FATAL: Cannot load server configuration " << std::endl;
         std::cerr << "FATAL: " << serverConf->getErrorMessage() << std::endl;
@@ -150,7 +149,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
                 keywords::format = "%TimeStamp%\t%ProcessID%\t%Severity%\t%Message%",
                 keywords::auto_flush = true
             );
-        } else if ( serverConf->getLogOutput() == "standard_output_stream_for_errors") {
+        } else if ( serverConf->getLogOutput() == "standard_output") {
             logging::add_console_log (
                 std::cout,
                 keywords::format = "%TimeStamp%\t%ProcessID%\t%Severity%\t%Message%"
@@ -163,7 +162,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
     }
 
     // Construction des parametres de service
-    ServicesConf* servicesConf = ConfLoader::buildServicesConf ( serverConf->getServicesConfigFile() );
+    ServicesConf* servicesConf = new ServicesConf ( serverConf->getServicesConfigFile() );
     if ( ! servicesConf->isOk() ) {
         BOOST_LOG_TRIVIAL(fatal) << "Cannot load services configuration " << std::endl;
         BOOST_LOG_TRIVIAL(fatal) << servicesConf->getErrorMessage() << std::endl;
@@ -171,29 +170,49 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
         return NULL;
     }
 
-    // Chargement des TMS
-    if ( ! ConfLoader::buildTMSList ( serverConf ) ) {
-        BOOST_LOG_TRIVIAL(fatal) <<   "Impossible de charger la conf des TileMatrix" ;
-        BOOST_LOG_TRIVIAL(fatal) <<   "Extinction du serveur ROK4" ;
-        sleep ( 1 );    // Pour laisser le temps au logger pour se vider
-        return NULL;
-    }
-
-    //Chargement des styles
-    if ( ! ConfLoader::buildStylesList ( serverConf, servicesConf ) ) {
-        BOOST_LOG_TRIVIAL(fatal) <<   "Impossible de charger la conf des Styles" ;
-        BOOST_LOG_TRIVIAL(fatal) <<   "Extinction du serveur ROK4" ;
-        sleep ( 1 );    // Pour laisser le temps au logger pour se vider
-        return NULL;
-    }
-
     // Chargement des layers
-    if ( ! ConfLoader::buildLayersList ( serverConf, servicesConf ) ) {
-        BOOST_LOG_TRIVIAL(fatal) <<   "Impossible de charger la conf des Layers/pyramides" ;
-        BOOST_LOG_TRIVIAL(fatal) <<   "Extinction du serveur ROK4" ;
-        sleep ( 1 );    // Pour laisser le temps au logger pour se vider
-        return NULL;
+
+    BOOST_LOG_TRIVIAL(info) << "LAYERS LOADING" ;
+    
+    std::string list_path = serverConf->getLayersList();
+
+    if (list_path != "") {
+        // Lecture de la liste des couches
+
+        ContextType::eContextType storage_type;
+        std::string tray_name, fo_name;
+        ContextType::split_path(list_path, storage_type, fo_name, tray_name);
+
+        Context* context = StoragePool::get_context(storage_type, tray_name);
+        if (context == NULL) {
+            BOOST_LOG_TRIVIAL(fatal) << "Cannot add " + ContextType::toString(storage_type) + " storage context to read layers list" << std::endl;
+            return NULL;
+        }
+
+        int size = -1;
+        uint8_t* data = context->readFull(size, fo_name);
+
+        if (size < 0) {
+            BOOST_LOG_TRIVIAL(fatal) << "Cannot read layers list " + list_path << std::endl;
+            if (data != NULL) delete[] data;
+            return NULL;
+        }
+        
+        std::istringstream list_content(std::string((char*) data, size));
+        delete[] data; 
+        std::string layer_desc;    
+        while (std::getline(list_content, layer_desc)) {
+            Layer* layer = new Layer(layer_desc, servicesConf );
+            if ( layer->isOk() ) {
+                serverConf->addLayer ( layer );
+            } else {
+                BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layer_desc << ": " << layer->getErrorMessage();
+                delete layer;
+            }
+        }
     }
+
+    BOOST_LOG_TRIVIAL(info) << serverConf->getNbLayers() << " layer(s) loaded" ;
 
     // Instanciation du serveur
     return new Rok4Server ( serverConf, servicesConf );
@@ -328,6 +347,7 @@ int main ( int argc, char** argv ) {
 
     // Demarrage du serveur
     while ( reload ) {
+
         reload = false;
         int pid = getpid();
         std::cout<<  "Server start " << "["<< pid <<"]" <<std::endl;
@@ -345,6 +365,8 @@ int main ( int argc, char** argv ) {
                 std::cout<<  "Servers switch " << "["<< pid <<"]" <<std::endl;
                 W = Wtmp;
                 Wtmp = 0;
+                TmsBook::empty_trash();
+                StyleBook::empty_trash();
             }
             W->setFCGISocket ( sock );
         }
@@ -359,6 +381,9 @@ int main ( int argc, char** argv ) {
         
         W->run(signal_pending);
 
+        TmsBook::send_to_trash();
+        StyleBook::send_to_trash();
+
         if ( reload ) {
             // Rechargement du serveur
             BOOST_LOG_TRIVIAL(info) << "Configuration reload" ;
@@ -371,6 +396,8 @@ int main ( int argc, char** argv ) {
         delete W;
     }
 
+    TmsBook::empty_trash();
+    StyleBook::empty_trash();
     CurlPool::cleanCurlPool();
     ProjPool::cleanProjPool();
     StoragePool::cleanStoragePool();

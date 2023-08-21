@@ -27,7 +27,7 @@
                     "type": "string",
                     "description": "Type de sortie",
                     "enum": [
-                        "standard_output_stream_for_errors",
+                        "standard_output",
                         "static_file",
                         "rolling_file"
                     ]
@@ -57,7 +57,7 @@
         },
         "cache": {
             "type": "object",
-            "description": "Paramètres du cahe des index des dalles",
+            "description": "Paramètres du cache des index des dalles",
             "properties": {
                 "size": {
                     "type": "integer",
@@ -74,6 +74,7 @@
         "configurations": {
             "type": "object",
             "description": "Fichiers secondaires de configuration",
+            "required": ["services", "styles", "tile_matrix_sets"],
             "properties": {
                 "services": {
                     "type": "string",
@@ -81,15 +82,15 @@
                 },
                 "layers": {
                     "type": "string",
-                    "description": "Chemin vers le dossier des descripteurs de couches"
+                    "description": "Chemin vers le fichier ou objet contenant la liste des descripteurs de couches à considérer"
                 },
                 "styles": {
                     "type": "string",
-                    "description": "Chemin vers le dossier de configurations des styles"
+                    "description": "Chemin vers la racine de configurations des styles (répertoire fichier ou préfixe objet)"
                 },
                 "tile_matrix_sets": {
                     "type": "string",
-                    "description": "Chemin vers le dossier de définition des tile matrix sets"
+                    "description": "Chemin vers la racine de définition des tile matrix sets (répertoire fichier ou préfixe objet)"
                 }
             }
 

@@ -53,10 +53,10 @@
 #include <set>
 #include <functional>
 #include <cmath>
-#include "utils/TileMatrixSet.h"
-#include "utils/Pyramid.h"
+#include <rok4/utils/TileMatrixSet.h>
+#include <rok4/utils/Pyramid.h>
 #include "config.h"
-#include "utils/Utils.h"
+#include <rok4/utils/Utils.h>
 
 DataSource* Rok4Server::getTileParamTMS ( Request* request, Layer*& layer, TileMatrixSet*& tms, TileMatrix*& tm, int& tileCol, int& tileRow, std::string& format, Style*& style) {
     
@@ -122,7 +122,9 @@ DataSource* Rok4Server::getTileParamTMS ( Request* request, Layer*& layer, TileM
     }
 
     // Le style
-    style = serverConf->getStyle(layer->getDefaultStyle());
+    if (Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
+        style = layer->getDefaultStyle();
+    }
 
     // Le format : on vérifie la cohérence de l'extension avec le format des données
 

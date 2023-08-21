@@ -46,8 +46,8 @@
 #ifndef _MESSAGE_
 #define _MESSAGE_
 
-#include "datastream/DataStream.h"
-#include "datasource/DataSource.h"
+#include <rok4/datastream/DataStream.h>
+#include <rok4/datasource/DataSource.h>
 #include <string.h> // Pour memcpy
 #include "ServiceException.h"
 #include <vector>

@@ -65,28 +65,28 @@
 #include <sstream>
 #include <vector>
 
-#include "datastream/AscEncoder.h"
-#include "datastream/BilEncoder.h"
-#include "image/ConvertedChannelsImage.h"
-#include "image/EmptyImage.h"
-#include "storage/FileContext.h"
-#include "enums/Format.h"
-#include "image/Image.h"
-#include "datastream/JPEGEncoder.h"
+#include <rok4/datastream/AscEncoder.h>
+#include <rok4/datastream/BilEncoder.h>
+#include <rok4/image/ConvertedChannelsImage.h>
+#include <rok4/image/EmptyImage.h>
+#include <rok4/enums/Format.h>
+#include <rok4/image/Image.h>
+#include <rok4/datastream/JPEGEncoder.h>
 #include "Layer.h"
-#include "image/MergeImage.h"
+#include <rok4/image/MergeImage.h>
 #include "Message.h"
-#include "datastream/PNGEncoder.h"
-#include "datasource/PaletteDataSource.h"
+#include <rok4/datastream/PNGEncoder.h>
+#include <rok4/datasource/PaletteDataSource.h>
 #include "ServiceException.h"
-#include "image/StyledImage.h"
-#include "utils/Cache.h"
-#include "datastream/TiffEncoder.h"
-#include "utils/TileMatrixSet.h"
+#include <rok4/image/StyledImage.h>
+#include <rok4/utils/Cache.h>
+#include <rok4/datastream/TiffEncoder.h>
+#include <rok4/utils/TileMatrixSet.h>
 #include "WebService.h"
 #include "config.h"
-#include "curl/curl.h"
-#include "fcgiapp.h"
+#include <curl/curl.h>
+#include <fcgiapp.h>
+#include <rok4/utils/Cache.h>
 #include "healthcheck/Threads.h"
 
 void hangleSIGALARM(int id) {
@@ -844,7 +844,7 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
         res << "    ],\n";
 
         // tms
-        auto tms = this->getTmsList();
+        auto tms = TmsBook::get_book();
         std::map<std::string, TileMatrixSet *>::iterator itt = tms.begin();
         res << "    \"tms\": [\n";
         while(itt != tms.end()) {
@@ -857,7 +857,7 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
         res << "    ],\n";
 
         // styles
-        auto styles = this->getStylesList();
+        auto styles = StyleBook::get_book();
         std::map<std::string, Style *>::iterator its = styles.begin();
         res << "    \"styles\": [\n";
         while(its != styles.end()) {
@@ -960,8 +960,6 @@ void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
 ServicesConf* Rok4Server::getServicesConf() { return servicesConf; }
 ServerConf* Rok4Server::getServerConf() { return serverConf; }
 std::map<std::string, Layer*>& Rok4Server::getLayerList() { return serverConf->layersList; }
-std::map<std::string, TileMatrixSet*>& Rok4Server::getTmsList() { return serverConf->tmsList; }
-std::map<std::string, Style*>& Rok4Server::getStylesList() { return serverConf->stylesList; }
 
 int Rok4Server::getFCGISocket() { return sock; }
 void Rok4Server::setFCGISocket(int sockFCGI) { sock = sockFCGI; }

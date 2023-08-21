@@ -1,6 +1,6 @@
 # Serveur de diffusion WMS, WMTS et TMS
 
-Le serveur fait partie du projet open-source ROK4 (sous licence CeCILL-C) développé par les équipes du projet [Géoportail](https://www.geoportail.gouv.fr)([@Geoportail](https://twitter.com/Geoportail)) de l’[Institut National de l’Information Géographique et Forestière](https://ign.fr) ([@IGNFrance](https://twitter.com/IGNFrance)). Il est écrit en C++ et permet la diffusion de données raster ou vecteur.
+![ROK4 Logo](https://rok4.github.io/assets/images/rok4.png)
 
 Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (OGC) WMS 1.3.0 et WMTS 1.0.0, ainsi que le TMS (Tile Map Service). Il vise deux objectifs principaux :
 
@@ -11,77 +11,67 @@ Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (
 
 Les pyramides de données utilisées sont produites via les outils de [prégénération](https://github.com/rok4/pregeneration) et de [génération](https://github.com/rok4/generation).
 
-## Installation via le paquet debian
+L'implémentation s'appuie essentiellement sur la [librairie C++ du projet](https://github.com/rok4/core-cpp).
 
-Télécharger les paquets sur GitHub :
+- [Installer le serveur outils (Debian)](#installer-le-serveur-outils-debian)
+- [Utiliser le serveur](#utiliser-le-serveur)
+    - [Variables d'environnement utilisées](#variables-denvironnement-utilisées)
+    - [Configurer le serveur](#configurer-le-serveur)
+    - [Lancer le serveur](#lancer-le-serveur)
+    - [Installer et configurer NGINX](#installer-et-configurer-nginx)
+    - [Accès aux capacités du serveur](#accès-aux-capacités-du-serveur)
+- [Fonctionnement général du serveur](#fonctionnement-général-du-serveur)
+    - [Identification du service et du type de requête](#identification-du-service-et-du-type-de-requête)
+    - [Accès aux données](#accès-aux-données)
+    - [Gestion des configurations](#gestion-des-configurations)
+    - [Personnalisation des points d'accès aux services](#personnalisation-des-points-daccès-aux-services)
+- [Compiler le serveur (Debian)](#compiler-le-serveur-debian)
+    - [Dépendances supplémentaires](#dépendances-supplémentaires)
+    - [Variables CMake](#variables-cmake)
+    - [Compilation, tests unitaires et documentation et installation](#compilation-tests-unitaires-et-documentation-et-installation)
 
-* [le serveur](https://github.com/rok4/server/releases/)
-* [les styles](https://github.com/rok4/styles/releases/)
-* [les TMS](https://github.com/rok4/tilematrixsets/releases/)
 
-```bash
-apt install ./rok4-styles-<version>-linux-all.deb
-apt install ./rok4-tilematrixsets-<version>-linux-all.deb
-apt install ./rok4-server-<version>-ubuntu20.04-amd64.deb
-```
+## Installer le serveur outils (Debian)
 
-## Installation depuis les sources
+Installations système requises (listées dans le paquet debian, installées avec l'applicatif lors du `apt install`) :
 
-### Récupération du projet
+* `librok4-dev` (disponible sur [GitHub](https://github.com/rok4/core-cpp/releases/))
+* `libcurl4-openssl-dev`
+* `libssl-dev`
+* `libfcgi-dev`
+* `libtinyxml-dev`
+* `libproj-dev`
+* `libboost-log-dev`
+* `libboost-filesystem-dev`
+* `libboost-system-dev`
 
-```bash
-git clone --recursive https://github.com/rok4/server
-```
-
-ou
-
-```bash
-git clone https://github.com/rok4/server
-git submodule update --init --recursive
-```
-
-### Variables CMake
-
-* `CMAKE_INSTALL_PREFIX` : dossier d'installation du serveur. Valeur par défaut : `/usr/local`
-* `BUILD_VERSION` : version du serveur compilé. Valeur par défaut : `0.0.0`
-* `OBJECT_ENABLED` : active la compilation des classes de gestion des stockages objet. Valeur par défaut : `0`, `1` pour activer.
-* `DEBUG_BUILD` : active la compilation en mode debug. Valeur par défaut : `0`, `1` pour activer.
-* `UNITTEST_ENABLED` : active la compilation des tests unitaires. Valeur par défaut : `0`, `1` pour activer.
-
-### Dépendances à la compilation
-
-* Submodule GIT
-  * `https://github.com/rok4/core-cpp`
-* Paquets debian
-  * libfcgi-dev
-  * libtinyxml-dev
-  * zlib1g-dev
-  * libcurl4-openssl-dev
-  * libproj-dev
-  * libssl-dev
-  * libturbojpeg0-dev
-  * libjpeg-dev
-  * libc6-dev
-  * libjson11-1-dev
-  * libboost-log-dev
-  * libboost-filesystem-dev
-  * libboost-system-dev
-  * libsqlite3-dev
-  * Si `OBJECT_ENABLED` à `1`
-    * librados-dev
-  * Si `UNITTEST_ENABLED` à `1`
-    * libcppunit-dev
-
-### Compilation et installation
 
 ```bash
-mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_VERSION=0.0.1 -DOBJECT_ENABLED=1 ..
-make
-make install
+### librok4-dev
+curl -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/x.y.z/librok4-base-x.y.z-ubuntu-20.04-amd64.deb
+# or, with ceph driver
+curl -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/x.y.z/librok4-ceph-x.y.z-ubuntu-20.04-amd64.deb
+
+apt install ./librok4-dev.deb
+
+### rok4-server
+curl -o rok4-server.deb https://github.com/rok4/server/releases/download/x.y.z/rok4-server-x.y.z-ubuntu-20.04-amd64.deb
+
+apt install ./rok4-server.deb
+
+### installation des styles et des tile matrix sets 
+curl -o tilematrixsets.deb https://github.com/rok4/tilematrixsets/releases/download/4.1/rok4-tilematrixsets-4.1-linux-all.deb
+apt install ./tilematrixsets.deb
+
+curl -o styles.deb https://github.com/rok4/styles/releases/download/4.1/rok4-styles-4.1-linux-all.deb
+apt install ./rok4-styles.deb
 ```
 
-## Variables d'environnement utilisées dans les librairies de core-cpp
+## Utiliser le serveur
+
+Le serveur ROK4 est lancé en mode stand alone. Nous utiliserons ici Nginx comme serveur front pour "traduire" les requêtes HTTP en FCGI et les rediriger vers le serveur ROK4.
+
+### Variables d'environnement utilisées
 
 Leur définition est contrôlée à l'usage.
 
@@ -110,10 +100,6 @@ Leur définition est contrôlée à l'usage.
     - `HTTPS_PROXY`
     - `NO_PROXY`
 
-## Utilisation du serveur
-
-Le serveur ROK4 est lancé en mode stand alone. Nous utiliserons ici Nginx comme serveur front pour "traduire" les requêtes HTTP en FCGI et les rediriger vers le serveur ROK4.
-
 ### Configurer le serveur
 
 Dans le fichier `server.json`, on précise le port d'écoute :
@@ -133,6 +119,8 @@ On configure les logs de manière à les retrouver dans un fichier par jour :
 }
 ```
 
+Les répertoires dans lesquels sont les tile matrix sets et les styles peuvent être des dossiers (comme `file:///etc/rok4/tilematrixsets`) ou des préfixes objets  (comme `s3://tilematrixsets`). Sans préfixe précisant le type de stockage, le chemin est interprété en mode fichier.
+
 * Les paramètres possibles du fichier de configuration `server.json` sont décrits [ici](./config/server.schema.json)
 * Les paramètres possibles du fichier de configuration `services.json` sont décrits [ici](./config/services.schema.json)
 
@@ -150,11 +138,11 @@ rok4 -f /chemin/vers/fichier/server.json &
 Selon l'emplacement d'installation, le fichier dans `service/rok4.service` peut déjà être à un endroit pris en compte par systemctl (comme `/usr/lib/systemd/system`). Celui ci est écrit pour un déploiement à la racine, modifiez les chemins pour qu'il soit adapté à votre déploiement. Si l'installation a été faite via le paquet debian, le service est déjà correctement installé, et les configurations sont dans `/etc/rok4`.
 
 ```
-EnvironmentFile=/etc/rok4/config/env
-WorkingDirectory=/etc/rok4/config/
+EnvironmentFile=/etc/rok4/env
+WorkingDirectory=/etc/rok4/
 ```
 
-Le fichier `config/env` permet de définir les variables d'environnement propres au serveur pour configurer l'utilisation de stockages objets (voir [ici](#variables-denvironnement-utilisées-dans-les-librairies-de-core-cpp)).
+Le fichier `/etc/rok4/env` permet de définir les variables d'environnement propres au serveur pour configurer l'utilisation de stockages objets (voir [ici](#variables-denvironnement-utilisées)).
 
 Le serveur est lancé en tant que user (et group) `rok4`. Il convient donc de le créer : `useradd rok4`.
 
@@ -188,7 +176,7 @@ server {
 
 On redémarre nginx : `systemctl restart nginx`
 
-## Accès aux capacités du serveur
+### Accès aux capacités du serveur
 
 * Liste des services de diffusion : http://localhost/rok4/
 * GetCapabilities des services de diffusion
@@ -196,6 +184,7 @@ On redémarre nginx : `systemctl restart nginx`
     - WMTS : http://localhost/rok4/wmts?request=GetCapabilities&service=WMTS
     - TMS : http://localhost/rok4/tms/1.0.0
 * Racine de l'API d'administration : http://localhost/rok4/admin/
+* État de santé du serveur : http://localhost/rok4/healthcheck
 
 ## Fonctionnement général du serveur
 
@@ -204,6 +193,7 @@ On redémarre nginx : `systemctl restart nginx`
 Lorsque le serveur reçoit une requête, c'est le premier élément du chemin qui détermine le service :
 
 * `/` -> requête globale
+* `/healthcheck` -> requête d'état de santé ou statut du serveur
 * `/wmts` -> requête WMTS
 * `/wms` -> requête WMS
 * `/tms` -> requête TMS
@@ -225,7 +215,20 @@ Une fois que l'on a récupéré l'index, et grâce au numéro de la tuile dans l
 
 ### Gestion des configurations
 
-Au démarrage du serveur, toutes les configurations (serveur, services, tile matrix sets, styles et couches) sont chargées depuis les fichiers. Lors du fonctionnement, si une requête d'administration modifie cette configuration, les fichiers sont mis à jour (écrits, écrasés ou supprimés).
+Au démarrage du serveur, le fichier de configuration globale du serveur est chargé, puis celui des services. Si un fichier / objet est précisé pour les couches, il est lu. C'est interprété comme la liste des chemins vers les descripteurs des couches à charger à l'initialisation. Sinon, le serveur ne contient aucune couche.
+
+Lorsqu'une couche est chargée, les descripteurs de pyramide, de TMS et de styles nécessaire sont chargés à la volée. 
+
+```json
+    "configurations": {
+        "services": "/etc/rok4/services.json",
+        "layers": "s3://layers/list.txt",
+        "styles": "file:///usr/share/rok4/styles",
+        "tile_matrix_sets": "file:///usr/share/rok4/tilematrixsets"
+    }
+```
+
+Pour les TMS et les styles, ils sont cherchés dans les répertoires (fichier ou objet) renseignés dans le `server.json`, avec comme nom de fichier objet `<ID du style>.json`. Un annuaire est tenu à jour pour ne charger qu'une seule fois le style ou le TMS.
 
 ![Chargement du serveur](./docs/images/rok4server-layer-pyramid.png)
 
@@ -243,4 +246,36 @@ Pour que les URLs présentes dans les réponses des services soient correctes ma
     "tms": {
         "endpoint_uri": "http://localhost/rok4/tms"
     }
+```
+
+## Compiler le serveur (Debian)
+
+### Dépendances supplémentaires
+
+* `build-essential`
+* `cmake`
+* Pour les tests unitaires
+    * `libcppunit-dev`
+* Pour la documentation
+    * `doxygen`
+    * `graphviz`
+
+`apt install build-essential cmake libcppunit-dev doxygen graphviz` 
+
+### Variables CMake
+
+* `UNITTEST_ENABLED` : active la compilation des tests unitaires. Valeur par défaut : `1`, `0` pour désactiver.
+* `DOC_ENABLED` : active la compilation de la documentation. Valeur par défaut : `1`, `0` pour désactiver.
+* `BUILD_VERSION` : version de la librairie compilée. Valeur par défaut : `0.0.0`. Utile pour la compilation de la documentation.
+* `DEBUG_BUILD` : active la compilation en mode debug. Valeur par défaut : `0`, `1` pour activer.
+
+### Compilation, tests unitaires et documentation et installation
+
+```bash
+mkdir build && cd build
+cmake -DBUILD_VERSION=0.0.0 -DCMAKE_INSTALL_PREFIX=/opt/rok4 ..
+make
+make test
+make doc
+make install
 ```

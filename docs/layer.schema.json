@@ -1,0 +1,283 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "title": "Layer's descriptor",
+    "type": "object",
+    "additionalProperties": false,
+    "properties":
+    {
+        "title":
+        {
+            "type": "string"
+        },
+        "abstract":
+        {
+            "type": "string"
+        },
+        "keywords":
+        {
+            "type": "array",
+            "items":
+            {
+                "type": "string"
+            }
+        },
+        "styles":
+        {
+            "type": "array",
+            "items":
+            {
+                "type": "string"
+            }
+        },
+        "bbox":
+        {
+            "type": "object",
+            "required":
+            [
+                "east",
+                "west",
+                "north",
+                "south"
+            ],
+            "properties":
+            {
+                "east":
+                {
+                    "type": "number"
+                },
+                "west":
+                {
+                    "type": "number"
+                },
+                "north":
+                {
+                    "type": "number"
+                },
+                "south":
+                {
+                    "type": "number"
+                }
+            }
+        },
+        "attribution":
+        {
+            "type": "object",
+            "properties":
+            {
+                "title":
+                {
+                    "type": "string"
+                },
+                "url":
+                {
+                    "type": "string"
+                },
+                "logo":
+                {
+                    "type": "object",
+                    "properties":
+                    {
+                        "format":
+                        {
+                            "type": "string"
+                        },
+                        "url":
+                        {
+                            "type": "string"
+                        },
+                        "width":
+                        {
+                            "type": "integer"
+                        },
+                        "height":
+                        {
+                            "type": "integer"
+                        }
+                    },
+                    "required":
+                    [
+                        "format",
+                        "url",
+                        "width",
+                        "height"
+                    ]
+                }
+            },
+            "required":
+            [
+                "title",
+                "url"
+            ]
+        },
+        "metadata":
+        {
+            "type": "array",
+            "items":
+            {
+                "type": "object",
+                "properties":
+                {
+                    "format":
+                    {
+                        "type": "string"
+                    },
+                    "url":
+                    {
+                        "type": "string"
+                    },
+                    "type":
+                    {
+                        "type": "string"
+                    }
+                },
+                "required":
+                [
+                    "format",
+                    "url",
+                    "type"
+                ]
+            }
+        },
+        "pyramids":
+        {
+            "type": "array",
+            "items":
+            {
+                "type": "object",
+                "properties":
+                {
+                    "path":
+                    {
+                        "type": "string"
+                    },
+                    "bottom_level":
+                    {
+                        "type": "string"
+                    },
+                    "top_level":
+                    {
+                        "type": "string"
+                    }
+                },
+                "required":
+                [
+                    "path",
+                    "bottom_level",
+                    "top_level"
+                ]
+            }
+        },
+        "resampling":
+        {
+            "type": "string",
+            "enum": [
+                "nn", 
+                "linear", 
+                "bicubic", 
+                "lanczos",
+                "lanczos_2", 
+                "lanczos_3", 
+                "lanczos_4"
+            ]
+        },
+        "get_feature_info":
+        {
+            "type": "object",
+            "properties":
+            {
+                "type":
+                {
+                    "type": "string",
+                    "enum":
+                    [
+                        "EXTERNALWMS",
+                        "PYRAMID"
+                    ]
+                },
+                "url":
+                {
+                    "type": "string"
+                },
+                "layers":
+                {
+                    "type": "string"
+                },
+                "query_layers":
+                {
+                    "type": "string"
+                },
+                "version":
+                {
+                    "type": "string"
+                },
+                "service":
+                {
+                    "type": "string"
+                },
+                "force_epsg":
+                {
+                    "type": "boolean"
+                }
+            },
+            "required":
+            [
+                "type"
+            ]
+        },
+        "wms":
+        {
+            "type": "object",
+            "properties":
+            {
+                "authorized":
+                {
+                    "type": "boolean"
+                },
+                "crs":
+                {
+                    "type": "array",
+                    "items":
+                    {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "wmts":
+        {
+            "type": "object",
+            "properties":
+            {
+                "authorized":
+                {
+                    "type": "boolean"
+                },
+                "tms":
+                {
+                    "type": "array",
+                    "items":
+                    {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "tms":
+        {
+            "type": "object",
+            "properties":
+            {
+                "authorized":
+                {
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "required":
+    [
+        "title",
+        "abstract",
+        "pyramids"
+    ]
+}
