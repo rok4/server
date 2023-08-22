@@ -48,10 +48,12 @@
 #include <boost/algorithm/string.hpp>
 
 #include "Rok4Server.h"
-#include "utils/Utils.h"
+#include <rok4/utils/Utils.h>
+#include <rok4/utils/Cache.h>
 
-// FIXME [OGC] pour le getCapabilities (collections ou tilematrixsets), 
-// a t on besoin d'impl. les params 'limit' et 'bbox' ?
+// TODO [OGC] pour le getCapabilities (collections uniquement), 
+// impl du param 'bbox' (array[number]) : Lower left corner & Upper right corner en 
+// WGS 84 longitude/latitude sauf si le parametre 'bbox-crs' est renseigné
 
 // FIXME [OGC] quizz sur les getCapabilities : 
 // - CRS globales ?
@@ -184,7 +186,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
     std::ostringstream res_tms;
     res_tms << "{\n";
     res_tms << "  \"tilematrixsets\" : [\n";
-    auto tms = this->getTmsList();
+    auto tms = TmsBook::get_book();
     std::map<std::string, TileMatrixSet *>::iterator itt = tms.begin();
     while(itt != tms.end()) {
         TileMatrixSet* otms = itt->second;
@@ -284,8 +286,43 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
     // on determine la bonne collections en fonction du template demandé.
     std::string capabilities = "";
     if (request->tmpl == TemplateOGC::GETCAPABILITIESBYCOLLECTION) {
-        // all-collections
-        capabilities = ogctilesCapabilities.at("collections");
+        std::string str_limit = request->getParam("limit");
+        if (str_limit.empty()) {
+            // all-collections
+            capabilities = ogctilesCapabilities.at("collections");
+        } else {
+            // Limits the number of collections : 
+            // Check if Minimum = 1 / Maximum = 10000 otherwise Default = 10
+            int nlimit = std::stoi( str_limit );
+            if (nlimit < 1 || nlimit > 10000) {
+                BOOST_LOG_TRIVIAL(warning) <<  "Le parametre LIMIT doit être compris entre 1 et 10000 (sinon, 10 par défaut).";
+                nlimit = 10;
+            }
+            // Check if limit > Layers otherwise all collections
+            auto layers = this->getLayerList();
+            if (nlimit > layers.size()) {
+                BOOST_LOG_TRIVIAL(warning) <<  "Le parametre LIMIT ne doit pas depasser le nombre de collections (sinon, tous par défaut).";
+                nlimit = layers.size();
+            }
+            std::ostringstream res_limits;
+            res_limits << "{\n";
+            res_limits << "  \"links\" : [\n";
+            res_limits << "  ],\n";
+            res_limits << "  \"collections\" : [\n";
+            // Add collection
+            std::map<std::string, Layer *>::iterator itl = layers.begin();
+            for (size_t i = 0; i < nlimit; i++) {
+                res_limits << ogctilesCapabilities.at("collections::" + itl->first);
+                if (i != nlimit - 1) {
+                    itl++;
+                    res_limits << ",";
+                }
+                res_limits << "\n";
+            }
+            res_limits << "  ]\n";
+            res_limits << "}\n";
+            capabilities = res_limits.str();
+        }
     }
     else if (request->tmpl == TemplateOGC::GETTILEMATRIXSET) {
         // all-tilematrixsets
@@ -322,7 +359,7 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
             capabilities = ogctilesCapabilities.at("collections::" + str_id);
         }
         else if (request->tmpl == TemplateOGC::GETTILEMATRIXSETBYID) {
-            TileMatrixSet* tms = serverConf->getTMS(str_id);
+            TileMatrixSet* tms = TmsBook::get_tms(str_id);
             if ( tms == NULL ) {
                 return new SERDataStream ( 
                     new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TMS ID " + str_id + " inconnu.", "ogcapitiles" ) 
@@ -472,7 +509,7 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
             );
         }
 
-        tms = serverConf->getTMS(str_tms);
+        tms = TmsBook::get_tms(str_tms);
         if ( tms == NULL ) {
             return new SERDataSource ( 
                 new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TILEMATRIXSET " + str_tms + " inconnu.", "ogcapitiles" ) 
@@ -561,7 +598,11 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
             }
         }
 
-        // OTHER PARAMS NOT YET IMPLEMENTED §
+        // OTHER PARAMS NOT YET IMPLEMENTED
+        std::string str_collections = request->getParam("collections");
+        if ( !str_collections.empty() ) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre COLLECTIONS non géré :" << str_collections;
+        }
         std::string str_crs = request->getParam("crs");
         if ( !str_crs.empty() ) {
             BOOST_LOG_TRIVIAL(warning) <<  "Parametre CRS non géré :" << str_crs;
@@ -572,11 +613,11 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
         }
         std::string str_bgcolor = request->getParam("bgcolor");
         if ( !str_bgcolor.empty() ) {
-            BOOST_LOG_TRIVIAL(warning) <<  "Parametre BGCOLOR non géré :" << str_bgcolor;
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre BGCOLOR non géré (raster uniquement) :" << str_bgcolor;
         }
         std::string str_transparent = request->getParam("transparent");
         if ( !str_transparent.empty() ) {
-            BOOST_LOG_TRIVIAL(warning) <<  "Parametre TRANSPARENT non géré :" << str_transparent;
+            BOOST_LOG_TRIVIAL(warning) <<  "Parametre TRANSPARENT non géré (raster uniquement) :" << str_transparent;
         }
         std::string str_subset_crs = request->getParam("subset-crs");
         if ( !str_subset_crs.empty() ) {
