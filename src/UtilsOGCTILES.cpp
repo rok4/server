@@ -62,8 +62,9 @@
 // - limites de TMS ?
 // - metadata ?
 // - GFI ou queryable ?
+// - format des tuiles ?
 
-// TODO [OGC] les metadata peuvent elles être mises dans les 'links' ?
+// TODO [OGC] les metadata doivent elles être mises dans les 'links' ?
 
 void Rok4Server::buildOGCTILESCapabilities() {
     BOOST_LOG_TRIVIAL(warning) <<  "Not completly implemented !";
@@ -75,22 +76,17 @@ void Rok4Server::buildOGCTILESCapabilities() {
     // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/responses/common-geodata/rCollectionsList.yaml
     // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/responses/common-geodata/rCollection.yaml
 
-    // ex. impl. Geoserver : 
-    // https://vtp2.geo-solutions.it/geoserver/ogc/features?f=text%2Fhtml
-    // https://vtp2.geo-solutions.it/geoserver/ogc/tiles?f=text%2Fhtml
-
     std::ostringstream res_coll;
     res_coll << "{\n";
     res_coll << "  \"links\" : [\n";
-    // TODO [OGC] autre format de sortie en yaml ?
-    // TODO [OGC] ex. de links ...
-    // {
-    //     href: "/ogcapitiles/collections?f=applicaiton/json",
-    //     rel: "self",
-    //     type: "applicaiton/json",
-    //     title: "",
-    //     templated: false
-    // },
+    // TODO [OGC] autre format de sortie : ex. en yaml ?
+    res_coll << "    {\n";
+    res_coll << "      \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections?f=application/json\",\n";
+    res_coll << "      \"rel\": \"self\",\n";
+    res_coll << "      \"type\": \"application/json\",\n";
+    res_coll << "      \"title\": \"this document\",\n";
+    res_coll << "      \"templated\": false\n";
+    res_coll << "    }\n";
     res_coll << "  ],\n";
     res_coll << "  \"collections\" : [\n";
     // Layers
@@ -100,20 +96,29 @@ void Rok4Server::buildOGCTILESCapabilities() {
         // Layer
         Layer* layer = itl->second;
 
+        // [OGC] format : 'map' / 'vector'
+        // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
+        std::string dataType = "map"; 
+        std::string typePath = "/map/tiles";
+        if (! Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
+            dataType = "vector";
+            typePath = "/tiles";
+        }
+
         res_coll << "    {\n";
 
         std::ostringstream res_coll_id;
         res_coll_id << "{\n";
         res_coll_id << "  \"links\" : [\n";
-        // TODO [OGC] ex. de links ...
-        // {
-        //     href: "/ogcapitiles/collections/{collectionId}/map/tiles?f=applicaiton/json",
-        //     rel: "item",
-        //     type: "applicaiton/json",
-        //     title: "",
-        //     templated: false
-        // },
-        res_coll_id << "  ],\n";
+        // TODO [OGC] autre liens possibles ?
+        res_coll_id << "     {\n";
+        res_coll_id << "       \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "?f=application/json\",\n";
+        res_coll_id << "       \"rel\": \"self\",\n";
+        res_coll_id << "       \"type\": \"application/json\",\n";
+        res_coll_id << "       \"title\": \"this document\",\n";
+        res_coll_id << "       \"templated\": false\n";
+        res_coll_id << "     }\n";
+        res_coll_id << "   ],\n";
         res_coll_id << "  \"tilesets\" : [\n";
         res_coll_id << "    {\n";
 
@@ -135,32 +140,35 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "        }\n";
         res << "      },\n";
         res << "     \"crs\": [],\n"; // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
-        // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
-        std::string dataType = "map"; // TODO [OGC] format map / vector. libre ? 
-        if (! Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
-            dataType = "vector";
-        }
         res << "     \"dataType\": \"" << dataType << "\",\n";
         res << "     \"geometryDimension\": \"\",\n"; // TODO [OGC] utile ?
         res << "     \"minScaleDenominator\": \"" << layer->getMinRes() * 1000/0.28 << "\",\n";
         res << "     \"maxScaleDenominator\": \"" << layer->getMaxRes() * 1000/0.28 << "\",\n";
-        res << "     \"tileMatrixSetURI\": \"/ogcapitiles/tileMatrixSets/"  << layer->getDataPyramid()->getTms()->getId() << "\",\n";
-        res << "     \"links\":[]\n";
-        // TODO [OGC] ex. de links :
-        // {
-        //     href: "/ogcapitiles/collections/{collectionId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=image/png",
-        //     rel: "item",
-        //     type: "image/png",
-        //     title: "get tile with style by default",
-        //     templated: true
-        // },
-        // {
-        //     href: "/ogcapitiles/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=image/png&collections={collectionId}",
-        //     rel: "item",
-        //     type: "image/png",
-        //     title: "get tile with style by default",
-        //     templated: true
-        // }
+        res << "     \"tileMatrixSetURI\": " << "\"" << servicesConf->ogctilesPublicUrl << "/tilematrixsets/" << layer->getDataPyramid()->getTms()->getId() << "\",\n";
+        res << "     \"links\":[\n";
+        // TODO [OGC] autre liens possibles ?
+        res << "        {\n";
+        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "?f=application/json\",\n";
+        res << "         \"rel\": \"self\",\n";
+        res << "         \"type\": \"application/json\",\n";
+        res << "         \"title\": \"this document\",\n";
+        res << "         \"templated\": false\n";
+        res << "        },\n";
+        res << "        {\n";
+        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=image/png\",\n";
+        res << "         \"rel\": \"item\",\n";
+        res << "         \"type\": \"image/png\",\n";
+        res << "         \"title\": \"get tile with style by default\",\n";
+        res << "         \"templated\": true\n";
+        res << "        },\n";
+        res << "        {\n";
+        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=image/png&collections=" << itl->first << "\",\n";
+        res << "         \"rel\": \"item\",\n";
+        res << "         \"type\": \"image/png\",\n";
+        res << "         \"title\": \"get tile with style by default\",\n";
+        res << "         \"templated\": true\n";
+        res << "        }\n";
+        res << "      ]\n";
 
         res_coll_id << res.str();
         res_coll_id << "    }\n";
@@ -194,11 +202,11 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res_tms << "     {\n";
         res_tms << "       \"id\": \"" << otms->getId() << "\",\n";
         res_tms << "       \"title\": \"" << otms->getTitle() << "\",\n";
-        res_tms << "       \"uri\": \"/ogcapitiles/tilematrixsets/" << otms->getId() << "\",\n";
+        res_tms << "       \"uri\": " << "\"" << servicesConf->ogctilesPublicUrl << "/tilematrixsets/" << otms->getId() << "\",\n";
         res_tms << "       \"crs\": \"" << otms->getCrs()->getRequestCode() << "\",\n";
         res_tms << "       \"links\": [\n";
         res_tms << "          {\n";
-        res_tms << "            \"href\": \"/ogcapitiles/tilematrixsets/" << otms->getId() << "\",\n";
+        res_tms << "            \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/tilematrixsets/" << otms->getId() << "\",\n";
         res_tms << "            \"rel\": \"item\",\n";
         res_tms << "            \"type\": \"application/json\",\n";
         res_tms << "            \"title\": \"\",\n";
@@ -286,6 +294,15 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
     // on determine la bonne collections en fonction du template demandé.
     std::string capabilities = "";
     if (request->tmpl == TemplateOGC::GETCAPABILITIESBYCOLLECTION) {
+        // si le param 'bbox' est renseigné, 
+        // on recherche les collections qui intersectent la bbox
+        std::string str_bbox = request->getParam("bbox");
+        if (str_bbox.empty()) {
+            // TODO...
+        } 
+        // si le param 'limit' est renseigné,
+        // on limite l'affichage des collections
+        // NB: prendre en compte les collections filtrées avec le param 'bbox' !
         std::string str_limit = request->getParam("limit");
         if (str_limit.empty()) {
             // all-collections
