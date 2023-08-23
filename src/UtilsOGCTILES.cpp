@@ -98,11 +98,10 @@ void Rok4Server::buildOGCTILESCapabilities() {
         // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
         std::string dataType = "map"; 
         std::string typePath = "/map/tiles";
-        std::string typeFormat = "image/png"; // FIXME recuperer le bon format !
+        std::string mimeType = Rok4Format::toMimeType((layer->getDataPyramid()->getFormat()));
         if (! Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
             dataType = "vector";
             typePath = "/tiles";
-            typeFormat = "application/vnd.mapbox-vector-tile"; // FIXME recuperer le bon format !
         }
 
         res_coll << "    {\n";
@@ -141,10 +140,13 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "      },\n";
         res << "     \"crs\": [],\n"; // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
         res << "     \"dataType\": \"" << dataType << "\",\n";
-        res << "     \"geometryDimension\": \"\",\n"; // TODO [OGC] utile ?
-        res << "     \"minScaleDenominator\": \"" << layer->getMinRes() * 1000/0.28 << "\",\n";
-        res << "     \"maxScaleDenominator\": \"" << layer->getMaxRes() * 1000/0.28 << "\",\n";
+        res << "     \"geometryDimension\": \"\",\n"; // FIXME [OGC] utile ?
+        res << "     \"minScaleDenominator\": \"" << Rok4Server::doubleToStr(layer->getMinRes() * 1000/0.28) << "\",\n";
+        res << "     \"maxScaleDenominator\": \"" << Rok4Server::doubleToStr(layer->getMaxRes() * 1000/0.28) << "\",\n";
         res << "     \"tileMatrixSetURI\": " << "\"" << servicesConf->ogctilesPublicUrl << "/tilematrixsets/" << layer->getDataPyramid()->getTms()->getId() << "\",\n";
+        // FIXME [OGC] utile ?
+        res << "     \"minCellSize\": null,\n";
+        res << "     \"maxCellSize\": null,\n";
         res << "     \"links\":[\n";
         // TODO [OGC] autre liens possibles ?
         res << "        {\n";
@@ -155,16 +157,16 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "         \"templated\": false\n";
         res << "        },\n";
         res << "        {\n";
-        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=" << typeFormat << "\",\n";
+        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=" << mimeType << "\",\n";
         res << "         \"rel\": \"item\",\n";
-        res << "         \"type\": " << "\"" << typeFormat << "\",\n";
+        res << "         \"type\": " << "\"" << mimeType << "\",\n";
         res << "         \"title\": \"get tile with style by default\",\n";
         res << "         \"templated\": true\n";
         res << "        },\n";
         res << "        {\n";
-        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=" << typeFormat << "&collections=" << itl->first << "\",\n";
+        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=" << mimeType << "&collections=" << itl->first << "\",\n";
         res << "         \"rel\": \"item\",\n";
-        res << "         \"type\": " << "\"" << typeFormat << "\",\n";
+        res << "         \"type\": " << "\"" << mimeType << "\",\n";
         res << "         \"title\": \"get tile with style by default\",\n";
         res << "         \"templated\": true\n";
         res << "        }\n";
@@ -230,7 +232,8 @@ void Rok4Server::buildOGCTILESCapabilities() {
             }
         }
         res_tms_id << "  \"keywords\":  [" << keyWords << "],\n";
-        // TODO global tms limits with crs native !
+        // TODO :
+        //  global tms limits with crs native !
         // comment calculer la bbox du tms ?
         res_tms_id << "  \"boundingBox\": {\n";
         res_tms_id << "    \"lowerLeft\" : [],\n";
@@ -251,7 +254,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
             res_tms_id << "      \"abstract\" : \"\",\n"; // TODO [OGC] où obtenir l'info ?
             res_tms_id << "      \"keywords\" : [],\n"; // TODO [OGC] où obtenir l'info ?
             double scaleDenominator = ( ( long double ) ( otm->getRes() * otms->getCrs()->getMetersPerUnit() ) /0.00028 );
-            res_tms_id << "      \"scaleDenominator\" : " << scaleDenominator << ",\n";
+            res_tms_id << "      \"scaleDenominator\" : " << Rok4Server::doubleToStr(scaleDenominator) << ",\n";
             res_tms_id << "      \"cornerOfOrigin\" : \"topLeft\",\n";
             res_tms_id << "      \"pointOfOrigin\" : [\n"; // FIXME [OGC] la norme n'est pas claire "topLeftCorner" !?
             res_tms_id << "         " << otm->getX0() << ",\n";
