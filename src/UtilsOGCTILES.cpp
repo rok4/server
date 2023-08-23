@@ -94,13 +94,15 @@ void Rok4Server::buildOGCTILESCapabilities() {
         // Layer
         Layer* layer = itl->second;
 
-        // INFO [OGC] format : on fait le choix d'utiliser 'map' / 'vector'
+        // INFO [OGC] dataType : on fait le choix d'utiliser 'map' / 'vector' pour differencier les 2
         // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
         std::string dataType = "map"; 
         std::string typePath = "/map/tiles";
+        std::string typeFormat = "image/png"; // FIXME recuperer le bon format !
         if (! Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
             dataType = "vector";
             typePath = "/tiles";
+            typeFormat = "application/vnd.mapbox-vector-tile"; // FIXME recuperer le bon format !
         }
 
         res_coll << "    {\n";
@@ -153,16 +155,16 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "         \"templated\": false\n";
         res << "        },\n";
         res << "        {\n";
-        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=image/png\",\n";
+        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=" << typeFormat << "\",\n";
         res << "         \"rel\": \"item\",\n";
-        res << "         \"type\": \"image/png\",\n";
+        res << "         \"type\": " << "\"" << typeFormat << "\",\n";
         res << "         \"title\": \"get tile with style by default\",\n";
         res << "         \"templated\": true\n";
         res << "        },\n";
         res << "        {\n";
-        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=image/png&collections=" << itl->first << "\",\n";
+        res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << typePath << "/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}?f=" << typeFormat << "&collections=" << itl->first << "\",\n";
         res << "         \"rel\": \"item\",\n";
-        res << "         \"type\": \"image/png\",\n";
+        res << "         \"type\": " << "\"" << typeFormat << "\",\n";
         res << "         \"title\": \"get tile with style by default\",\n";
         res << "         \"templated\": true\n";
         res << "        }\n";
@@ -422,6 +424,25 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
             if ( layer == NULL ) {
                 return new SERDataStream ( 
                     new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "LAYER ID " + str_id + " inconnu.", "ogcapitiles" ) 
+                );
+            }
+            // le type d'url est t il conforme au dataType ?
+            // ex. raster -> collections/(id)/map/tiles
+            //     vector -> collections/(id)/tiles
+            bool bHasUrlConformToDataType = false;
+            if (request->tmpl == TemplateOGC::GETCAPABILITIESRASTERBYCOLLECTION) {
+                if (Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
+                    bHasUrlConformToDataType = true;
+                }
+            }
+            if (request->tmpl == TemplateOGC::GETCAPABILITIESVECTORBYCOLLECTION) {
+                if (!Rok4Format::isRaster(layer->getDataPyramid()->getFormat())) {
+                    bHasUrlConformToDataType = true;
+                }
+            }
+            if (!bHasUrlConformToDataType) {
+                return new SERDataStream ( 
+                    new ServiceException ( "", HTTP_NOT_FOUND, "No Data found", "ogcapitiles" ) 
                 );
             }
             // collections-id
