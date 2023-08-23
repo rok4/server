@@ -36,7 +36,7 @@
  */
 
 /**
- * \file CapabilitiesBuilder.cpp
+ * \file UtilsOGCTILES.cpp
  * \~french
  * \brief Implémentation des fonctions de générations des GetCapabilities
  * \~english
@@ -49,11 +49,8 @@
 
 #include "Rok4Server.h"
 #include <rok4/utils/Utils.h>
+#include <rok4/utils/BoundingBox.h>
 #include <rok4/utils/Cache.h>
-
-// TODO [OGC] pour le getCapabilities (collections uniquement), 
-// impl du param 'bbox' (array[number]) : Lower left corner & Upper right corner en 
-// WGS 84 longitude/latitude sauf si le parametre 'bbox-crs' est renseigné
 
 // FIXME [OGC] quizz sur les getCapabilities : 
 // - CRS globales ?
@@ -89,6 +86,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
     res_coll << "    }\n";
     res_coll << "  ],\n";
     res_coll << "  \"collections\" : [\n";
+
     // Layers
     auto layers = this->getLayerList();
     std::map<std::string, Layer *>::iterator itl = layers.begin();
@@ -96,7 +94,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
         // Layer
         Layer* layer = itl->second;
 
-        // [OGC] format : 'map' / 'vector'
+        // INFO [OGC] format : on fait le choix d'utiliser 'map' / 'vector'
         // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/common-geodata/dataType.yaml
         std::string dataType = "map"; 
         std::string typePath = "/map/tiles";
@@ -230,7 +228,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
             }
         }
         res_tms_id << "  \"keywords\":  [" << keyWords << "],\n";
-        // TODO [OGC] global tms limits with crs native !
+        // TODO global tms limits with crs native !
         // comment calculer la bbox du tms ?
         res_tms_id << "  \"boundingBox\": {\n";
         res_tms_id << "    \"lowerLeft\" : [],\n";
@@ -239,7 +237,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res_tms_id << "    \"orderedAxes\" : []\n"; // FIXME [OGC] possibles ?
         res_tms_id << "   },\n";
 
-        // FIXME [OGC] notion de getTileLimits() !?
+        // FIXME notion de getTileLimits() !?
         res_tms_id << "  \"tileMatrices\": [\n";
         auto tmOrderd = otms->getOrderedTileMatrix(false);
         auto ittm = tmOrderd.begin();
@@ -294,12 +292,67 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
     // on determine la bonne collections en fonction du template demandé.
     std::string capabilities = "";
     if (request->tmpl == TemplateOGC::GETCAPABILITIESBYCOLLECTION) {
+        std::map<std::string, Layer *> lst_layers;
+        // TODO :
+        // si le param 'bbox-crs' est renseigné,
+        // on realise une reprojection en geographique
+        std::string str_bbox_crs = request->getParam("bbox-crs");
+        if (!str_bbox_crs.empty()) {}
+        
         // si le param 'bbox' est renseigné, 
         // on recherche les collections qui intersectent la bbox
+        // NB: prendre en compte une reprojection avec le param 'bbox-crs' !
         std::string str_bbox = request->getParam("bbox");
         if (str_bbox.empty()) {
-            // TODO...
-        } 
+            // on prend la liste complète des layers
+            lst_layers = this->getLayerList();
+        } else {
+            // on filtre la liste de layers qui intersectent la bbox
+            // (dans la même projection geographique (WGS84))
+            auto bbox = Rok4Server::split(str_bbox, ',');
+            double xmin = 0.0, ymin = 0.0, xmax = 0.0, ymax = 0.0; // par defaut
+            if (bbox.size() == 4) {
+                xmin = std::stod(bbox.at(0));
+                ymin = std::stod(bbox.at(1));
+                xmax = std::stod(bbox.at(2));
+                ymax = std::stod(bbox.at(3));
+            } else if (bbox.size() == 6) {
+                xmin = std::stod(bbox.at(0));
+                ymin = std::stod(bbox.at(1));
+                // bbox.at(2) : Minimum value, coordinate axis 3 (optional)
+                xmax = std::stod(bbox.at(3));
+                ymax = std::stod(bbox.at(4));
+                // bbox.at(5) : Maximum value, coordinate axis 3 (optional)
+            } else {
+                BOOST_LOG_TRIVIAL(warning) << "Le parametre BBOX n'est pas conforme (par defaut, (0,0,0,0)).";
+            }
+            auto boundingBox = BoundingBox<double>(xmin, ymin, xmax, ymax);
+            auto layers = this->getLayerList();
+            std::map<std::string, Layer *>::iterator itl = layers.begin();
+            while(itl != layers.end()) {
+                // key = nom de la couche
+                std::string key = itl->first;
+                // obj Layer
+                Layer* layer = itl->second;
+                // bbox en geographique
+                auto geographicBoundingBox = BoundingBox<double>(
+                    layer->getGeographicBoundingBox().xmin,
+                    layer->getGeographicBoundingBox().ymin,
+                    layer->getGeographicBoundingBox().xmax,
+                    layer->getGeographicBoundingBox().ymax
+                );
+                // INFO :
+                // intersection ? les 2 bbox doivent être en geographique !
+                if (geographicBoundingBox.intersects(boundingBox)) {
+                    lst_layers.insert(std::pair<std::string, Layer *>(key, layer));
+                }
+            }
+            // la liste est vide !?
+            if (lst_layers.size() == 0) {
+                BOOST_LOG_TRIVIAL(warning) << "Le parametre BBOX n'intersecte aucunes données.";
+            }
+        }
+        
         // si le param 'limit' est renseigné,
         // on limite l'affichage des collections
         // NB: prendre en compte les collections filtrées avec le param 'bbox' !
@@ -316,10 +369,9 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
                 nlimit = 10;
             }
             // Check if limit > Layers otherwise all collections
-            auto layers = this->getLayerList();
-            if (nlimit > layers.size()) {
+            if (nlimit > lst_layers.size()) {
                 BOOST_LOG_TRIVIAL(warning) <<  "Le parametre LIMIT ne doit pas depasser le nombre de collections (sinon, tous par défaut).";
-                nlimit = layers.size();
+                nlimit = lst_layers.size();
             }
             std::ostringstream res_limits;
             res_limits << "{\n";
@@ -327,7 +379,7 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
             res_limits << "  ],\n";
             res_limits << "  \"collections\" : [\n";
             // Add collection
-            std::map<std::string, Layer *>::iterator itl = layers.begin();
+            std::map<std::string, Layer *>::iterator itl = lst_layers.begin();
             for (size_t i = 0; i < nlimit; i++) {
                 res_limits << ogctilesCapabilities.at("collections::" + itl->first);
                 if (i != nlimit - 1) {
@@ -408,6 +460,7 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
  
     if (std::regex_match(request->path, m, re)) {
 
+        // INFO :
         // Analyse generique du template :
         //  1.les 5 derniers groupement sont toujours : tms, tm, tileCol, tileRow, (info)
         //    le groupe (info) est toujours vide car c'est pour le getFeatureInfo
@@ -615,11 +668,8 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
             }
         }
 
+        // INFO :
         // OTHER PARAMS NOT YET IMPLEMENTED
-        std::string str_collections = request->getParam("collections");
-        if ( !str_collections.empty() ) {
-            BOOST_LOG_TRIVIAL(warning) <<  "Parametre COLLECTIONS non géré :" << str_collections;
-        }
         std::string str_crs = request->getParam("crs");
         if ( !str_crs.empty() ) {
             BOOST_LOG_TRIVIAL(warning) <<  "Parametre CRS non géré :" << str_crs;
