@@ -832,6 +832,34 @@ paths:
             example:
               application/json
 
+        - name: bbox
+          required: false
+          in: query
+          description: Seules les collections dont la géométrie intersecte la "bounding box" sont sélectionnées.
+          schema:
+            type: array
+            minItems: 4
+            maxItems: 4
+            items:
+              type: number
+              format: double
+            example:
+              - 450000
+              - 560000
+              - 455000
+              - 565000
+          explode: false
+
+        - name: limit
+          required: false
+          in: query
+          description: Limite le nombre de collections
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            default: 10
+
       responses:
         200:
           description: Liste des couches disponibles

@@ -107,9 +107,10 @@ namespace ServiceType {
 
 namespace TemplateOGC {
 
-    // TODO [OGC] format vector with style : 
-    // ^/ogcapitiles/styles/(.*)/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?
-    // ^/ogcapitiles/collections/(.*)/styles/(.*)/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?
+    // TODO [OGC] Route to obtain "tileMatrixSetLimits" and "metadata" of layers : 
+    // ^/ogcapitiles/tiles/(.*)?
+    // ^/ogcapitiles/map/tiles/(.*)?
+    // ex. /ogcapitiles/tiles/LAMB93 or /ogcapitiles/map/tiles/PM
 
     const char* const regex[] = {
         "^/ogcapitiles/styles/(.*)/map/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",

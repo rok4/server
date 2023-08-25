@@ -53,15 +53,15 @@
 #include <rok4/utils/Cache.h>
 
 // FIXME [OGC] quizz sur les getCapabilities : 
-// - CRS globales ?
-// - styles ?
+// > où renseigne t on / où recupére t on les infos !
+// - CRS globales ou supplementaires ?
+// - liste des styles ?
 // - TMS supplementaires ?
-// - limites de TMS ?
-// - metadata ?
+// - limites de TMS (TileMatrixSetLimits) ?
+// - limite geographique de TMS ?
+// - metadata (ex. date de publication, ...) ?
 // - GFI ou queryable ?
-// - format des tuiles ?
-
-// TODO [OGC] les metadata doivent elles être mises dans les 'links' ?
+// - format des tuiles (mime type) ?
 
 void Rok4Server::buildOGCTILESCapabilities() {
     BOOST_LOG_TRIVIAL(warning) <<  "Not completly implemented !";
@@ -76,7 +76,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
     std::ostringstream res_coll;
     res_coll << "{\n";
     res_coll << "  \"links\" : [\n";
-    // TODO [OGC] autre format de sortie : ex. en yaml ?
+    // autre format de sortie : ex. en yaml ?
     res_coll << "    {\n";
     res_coll << "      \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections?f=application/json\",\n";
     res_coll << "      \"rel\": \"self\",\n";
@@ -109,7 +109,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
         std::ostringstream res_coll_id;
         res_coll_id << "{\n";
         res_coll_id << "  \"links\" : [\n";
-        // TODO [OGC] autre liens possibles ?
+        // autre liens possibles ?
         res_coll_id << "     {\n";
         res_coll_id << "       \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "?f=application/json\",\n";
         res_coll_id << "       \"rel\": \"self\",\n";
@@ -138,17 +138,17 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "          ]\n";
         res << "        }\n";
         res << "      },\n";
-        res << "     \"crs\": [],\n"; // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
+        res << "     \"crs\": [],\n"; // FIXME [OGC] https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
         res << "     \"dataType\": \"" << dataType << "\",\n";
-        res << "     \"geometryDimension\": \"\",\n"; // FIXME [OGC] utile ?
+        res << "     \"geometryDimension\": \"\",\n"; // TODO [OGC] utile ?
         res << "     \"minScaleDenominator\": \"" << Rok4Server::doubleToStr(layer->getMinRes() * 1000/0.28) << "\",\n";
         res << "     \"maxScaleDenominator\": \"" << Rok4Server::doubleToStr(layer->getMaxRes() * 1000/0.28) << "\",\n";
         res << "     \"tileMatrixSetURI\": " << "\"" << servicesConf->ogctilesPublicUrl << "/tilematrixsets/" << layer->getDataPyramid()->getTms()->getId() << "\",\n";
-        // FIXME [OGC] utile ?
+        // FIXME [OGC] quelles sont les valeurs à calculer ?
         res << "     \"minCellSize\": null,\n";
         res << "     \"maxCellSize\": null,\n";
         res << "     \"links\":[\n";
-        // TODO [OGC] autre liens possibles ?
+        // autre liens possibles ?
         res << "        {\n";
         res << "         \"href\": " << "\"" << servicesConf->ogctilesPublicUrl << "/collections/" << itl->first << typePath << "?f=application/json\",\n";
         res << "         \"rel\": \"self\",\n";
@@ -193,6 +193,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
     // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/tms/tileMatrixSet-item.yaml
     // https://github.com/opengeospatial/ogcapi-maps/blob/master/openapi/schemas/tms/tileMatrixSet.yaml
     // https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/tms/tileMatrix.yaml
+    
     std::ostringstream res_tms;
     res_tms << "{\n";
     res_tms << "  \"tilematrixsets\" : [\n";
@@ -232,17 +233,16 @@ void Rok4Server::buildOGCTILESCapabilities() {
             }
         }
         res_tms_id << "  \"keywords\":  [" << keyWords << "],\n";
-        // TODO :
-        //  global tms limits with crs native !
-        // comment calculer la bbox du tms ?
+        // FIXME [OGC] global tms limites avec le crs natif !
         res_tms_id << "  \"boundingBox\": {\n";
         res_tms_id << "    \"lowerLeft\" : [],\n";
         res_tms_id << "    \"upperRight\" : [],\n";
         res_tms_id << "    \"crs\" : \"\",\n";
-        res_tms_id << "    \"orderedAxes\" : []\n"; // FIXME [OGC] possibles ?
+        res_tms_id << "    \"orderedAxes\" : []\n"; // FIXME [OGC] info disponible ?
         res_tms_id << "   },\n";
 
-        // FIXME notion de getTileLimits() !?
+        // FIXME [OGC] notion de TileMatrixSetLimits() !?
+
         res_tms_id << "  \"tileMatrices\": [\n";
         auto tmOrderd = otms->getOrderedTileMatrix(false);
         auto ittm = tmOrderd.begin();
@@ -250,9 +250,9 @@ void Rok4Server::buildOGCTILESCapabilities() {
             TileMatrix* otm = ittm->second;
             res_tms_id << "     {\n";
             res_tms_id << "      \"identifier\" : \"" << otm->getId() << "\",\n";
-            res_tms_id << "      \"title\" : \"\",\n"; // TODO [OGC] où obtenir l'info ?
-            res_tms_id << "      \"abstract\" : \"\",\n"; // TODO [OGC] où obtenir l'info ?
-            res_tms_id << "      \"keywords\" : [],\n"; // TODO [OGC] où obtenir l'info ?
+            res_tms_id << "      \"title\" : \"\",\n"; // TODO [OGC] mais où obtenir l'info ?
+            res_tms_id << "      \"abstract\" : \"\",\n"; // TODO [OGC] mais où obtenir l'info ?
+            res_tms_id << "      \"keywords\" : [],\n"; // TODO [OGC] mais où obtenir l'info ?
             double scaleDenominator = ( ( long double ) ( otm->getRes() * otms->getCrs()->getMetersPerUnit() ) /0.00028 );
             res_tms_id << "      \"scaleDenominator\" : " << Rok4Server::doubleToStr(scaleDenominator) << ",\n";
             res_tms_id << "      \"cornerOfOrigin\" : \"topLeft\",\n";
@@ -298,8 +298,7 @@ DataStream* Rok4Server::OGCTILESGetCapabilities ( Request* request ) {
     std::string capabilities = "";
     if (request->tmpl == TemplateOGC::GETCAPABILITIESBYCOLLECTION) {
         std::map<std::string, Layer *> lst_layers;
-        // TODO :
-        // si le param 'bbox-crs' est renseigné,
+        // TODO [OGC] si le param 'bbox-crs' est renseigné,
         // on realise une reprojection en geographique
         std::string str_bbox_crs = request->getParam("bbox-crs");
         if (!str_bbox_crs.empty()) {}
@@ -571,7 +570,7 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
             request->tmpl == TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION) {
                str_style = m[1].str();
         } else {
-            str_style = "default"; // FIXME [OGC] style par defaut ?
+            str_style = "default"; // FIXME [OGC] le style par defaut : "normal" ?
         }
 
         if ( str_style.empty() ) {
