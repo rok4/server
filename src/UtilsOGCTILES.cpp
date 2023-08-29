@@ -138,15 +138,19 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res << "          ]\n";
         res << "        }\n";
         res << "      },\n";
-        res << "     \"crs\": [],\n"; // FIXME [OGC] https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
+
+        // INFO [OGC] https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
+        CRS* crs = layer->getDataPyramid()->getTms()->getCrs();
+        std::string registre = crs->getAuthority();
+        std::string code = crs->getIdentifier();
+        res << "     \"crs\": [\"" << ((registre == "EPSG") ? "https://www.opengis.net/def/crs/EPSG/0/" + code : (registre == "IGNF") ? "http://registre.ign.fr/ign/IGNF/crs/IGNF/" + code : (registre == "OGC") ? "https://www.opengis.net/def/crs/OGC/0/" + code : "") << "\"],\n";
         res << "     \"dataType\": \"" << dataType << "\",\n";
         res << "     \"geometryDimension\": \"\",\n"; // TODO [OGC] utile ?
         res << "     \"minScaleDenominator\": \"" << Rok4Server::doubleToStr(layer->getMinRes() * 1000/0.28) << "\",\n";
         res << "     \"maxScaleDenominator\": \"" << Rok4Server::doubleToStr(layer->getMaxRes() * 1000/0.28) << "\",\n";
         res << "     \"tileMatrixSetURI\": " << "\"" << servicesConf->ogctilesPublicUrl << "/tilematrixsets/" << layer->getDataPyramid()->getTms()->getId() << "\",\n";
-        // FIXME [OGC] quelles sont les valeurs à calculer ?
-        res << "     \"minCellSize\": null,\n";
-        res << "     \"maxCellSize\": null,\n";
+        res << "     \"minCellSize\": \"" << Rok4Server::doubleToStr(layer->getMinRes()) << "\",\n"; 
+        res << "     \"maxCellSize\": \"" << Rok4Server::doubleToStr(layer->getMaxRes()) << "\",\n"; 
         res << "     \"links\":[\n";
         // autre liens possibles ?
         res << "        {\n";
@@ -217,7 +221,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res_tms << "          }\n";
         res_tms << "        ]\n";
 
-        // puis, on construit le tileMatrix
+        // puis, on construit le tileMatrixSet
         std::ostringstream res_tms_id;
         res_tms_id << "{\n";
         res_tms_id << "  \"id\": \"" << otms->getId() << "\",\n";
@@ -238,7 +242,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
         res_tms_id << "    \"lowerLeft\" : [],\n";
         res_tms_id << "    \"upperRight\" : [],\n";
         res_tms_id << "    \"crs\" : \"\",\n";
-        res_tms_id << "    \"orderedAxes\" : []\n"; // FIXME [OGC] info disponible ?
+        res_tms_id << "    \"orderedAxes\" : []\n"; // FIXME [OGC] info disponible : [X,Y] ?
         res_tms_id << "   },\n";
 
         // FIXME [OGC] notion de TileMatrixSetLimits() !?
@@ -256,7 +260,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
             double scaleDenominator = ( ( long double ) ( otm->getRes() * otms->getCrs()->getMetersPerUnit() ) /0.00028 );
             res_tms_id << "      \"scaleDenominator\" : " << Rok4Server::doubleToStr(scaleDenominator) << ",\n";
             res_tms_id << "      \"cornerOfOrigin\" : \"topLeft\",\n";
-            res_tms_id << "      \"pointOfOrigin\" : [\n"; // FIXME [OGC] la norme n'est pas claire "topLeftCorner" !?
+            res_tms_id << "      \"pointOfOrigin\" : [\n";
             res_tms_id << "         " << otm->getX0() << ",\n";
             res_tms_id << "         " << otm->getY0()  << "\n";
             res_tms_id << "       ],\n";
