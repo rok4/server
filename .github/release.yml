@@ -1,0 +1,24 @@
+changelog:
+  exclude:
+    authors:
+      - dependabot
+      - pre-commit-ci
+  categories:
+    - title: Correction de bugs 🐛
+      labels:
+        - bug
+    - title: Améliorations et nouvelles fonctionnalités 🎉
+      labels:
+        - enhancement
+        - quality
+    - title: Outillage 🔧
+      labels:
+        - ci-cd
+        - dependencies
+        - tooling
+    - title: Documentation 📖
+      labels:
+        - documentation
+    - title: Divers
+      labels:
+        - "*"

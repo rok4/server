@@ -13,24 +13,6 @@ Les pyramides de données utilisées sont produites via les outils de [prégén�
 
 L'implémentation s'appuie essentiellement sur la [librairie C++ du projet](https://github.com/rok4/core-cpp).
 
-- [Installer le serveur outils (Debian)](#installer-le-serveur-outils-debian)
-- [Utiliser le serveur](#utiliser-le-serveur)
-    - [Variables d'environnement utilisées](#variables-denvironnement-utilisées)
-    - [Configurer le serveur](#configurer-le-serveur)
-    - [Lancer le serveur](#lancer-le-serveur)
-    - [Installer et configurer NGINX](#installer-et-configurer-nginx)
-    - [Accès aux capacités du serveur](#accès-aux-capacités-du-serveur)
-- [Fonctionnement général du serveur](#fonctionnement-général-du-serveur)
-    - [Identification du service et du type de requête](#identification-du-service-et-du-type-de-requête)
-    - [Accès aux données](#accès-aux-données)
-    - [Gestion des configurations](#gestion-des-configurations)
-    - [Personnalisation des points d'accès aux services](#personnalisation-des-points-daccès-aux-services)
-- [Compiler le serveur (Debian)](#compiler-le-serveur-debian)
-    - [Dépendances supplémentaires](#dépendances-supplémentaires)
-    - [Variables CMake](#variables-cmake)
-    - [Compilation, tests unitaires et documentation et installation](#compilation-tests-unitaires-et-documentation-et-installation)
-
-
 ## Installer le serveur outils (Debian)
 
 Installations système requises (listées dans le paquet debian, installées avec l'applicatif lors du `apt install`) :
@@ -119,7 +101,7 @@ On configure les logs de manière à les retrouver dans un fichier par jour :
 }
 ```
 
-Les répertoires dans lesquels sont les tile matrix sets et les styles peuvent être des dossiers (comme `file:///etc/rok4/tilematrixsets`) ou des préfixes objets  (comme `s3://tilematrixsets`). Sans préfixe précisant le type de stockage, le chemin est interprété en mode fichier.
+Les répertoires dans lesquels sont les tile matrix sets et les styles peuvent être des dossiers (comme `file:///usr/share/rok4/tilematrixsets`) ou des préfixes objets  (comme `s3://tilematrixsets`). Sans préfixe précisant le type de stockage, le chemin est interprété en mode fichier.
 
 * Les paramètres possibles du fichier de configuration `server.json` sont décrits [ici](./config/server.schema.json)
 * Les paramètres possibles du fichier de configuration `services.json` sont décrits [ici](./config/services.schema.json)
@@ -279,3 +261,7 @@ make test
 make doc
 make install
 ```
+
+## Contribuer
+
+Consulter les [directives de contribution](./CONTRIBUTING.md)
