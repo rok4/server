@@ -36,7 +36,7 @@
  */
 
 /**
- * \file CapabilitiesBuilder.cpp
+ * \file UtilsWMTS.cpp
  * \~french
  * \brief Implémentation des fonctions de générations des GetCapabilities
  * \~english

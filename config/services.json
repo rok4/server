@@ -65,5 +65,9 @@
     "tms": {
         "active": true,
         "endpoint_uri": "http://localhost/rok4/tms"
+    },
+    "ogctiles": {
+        "active": true,
+        "endpoint_uri": "http://localhost/rok4/ogcapitiles"
     }
 }
