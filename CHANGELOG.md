@@ -1,3 +1,34 @@
+## 5.1.0
+
+Implémentation partielle de l'API OGC Tiles - Part 1 [v1.0.0 final release](https://github.com/opengeospatial/ogcapi-tiles/releases/tag/1.0.0)
+
+### [Added]
+
+* Liste de nouvelles routes pour obtenir le **GetCapabilities**: 
+    * /ogcapitiles/collections
+     avec les paramètres facultatifs : 
+       * bbox
+       * limit
+    * /ogcapitiles/collections/{layer}/map/tiles
+    * /ogcapitiles/collections/{layer}/tiles
+    * /ogcapitiles/tilematrixsets
+    *  /ogcapitiles/tilematrixsets/{tms}
+
+* Liste des nouvelles routes pour obtenir le **GetTile** :
+
+   * Raster
+       * /ogcapitiles/map/tiles/{tms}/{level}/{row}/{col}
+          avec le paramètre obligatoire : collections={layer}
+       * /ogcapitiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
+         avec le paramètre obligatoire : collections={layer}
+       * /ogcapitiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
+       * /ogcapitiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}
+
+   * Vecteur
+        * /ogcapitiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}
+        * /ogcapitiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}
+
+
 ## 5.0.4
 
 ### [Fixed]
