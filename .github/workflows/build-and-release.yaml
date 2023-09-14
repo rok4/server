@@ -145,7 +145,7 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add -v docs/versions/${{ github.ref_name }}/ docs/versions/latest/ docs/index.md docs/versions.md
+          git add -v docs/versions/${{ github.ref_name }}/ docs/versions/latest/ docs/index.md docs/versions/index.md
           git commit -m "Add documentation for version ${{ github.ref_name }}"
           git push
 
