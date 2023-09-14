@@ -17,6 +17,8 @@ tags:
   description: Diffusion d'images raster selon le standard OGC WMS
 - name: Tile Map Service
   description: Diffusion de tuiles raster et vecteur selon la convention TMS
+- name: OGC API Tiles
+  description: Diffusion de tuiles raster et vecteur selon le standard l'API OGC - Tiles
 - name: Administration
   description: API d'ajout et de suppression de couches disponibles
 
@@ -809,7 +811,571 @@ paths:
                 type: string
                 format: binary
 
+  ######################################### OGC API Tiles
+
+  /ogcapitiles/collections:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère la liste des couches disponibles
+      operationId: ogc_get_collections
+      parameters:
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
+
+        - name: bbox
+          required: false
+          in: query
+          description: Seules les collections dont la géométrie intersecte la "bounding box" sont sélectionnées.
+          schema:
+            type: array
+            minItems: 4
+            maxItems: 4
+            items:
+              type: number
+              format: double
+            example:
+              - 450000
+              - 560000
+              - 455000
+              - 565000
+          explode: false
+
+        - name: limit
+          required: false
+          in: query
+          description: Limite le nombre de collections
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            default: 10
+
+      responses:
+        200:
+          description: Liste des couches disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_collections'
+
+  /ogcapitiles/collections/{layer}/map/tiles:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les informations sur une couche
+      operationId: ogc_get_collections_maptile_id
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+        
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
   
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_collections_id'
+  
+  /ogcapitiles/collections/{layer}/tiles:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les informations sur une couche
+      operationId: ogc_get_collections_tile_id
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
+  
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_collections_id'
+
+  /ogcapitiles/tilematrixsets:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère la liste des tileMatreixSet disponibles
+      operationId: ogc_get_tilematrixsets
+      parameters:
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
+
+      responses:
+        200:
+          description: Liste des tileMatreixSet disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_tilematrixsets'
+    
+  /ogcapitiles/tilematrixsets/{tms}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les informations sur un tileMatrixSet
+      operationId: ogc_get_tilematrixsets_id
+      parameters:
+
+        - name: tms
+          required: true
+          in: path
+          description: tileMatrixSet demandée
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandée
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
+  
+      responses:
+        200:
+          description: ...
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_tilematrixsets_id'
+
+  /ogcapitiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Télécharge une tuile
+      operationId: ogc_get_coll_maptile_default_style
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+        
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Télécharge une tuile
+      operationId: ogc_get_coll_tile_default_style
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/map/tiles/{tms}/{level}/{row}/{col}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Télécharge une tuile
+      operationId: ogc_get_maptile_default_style
+      parameters:
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+          
+        - name: collections
+          required: true
+          in: query
+          description: couche demandée
+          schema:
+            type: string
+        
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/tiles/{tms}/{level}/{row}/{col}:
+   get:
+      tags:
+      - OGC API Tiles
+      summary: Télécharge une tuile
+      operationId: ogc_get_tile_default_style
+      parameters:
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: collections
+          required: true
+          in: query
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Télécharge une tuile
+      operationId: ogc_get_maptile_style
+      parameters:
+
+        - name: style
+          required: true
+          in: path
+          description: style demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+        
+        - name: collections
+          required: true
+          in: query
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /ogcapitiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Télécharge une tuile
+      operationId: ogc_get_coll_maptile_style
+      parameters:
+
+        - name: style
+          required: true
+          in: path
+          description: style demandée
+          schema:
+            type: string
+          
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandée
+          schema:
+            type: string
+
+        - name: level
+          required: true
+          in: path
+          description: niveau de la tuile demandée
+          schema:
+            type: integer
+
+        - name: row
+          required: true
+          in: path
+          description: ligne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: col
+          required: true
+          in: path
+          description: colonne de la tuile demandée
+          schema:
+            type: integer
+
+        - name: f
+          required: true
+          in: query
+          description: format demandée
+          schema:
+            type: string
+            example:
+              image/png
+      
+      responses:
+        200:
+          description: Tuile demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
   ######################################### ADMIN
 
   /admin/layers/{layername}:
@@ -1024,6 +1590,36 @@ components:
         name: 'WMS_Capabilities'
       type: object
       additionalProperties: false
+
+    ogc_collections:
+      type: object
+      allOf:
+        - $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/common-geodata/collections.yaml'
+
+    ogc_collections_id:
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/common-core/link.yaml'
+        tilesets:
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/common-geodata/collectionInfo.yaml'
+
+    ogc_tilematrixsets:
+      type: object
+      properties:
+        tilematrixsets:
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/tms/tileMatrixSet-item.yaml'
+
+    ogc_tilematrixsets_id:
+      type: object
+      allOf:
+        - $ref: 'https://raw.githubusercontent.com/opengeospatial/ogcapi-tiles/master/openapi/schemas/tms/tileMatrixSet.yaml'
 
     healthcheck:
       type: object

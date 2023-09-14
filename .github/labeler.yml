@@ -1,0 +1,19 @@
+ci-cd:
+  - .github/**/*
+
+dependencies:
+  - cmake/**/*
+
+documentation:
+  - docs/**/*
+
+enhancement:
+  - src/**/*
+
+quality:
+  - tests/**/*
+
+tooling:
+  - CMakeLists.txt
+  - config.h.in
+  - '**/CMakeLists.txt'

@@ -200,6 +200,7 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
         if (! dataPyramid->addLevels(pyramids.at(i), bottomLevels.at(i), topLevels.at(i))) {
             BOOST_LOG_TRIVIAL(error) << "Cannot compose pyramid to broadcast with input pyramid " << i;
             delete dataPyramid;
+            dataPyramid = NULL;
             errorMessage = "Pyramid to broadcast cannot be loaded";
             break;
         }
@@ -305,7 +306,7 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
 
         // Configuration des styles
         std::string inspireStyleName = DEFAULT_STYLE_INSPIRE;
-        if (doc["styles"].is_array()) {
+        if (doc["styles"].is_array() && ! doc["styles"].array_items().empty()) {
             for (json11::Json st : doc["styles"].array_items()) {
                 if (st.is_string()) {
                     std::string styleName = st.string_value();
@@ -335,10 +336,11 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
                     return false;
                 }
             }
-        } else if (! doc["styles"].is_null()) {
+        } else if (! doc["styles"].is_null() && ! doc["styles"].is_array()) {
             errorMessage = "styles have to be an string array";
             return false;
         } else {
+            // Pas de style renseigné, ou une liste vide
             std::string styleName = ( inspire ? DEFAULT_STYLE_INSPIRE : DEFAULT_STYLE );
             Style* sty = StyleBook::get_style(styleName);
             if ( sty == NULL ) {
@@ -690,6 +692,7 @@ std::string Layer::getId() {
 }
 
 Layer::~Layer() {
+
     for (unsigned int l = 0 ; l < WMSCRSList.size() ; l++) {
         delete WMSCRSList.at(l);
     }

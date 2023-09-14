@@ -54,6 +54,7 @@
 #include "UtilsXML.h"
 #include "config.h"
 #include <algorithm>
+#include <regex>
 
 
 namespace RequestType {
@@ -68,6 +69,7 @@ namespace RequestType {
         "GetLayerGdal",
         "GetMap",
         "GetTile",
+        "GetMapTile",
         "GetFeatureInfo",
         "GetVersion",
         "AddLayer",
@@ -92,6 +94,7 @@ namespace ServiceType {
         "WMTS",
         "WMS",
         "TMS",
+        "OGCTILES",
         "GLOBAL",
         "ADMIN",
         "HEALTHCHECK"
@@ -102,6 +105,30 @@ namespace ServiceType {
     }
 }
 
+namespace TemplateOGC {
+
+    // TODO [OGC] Route to obtain "tileMatrixSetLimits" and "metadata" of layers : 
+    // ^/ogcapitiles/tiles/(.*)?
+    // ^/ogcapitiles/map/tiles/(.*)?
+    // ex. /ogcapitiles/tiles/LAMB93 or /ogcapitiles/map/tiles/PM
+
+    const char* const regex[] = {
+        "^/ogcapitiles/styles/(.*)/map/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
+        "^/ogcapitiles/map/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
+        "^/ogcapitiles/collections/(.*)/styles/(.*)/map/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
+        "^/ogcapitiles/collections/(.*)/map/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
+        "^/ogcapitiles/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
+        "^/ogcapitiles/collections/(.*)/tiles/(.*)/(\\d{1,})/(\\d{1,})/(\\d{1,})(/info)?",
+        "^/ogcapitiles/collections$",
+        "^/ogcapitiles/collections/(.*)/map/tiles$",
+        "^/ogcapitiles/collections/(.*)/tiles$",
+        "^/ogcapitiles/tilematrixsets$",
+        "^/ogcapitiles/tilematrixsets/(.*)$"
+    };
+    std::string toString ( eTemplateOGC r ) {
+        return std::string ( regex[r] );
+    }
+}
 
 /**
  * \~french
@@ -758,6 +785,88 @@ void Request::determineServiceAndRequest() {
         }
     }
 
+    // ************************ OGC
+    else if (pathParts.at(0) == "ogcapitiles") {
+
+        if (method != "GET") {
+            return;
+        }
+
+        // Service
+        service = ServiceType::OGCTILES;
+
+        // Requête
+        // - GetTile Raster & Vector
+        // - GetFeatureInfo
+        // - GetCapabilities
+
+        if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILERASTERSTYLED)))) {
+            tmpl = TemplateOGC::GETTILERASTERSTYLED;
+            request = RequestType::GETMAPTILE;
+            if (pathParts.size() == 10) {
+                request = RequestType::GETFEATUREINFO;
+            }
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILERASTER)))) {
+            tmpl = TemplateOGC::GETTILERASTER;
+            request = RequestType::GETMAPTILE;
+            if (pathParts.size() == 8) {
+                request = RequestType::GETFEATUREINFO;
+            }
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION)))) {
+            tmpl = TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION;
+            request = RequestType::GETMAPTILE;
+            if (pathParts.size() == 12) {
+                request = RequestType::GETFEATUREINFO;
+            }
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILERASTERBYCOLLECTION)))) {
+            tmpl = TemplateOGC::GETTILERASTERBYCOLLECTION;
+            request = RequestType::GETMAPTILE;
+            if (pathParts.size() == 10) {
+                request = RequestType::GETFEATUREINFO;
+            }
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILEVECTOR)))) {
+            tmpl = TemplateOGC::GETTILEVECTOR;
+            request = RequestType::GETTILE;
+            if (pathParts.size() == 7) {
+                request = RequestType::GETFEATUREINFO;
+            }
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILEVECTORBYCOLLECTION)))) {
+            tmpl = TemplateOGC::GETTILEVECTORBYCOLLECTION;
+            request = RequestType::GETTILE;
+            if (pathParts.size() == 9) {
+                request = RequestType::GETFEATUREINFO;
+            }
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETCAPABILITIESBYCOLLECTION)))) {
+            tmpl = TemplateOGC::GETCAPABILITIESBYCOLLECTION;
+            request = RequestType::GETCAPABILITIES;
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETCAPABILITIESRASTERBYCOLLECTION)))) {
+            tmpl = TemplateOGC::GETCAPABILITIESRASTERBYCOLLECTION;
+            request = RequestType::GETCAPABILITIES;
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETCAPABILITIESVECTORBYCOLLECTION)))) {
+            tmpl = TemplateOGC::GETCAPABILITIESVECTORBYCOLLECTION;
+            request = RequestType::GETCAPABILITIES;
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILEMATRIXSET)))) {
+            tmpl = TemplateOGC::GETTILEMATRIXSET;
+            request = RequestType::GETCAPABILITIES;
+        }
+        else if (std::regex_match(path, std::regex(TemplateOGC::toString(TemplateOGC::GETTILEMATRIXSETBYID)))) {
+            tmpl = TemplateOGC::GETTILEMATRIXSETBYID;
+            request = RequestType::GETCAPABILITIES;
+        }
+        else {
+            request = RequestType::REQUEST_UNKNOWN;
+        }
+    }
+
     // ************************ ADMIN
     else if (pathParts.at(0) == "admin") {
         // Service
@@ -783,6 +892,7 @@ void Request::determineServiceAndRequest() {
             request = RequestType::REQUEST_UNKNOWN;
         }
     }
+    
     // ************************ HEALTHCHECK
     else if (pathParts.at(0) == "healthcheck") {
         // Uniquement du GET !

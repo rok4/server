@@ -53,7 +53,7 @@ class Layer;
 
 #include <rok4/utils/Pyramid.h>
 #include <rok4/utils/CRS.h>
-#include "style/Style.h"
+#include <rok4/style/Style.h>
 #include "ServerConf.h"
 #include "ServicesConf.h"
 #include "MetadataURL.h"

@@ -48,7 +48,7 @@ class ServerConf;
 
 #include <rok4/utils/Configuration.h>
 #include "Layer.h"
-#include "style/Style.h"
+#include <rok4/style/Style.h>
 
 #include "config.h"
 
