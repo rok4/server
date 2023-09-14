@@ -306,7 +306,7 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
 
         // Configuration des styles
         std::string inspireStyleName = DEFAULT_STYLE_INSPIRE;
-        if (doc["styles"].is_array()) {
+        if (doc["styles"].is_array() && ! doc["styles"].array_items().empty()) {
             for (json11::Json st : doc["styles"].array_items()) {
                 if (st.is_string()) {
                     std::string styleName = st.string_value();
@@ -340,6 +340,7 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
             errorMessage = "styles have to be an string array";
             return false;
         } else {
+            // Pas de stule renseigné, ou une liste vide
             std::string styleName = ( inspire ? DEFAULT_STYLE_INSPIRE : DEFAULT_STYLE );
             Style* sty = StyleBook::get_style(styleName);
             if ( sty == NULL ) {
