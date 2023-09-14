@@ -28,6 +28,9 @@ Implémentation partielle de l'API OGC Tiles - Part 1 [v1.0.0 final release](htt
         * /ogcapitiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}
         * /ogcapitiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}
 
+### [Changed]
+
+* Si la liste des styles est fournie mais vide, on le traite comme si rien n'était fourni : on ajoute le style par défaut
 
 ## 5.0.4
 

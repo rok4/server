@@ -336,11 +336,11 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
                     return false;
                 }
             }
-        } else if (! doc["styles"].is_null()) {
+        } else if (! doc["styles"].is_null() && ! doc["styles"].is_array()) {
             errorMessage = "styles have to be an string array";
             return false;
         } else {
-            // Pas de stule renseigné, ou une liste vide
+            // Pas de style renseigné, ou une liste vide
             std::string styleName = ( inspire ? DEFAULT_STYLE_INSPIRE : DEFAULT_STYLE );
             Style* sty = StyleBook::get_style(styleName);
             if ( sty == NULL ) {
