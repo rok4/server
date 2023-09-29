@@ -406,6 +406,11 @@ void Rok4Server::buildTMSCapabilities() {
     tmsCapabilities += "<TileMapService version=\"1.0.0\" services=\"" + servicesConf->tmsPublicUrl + "\">\n";
     tmsCapabilities += "  <Title>" + servicesConf->title + "</Title>\n";
     tmsCapabilities += "  <Abstract>" + servicesConf->abstract + "</Abstract>\n";
+
+    if ( servicesConf->mtdTMS ) {
+        tmsCapabilities += "  <Metadata type=\"" + servicesConf->mtdTMS->getType() + "\" mime-type=\"text/xml\" href=\"" + servicesConf->mtdTMS->getHRef() + "\" />\n";
+    }
+
     tmsCapabilities += "  <TileMaps>\n";
 
     std::map<std::string, Layer*>::iterator itLay ( serverConf->layersList.begin() ), itLayEnd ( serverConf->layersList.end() );

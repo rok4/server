@@ -607,7 +607,7 @@ void Rok4Server::buildWMSCapabilities() {
     capabilityEl->LinkEndChild ( exceptionEl );
 
     // Inspire (extended Capability)
-    if ( servicesConf->inspire ) {
+    if ( servicesConf->mtdWMS ) {
         // TODO : en dur. A mettre dans la configuration du service (prevoir differents profils d'application possibles)
         TiXmlElement * extendedCapabilititesEl = new TiXmlElement ( "inspire_vs:ExtendedCapabilities" );
 

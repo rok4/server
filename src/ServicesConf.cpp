@@ -582,6 +582,9 @@ bool ServicesConf::parse(json11::Json& doc) {
                 errorMessage = "Invalid WMS metadata: have to own a field " + mtdWMS->getMissingField();
                 return false;
             }
+        } else if (inspire) {
+            errorMessage = "Inspire WMS service require a metadata";
+            return false;
         }
         
     }
@@ -618,6 +621,9 @@ bool ServicesConf::parse(json11::Json& doc) {
                 errorMessage = "Invalid WMTS metadata: have to own a field " + mtdWMTS->getMissingField();
                 return false;
             }
+        } else if (inspire) {
+            errorMessage = "Inspire WMTS service require a metadata";
+            return false;
         }
         
     }
@@ -680,6 +686,18 @@ bool ServicesConf::parse(json11::Json& doc) {
         } else {
             ogctilesPublicUrl = "/ogcapitiles";
         }
+
+        // Métadonnée
+        if (ogcSection["metadata"].is_object()) {
+            mtdOGCTILES = new MetadataURL ( ogcSection["metadata"] );
+            if (mtdOGCTILES->getMissingField() != "") {
+                errorMessage = "Invalid OGC TIles metadata: have to own a field " + mtdOGCTILES->getMissingField();
+                return false;
+            }
+        } else if (inspire) {
+            errorMessage = "Inspire OGC API Tiles service require a metadata";
+            return false;
+        }
         
     }
 
@@ -687,6 +705,8 @@ bool ServicesConf::parse(json11::Json& doc) {
 }
 
 ServicesConf::ServicesConf(std::string path) : Configuration(path) {
+
+    mtdOGCTILES = 0, mtdTMS = 0, mtdWMS = 0, mtdWMTS = 0;
 
     std::cout << "Loading services configuration from file " << filePath << std::endl;
 
@@ -738,9 +758,10 @@ bool ServicesConf::are_the_two_CRS_equal( std::string crs1, std::string crs2 ) {
 }
 
 ServicesConf::~ServicesConf(){ 
-    delete mtdWMS;
-    delete mtdWMTS;
-    delete mtdTMS;
+    if (mtdWMS) {delete mtdWMS;}
+    if (mtdWMTS) {delete mtdWMTS;}
+    if (mtdTMS) {delete mtdTMS;}
+    if (mtdOGCTILES) {delete mtdOGCTILES;}
 
     for ( unsigned int l = 0; l < listofequalsCRS.size(); l++ ) {
         for ( unsigned int c = 0; c < listofequalsCRS.at(l).size(); c++ ) {

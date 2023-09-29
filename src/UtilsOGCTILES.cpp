@@ -83,8 +83,19 @@ void Rok4Server::buildOGCTILESCapabilities() {
     res_coll << "      \"type\": \"application/json\",\n";
     res_coll << "      \"title\": \"this document\",\n";
     res_coll << "      \"templated\": false\n";
-    res_coll << "    }\n";
-    res_coll << "  ],\n";
+    res_coll << "    }";
+
+    if ( servicesConf->mtdOGCTILES ) {
+        res_coll << ",\n";
+        res_coll << "    {\n";
+        res_coll << "      \"href\": \"" << servicesConf->mtdOGCTILES->getHRef() << "\",\n";
+        res_coll << "      \"type\": \"" << servicesConf->mtdOGCTILES->getType() << "\",\n";
+        res_coll << "      \"rel\": \"describedby\",\n";
+        res_coll << "      \"title\": \"Service metadata\"\n";
+        res_coll << "    }\n";
+    }
+
+    res_coll << "\n  ],\n";
     res_coll << "  \"collections\" : [\n";
 
     // Layers
