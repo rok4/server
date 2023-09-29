@@ -112,6 +112,8 @@ public:
      * \param[in] origMtdUrl MetadataURL to copy
      */
     MetadataURL ( const MetadataURL & origMtdUrl ) : ResourceLocator ( origMtdUrl ) {
+        href = origMtdUrl.href;
+        format = origMtdUrl.format;
         type = origMtdUrl.type;
     };
     /**
