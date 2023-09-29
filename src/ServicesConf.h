@@ -156,11 +156,12 @@ class ServicesConf : public Configuration
         // ----------------------- OGC Tiles
 
         /**
-         * \~french \brief Définit si le serveur doit honorer les requêtes OGC
+         * \~french \brief Définit si le serveur doit honorer les requêtes OGC Tiles
          * \~english \brief Define whether OGC request should be honored
          */
         bool supportOGCTILES;
         std::string ogctilesPublicUrl;
+        MetadataURL* mtdOGCTILES;
 
         // ----------------------- WMS 
         /**

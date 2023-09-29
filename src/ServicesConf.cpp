@@ -680,6 +680,15 @@ bool ServicesConf::parse(json11::Json& doc) {
         } else {
             ogctilesPublicUrl = "/ogcapitiles";
         }
+
+        // Métadonnée
+        if (ogcSection["metadata"].is_object()) {
+            mtdOGCTILES = new MetadataURL ( ogcSection["metadata"] );
+            if (mtdOGCTILES->getMissingField() != "") {
+                errorMessage = "Invalid OGC TIles metadata: have to own a field " + mtdOGCTILES->getMissingField();
+                return false;
+            }
+        }
         
     }
 
@@ -741,6 +750,7 @@ ServicesConf::~ServicesConf(){
     delete mtdWMS;
     delete mtdWMTS;
     delete mtdTMS;
+    delete mtdOGCTILES;
 
     for ( unsigned int l = 0; l < listofequalsCRS.size(); l++ ) {
         for ( unsigned int c = 0; c < listofequalsCRS.at(l).size(); c++ ) {
