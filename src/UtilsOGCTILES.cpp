@@ -65,6 +65,7 @@
 
 void Rok4Server::buildOGCTILESCapabilities() {
     BOOST_LOG_TRIVIAL(warning) <<  "Not completly implemented !";
+    std::map<std::string,TileMatrixSet*> usedTMSList;
 
     // build collections...
     // schemas openapi tiles :
@@ -152,6 +153,7 @@ void Rok4Server::buildOGCTILESCapabilities() {
 
         // INFO [OGC] https://github.com/opengeospatial/ogcapi-tiles/blob/master/openapi/schemas/common-geodata/crs.yaml
         CRS* crs = layer->getDataPyramid()->getTms()->getCrs();
+        usedTMSList.insert ( std::pair<std::string,TileMatrixSet*> ( layer->getDataPyramid()->getTms()->getId() , layer->getDataPyramid()->getTms()) );
         std::string registre = crs->getAuthority();
         std::string code = crs->getIdentifier();
         res << "     \"crs\": [\"" << ((registre == "EPSG") ? "https://www.opengis.net/def/crs/EPSG/0/" + code : (registre == "IGNF") ? "http://registre.ign.fr/ign/IGNF/crs/IGNF/" + code : (registre == "OGC") ? "https://www.opengis.net/def/crs/OGC/0/" + code : "") << "\"],\n";
@@ -212,10 +214,11 @@ void Rok4Server::buildOGCTILESCapabilities() {
     std::ostringstream res_tms;
     res_tms << "{\n";
     res_tms << "  \"tilematrixsets\" : [\n";
-    auto tms = TmsBook::get_book();
-    std::map<std::string, TileMatrixSet *>::iterator itt = tms.begin();
-    while(itt != tms.end()) {
-        TileMatrixSet* otms = itt->second;
+
+    std::map<std::string,TileMatrixSet*>::iterator itTms ( usedTMSList.begin() ), itTmsEnd ( usedTMSList.end() );
+    for ( ; itTms!=itTmsEnd; ++itTms ) {
+
+        TileMatrixSet* otms = itTms->second;
         // on construit un tileMatrixSet-item
         res_tms << "     {\n";
         res_tms << "       \"id\": \"" << otms->getId() << "\",\n";
@@ -289,10 +292,10 @@ void Rok4Server::buildOGCTILESCapabilities() {
 
         res_tms_id << "   ]\n";
         res_tms_id << "}";
-        ogctilesCapabilities.insert(std::pair<std::string, std::string>("tilematrixsets::" + itt->first, res_tms_id.str()));
+        ogctilesCapabilities.insert(std::pair<std::string, std::string>("tilematrixsets::" + itTms->first, res_tms_id.str()));
         
         res_tms << "     }";
-        if (++itt != tms.end()) {
+        if (itTms != std::prev(usedTMSList.end())) {
             res_tms << ",";
         }
         res_tms << "\n";
