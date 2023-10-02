@@ -523,10 +523,9 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
         // LAYER (collections)
         std::string str_layer;
         if (request->tmpl == TemplateOGC::GETTILERASTERBYCOLLECTION || 
-            request->tmpl == TemplateOGC::GETTILEVECTORBYCOLLECTION) {
+            request->tmpl == TemplateOGC::GETTILEVECTORBYCOLLECTION || 
+            request->tmpl == TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION) {
             str_layer = m[1].str();
-        } else if (request->tmpl == TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION) {
-            str_layer = m[2].str();
         } else {
             str_layer = request->getParam("collections");
         }
@@ -584,11 +583,12 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
 
         // STYLE
         std::string str_style;
-        if (request->tmpl == TemplateOGC::GETTILERASTERSTYLED ||
-            request->tmpl == TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION) {
-               str_style = m[1].str();
+        if (request->tmpl == TemplateOGC::GETTILERASTERSTYLED) {
+            str_style = m[1].str();
+        } else if (request->tmpl == TemplateOGC::GETTILERASTERSTYLEDBYCOLLECTION) {
+            str_style = m[2].str();
         } else {
-            str_style = "default"; // FIXME [OGC] le style par defaut : "normal" ?
+            str_style = layer->getDefaultStyle()->getIdentifier();
         }
 
         if ( str_style.empty() ) {
