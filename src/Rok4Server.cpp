@@ -674,6 +674,7 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
                 image->getline(floatbuffer, 0);
                 for (int i = 0; i < n; i++) {
                     std::stringstream ss;
+                    ss.setf ( std::ios::fixed,std::ios::floatfield );
                     ss << (float)floatbuffer[i];
                     strData.push_back(ss.str());
                 }
