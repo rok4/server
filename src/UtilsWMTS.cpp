@@ -379,7 +379,7 @@ void Rok4Server::buildWMTSCapabilities() {
 
     // Inspire (extended Capability)
     // TODO : en dur. A mettre dans la configuration du service (prevoir differents profils d'application possibles)
-    if ( servicesConf->inspire ) {
+    if ( servicesConf->inspire && servicesConf->mtdWMTS) {
         TiXmlElement * extendedCapabilititesEl = new TiXmlElement ( "inspire_vs:ExtendedCapabilities" );
 
         // MetadataURL

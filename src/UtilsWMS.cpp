@@ -607,7 +607,7 @@ void Rok4Server::buildWMSCapabilities() {
     capabilityEl->LinkEndChild ( exceptionEl );
 
     // Inspire (extended Capability)
-    if ( servicesConf->inspire ) {
+    if ( servicesConf->inspire && servicesConf->mtdWMS ) {
         // TODO : en dur. A mettre dans la configuration du service (prevoir differents profils d'application possibles)
         TiXmlElement * extendedCapabilititesEl = new TiXmlElement ( "inspire_vs:ExtendedCapabilities" );
 
@@ -860,7 +860,7 @@ void Rok4Server::buildWMSCapabilities() {
                             styleEl->LinkEndChild ( UtilsXML::buildTextNode ( "Abstract", style->getAbstracts() [j].c_str() ) );
                         }
                         for ( j=0 ; j < style->getLegendURLs().size(); ++j ) {
-                            BOOST_LOG_TRIVIAL(debug) <<  "LegendURL" << style->getId()  ;
+                            BOOST_LOG_TRIVIAL(debug) <<  "LegendURL " << style->getId()  ;
                             LegendURL legendURL = style->getLegendURLs() [j];
                             TiXmlElement* legendURLEl = new TiXmlElement ( "LegendURL" );
 
