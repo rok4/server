@@ -1,3 +1,23 @@
+## 5.2.0
+
+### [Fixed]
+
+* La fonction de copie d'une instance MetadataURL recopie bien le format et le href
+* Lors de l'écriture de nombres flottants dans les réponses à un appel GetFeatureInfo, on précise les décimales
+* Utils API Tiles 
+    * correction l'extraction de la collection et du style lors d'appels à la route `/ogcapitiles/collections/{}/styles/{}/map/tiles/{}/{}/{}/{}(/info)?` 
+    * le style par défaut de la couche est bien utilisée lors d'appels sans précision de style
+
+### [Added]
+
+* Gestion de la métadonnée de service pour l'OGC API Tiles
+
+### [Changed]
+
+* Pour le WMS, WMTS et OGC API Tiles, la fourniture d'une métadonnée de service est obligatoire dans le cas inspire
+* Pour tous les services de diffusion, si une métadonnée de service est fournie, elle est mise dans la réponse au GetCapabilities
+* `Layer` : si aucune bbox n'est fournie, elle est déduite du niveau le mieux résolu des pyramides utilisées par la couche * Dans le getcapabilities WMTS, dans le cas de TMS additionnel pour une couche, on ajoute une marge de une tuile pour les tuiles limites calculées
+
 ## 5.1.0
 
 Implémentation partielle de l'API OGC Tiles - Part 1 [v1.0.0 final release](https://github.com/opengeospatial/ogcapi-tiles/releases/tag/1.0.0)
