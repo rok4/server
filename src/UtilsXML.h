@@ -98,10 +98,10 @@ class UtilsXML
 
 
         /**
-         * \~french \brief Export XML du mot clé pour le GetCapabilities
-         * \param[in] elName Nom de l'élément XML
-         * \~english \brief Keyword XML export for GetCapabilities
-         * \param[in] elName XML element name
+         * \~french \brief Export XML des tuiles limites pour un niveau
+         * \param[in] tml Tuiles limites du niveau
+         * \~english \brief XML export for tiles' limits for a level
+         * \param[in] tml Level's tiles limits
          */
         static TiXmlElement* getXml(TileMatrixLimits tml) {
             TiXmlElement* tmLimitsEl = new TiXmlElement ( "TileMatrixLimits" );

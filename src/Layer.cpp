@@ -476,20 +476,11 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
 
 void Layer::calculateBoundingBoxes() {
 
-    // On calcule la bbox à partir des tuiles limites des niveaux de la pyramide
+    // On calcule la bbox à partir des tuiles limites du niveau le mieux résolu de la pyramide
     std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = dataPyramid->getOrderedLevels(true);
-    bool first = true;
-    for (std::pair<std::string, Level*> element : orderedLevels) {
-        Level * level = element.second;
 
-        if (first) {
-            boundingBox = BoundingBox<double>(level->getBboxFromTileLimits());
-            first = false;
-            continue;
-        }
-
-        boundingBox = boundingBox.getUnion(level->getBboxFromTileLimits());
-    }
+    Level * level = orderedLevels.begin()->second;
+    boundingBox = BoundingBox<double>(level->getBboxFromTileLimits());
     boundingBox.crs = dataPyramid->getTms()->getCrs()->getRequestCode();
 
     geographicBoundingBox = BoundingBox<double>(boundingBox);
@@ -578,7 +569,7 @@ void Layer::calculateExtraTileMatrixLimits() {
         newList.push_back(tms);
     }
 
-    // La nouvelle liste ne contient pas les TMS pour lesquels nous n'avons pas pu calculer les liveaux et les limites
+    // La nouvelle liste ne contient pas les TMS pour lesquels nous n'avons pas pu calculer les niveaux et les limites
     WMTSTMSList = newList;
 }
 
