@@ -78,7 +78,7 @@ DataStream* Rok4Server::getMapParamWMS (
     // VERSION
     std::string version = request->getParam ( "version" );
     if ( version == "" ) {
-        return new SERDataStream ( new ServiceException ( "",OWS_MISSING_PARAMETER_VALUE,"Parametre VERSION absent.","wms" ) );
+        version = "1.3.0";
     }
 
     if ( version != "1.3.0" )
@@ -415,7 +415,7 @@ DataStream* Rok4Server::getCapParamWMS ( Request* request, std::string& version 
     // VERSION
     version = request->getParam ( "version" );
     if ( version == "" ) {
-        return new SERDataStream ( new ServiceException ( "",OWS_MISSING_PARAMETER_VALUE,"Parametre VERSION absent.","wms" ) );
+        version = "1.3.0";
     }
 
     if ( version != "1.3.0" )

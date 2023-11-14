@@ -60,7 +60,7 @@ DataSource* Rok4Server::getTileParamWMTS ( Request* request, Layer*& layer, Tile
     // VERSION
     std::string version = request->getParam ( "version" );
     if ( version == "" ) {
-        return new SERDataSource ( new ServiceException ( "",OWS_MISSING_PARAMETER_VALUE,"Parametre VERSION absent.","wmts" ) );
+        version = "1.0.0";
     }
 
     if ( version != "1.0.0" )
@@ -630,7 +630,7 @@ DataStream* Rok4Server::getCapParamWMTS ( Request* request, std::string& version
     
     version = request->getParam ( "version" );
     if ( version == "" ) {
-        return new SERDataStream ( new ServiceException ( "",OWS_MISSING_PARAMETER_VALUE,"Parametre VERSION absent.","wmts" ) );
+        version = "1.0.0";
     }
 
     if ( version != "1.0.0" )

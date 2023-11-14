@@ -1,3 +1,10 @@
+## 5.2.1
+
+### [Changed]
+
+* En WMS, si la requête ne précise pas de version, on met la version 1.3.0 par défaut
+* En WMTS, si la requête ne précise pas de version, on met la version 1.0.0 par défaut
+
 ## 5.2.0
 
 ### [Fixed]
