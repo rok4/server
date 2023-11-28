@@ -75,7 +75,32 @@ DataStream* Rok4Server::AdminCreateLayer ( Request* request ) {
 
     serverConf->addLayer ( layer );
 
+
+    if (request->getParam("build_capabilities") != "false") {
+        // On recalcule les GetCapabilities
+        BOOST_LOG_TRIVIAL(debug) << "Services capabilities build"  ;
+        if ( servicesConf->supportWMS ) {
+            buildWMSCapabilities();
+        }
+        if ( servicesConf->supportWMTS ) {
+            buildWMTSCapabilities();
+        }
+        if ( servicesConf->supportTMS ) {
+            buildTMSCapabilities();
+        }
+        if ( servicesConf->supportOGCTILES ) {
+            buildOGCTILESCapabilities();
+        }
+    }
+
+    return new EmptyResponseDataStream ();
+}
+
+
+DataStream* Rok4Server::AdminBuildCapabilities ( Request* request ) {
+
     // On recalcule les GetCapabilities
+    BOOST_LOG_TRIVIAL(debug) << "Services capabilities build"  ;
     if ( servicesConf->supportWMS ) {
         buildWMSCapabilities();
     }
@@ -105,18 +130,21 @@ DataStream* Rok4Server::AdminDeleteLayer ( Request* request ) {
 
     serverConf->removeLayer ( layer->getId() );
 
-    // On recalcule les GetCapabilities
-    if ( servicesConf->supportWMS ) {
-        buildWMSCapabilities();
-    }
-    if ( servicesConf->supportWMTS ) {
-        buildWMTSCapabilities();
-    }
-    if ( servicesConf->supportTMS ) {
-        buildTMSCapabilities();
-    }
-    if ( servicesConf->supportOGCTILES ) {
-        buildOGCTILESCapabilities();
+    if (request->getParam("build_capabilities") != "false") {
+        // On recalcule les GetCapabilities
+        BOOST_LOG_TRIVIAL(debug) << "Services capabilities build"  ;
+        if ( servicesConf->supportWMS ) {
+            buildWMSCapabilities();
+        }
+        if ( servicesConf->supportWMTS ) {
+            buildWMTSCapabilities();
+        }
+        if ( servicesConf->supportTMS ) {
+            buildTMSCapabilities();
+        }
+        if ( servicesConf->supportOGCTILES ) {
+            buildOGCTILESCapabilities();
+        }
     }
 
     return new EmptyResponseDataStream ();
@@ -142,18 +170,23 @@ DataStream* Rok4Server::AdminUpdateLayer ( Request* request ) {
     serverConf->removeLayer ( layer->getId() );
     serverConf->addLayer ( newLayer );
 
-    // On recalcule les GetCapabilities
-    if ( servicesConf->supportWMS ) {
-        buildWMSCapabilities();
-    }
-    if ( servicesConf->supportWMTS ) {
-        buildWMTSCapabilities();
-    }
-    if ( servicesConf->supportTMS ) {
-        buildTMSCapabilities();
-    }
-    if ( servicesConf->supportOGCTILES ) {
-        buildOGCTILESCapabilities();
+    if (request->getParam("build_capabilities") != "false") {
+        // On recalcule les GetCapabilities
+        BOOST_LOG_TRIVIAL(debug) << "Services capabilities build"  ;
+
+        // On recalcule les GetCapabilities
+        if ( servicesConf->supportWMS ) {
+            buildWMSCapabilities();
+        }
+        if ( servicesConf->supportWMTS ) {
+            buildWMTSCapabilities();
+        }
+        if ( servicesConf->supportTMS ) {
+            buildTMSCapabilities();
+        }
+        if ( servicesConf->supportOGCTILES ) {
+            buildOGCTILESCapabilities();
+        }
     }
 
     return new EmptyResponseDataStream ();

@@ -474,6 +474,18 @@ private:
 
     /**
      * \~french
+     * \brief Traitement d'une requête de réécriture des capacités
+     * \param[in] request représentation de la requête
+     * \return flux de la réponse
+     * \~english
+     * \brief Process a BuildCapabilities admin request
+     * \param[in] request request representation
+     * \return response stream
+     */
+    DataStream* AdminBuildCapabilities ( Request* request );
+
+    /**
+     * \~french
      * \brief Traitement d'une requête de suppression de couche
      * \param[in] request représentation de la requête
      * \return flux de la réponse
