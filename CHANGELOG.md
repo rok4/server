@@ -1,3 +1,10 @@
+## 5.3.0
+
+### [Added]
+
+* Sur les routes admin de ajout, modification et suppression de couche, on peut demander que les capacités des services ne soient pas regénérés
+* Un nouvelle route admin (PUT /admin/layers) sans paramètre permet de demander la réécriture des capacités des services
+
 ## 5.2.1
 
 ### [Changed]
