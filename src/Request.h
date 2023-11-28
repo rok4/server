@@ -80,6 +80,7 @@ namespace RequestType {
         ADDLAYER,
         UPDATELAYER,
         DELETELAYER,
+        BUILDCAPABILITIES,
         GETHEALTHSTATUS,
         GETINFOSTATUS,
         GETTHREADSTATUS,
