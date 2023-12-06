@@ -800,6 +800,8 @@ void Rok4Server::processTMS(Request* request, FCGX_Request& fcgxRequest) {
 void Rok4Server::processAdmin(Request* request, FCGX_Request& fcgxRequest) {
     if (request->request == RequestType::ADDLAYER) {
         S.sendresponse(AdminCreateLayer(request), &fcgxRequest);
+    } else if (request->request == RequestType::BUILDCAPABILITIES) {
+        S.sendresponse(AdminBuildCapabilities(request), &fcgxRequest);
     } else if (request->request == RequestType::UPDATELAYER) {
         S.sendresponse(AdminUpdateLayer(request), &fcgxRequest);
     } else if (request->request == RequestType::DELETELAYER) {

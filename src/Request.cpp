@@ -75,6 +75,7 @@ namespace RequestType {
         "AddLayer",
         "UpdateLayer",
         "DeleteLayer",
+        "BuildCapabilities",
         "GetStatus",
         "GetInfos"
         "GetThreads",
@@ -876,6 +877,11 @@ void Request::determineServiceAndRequest() {
         if (method == "POST" && pathParts.size() == 3 && pathParts.at(1) == "layers") {
             //--> POST /admin/layers/{layername}
             request = RequestType::ADDLAYER;
+        }
+
+        else if (method == "PUT" && pathParts.size() == 2 && pathParts.at(1) == "layers") {
+            //--> PUT /admin/layers
+            request = RequestType::BUILDCAPABILITIES;
         }
 
         else if (method == "PUT" && pathParts.size() == 3 && pathParts.at(1) == "layers") {
