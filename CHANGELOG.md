@@ -5,6 +5,10 @@
 * Sur les routes admin de ajout, modification et suppression de couche, on peut demander que les capacités des services ne soient pas regénérés
 * Un nouvelle route admin (PUT /admin/layers) sans paramètre permet de demander la réécriture des capacités des services
 
+### [Changed]
+
+* Ajout de l'ID de thread dans les logs
+
 ## 5.2.1
 
 ### [Changed]
@@ -46,7 +50,7 @@ Implémentation partielle de l'API OGC Tiles - Part 1 [v1.0.0 final release](htt
     * /ogcapitiles/collections/{layer}/map/tiles
     * /ogcapitiles/collections/{layer}/tiles
     * /ogcapitiles/tilematrixsets
-    *  /ogcapitiles/tilematrixsets/{tms}
+    * /ogcapitiles/tilematrixsets/{tms}
 
 * Liste des nouvelles routes pour obtenir le **GetTile** :
 

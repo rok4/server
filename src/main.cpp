@@ -140,19 +140,19 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
             logging::add_file_log (
                 keywords::file_name = serverConf->getLogFilePrefix()+"-%Y-%m-%d-%H-%M-%S.log",
                 keywords::time_based_rotation = sinks::file::rotation_at_time_interval(boost::posix_time::seconds(serverConf->getLogFilePeriod())),
-                keywords::format = "%TimeStamp%\t%ProcessID%\t%Severity%\t%Message%",
+                keywords::format = "%TimeStamp%\t%ProcessID%\t%ThreadID%\t%Severity%\t%Message%",
                 keywords::auto_flush = true
             );
         } else if ( serverConf->getLogOutput() == "static_file") {
             logging::add_file_log (
                 keywords::file_name = serverConf->getLogFilePrefix(),
-                keywords::format = "%TimeStamp%\t%ProcessID%\t%Severity%\t%Message%",
+                keywords::format = "%TimeStamp%\t%ProcessID%\t%ThreadID%\t%Severity%\t%Message%",
                 keywords::auto_flush = true
             );
         } else if ( serverConf->getLogOutput() == "standard_output") {
             logging::add_console_log (
                 std::cout,
-                keywords::format = "%TimeStamp%\t%ProcessID%\t%Severity%\t%Message%"
+                keywords::format = "%TimeStamp%\t%ProcessID%\t%ThreadID%\t%Severity%\t%Message%"
             );
         }
 
