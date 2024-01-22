@@ -416,7 +416,7 @@ void Rok4Server::buildWMTSCapabilities() {
     std::map<std::string, Layer*>::iterator itLay ( serverConf->layersList.begin() ), itLayEnd ( serverConf->layersList.end() );
     for ( ; itLay!=itLayEnd; ++itLay ) {
         //Look if the layer is published in WMTS
-        if (itLay->second->getWMTSAuthorized()) {
+        if (itLay->second->getWMTSAuthorized() && Rok4Format::isRaster(itLay->second->getDataPyramid()->getFormat())) {
             TiXmlElement * layerEl=new TiXmlElement ( "Layer" );
             Layer* layer = itLay->second;
 

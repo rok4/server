@@ -162,19 +162,6 @@ private:
      */
     static void* thread_loop ( void* arg );
     
-    /**
-     * \~french
-     * \brief Donne le nombre de chiffres après la virgule
-     * \details 3.14 -> 2, 1.0001 -> 4, le maximum est 10
-     * \param[in] arg un double
-     * \return int valeur
-     * \~english
-     * \brief Give the number of decimal places
-     * \details 3.14 -> 2, 1.0001 -> 4, maximum is 10
-     * \param[in] arg a double
-     * \return int value
-     */
-    int GetDecimalPlaces ( double number );
 
     /**
      * \~french

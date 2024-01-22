@@ -43,6 +43,7 @@ class Attribute;
 #include <vector>
 #include <string>
 #include <tinyxml.h>
+#include <iomanip>
 
 #include <rok4/utils/Keyword.h>
 #include <rok4/utils/TileMatrixLimits.h>
@@ -98,6 +99,34 @@ class UtilsXML
 
 
         /**
+        * \~french
+        * \brief Donne le nombre de chiffres après la virgule
+        * \details 3.14 -> 2, 1.0001 -> 4, le maximum est 10
+        * \param[in] arg un double
+        * \return int valeur
+        * \~english
+        * \brief Give the number of decimal places
+        * \details 3.14 -> 2, 1.0001 -> 4, maximum is 10
+        * \param[in] arg a double
+        * \return int value
+        */
+        static int GetDecimalPlaces ( double dbVal ) {
+            dbVal = fmod(dbVal, 1);
+            static const int MAX_DP = 10;
+            double THRES = pow ( 0.1, MAX_DP );
+            if ( dbVal == 0.0 )
+                return 0;
+            int nDecimal = 0;
+            while ( dbVal - floor ( dbVal ) > THRES && nDecimal < MAX_DP && ceil(dbVal)-dbVal > THRES) {
+                dbVal *= 10.0;
+                THRES *= 10.0;
+                nDecimal++;
+            }
+            return nDecimal;
+        }
+
+
+        /**
          * \~french \brief Export XML des tuiles limites pour un niveau
          * \param[in] tml Tuiles limites du niveau
          * \~english \brief XML export for tiles' limits for a level
@@ -112,6 +141,70 @@ class UtilsXML
             tmLimitsEl->LinkEndChild ( buildTextNode ( "MaxTileCol", std::to_string(tml.maxTileCol) ) );
             
             return tmLimitsEl;
+        }
+
+
+        /**
+         * \~french \brief Export XML d'une bbox, en géographique ou dans le CRS fourni
+         * \details La bbox fournie doit être en coordonnées géographique ou dans le CRS fourni
+         * \param[in] bbox Bounding box
+         * \param[in] crs CRS spécifique
+         * \~english \brief XML export for bounding box, geographical or with provided CRS
+         * \details Provided bbox have to be geographical or with the provided CRS
+         * \param[in] bbox Bounding box
+         * \param[in] crs Specific CRS
+         */
+        static TiXmlElement* getXml(BoundingBox<double> bbox, std::string crs = "") {
+
+            std::ostringstream os;
+
+            if (crs == "") {
+                TiXmlElement * el = new TiXmlElement ( "EX_GeographicBoundingBox" );
+
+                os.str ( "" );
+                os<<bbox.xmin;
+                el->LinkEndChild ( UtilsXML::buildTextNode ( "westBoundLongitude", os.str() ) );
+                os.str ( "" );
+                os<<bbox.xmax;
+                el->LinkEndChild ( UtilsXML::buildTextNode ( "eastBoundLongitude", os.str() ) );
+                os.str ( "" );
+                os<<bbox.ymin;
+                el->LinkEndChild ( UtilsXML::buildTextNode ( "southBoundLatitude", os.str() ) );
+                os.str ( "" );
+                os<<bbox.ymax;
+                el->LinkEndChild ( UtilsXML::buildTextNode ( "northBoundLatitude", os.str() ) );
+                os.str ( "" );
+
+                return el;
+            } else {
+
+                TiXmlElement * el = new TiXmlElement ( "BoundingBox" );
+
+                el->SetAttribute ( "CRS", crs );
+                int floatprecision = GetDecimalPlaces ( bbox.xmin );
+                floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.xmax ) );
+                floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.ymin ) );
+                floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.ymax ) );
+                floatprecision = std::min ( floatprecision,9 ); //FIXME gestion du nombre maximal de décimal.
+
+                os.str ( "" );
+                os<< std::fixed << std::setprecision ( floatprecision );
+                os<<bbox.xmin;
+                el->SetAttribute ( "minx",os.str() );
+                os.str ( "" );
+                os<<bbox.ymin;
+                el->SetAttribute ( "miny",os.str() );
+                os.str ( "" );
+                os<<bbox.xmax;
+                el->SetAttribute ( "maxx",os.str() );
+                os.str ( "" );
+                os<<bbox.ymax;
+                el->SetAttribute ( "maxy",os.str() );
+                os.str ( "" );
+
+                return el;
+            }
+
         }
 
 };
