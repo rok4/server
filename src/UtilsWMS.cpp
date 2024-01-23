@@ -47,7 +47,6 @@
 #include "UtilsXML.h"
 #include <iostream>
 #include <algorithm>
-#include <iomanip>
 #include <vector>
 #include <map>
 #include <cmath>
@@ -55,21 +54,6 @@
 #include <rok4/utils/Pyramid.h>
 #include <rok4/utils/BoundingBox.h>
 #include <rok4/utils/Utils.h>
-
-int Rok4Server::GetDecimalPlaces ( double dbVal ) {
-    dbVal = fmod(dbVal, 1);
-    static const int MAX_DP = 10;
-    double THRES = pow ( 0.1, MAX_DP );
-    if ( dbVal == 0.0 )
-        return 0;
-    int nDecimal = 0;
-    while ( dbVal - floor ( dbVal ) > THRES && nDecimal < MAX_DP && ceil(dbVal)-dbVal > THRES) {
-        dbVal *= 10.0;
-        THRES *= 10.0;
-        nDecimal++;
-    }
-    return nDecimal;
-}
 
 DataStream* Rok4Server::getMapParamWMS (
     Request* request, std::vector<Layer*>& layers, BoundingBox< double >& bbox, int& width, int& height, CRS*& crs,
@@ -640,13 +624,19 @@ void Rok4Server::buildWMSCapabilities() {
         // Parent layer
         TiXmlElement * parentLayerEl = new TiXmlElement ( "Layer" );
         // Title
-        parentLayerEl->LinkEndChild ( UtilsXML::buildTextNode ( "Title", "cache IGN" ) );
+        parentLayerEl->LinkEndChild ( UtilsXML::buildTextNode ( "Title", servicesConf->layerRootTitle ) );
         // Abstract
-        parentLayerEl->LinkEndChild ( UtilsXML::buildTextNode ( "Abstract", "Cache IGN" ) );
+        parentLayerEl->LinkEndChild ( UtilsXML::buildTextNode ( "Abstract", servicesConf->layerRootAbstract ) );
         // Global CRS
         for ( unsigned int i=0; i < servicesConf->globalCRSList.size(); i++ ) {
             parentLayerEl->LinkEndChild ( UtilsXML::buildTextNode ( "CRS", servicesConf->globalCRSList.at ( i )->getRequestCode() ) );
         }
+        // Global GeographicBoundingBox
+
+        BoundingBox<double> gbbox ( -180.0,-90.0,180.0,90.0 );
+        parentLayerEl->LinkEndChild ( UtilsXML::getXml(gbbox) );
+        parentLayerEl->LinkEndChild ( UtilsXML::getXml(gbbox, "CRS:84") );
+
         // Child layers
         std::map<std::string, Layer*>::iterator it;
         for ( it=serverConf->layersList.begin(); it!=serverConf->layersList.end(); it++ ) {
@@ -681,22 +671,7 @@ void Rok4Server::buildWMSCapabilities() {
                 }
 
                 // GeographicBoundingBox
-                TiXmlElement * gbbEl = new TiXmlElement ( "EX_GeographicBoundingBox" );
-
-                os.str ( "" );
-                os<<childLayer->getGeographicBoundingBox().xmin;
-                gbbEl->LinkEndChild ( UtilsXML::buildTextNode ( "westBoundLongitude", os.str() ) );
-                os.str ( "" );
-                os<<childLayer->getGeographicBoundingBox().xmax;
-                gbbEl->LinkEndChild ( UtilsXML::buildTextNode ( "eastBoundLongitude", os.str() ) );
-                os.str ( "" );
-                os<<childLayer->getGeographicBoundingBox().ymin;
-                gbbEl->LinkEndChild ( UtilsXML::buildTextNode ( "southBoundLatitude", os.str() ) );
-                os.str ( "" );
-                os<<childLayer->getGeographicBoundingBox().ymax;
-                gbbEl->LinkEndChild ( UtilsXML::buildTextNode ( "northBoundLatitude", os.str() ) );
-                os.str ( "" );
-                childLayerEl->LinkEndChild ( gbbEl );
+                childLayerEl->LinkEndChild ( UtilsXML::getXml(childLayer->getGeographicBoundingBox()) );
 
 
                 // BoundingBox
@@ -723,29 +698,7 @@ void Rok4Server::buildWMSCapabilities() {
                             bbox.ymax = doubletmp;
                         }
 
-                        TiXmlElement * bbEl = new TiXmlElement ( "BoundingBox" );
-                        bbEl->SetAttribute ( "CRS", crs->getRequestCode() );
-                        int floatprecision = GetDecimalPlaces ( bbox.xmin );
-                        floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.xmax ) );
-                        floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.ymin ) );
-                        floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.ymax ) );
-                        floatprecision = std::min ( floatprecision,9 ); //FIXME gestion du nombre maximal de décimal.
-
-                        os.str ( "" );
-                        os<< std::fixed << std::setprecision ( floatprecision );
-                        os<<bbox.xmin;
-                        bbEl->SetAttribute ( "minx",os.str() );
-                        os.str ( "" );
-                        os<<bbox.ymin;
-                        bbEl->SetAttribute ( "miny",os.str() );
-                        os.str ( "" );
-                        os<<bbox.xmax;
-                        bbEl->SetAttribute ( "maxx",os.str() );
-                        os.str ( "" );
-                        os<<bbox.ymax;
-                        bbEl->SetAttribute ( "maxy",os.str() );
-                        os.str ( "" );
-                        childLayerEl->LinkEndChild ( bbEl );
+                        childLayerEl->LinkEndChild ( UtilsXML::getXml(bbox, crs->getRequestCode()) );
                     }
                     for ( unsigned int i=0; i < servicesConf->globalCRSList.size(); i++ ) {
                         CRS* crs = servicesConf->globalCRSList.at ( i );
@@ -769,28 +722,7 @@ void Rok4Server::buildWMSCapabilities() {
                             bbox.ymax = doubletmp;
                         }
 
-                        TiXmlElement * bbEl = new TiXmlElement ( "BoundingBox" );
-                        bbEl->SetAttribute ( "CRS", crs->getRequestCode() );
-                        int floatprecision = GetDecimalPlaces ( bbox.xmin );
-                        floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.xmax ) );
-                        floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.ymin ) );
-                        floatprecision = std::max ( floatprecision,GetDecimalPlaces ( bbox.ymax ) );
-                        floatprecision = std::min ( floatprecision,9 ); //FIXME gestion du nombre maximal de décimal.
-                        os.str ( "" );
-                        os<< std::fixed << std::setprecision ( floatprecision );
-                        os<<bbox.xmin;
-                        bbEl->SetAttribute ( "minx",os.str() );
-                        os.str ( "" );
-                        os<<bbox.ymin;
-                        bbEl->SetAttribute ( "miny",os.str() );
-                        os.str ( "" );
-                        os<<bbox.xmax;
-                        bbEl->SetAttribute ( "maxx",os.str() );
-                        os.str ( "" );
-                        os<<bbox.ymax;
-                        bbEl->SetAttribute ( "maxy",os.str() );
-                        os.str ( "" );
-                        childLayerEl->LinkEndChild ( bbEl );
+                        childLayerEl->LinkEndChild ( UtilsXML::getXml(bbox, crs->getRequestCode()) );
                     }
                 } else {
                     TiXmlElement * bbEl = new TiXmlElement ( "BoundingBox" );
@@ -825,6 +757,11 @@ void Rok4Server::buildWMSCapabilities() {
 
                     childLayerEl->LinkEndChild ( bbEl );
                 }
+                //Attribution
+                if ( childLayer->getAttribution() != NULL ) {
+                    childLayerEl->LinkEndChild ( childLayer->getAttribution()->getWmsXml() );
+                }
+
                 //MetadataURL
                 if ( childLayer->getMetadataURLs().size() != 0 ) {
                     for ( unsigned int i=0; i < childLayer->getMetadataURLs().size(); ++i ) {
@@ -839,10 +776,6 @@ void Rok4Server::buildWMSCapabilities() {
                         mtdURLEl->LinkEndChild ( onlineResourceEl );
                         childLayerEl->LinkEndChild ( mtdURLEl );
                     }
-                }
-                //Attribution
-                if ( childLayer->getAttribution() != NULL ) {
-                    childLayerEl->LinkEndChild ( childLayer->getAttribution()->getWmsXml() );
                 }
 
                 // Style

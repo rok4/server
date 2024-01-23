@@ -172,6 +172,8 @@ class ServicesConf : public Configuration
         std::string wmsPublicUrl;
         MetadataURL* mtdWMS;
         std::string name;
+        std::string layerRootTitle;
+        std::string layerRootAbstract;
         unsigned int maxWidth;
         unsigned int maxHeight;
         unsigned int maxTileX;

@@ -108,6 +108,12 @@
                 "name": {
                     "type": "string"
                 },
+                "layer_root_title": {
+                    "type": "string"
+                },
+                "layer_root_abstract": {
+                    "type": "string"
+                },
                 "max_width": {
                     "type": "integer"
                 },
