@@ -56,7 +56,9 @@
             "CRS:84",
             "EPSG:3857",
             "EPSG:4326"
-        ]
+        ],
+        "layer_root_title": "Couches WMS",
+        "layer_root_abstract": "Données servies en WMS"
     },
     "wmts": {
         "active": true,

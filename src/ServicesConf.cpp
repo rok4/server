@@ -175,6 +175,8 @@ bool ServicesConf::parse(json11::Json& doc) {
 
     name="";
     title="";
+    layerRootTitle="";
+    layerRootAbstract="";
     abstract="";
     serviceProvider="";
     fee="";
@@ -429,6 +431,22 @@ bool ServicesConf::parse(json11::Json& doc) {
         } else if (! wmsSection["name"].is_null()) {
             errorMessage = "wms.name have to be a string";
             return false;
+        }
+        if (wmsSection["layer_root_title"].is_string()) {
+            layerRootTitle = wmsSection["layer_root_title"].string_value();
+        } else if (! wmsSection["layer_root_title"].is_null()) {
+            errorMessage = "wms.layer_root_title have to be a string";
+            return false;
+        } else {
+            layerRootTitle = "WMS layers";
+        }
+        if (wmsSection["layer_root_abstract"].is_string()) {
+            layerRootAbstract = wmsSection["layer_root_abstract"].string_value();
+        } else if (! wmsSection["layer_root_abstract"].is_null()) {
+            errorMessage = "wms.layer_root_abstract have to be a string";
+            return false;
+        } else {
+            layerRootAbstract = "WMS layers";
         }
         if (wmsSection["max_width"].is_number()) {
             maxWidth = wmsSection["max_width"].int_value();
