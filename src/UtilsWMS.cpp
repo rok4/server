@@ -635,8 +635,6 @@ void Rok4Server::buildWMSCapabilities() {
 
         BoundingBox<double> gbbox ( -180.0,-90.0,180.0,90.0 );
         parentLayerEl->LinkEndChild ( UtilsXML::getXml(gbbox) );
-
-        TiXmlElement * gbbEl = new TiXmlElement ( "BoundingBox" );
         parentLayerEl->LinkEndChild ( UtilsXML::getXml(gbbox, "CRS:84") );
 
         // Child layers

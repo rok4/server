@@ -190,7 +190,9 @@ DataSource* Rok4Server::getTileParamWMTS ( Request* request, Layer*& layer, Tile
 //   Done only 1 time (during server initialization)
 void Rok4Server::buildWMTSCapabilities() {
 
-    std::map<std::string,TileMatrixSet*> usedTMSList;
+    // On va mémoriser les TMS utilisés, avec les niveaux du haut et du bas
+    // La clé est un triplet : nom du TMS, niveau du haut, niveau du bas
+    std::map< std::tuple<std::string, std::string, std::string>, TileMatrixSet*> usedTMSList;
 
     TiXmlDocument doc;
     TiXmlDeclaration * decl = new TiXmlDeclaration ( "1.0", "UTF-8", "" );
@@ -504,8 +506,7 @@ void Rok4Server::buildWMTSCapabilities() {
 
             // On précise le TMS natif et les limites de la pyramide
             TiXmlElement * tmsLinkEl = new TiXmlElement ( "TileMatrixSetLink" );
-            tmsLinkEl->LinkEndChild ( UtilsXML::buildTextNode ( "TileMatrixSet",layer->getDataPyramid()->getTms()->getId() ) );
-            usedTMSList.insert ( std::pair<std::string,TileMatrixSet*> ( layer->getDataPyramid()->getTms()->getId() , layer->getDataPyramid()->getTms()) );
+
             //tileMatrixSetLimits
             TiXmlElement * tmsLimitsEl = new TiXmlElement ( "TileMatrixSetLimits" );
 
@@ -517,6 +518,17 @@ void Rok4Server::buildWMTSCapabilities() {
                 tmsLimitsEl->LinkEndChild ( tmLimitsEl );
             }
 
+            // On ajoute le TMS utilisé avec les niveaux du haut et du bas
+
+            std::string tms_id = layer->getDataPyramid()->getTms()->getId();
+            std::string partial_tms_top = orderedLevels.begin()->second->getId();
+            std::string partial_tms_bottom = orderedLevels.rbegin()->second->getId();
+            std::string partial_tms_id = tms_id + "_" + partial_tms_top + "_" + partial_tms_bottom;
+
+            std::tuple<std::string, std::string, std::string> t = std::make_tuple(tms_id, partial_tms_top, partial_tms_bottom);
+            usedTMSList.insert ( std::pair<std::tuple<std::string, std::string, std::string>,TileMatrixSet*> ( t , layer->getDataPyramid()->getTms()) );
+
+            tmsLinkEl->LinkEndChild ( UtilsXML::buildTextNode ( "TileMatrixSet", partial_tms_id ) );
             tmsLinkEl->LinkEndChild ( tmsLimitsEl );
             layerEl->LinkEndChild ( tmsLinkEl );
 
@@ -524,8 +536,6 @@ void Rok4Server::buildWMTSCapabilities() {
             for ( unsigned int i=0; i < layer->getWMTSTMSList().size(); i++ ) {
                 TileMatrixSet* tms = layer->getWMTSTMSList().at(i);
                 TiXmlElement * tmsLinkEl = new TiXmlElement ( "TileMatrixSetLink" );
-                tmsLinkEl->LinkEndChild ( UtilsXML::buildTextNode ( "TileMatrixSet",tms->getId() ) );
-                usedTMSList.insert ( std::pair<std::string,TileMatrixSet*> ( tms->getId() , tms) );
                 
                 TiXmlElement * tmsLimitsEl = new TiXmlElement ( "TileMatrixSetLimits" );
 
@@ -535,6 +545,17 @@ void Rok4Server::buildWMTSCapabilities() {
                     tmsLimitsEl->LinkEndChild ( tmLimitsEl );
                 }
 
+                // On ajoute le TMS utilisé avec les niveaux du haut et du bas
+
+                tms_id = tms->getId();
+                partial_tms_top = layer->getWMTSTMSLimitsList().at(i).front().tileMatrixId;
+                partial_tms_bottom = layer->getWMTSTMSLimitsList().at(i).back().tileMatrixId;
+                partial_tms_id = tms_id + "_" + partial_tms_top + "_" + partial_tms_bottom;
+
+                std::tuple<std::string, std::string, std::string> t = std::make_tuple(tms_id, partial_tms_top, partial_tms_bottom);
+                usedTMSList.insert ( std::pair<std::tuple<std::string, std::string, std::string>,TileMatrixSet*> ( t , layer->getDataPyramid()->getTms()) );
+
+                tmsLinkEl->LinkEndChild ( UtilsXML::buildTextNode ( "TileMatrixSet",partial_tms_id ) );
                 tmsLinkEl->LinkEndChild ( tmsLimitsEl );
                 layerEl->LinkEndChild ( tmsLinkEl );
 
@@ -547,14 +568,17 @@ void Rok4Server::buildWMTSCapabilities() {
 
     // TileMatrixSet
     //--------------------------------------------------------
-    std::map<std::string,TileMatrixSet*>::iterator itTms ( usedTMSList.begin() ), itTmsEnd ( usedTMSList.end() );
+    std::map<std::tuple<std::string, std::string, std::string>,TileMatrixSet*>::iterator itTms ( usedTMSList.begin() ), itTmsEnd ( usedTMSList.end() );
     for ( ; itTms!=itTmsEnd; ++itTms ) {
 
-
+        std::string tms_id = std::get<0>(itTms->first);
+        std::string partial_tms_top = std::get<1>(itTms->first);
+        std::string partial_tms_bottom = std::get<2>(itTms->first);
+        std::string partial_tms_id = tms_id + "_" + partial_tms_top + "_" + partial_tms_bottom;
         TileMatrixSet* tms = itTms->second;
 
-        TiXmlElement * tmsEl=new TiXmlElement ( "TileMatrixSet" );
-        tmsEl->LinkEndChild ( UtilsXML::buildTextNode ( "ows:Identifier",tms->getId() ) );
+        TiXmlElement * tmsEl = new TiXmlElement ( "TileMatrixSet" );
+        tmsEl->LinkEndChild ( UtilsXML::buildTextNode ( "ows:Identifier", partial_tms_id ) );
         if ( ! ( tms->getTitle().empty() ) ) {
             tmsEl->LinkEndChild ( UtilsXML::buildTextNode ( "ows:Title", tms->getTitle().c_str() ) );
         }
@@ -584,8 +608,16 @@ void Rok4Server::buildWMTSCapabilities() {
         
         // TileMatrix
         std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->getOrderedTileMatrix(false);
+        bool keep = false;
         for (std::pair<std::string, TileMatrix*> element : orderedTM) {
             TileMatrix* tm = element.second;
+
+            if (! keep && tm->getId() != partial_tms_top) {
+                continue;
+            } else {
+                keep = true;
+            }
+
             TiXmlElement * tmEl = new TiXmlElement ( "TileMatrix" );
             tmEl->LinkEndChild ( UtilsXML::buildTextNode ( "ows:Identifier",tm->getId() ) );
             tmEl->LinkEndChild ( UtilsXML::buildTextNode ( "ScaleDenominator",doubleToStr ( ( long double ) ( tm->getRes() * tms->getCrs()->getMetersPerUnit() ) /0.00028 ) ) );
@@ -595,6 +627,10 @@ void Rok4Server::buildWMTSCapabilities() {
             tmEl->LinkEndChild ( UtilsXML::buildTextNode ( "MatrixWidth",numToStr ( tm->getMatrixW() ) ) );
             tmEl->LinkEndChild ( UtilsXML::buildTextNode ( "MatrixHeight",numToStr ( tm->getMatrixH() ) ) );
             tmsEl->LinkEndChild ( tmEl );
+
+            if (tm->getId() == partial_tms_bottom) {
+                break;
+            }
         }
 
         contentsEl->LinkEndChild ( tmsEl );
