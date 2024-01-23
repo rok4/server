@@ -1,3 +1,20 @@
+## 5.4.0
+
+### [Added]
+
+* WMS :
+  * Ajout de la configuration du titre et nom de la couche racine dans le getCapabilities
+
+### [Changed]
+
+* WMS :
+  * Déplacement des fonctions d'écriture d'une bbox du getCapabilities dans UtilsXML
+  * Ajout de bbox au niveau de la couche racine dans le getCapabilities
+  * L'attribution d'une couche est mise après les éventuelles métadonnées
+* WMTS :
+  * On ne liste plus les couches de tuiles vectorielles dans le getCapabilities
+  * On exporte dans le getcapabilities un TMS différent pour chaque couple haut / bas présent dans les couches
+
 ## 5.3.0
 
 ### [Added]
