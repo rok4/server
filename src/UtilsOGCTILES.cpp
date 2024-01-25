@@ -620,17 +620,10 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
             );
         }
 
-        tms = TmsBook::get_tms(str_tms);
-        if ( tms == NULL ) {
-            return new SERDataSource ( 
-                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TILEMATRIXSET " + str_tms + " inconnu.", "ogcapitiles" ) 
-            );
-        }
 
-        if ( tms->getId() != layer->getDataPyramid()->getTms()->getId() && ! layer->isInWMTSTMSList(tms)) {
-            return new SERDataSource ( 
-                new ServiceException ( "", OWS_INVALID_PARAMETER_VALUE, "TILEMATRIXSET " + str_tms + " inconnu pour le layer.", "ogcapitiles" ) 
-            );
+        tms = layer->getTms(str_tms);
+        if ( tms == NULL) {
+            return new SERDataSource ( new ServiceException ( "",OWS_INVALID_PARAMETER_VALUE,"TileMatrixSet " +str_tms+" inconnu pour le layer.","ogcapitiles" ) );
         }
     
         // TILEMATRIX
@@ -680,33 +673,18 @@ DataSource* Rok4Server::getTileParamOGCTILES ( Request* request, Layer*& layer, 
             );
         }
 
-        if ( tms->getId() == layer->getDataPyramid()->getTms()->getId()) {
-            // TMS natif de la pyramide, les tuiles limites sont stockées dans le niveau
-            Level* level = layer->getDataPyramid()->getLevel(tm->getId());
-            if (level == NULL) {
-                // On est hors niveau -> erreur
-                return new SERDataSource ( new ServiceException ( "", HTTP_NOT_FOUND,"No data found", "ogcapitiles" ) );
-            }
-
-            if (! level->getTileLimits().containTile(tileCol, tileRow)) {
-                // On est hors tuiles -> erreur
-                return new SERDataSource ( new ServiceException ( "", HTTP_NOT_FOUND,"No data found", "ogcapitiles" ) );
-            }
-        } else if (layer->isInWMTSTMSList(tms)) {
-            // TMS supplémentaire, les tuiles limites sont stockées dans la couche
-            TileMatrixLimits* tml = layer->getTmLimits(tms, tm);
-            if (tml == NULL) {
-                // On est hors niveau -> erreur
-                return new SERDataSource ( 
-                    new ServiceException ( "", HTTP_NOT_FOUND, "No data found", "ogcapitiles" ) 
-                );
-            }
-            if (! tml->containTile(tileCol, tileRow)) {
-                // On est hors tuiles -> erreur
-                return new SERDataSource ( 
-                    new ServiceException ( "", HTTP_NOT_FOUND, "No data found", "ogcapitiles" ) 
-                );
-            }
+        TileMatrixLimits* tml = layer->getTmLimits(tms, tm);
+        if (tml == NULL) {
+            // On est hors niveau -> erreur
+            return new SERDataSource ( 
+                new ServiceException ( "", HTTP_NOT_FOUND, "No data found", "ogcapitiles" ) 
+            );
+        }
+        if (! tml->containTile(tileCol, tileRow)) {
+            // On est hors tuiles -> erreur
+            return new SERDataSource ( 
+                new ServiceException ( "", HTTP_NOT_FOUND, "No data found", "ogcapitiles" ) 
+            );
         }
 
         // INFO :

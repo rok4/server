@@ -216,6 +216,13 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
         return false;
     }
 
+    WmtsTmsInfos infos;
+    infos.tms = dataPyramid->getTms();
+    infos.top_level = dataPyramid->getHighestLevel()->getId();
+    infos.bottom_level = dataPyramid->getLowestLevel()->getId();
+    infos.wmts_id = infos.tms->getId() + "_" + infos.top_level + "_" + infos.bottom_level;
+    WMTSTMSList.push_back(infos);
+
     /********************** Gestion de l'étendue des données */
 
     if (doc["bbox"].is_object()) {
@@ -402,11 +409,15 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
                         BOOST_LOG_TRIVIAL(warning) <<  "Forbiden CRS for TMS " << t.string_value();
                         continue;
                     }
-                    if (isInWMTSTMSList(tms) || dataPyramid->getTms()->getId() == tms->getId()) {
+
+                    if (getTms(tms->getId()) != NULL) {
                         // Le TMS est déjà dans la liste ou est celui natif de la pyramide
                         continue;
                     }
-                    WMTSTMSList.push_back ( tms );
+
+                    infos.tms = tms;
+                    // On calculera plus tard (dans calculateTileMatrixLimits) les informations de niveaux de haut et bas (et donc l'ID WMTS de ce TMS)
+                    WMTSTMSList.push_back(infos);
                 }
             }
 
@@ -495,14 +506,30 @@ void Layer::calculateNativeTileMatrixLimits() {
     }
 }
 
-void Layer::calculateExtraTileMatrixLimits() {
+void Layer::calculateTileMatrixLimits() {
 
-    std::vector<TileMatrixSet *> newList;
+    std::vector<WmtsTmsInfos> newList;
+
+    // Le premier TMS est ce lui natif : les tuiles limites sont déjà calculée et stockées dans les niveaux
+
+    WmtsTmsInfos infos = WMTSTMSList.at(0);
+    infos.limits = std::vector<TileMatrixLimits>();
+
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = dataPyramid->getOrderedLevels(false);
+    for (std::pair<std::string, Level*> element : orderedLevels) {
+        infos.limits.push_back(element.second->getTileLimits());
+    }
+
+    newList.push_back(infos);
 
     // On calcule les tuiles limites pour tous les TMS supplémentaires, que l'on filtre
-    for (unsigned i = 0 ; i < WMTSTMSList.size(); i++) {
-        TileMatrixSet* tms = WMTSTMSList.at(i);
+    for (unsigned i = 1 ; i < WMTSTMSList.size(); i++) {
+        TileMatrixSet* tms = WMTSTMSList.at(i).tms;
+
         BOOST_LOG_TRIVIAL(debug) <<  "Tile limits calculation for TMS " << tms->getId() ;
+
+        infos.tms = tms;
+        infos.limits = std::vector<TileMatrixLimits>();
 
         BoundingBox<double> tmp = geographicBoundingBox;
         tmp.print();
@@ -549,7 +576,6 @@ void Layer::calculateExtraTileMatrixLimits() {
 
         // Pour chaque niveau entre le haut et le base, on va calculer les tuiles limites
 
-        std::vector<TileMatrixLimits> limits;
         std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->getOrderedTileMatrix(false);
         bool begin = false;
         for (std::pair<std::string, TileMatrix*> element : orderedTM) {
@@ -559,14 +585,17 @@ void Layer::calculateExtraTileMatrixLimits() {
                 continue;
             }
             begin = true;
-            limits.push_back(tm->bboxToTileLimits(tmp));
+            infos.limits.push_back(tm->bboxToTileLimits(tmp));
             if (tm->getId() == tmBottom->getId()) {
                 break;
             }
         }
 
-        WMTSTMSLimitsList.push_back(limits);
-        newList.push_back(tms);
+        infos.bottom_level = tmBottom->getId();
+        infos.top_level = tmTop->getId();
+        infos.wmts_id = infos.tms->getId() + "_" + infos.top_level + "_" + infos.bottom_level;
+
+        newList.push_back(infos);
     }
 
     // La nouvelle liste ne contient pas les TMS pour lesquels nous n'avons pas pu calculer les niveaux et les limites
@@ -623,10 +652,11 @@ Layer::Layer(std::string path, ServicesConf* servicesConf ) : Configuration(path
     }
 
     if (Rok4Format::isRaster(dataPyramid->getFormat())) {
-        calculateExtraTileMatrixLimits();
+        calculateTileMatrixLimits();
     } else {
-        // Une pyramide vecteur n'est diffusée qu'en WMTS et TMS et le GFI n'est pas possible
+        // Une pyramide vecteur n'est diffusée qu'en TMS et le GFI n'est pas possible
         WMSAuthorized = false;
+        WMTSAuthorized = false;
         getFeatureInfoAvailability = false;
     }
 
@@ -659,10 +689,11 @@ Layer::Layer(std::string layerName, std::string content, ServicesConf* servicesC
     }
 
     if (Rok4Format::isRaster(dataPyramid->getFormat())) {
-        calculateExtraTileMatrixLimits();
+        calculateTileMatrixLimits();
     } else {
         // Une pyramide vecteur n'est diffusée qu'en WMTS et TMS et le GFI n'est pas possible
         WMSAuthorized = false;
+        WMTSAuthorized = false;
         getFeatureInfoAvailability = false;
     }
     
@@ -708,22 +739,22 @@ Style* Layer::getDefaultStyle() {
     }
 }
 std::vector<Style*> Layer::getStyles() { return styles; }
-std::vector<TileMatrixSet*> Layer::getWMTSTMSList() { return WMTSTMSList; }
-std::vector<std::vector<TileMatrixLimits> > Layer::getWMTSTMSLimitsList() { return WMTSTMSLimitsList; }
-bool Layer::isInWMTSTMSList(TileMatrixSet* tms) {
+
+std::vector<WmtsTmsInfos> Layer::getWMTSTMSList() { return WMTSTMSList; }
+TileMatrixSet* Layer::getTms(std::string wmts_id) {
     for ( unsigned int k = 0; k < WMTSTMSList.size(); k++ ) {
-        if ( tms->getId() == WMTSTMSList.at (k)->getId() ) {
-            return true;
+        if ( wmts_id == WMTSTMSList.at(k).wmts_id || wmts_id == WMTSTMSList.at(k).tms->getId() ) {
+            return WMTSTMSList.at(k).tms;
         }
     }
-    return false;
+    return NULL;
 }
 TileMatrixLimits* Layer::getTmLimits(TileMatrixSet* tms, TileMatrix* tm) {
     for ( unsigned int k = 0; k < WMTSTMSList.size(); k++ ) {
-        if ( tms->getId() == WMTSTMSList.at (k)->getId() ) {
-            for ( unsigned int l = 0; l < WMTSTMSLimitsList.at(k).size(); l++ ) {
-                if ( tm->getId() == WMTSTMSLimitsList.at(k).at(l).tileMatrixId ) {
-                    return &(WMTSTMSLimitsList.at(k).at(l));
+        if ( tms->getId() == WMTSTMSList.at (k).tms->getId() ) {
+            for ( unsigned int l = 0; l < WMTSTMSList.at (k).limits.size(); l++ ) {
+                if ( tm->getId() == WMTSTMSList.at (k).limits.at(l).tileMatrixId ) {
+                    return &(WMTSTMSList.at (k).limits.at(l));
                 }
             }
         }
@@ -778,3 +809,6 @@ std::string Layer::getGFIQueryLayers() { return GFIQueryLayers; }
 std::string Layer::getGFIService() { return GFIService; }
 std::string Layer::getGFIVersion() { return GFIVersion; }
 bool Layer::getGFIForceEPSG() { return GFIForceEPSG; }
+std::string Layer::getNativeWmtsTmsId() { 
+    return WMTSTMSList.at(0).wmts_id;
+}
