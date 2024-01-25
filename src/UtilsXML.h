@@ -79,7 +79,6 @@ class UtilsXML
             return "";
         }
 
-
         /**
          * \~french \brief Export XML du mot clé pour le GetCapabilities
          * \param[in] elName Nom de l'élément XML
@@ -96,7 +95,6 @@ class UtilsXML
             
             return el;
         }
-
 
         /**
         * \~french
@@ -124,7 +122,6 @@ class UtilsXML
             }
             return nDecimal;
         }
-
 
         /**
          * \~french \brief Export XML des tuiles limites pour un niveau
@@ -209,5 +206,5 @@ class UtilsXML
 
 };
 
-#endif // ATTRIBUTE_H
+#endif // UTILSXML_H
 

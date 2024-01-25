@@ -63,6 +63,14 @@ class Layer;
 #include <rok4/utils/BoundingBox.h>
 #include <rok4/utils/Configuration.h>
 
+struct WmtsTmsInfos {
+    TileMatrixSet* tms;
+    std::string wmts_id;
+    std::string top_level;
+    std::string bottom_level;
+    std::vector<TileMatrixLimits> limits;
+};
+
 /**
  * \author Institut national de l'information géographique et forestière
  * \~french
@@ -167,15 +175,11 @@ private:
      */
     std::vector<CRS*> WMSCRSList;
     /**
-     * \~french \brief Liste des TMS supplémentaires d'interrogation autorisés
-     * \~english \brief Extra TMS list
+     * \~french \brief Liste des TMS d'interrogation autorisés en WMTS
+     * \~english \brief TMS list for WMTS requests
      */
-    std::vector<TileMatrixSet*> WMTSTMSList;
-    /**
-     * \~french \brief Niveaux et tuiles limites pour les TMS supplémentaires
-     * \~english \brief Extra TMS tile limits list
-     */
-    std::vector<std::vector<TileMatrixLimits> > WMTSTMSLimitsList;
+    std::vector<WmtsTmsInfos> WMTSTMSList;
+
     /**
      * \~french \brief Interpolation utilisée pour reprojeter ou recadrer les tuiles
      * \~english \brief Interpolation used for resizing and reprojecting tiles
@@ -224,7 +228,7 @@ private:
 
     void calculateBoundingBoxes();
     void calculateNativeTileMatrixLimits();
-    void calculateExtraTileMatrixLimits();
+    void calculateTileMatrixLimits();
 
     bool parse(json11::Json& doc, ServicesConf* servicesConf);
 
@@ -375,6 +379,17 @@ public:
      * \return pyramid
      */
     Pyramid* getDataPyramid() ;
+    /**
+     * \~french
+     * \brief Retourne l'ID WMTS du TMS natif de la pyramide de données associée
+     * \details L'identifiant intègre les niveaux du haut et du bas d'utilisation dans son nom
+     * \return Identifiant de TMS
+     * \~english
+     * \brief Return the WMTS ID of associated data pyramid native TMS
+     * \details ID contains used top and bottom levels
+     * \return TMS id
+     */
+    std::string getNativeWmtsTmsId() ;
     
     /**
      * \~french
@@ -396,22 +411,14 @@ public:
     std::vector<Style*> getStyles() ;
     /**
      * \~french
-     * \brief Retourne la liste des TMS supplémentaires
-     * \return liste de TMS
+     * \brief Retourne la liste des TMS disponibles
+     * \return liste d'informations sur les TMS
      * \~english
-     * \brief Return the extra TMS list
-     * \return TMS list
+     * \brief Return the available TMS list
+     * \return TMS infos list
      */
-    std::vector<TileMatrixSet*> getWMTSTMSList() ;
-    /**
-     * \~french
-     * \brief Retourne la liste des limites pour les TMS supplémentaires
-     * \return liste de TMS
-     * \~english
-     * \brief Return the extra TMS limits list
-     * \return TMS list
-     */
-    std::vector<std::vector<TileMatrixLimits> > getWMTSTMSLimitsList() ;
+    std::vector<WmtsTmsInfos> getWMTSTMSList() ;
+
     /**
      * \~french
      * \brief Retourne le style associé à la couche (identifiant interne)
@@ -474,13 +481,14 @@ public:
 
     /**
      * \~french
-     * \brief Teste la présence du TMS dans la liste
-     * \return Présent ou non
+     * \brief Récupère le TMS disponible sur la couche par l'identifiant
+     * \details L'identifiant peut contenir les niveaux du haut et du bas
+     * \return NULL si ce TMS n'est pas disponible
      * \~english
-     * \brief Test if TMS is in the TMS list
-     * \return Present or not
+     * \brief Get available TMS for the layer with identifiant
+     * \return NULL if not available
      */
-    bool isInWMTSTMSList(TileMatrixSet* tms) ;
+    TileMatrixSet* getTms(std::string id) ;
 
     /**
      * \~french
