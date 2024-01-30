@@ -1,0 +1,30 @@
+site_name: "Projet ROK4 - Serveur de diffusion WMS, WMTS et TMS"
+site_url: https://rok4.github.io/server
+nav:
+    - Accueil: README.md
+    - Spécification de l'API: openapi.md
+    - Documentation technique: documentation.md
+    - Historique des versions: CHANGELOG.md
+    - Contribuer: CONTRIBUTING.md
+
+theme:
+    logo: https://rok4.github.io/assets/images/rok4-carre.png
+    favicon: https://rok4.github.io/assets/images/rok4-carre.png
+    name: material
+    features:
+        - navigation.tabs
+        - navigation.tabs.sticky
+    language: fr
+    custom_dir: overrides
+
+extra_css:
+    - https://rok4.github.io/assets/css/commun.css
+
+extra:
+    homepage: https://rok4.github.io
+    version:
+        provider: mike
+        default: latest
+
+plugins:
+    - render_swagger
