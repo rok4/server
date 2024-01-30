@@ -1,0 +1,100 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "title": "ROK4 Server configuration",
+    "type": "object",
+    "properties": {
+        "threads": {
+            "type": "integer",
+            "description": "Nombre de thread de traitement des requêtes"
+        },
+        "port": {
+            "type": "string",
+            "description": "Port d'écoute du serveur"
+        },
+        "backlog": {
+            "type": "integer",
+            "description": "Taille de la file d'attente du socket"
+        },
+        "api": {
+            "type": "boolean",
+            "description": "Active-t-on l'API d'administration"
+        },
+        "logger": {
+            "type": "object",
+            "description": "Paramètres du logger",
+            "properties": {
+                "output": {
+                    "type": "string",
+                    "description": "Type de sortie",
+                    "enum": [
+                        "standard_output",
+                        "static_file",
+                        "rolling_file"
+                    ]
+                },
+                "level": {
+                    "type": "string",
+                    "description": "Niveau de log",
+                    "enum": [
+                        "fatal",
+                        "error",
+                        "warn",
+                        "info",
+                        "debug"
+                    ]
+                },
+                "file_prefix": {
+                    "type": "string",
+                    "description": "Chemin ou préfixe du fichier de logs"
+                },
+                "file_period": {
+                    "type": "integer",
+                    "description": "Temps en seconde avant de changer de fichier de logs"
+                }
+
+            }
+
+        },
+        "cache": {
+            "type": "object",
+            "description": "Paramètres du cache des index des dalles",
+            "properties": {
+                "size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Nombre d'éléments maximal dans le cache"
+                },
+                "validity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Temps de validité d'une élément du cache en minutes"
+                }
+            }
+        },
+        "configurations": {
+            "type": "object",
+            "description": "Fichiers secondaires de configuration",
+            "required": ["services", "styles", "tile_matrix_sets"],
+            "properties": {
+                "services": {
+                    "type": "string",
+                    "description": "Chemin vers le fichier de configurations des services"
+                },
+                "layers": {
+                    "type": "string",
+                    "description": "Chemin vers le fichier ou objet contenant la liste des descripteurs de couches à considérer"
+                },
+                "styles": {
+                    "type": "string",
+                    "description": "Chemin vers la racine de configurations des styles (répertoire fichier ou préfixe objet)"
+                },
+                "tile_matrix_sets": {
+                    "type": "string",
+                    "description": "Chemin vers la racine de définition des tile matrix sets (répertoire fichier ou préfixe objet)"
+                }
+            }
+
+        }
+        
+    }
+}
