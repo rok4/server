@@ -85,69 +85,41 @@ jobs:
           cd build
           make doc
           cd ..
-          cp -r README.md CHANGELOG.md docs/openapi.yaml docs/images config/*.schema.json dist/
 
-      - name: Upload documentation
+          cp docs/mkdocs.yml target/mkdocs.yml
+          cp -r docs/overrides target/
+          cp -r docs/images target/docs/
+          cp -r config/ target/docs/
+          cp docs/documentation.md target/docs/documentation.md
+          cp docs/openapi.md target/docs/openapi.md
+          cp docs/README.hdr.md target/docs/README.md
+          cp docs/CHANGELOG.hdr.md target/docs/CHANGELOG.md
+          cp docs/CONTRIBUTING.hdr.md target/docs/CONTRIBUTING.md
+          sed "s#__version__#${{ github.ref_name }}#g" docs/openapi.yaml >>target/docs/openapi.yaml
+          sed "s#x.y.z#${{ github.ref_name }}#g" README.md >>target/docs/README.md
+          sed -i "s#](./docs/images/#](./images/#g" target/docs/README.md
+          cat CHANGELOG.md >>target/docs/CHANGELOG.md
+          cat CONTRIBUTING.md >>target/docs/CONTRIBUTING.md
+
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+
+      - name: Install Mkdocs
+        run: pip install -r docs/requirements.txt
+
+      - name: Publish documentation
         if: "matrix.os == 'ubuntu-20.04'"
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist-py3
-          path: dist/
-          if-no-files-found: error
-          retention-days: 1
-
-  commit_documentation:
-    name: Add documentation into gh-pages branch
-    needs: build_and_test
-    if: "always()&&(needs.create_release.outputs.job_status=='success')&&(needs.build_and_test.outputs.job_status=='success')" 
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Checkout project on gh-pages
-        uses: actions/checkout@v3
-        with:
-          ref: 'gh-pages'
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist-py3
-          path: artifact/
-
-      - name: Copy version elements to final location
-        run: |
-          mkdir -p docs/versions/${{ github.ref_name }}/docs docs/versions/${{ github.ref_name }}/config
-          cp -r artifact/html docs/versions/${{ github.ref_name }}/
-          cp -r artifact/images docs/versions/${{ github.ref_name }}/docs/
-          cp -r artifact/*.schema.json docs/versions/${{ github.ref_name }}/config/
-
-      - name: Add pages from templates
-        run: |
-          sed "s#__version__#${{ github.ref_name }}#" templates/mkdocs.template.yml >mkdocs.yml
-
-          sed "s#__version__#${{ github.ref_name }}#" templates/documentation.template.md >docs/versions/${{ github.ref_name }}/documentation.md
-
-          sed "s#__version__#${{ github.ref_name }}#" templates/index-version.template.md >docs/versions/${{ github.ref_name }}/index.md
-          cat artifact/README.md >>docs/versions/${{ github.ref_name }}/index.md
-          sed -i "s#x.y.z#${{ github.ref_name }}#g" docs/versions/${{ github.ref_name }}/index.md
-
-          sed "s#__version__#${{ github.ref_name }}#" templates/openapi.template.md >docs/versions/${{ github.ref_name }}/openapi.md
-          sed "s#__version__#${{ github.ref_name }}#" artifact/openapi.yaml >docs/versions/${{ github.ref_name }}/openapi.yaml
-
-          cp templates/index-versions.template.md docs/versions/index.md
-          sed "s/^## \(.*\)$/## \1 \n\n[➔ Lien vers la documentation](\1\/index.md) /" artifact/CHANGELOG.md >>docs/versions/index.md
-
-          sed "s#__version__#${{ github.ref_name }}#" templates/latest.template.html >docs/versions/latest/index.html
-          rm -r artifact
-
-      - name: Publish on gh-pages branch
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add -v docs/versions/${{ github.ref_name }}/ docs/versions/latest/ docs/index.md docs/versions.md
-          git commit -m "Add documentation for version ${{ github.ref_name }}"
-          git push
+          cd target/
+          mike deploy --push --update-aliases --branch gh-pages -t "Version ${{ github.ref_name }}" ${{ github.ref_name }} latest
+          mike set-default --push --branch gh-pages ${{ github.ref_name }}
+
 
   delete_version:
     name: Remove release and tag if error occured
