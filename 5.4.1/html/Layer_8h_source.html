@@ -1,0 +1,284 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+    <meta name="generator" content="Doxygen 1.8.17" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Serveur de diffusion WMS, WMTS et TMS</title>
+    <link href="tabs.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="resize.js"></script>
+    <script type="text/javascript" src="navtreedata.js"></script>
+    <script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="search/searchdata.js"></script>
+    <script type="text/javascript" src="search/search.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css" />
+</head>
+<body><!-- Généré par Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'Recherche');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','Recherche');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('Layer_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">Layer.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<a href="Layer_8h.html">Aller à la documentation de ce fichier.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright © (2011-2013) Institut national de l&#39;information</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *                    géographique et forestière</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * Géoportail SAV &lt;contact.geoservices@ign.fr&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> * This software is a computer program whose purpose is to publish geographic</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> * data using OGC WMS and WMTS protocol.</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * This software is governed by the CeCILL-C license under French law and</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * abiding by the rules of distribution of free software.  You can  use,</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * modify and/ or redistribute the software under the terms of the CeCILL-C</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> * license as circulated by CEA, CNRS and INRIA at the following URL</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * &quot;http://www.cecill.info&quot;.</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"> * As a counterpart to the access to the source code and  rights to copy,</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment"> * modify and redistribute granted by the license, users are provided only</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment"> * with a limited warranty  and the software&#39;s author,  the holder of the</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment"> * economic rights,  and the successive licensors  have only  limited</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment"> * liability.</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment"> * In this respect, the user&#39;s attention is drawn to the risks associated</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment"> * with loading,  using,  modifying and/or developing or reproducing the</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment"> * software by the user in light of its specific status of free software,</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment"> * that may mean  that it is complicated to manipulate,  and  that  also</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment"> * therefore means  that it is reserved for developers  and  experienced</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment"> * professionals having in-depth computer knowledge. Users are therefore</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment"> * encouraged to load and test the software&#39;s suitability as regards their</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment"> * requirements in conditions enabling the security of their systems and/or</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment"> * data to be ensured and,  more generally, to use and operate it in the</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment"> * same conditions as regards security.</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment"> * The fact that you are presently reading this means that you have had</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment"> * knowledge of the CeCILL-C license and that you accept its terms.</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">class </span><a class="code" href="classLayer.html">Layer</a>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#ifndef LAYER_H_</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#define LAYER_H_</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &lt;rok4/utils/Pyramid.h&gt;</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#include &lt;rok4/utils/CRS.h&gt;</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &lt;rok4/style/Style.h&gt;</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include &quot;ServerConf.h&quot;</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include &quot;ServicesConf.h&quot;</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="MetadataURL_8h.html">MetadataURL.h</a>&quot;</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="AttributionURL_8h.html">AttributionURL.h</a>&quot;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &lt;rok4/enums/Interpolation.h&gt;</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &lt;rok4/utils/Keyword.h&gt;</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include &lt;rok4/utils/BoundingBox.h&gt;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include &lt;rok4/utils/Configuration.h&gt;</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="structWmtsTmsInfos.html">   66</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structWmtsTmsInfos.html">WmtsTmsInfos</a> {</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    TileMatrixSet* tms;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    std::string wmts_id;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    std::string top_level;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    std::string bottom_level;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    std::vector&lt;TileMatrixLimits&gt; limits;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;};</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="classLayer.html">   95</a></span>&#160;<span class="keyword">class </span><a class="code" href="classLayer.html">Layer</a> : <span class="keyword">public</span> Configuration {</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    std::string id;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    std::string title;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    std::string <span class="keyword">abstract</span>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordtype">bool</span> WMSAuthorized;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordtype">bool</span> WMTSAuthorized;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordtype">bool</span> TMSAuthorized;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    std::vector&lt;Keyword&gt; keyWords;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    Pyramid* dataPyramid;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    std::string authority;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    BoundingBox&lt;double&gt; geographicBoundingBox;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    BoundingBox&lt;double&gt; boundingBox;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    std::vector&lt;MetadataURL&gt; metadataURLs;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <a class="code" href="classAttributionURL.html">AttributionURL</a>* attribution;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    </div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="comment">    /******************* PYRAMIDE RASTER *********************/</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    std::vector&lt;Style*&gt; styles;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    std::vector&lt;CRS*&gt; WMSCRSList;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    std::vector&lt;WmtsTmsInfos&gt; WMTSTMSList;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    Interpolation::KernelType resampling;</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordtype">bool</span> getFeatureInfoAvailability;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    std::string getFeatureInfoType;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    std::string getFeatureInfoBaseURL;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    std::string GFIService;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    std::string GFIVersion;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    std::string GFIQueryLayers;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    std::string GFILayers;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordtype">bool</span> GFIForceEPSG;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordtype">void</span> calculateBoundingBoxes();</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordtype">void</span> calculateNativeTileMatrixLimits();</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordtype">void</span> calculateTileMatrixLimits();</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160; </div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keywordtype">bool</span> parse(json11::Json&amp; doc, <a class="code" href="classServicesConf.html">ServicesConf</a>* servicesConf);</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <a class="code" href="classLayer.html#afa4b1556ef7da8f183d42d266d81454a">Layer</a>(std::string path, <a class="code" href="classServicesConf.html">ServicesConf</a>* servicesConf );</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <a class="code" href="classLayer.html#afa4b1556ef7da8f183d42d266d81454a">Layer</a>(std::string layerName, std::string content, <a class="code" href="classServicesConf.html">ServicesConf</a>* servicesConf );</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    std::string <a class="code" href="classLayer.html#a77aa74e0090b3aa05b514de609dff202">getId</a>();</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    Image* <a class="code" href="classLayer.html#a68ac5b3bebe10bcbbd04120ed256f234">getbbox</a> (<a class="code" href="classServicesConf.html">ServicesConf</a>* servicesConf, BoundingBox&lt;double&gt; bbox, <span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height, CRS* dst_crs, <span class="keywordtype">int</span> dpi, <span class="keywordtype">int</span>&amp; error );</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    std::string <a class="code" href="classLayer.html#a46a412532878914553d798c622b399e4">getAbstract</a>() ;</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classLayer.html#adc16a335e0f02b5dfed8807bef0f10b2">getWMSAuthorized</a>() ;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classLayer.html#abead6dd5312f0bc7d6d6e9046a5a1355">getTMSAuthorized</a>() ;</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classLayer.html#a2b124964a193be76ecfcc19e64b869a2">getWMTSAuthorized</a>() ;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    std::vector&lt;Keyword&gt;* <a class="code" href="classLayer.html#aab5d38db0f3c5dc68aef207c75496a7f">getKeyWords</a>() ;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <a class="code" href="classAttributionURL.html">AttributionURL</a>* <a class="code" href="classLayer.html#a7b06a54e94c9023c7e9e0e81f5e5417f">getAttribution</a>() ;</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="keywordtype">double</span> <a class="code" href="classLayer.html#ae362cdf535c06a6dd7cadb6f6853f228">getMaxRes</a>() ;</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="keywordtype">double</span> <a class="code" href="classLayer.html#a96a14953ba82ff73ebb5967ce57b1b6b">getMinRes</a>() ;</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    Pyramid* <a class="code" href="classLayer.html#aadc3d16e27a0afdd5e28da925aa48134">getDataPyramid</a>() ;</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    std::string <a class="code" href="classLayer.html#a0876ed859204fdde1aaed004140cbdb2">getNativeWmtsTmsId</a>() ;</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    </div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    Style* <a class="code" href="classLayer.html#abe2e108dd9362687511bf62eec409365">getDefaultStyle</a>() ;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    std::vector&lt;Style*&gt; <a class="code" href="classLayer.html#af9d1ced1de30bad58d239dce604af83a">getStyles</a>() ;</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    std::vector&lt;WmtsTmsInfos&gt; <a class="code" href="classLayer.html#a96a7a37fa8cc8cc18298014645a2f7b9">getWMTSTMSList</a>() ;</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    Style* <a class="code" href="classLayer.html#a751e5e85c85482efe12234e34fb8da60">getStyle</a>(std::string <span class="keywordtype">id</span>) ;</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160; </div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    Style* <a class="code" href="classLayer.html#a20facf5704e57e41b623912dd2451629">getStyleByIdentifier</a>(std::string identifier) ;</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160; </div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    std::string <a class="code" href="classLayer.html#a6e626cdba51b1c1f478603796d54abc9">getTitle</a>() ;</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160; </div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    std::vector&lt;CRS*&gt; <a class="code" href="classLayer.html#a31de035101162ce62ee49bcc00f01c2d">getWMSCRSList</a>() ;</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160; </div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classLayer.html#a03090344dc0993e52727faaaf0e6a4d4">isInWMSCRSList</a>(CRS* c) ;</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160; </div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classLayer.html#a03090344dc0993e52727faaaf0e6a4d4">isInWMSCRSList</a>(std::string c) ;</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160; </div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    TileMatrixSet* <a class="code" href="classLayer.html#a5a0ecedf788a75f04675b1178117192c">getTms</a>(std::string <span class="keywordtype">id</span>) ;</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160; </div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;    TileMatrixLimits* <a class="code" href="classLayer.html#a5713cb3862a297a29112b492dd8b9e57">getTmLimits</a>(TileMatrixSet* tms, TileMatrix* tm) ;</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160; </div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    BoundingBox&lt;double&gt; <a class="code" href="classLayer.html#aa5b2d37d9c439927a25aa6e06ac03bbc">getGeographicBoundingBox</a>() ;</div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    BoundingBox&lt;double&gt; <a class="code" href="classLayer.html#a74397ce308d2afdef935a4ca09c4ac6c">getBoundingBox</a>() ;</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;    std::vector&lt;MetadataURL&gt; <a class="code" href="classLayer.html#ac895b6495a98e867e3a623a9643203a6">getMetadataURLs</a>() ;</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classLayer.html#ab51cb927fe1eb5949d82eb491b3b00e8">isGetFeatureInfoAvailable</a>() ;</div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;    std::string <a class="code" href="classLayer.html#ab11788d25b9899952b213853169825ab">getGFIType</a>() ;</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    std::string <a class="code" href="classLayer.html#a138517d4e69e6c1420bb72458085dc00">getGFIBaseUrl</a>() ;</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;    std::string <a class="code" href="classLayer.html#a59315fece727f7ca056c6b8c180b8e88">getGFILayers</a>() ;</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;    std::string <a class="code" href="classLayer.html#a26688c124cabde286c522346d2aaf869">getGFIQueryLayers</a>() ;</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;    std::string <a class="code" href="classLayer.html#ac4220b373362a1c44f43c24835b9964e">getGFIService</a>() ;</div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;    std::string <a class="code" href="classLayer.html#a79456e39321da6cf62327ca8529e44d6">getGFIVersion</a>() ;</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classLayer.html#a4f41decf054bc0614264d920fb5ab79e">getGFIForceEPSG</a>() ;</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <a class="code" href="classLayer.html#a1b1ba4804451dfe6cc357194e42762ae">~Layer</a>();</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160; </div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;};</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160; </div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* LAYER_H_ */</span><span class="preprocessor"></span></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<div class="ttc" id="aclassAttributionURL_html"><div class="ttname"><a href="classAttributionURL.html">AttributionURL</a></div><div class="ttdoc">Gestion des éléments d'attribution des documents de capacités.</div><div class="ttdef"><b>Definition:</b> AttributionURL.h:63</div></div>
+<div class="ttc" id="aclassLayer_html_a31de035101162ce62ee49bcc00f01c2d"><div class="ttname"><a href="classLayer.html#a31de035101162ce62ee49bcc00f01c2d">Layer::getWMSCRSList</a></div><div class="ttdeci">std::vector&lt; CRS * &gt; getWMSCRSList()</div><div class="ttdoc">Retourne la liste des systèmes de coordonnées authorisés.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:782</div></div>
+<div class="ttc" id="aclassLayer_html_aa5b2d37d9c439927a25aa6e06ac03bbc"><div class="ttname"><a href="classLayer.html#aa5b2d37d9c439927a25aa6e06ac03bbc">Layer::getGeographicBoundingBox</a></div><div class="ttdeci">BoundingBox&lt; double &gt; getGeographicBoundingBox()</div><div class="ttdoc">Retourne l'emprise des données en coordonnées géographique (WGS84)</div><div class="ttdef"><b>Definition:</b> Layer.cpp:801</div></div>
+<div class="ttc" id="astructWmtsTmsInfos_html"><div class="ttname"><a href="structWmtsTmsInfos.html">WmtsTmsInfos</a></div><div class="ttdef"><b>Definition:</b> Layer.h:66</div></div>
+<div class="ttc" id="aclassLayer_html_a138517d4e69e6c1420bb72458085dc00"><div class="ttname"><a href="classLayer.html#a138517d4e69e6c1420bb72458085dc00">Layer::getGFIBaseUrl</a></div><div class="ttdeci">std::string getGFIBaseUrl()</div><div class="ttdoc">Retourne l'URL du service de GFI.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:806</div></div>
+<div class="ttc" id="aAttributionURL_8h_html"><div class="ttname"><a href="AttributionURL_8h.html">AttributionURL.h</a></div><div class="ttdoc">Définition de la classe AttributionURL gérant les liens vers les métadonnées dans les documents de ca...</div></div>
+<div class="ttc" id="aclassLayer_html_a46a412532878914553d798c622b399e4"><div class="ttname"><a href="classLayer.html#a46a412532878914553d798c622b399e4">Layer::getAbstract</a></div><div class="ttdeci">std::string getAbstract()</div><div class="ttdoc">Retourne le résumé</div><div class="ttdef"><b>Definition:</b> Layer.cpp:726</div></div>
+<div class="ttc" id="aclassLayer_html_a4f41decf054bc0614264d920fb5ab79e"><div class="ttname"><a href="classLayer.html#a4f41decf054bc0614264d920fb5ab79e">Layer::getGFIForceEPSG</a></div><div class="ttdeci">bool getGFIForceEPSG()</div><div class="ttdef"><b>Definition:</b> Layer.cpp:811</div></div>
+<div class="ttc" id="aclassLayer_html_aadc3d16e27a0afdd5e28da925aa48134"><div class="ttname"><a href="classLayer.html#aadc3d16e27a0afdd5e28da925aa48134">Layer::getDataPyramid</a></div><div class="ttdeci">Pyramid * getDataPyramid()</div><div class="ttdoc">Retourne la pyramide de données associée.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:733</div></div>
+<div class="ttc" id="aclassLayer_html_a96a14953ba82ff73ebb5967ce57b1b6b"><div class="ttname"><a href="classLayer.html#a96a14953ba82ff73ebb5967ce57b1b6b">Layer::getMinRes</a></div><div class="ttdeci">double getMinRes()</div><div class="ttdoc">Retourne l'échelle minimum.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:732</div></div>
+<div class="ttc" id="aclassLayer_html_ab11788d25b9899952b213853169825ab"><div class="ttname"><a href="classLayer.html#ab11788d25b9899952b213853169825ab">Layer::getGFIType</a></div><div class="ttdeci">std::string getGFIType()</div><div class="ttdoc">Retourne la source du GFI.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:805</div></div>
+<div class="ttc" id="aclassLayer_html_a5a0ecedf788a75f04675b1178117192c"><div class="ttname"><a href="classLayer.html#a5a0ecedf788a75f04675b1178117192c">Layer::getTms</a></div><div class="ttdeci">TileMatrixSet * getTms(std::string id)</div><div class="ttdoc">Récupère le TMS disponible sur la couche par l'identifiant.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:744</div></div>
+<div class="ttc" id="aclassLayer_html_afa4b1556ef7da8f183d42d266d81454a"><div class="ttname"><a href="classLayer.html#afa4b1556ef7da8f183d42d266d81454a">Layer::Layer</a></div><div class="ttdeci">Layer(std::string path, ServicesConf *servicesConf)</div><div class="ttdoc">Constructeur.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:605</div></div>
+<div class="ttc" id="aclassLayer_html_a77aa74e0090b3aa05b514de609dff202"><div class="ttname"><a href="classLayer.html#a77aa74e0090b3aa05b514de609dff202">Layer::getId</a></div><div class="ttdeci">std::string getId()</div><div class="ttdoc">Retourne l'indentifiant de la couche.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:712</div></div>
+<div class="ttc" id="aclassLayer_html_a59315fece727f7ca056c6b8c180b8e88"><div class="ttname"><a href="classLayer.html#a59315fece727f7ca056c6b8c180b8e88">Layer::getGFILayers</a></div><div class="ttdeci">std::string getGFILayers()</div><div class="ttdoc">Retourne le paramètre layers de la requête de GFI.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:807</div></div>
+<div class="ttc" id="aclassLayer_html_aab5d38db0f3c5dc68aef207c75496a7f"><div class="ttname"><a href="classLayer.html#aab5d38db0f3c5dc68aef207c75496a7f">Layer::getKeyWords</a></div><div class="ttdeci">std::vector&lt; Keyword &gt; * getKeyWords()</div><div class="ttdoc">Retourne la liste des mots-clés.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:730</div></div>
+<div class="ttc" id="aMetadataURL_8h_html"><div class="ttname"><a href="MetadataURL_8h.html">MetadataURL.h</a></div><div class="ttdoc">Définition de la classe MetadataURL gérant les liens vers les métadonnées dans les documents de capac...</div></div>
+<div class="ttc" id="aclassLayer_html_a6e626cdba51b1c1f478603796d54abc9"><div class="ttname"><a href="classLayer.html#a6e626cdba51b1c1f478603796d54abc9">Layer::getTitle</a></div><div class="ttdeci">std::string getTitle()</div><div class="ttdoc">Retourne le titre.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:781</div></div>
+<div class="ttc" id="aclassLayer_html"><div class="ttname"><a href="classLayer.html">Layer</a></div><div class="ttdoc">Gestion des couches.</div><div class="ttdef"><b>Definition:</b> Layer.h:95</div></div>
+<div class="ttc" id="aclassLayer_html_adc16a335e0f02b5dfed8807bef0f10b2"><div class="ttname"><a href="classLayer.html#adc16a335e0f02b5dfed8807bef0f10b2">Layer::getWMSAuthorized</a></div><div class="ttdeci">bool getWMSAuthorized()</div><div class="ttdoc">Retourne le droit d'utiliser un service WMS.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:727</div></div>
+<div class="ttc" id="aclassLayer_html_a96a7a37fa8cc8cc18298014645a2f7b9"><div class="ttname"><a href="classLayer.html#a96a7a37fa8cc8cc18298014645a2f7b9">Layer::getWMTSTMSList</a></div><div class="ttdeci">std::vector&lt; WmtsTmsInfos &gt; getWMTSTMSList()</div><div class="ttdoc">Retourne la liste des TMS disponibles.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:743</div></div>
+<div class="ttc" id="aclassLayer_html_a7b06a54e94c9023c7e9e0e81f5e5417f"><div class="ttname"><a href="classLayer.html#a7b06a54e94c9023c7e9e0e81f5e5417f">Layer::getAttribution</a></div><div class="ttdeci">AttributionURL * getAttribution()</div><div class="ttdoc">Retourne l'attribution.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:800</div></div>
+<div class="ttc" id="aclassLayer_html_ae362cdf535c06a6dd7cadb6f6853f228"><div class="ttname"><a href="classLayer.html#ae362cdf535c06a6dd7cadb6f6853f228">Layer::getMaxRes</a></div><div class="ttdeci">double getMaxRes()</div><div class="ttdoc">Retourne l'échelle maximum.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:731</div></div>
+<div class="ttc" id="aclassLayer_html_a0876ed859204fdde1aaed004140cbdb2"><div class="ttname"><a href="classLayer.html#a0876ed859204fdde1aaed004140cbdb2">Layer::getNativeWmtsTmsId</a></div><div class="ttdeci">std::string getNativeWmtsTmsId()</div><div class="ttdoc">Retourne l'ID WMTS du TMS natif de la pyramide de données associée.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:812</div></div>
+<div class="ttc" id="aclassLayer_html_a20facf5704e57e41b623912dd2451629"><div class="ttname"><a href="classLayer.html#a20facf5704e57e41b623912dd2451629">Layer::getStyleByIdentifier</a></div><div class="ttdeci">Style * getStyleByIdentifier(std::string identifier)</div><div class="ttdoc">Retourne le style associé à la couche (identifiant public)</div><div class="ttdef"><b>Definition:</b> Layer.cpp:773</div></div>
+<div class="ttc" id="aclassLayer_html_a79456e39321da6cf62327ca8529e44d6"><div class="ttname"><a href="classLayer.html#a79456e39321da6cf62327ca8529e44d6">Layer::getGFIVersion</a></div><div class="ttdeci">std::string getGFIVersion()</div><div class="ttdoc">Retourne la version du service de GFI.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:810</div></div>
+<div class="ttc" id="aclassLayer_html_a2b124964a193be76ecfcc19e64b869a2"><div class="ttname"><a href="classLayer.html#a2b124964a193be76ecfcc19e64b869a2">Layer::getWMTSAuthorized</a></div><div class="ttdeci">bool getWMTSAuthorized()</div><div class="ttdoc">Retourne le droit d'utiliser un service WMTS.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:729</div></div>
+<div class="ttc" id="aclassLayer_html_a5713cb3862a297a29112b492dd8b9e57"><div class="ttname"><a href="classLayer.html#a5713cb3862a297a29112b492dd8b9e57">Layer::getTmLimits</a></div><div class="ttdeci">TileMatrixLimits * getTmLimits(TileMatrixSet *tms, TileMatrix *tm)</div><div class="ttdoc">Retourne les limites pour le niveau du TMS fourni.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:752</div></div>
+<div class="ttc" id="aclassLayer_html_af9d1ced1de30bad58d239dce604af83a"><div class="ttname"><a href="classLayer.html#af9d1ced1de30bad58d239dce604af83a">Layer::getStyles</a></div><div class="ttdeci">std::vector&lt; Style * &gt; getStyles()</div><div class="ttdoc">Retourne la liste des styles associés à la couche.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:741</div></div>
+<div class="ttc" id="aclassServicesConf_html"><div class="ttname"><a href="classServicesConf.html">ServicesConf</a></div><div class="ttdef"><b>Definition:</b> ServicesConf.h:54</div></div>
+<div class="ttc" id="aclassLayer_html_a74397ce308d2afdef935a4ca09c4ac6c"><div class="ttname"><a href="classLayer.html#a74397ce308d2afdef935a4ca09c4ac6c">Layer::getBoundingBox</a></div><div class="ttdeci">BoundingBox&lt; double &gt; getBoundingBox()</div><div class="ttdoc">Retourne l'emprise des données dans le système de coordonnées natif.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:802</div></div>
+<div class="ttc" id="aclassLayer_html_a1b1ba4804451dfe6cc357194e42762ae"><div class="ttname"><a href="classLayer.html#a1b1ba4804451dfe6cc357194e42762ae">Layer::~Layer</a></div><div class="ttdeci">~Layer()</div><div class="ttdoc">Destructeur par défaut.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:716</div></div>
+<div class="ttc" id="aclassLayer_html_abead6dd5312f0bc7d6d6e9046a5a1355"><div class="ttname"><a href="classLayer.html#abead6dd5312f0bc7d6d6e9046a5a1355">Layer::getTMSAuthorized</a></div><div class="ttdeci">bool getTMSAuthorized()</div><div class="ttdoc">Retourne le droit d'utiliser un service TMS.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:728</div></div>
+<div class="ttc" id="aclassLayer_html_ac895b6495a98e867e3a623a9643203a6"><div class="ttname"><a href="classLayer.html#ac895b6495a98e867e3a623a9643203a6">Layer::getMetadataURLs</a></div><div class="ttdeci">std::vector&lt; MetadataURL &gt; getMetadataURLs()</div><div class="ttdoc">Retourne la liste des métadonnées associées.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:803</div></div>
+<div class="ttc" id="aclassLayer_html_a03090344dc0993e52727faaaf0e6a4d4"><div class="ttname"><a href="classLayer.html#a03090344dc0993e52727faaaf0e6a4d4">Layer::isInWMSCRSList</a></div><div class="ttdeci">bool isInWMSCRSList(CRS *c)</div><div class="ttdoc">Teste la présence du CRS dans la liste.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:783</div></div>
+<div class="ttc" id="aclassLayer_html_a26688c124cabde286c522346d2aaf869"><div class="ttname"><a href="classLayer.html#a26688c124cabde286c522346d2aaf869">Layer::getGFIQueryLayers</a></div><div class="ttdeci">std::string getGFIQueryLayers()</div><div class="ttdoc">Retourne le paramètre query_layers de la requête de GFI.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:808</div></div>
+<div class="ttc" id="aclassLayer_html_abe2e108dd9362687511bf62eec409365"><div class="ttname"><a href="classLayer.html#abe2e108dd9362687511bf62eec409365">Layer::getDefaultStyle</a></div><div class="ttdeci">Style * getDefaultStyle()</div><div class="ttdoc">Retourne le style par défaut associé à la couche.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:734</div></div>
+<div class="ttc" id="aclassLayer_html_a68ac5b3bebe10bcbbd04120ed256f234"><div class="ttname"><a href="classLayer.html#a68ac5b3bebe10bcbbd04120ed256f234">Layer::getbbox</a></div><div class="ttdeci">Image * getbbox(ServicesConf *servicesConf, BoundingBox&lt; double &gt; bbox, int width, int height, CRS *dst_crs, int dpi, int &amp;error)</div><div class="ttdoc">Retourne une l'image correspondant à l'emprise demandée.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:704</div></div>
+<div class="ttc" id="aclassLayer_html_ac4220b373362a1c44f43c24835b9964e"><div class="ttname"><a href="classLayer.html#ac4220b373362a1c44f43c24835b9964e">Layer::getGFIService</a></div><div class="ttdeci">std::string getGFIService()</div><div class="ttdoc">Retourne le type du service de GFI.</div><div class="ttdef"><b>Definition:</b> Layer.cpp:809</div></div>
+<div class="ttc" id="aclassLayer_html_ab51cb927fe1eb5949d82eb491b3b00e8"><div class="ttname"><a href="classLayer.html#ab51cb927fe1eb5949d82eb491b3b00e8">Layer::isGetFeatureInfoAvailable</a></div><div class="ttdeci">bool isGetFeatureInfoAvailable()</div><div class="ttdoc">GFI est-il autorisé</div><div class="ttdef"><b>Definition:</b> Layer.cpp:804</div></div>
+<div class="ttc" id="aclassLayer_html_a751e5e85c85482efe12234e34fb8da60"><div class="ttname"><a href="classLayer.html#a751e5e85c85482efe12234e34fb8da60">Layer::getStyle</a></div><div class="ttdeci">Style * getStyle(std::string id)</div><div class="ttdoc">Retourne le style associé à la couche (identifiant interne)</div><div class="ttdef"><b>Definition:</b> Layer.cpp:765</div></div>
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="Layer_8h.html">Layer.h</a></li>
+    <li class="footer">Généré par
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
+</body>
+</html>
