@@ -162,6 +162,16 @@ bool ServerConf::parse(json11::Json& doc) {
         supportAdmin = doc["api"].bool_value();
     }
 
+    // api
+    if (doc["enabled"].is_null()) {
+        enabled = true;
+    } else if (! doc["api"].is_bool()) {
+        errorMessage = "enabled have to be a boolean";
+        return false;
+    } else {
+        enabled = doc["enabled"].bool_value();
+    }
+
     // configurations
     json11::Json configurationsSection = doc["configurations"];
     if (configurationsSection.is_null()) {

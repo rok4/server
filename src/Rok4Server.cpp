@@ -806,6 +806,12 @@ void Rok4Server::processAdmin(Request* request, FCGX_Request& fcgxRequest) {
         S.sendresponse(AdminUpdateLayer(request), &fcgxRequest);
     } else if (request->request == RequestType::DELETELAYER) {
         S.sendresponse(AdminDeleteLayer(request), &fcgxRequest);
+    } else if (request->request == RequestType::TURNON) {
+        serverConf->enabled = true;
+        S.sendresponse(new EmptyResponseDataStream (), &fcgxRequest);
+    } else if (request->request == RequestType::TURNOFF) {
+        serverConf->enabled = false;
+        S.sendresponse(new EmptyResponseDataStream (), &fcgxRequest);
     } else {
         S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "admin")), &fcgxRequest);
     }
@@ -816,7 +822,11 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
     std::ostringstream res;
     if (request->request == RequestType::GETHEALTHSTATUS) {
         res << "{\n";
-        res << "  \"status\": \"OK\",\n";
+        if (serverConf->enabled) {
+            res << "  \"status\": \"OK\",\n";
+        } else {
+            res << "  \"status\": \"DISABLED\",\n";
+        }
         res << "  \"version\": \"" << VERSION << "\",\n";
         res << "  \"pid\": " << this->getPID() << ",\n";
         res << "  \"time\": " << this->getTime() << "\n";
@@ -939,7 +949,10 @@ void Rok4Server::processOGCTILES(Request* request, FCGX_Request& fcgxRequest) {
 }
 
 void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
-    if (request->service == ServiceType::GLOBAL) {
+
+    if (request->service != ServiceType::ADMIN && request->service != ServiceType::HEALTHCHECK && ! serverConf->enabled) {
+        S.sendresponse(new SERDataSource(new ServiceException("", SERVICE_UNAVAILABLE, "Consultation services are not enabled", "global")), &fcgxRequest);
+    } else if (request->service == ServiceType::GLOBAL) {
         processGlobal(request, fcgxRequest);
     } else if (servicesConf->supportWMTS && request->service == ServiceType::WMTS) {
         processWMTS(request, fcgxRequest);

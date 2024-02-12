@@ -91,6 +91,10 @@ std::string ServiceException::getCodeAsString ( ExceptionCode code ) {
         return "ConfigurationConflict";
     case ADMIN_BAD_REQUEST:
         return "ConfigurationIssue";
+    case INTERNAL_SERVER_ERROR:
+        return "InternalServerError";
+    case SERVICE_UNAVAILABLE:
+        return "ServiceUnavailable";
     default:
         return "" ;
     }
@@ -121,6 +125,8 @@ int ServiceException::getCodeAsStatusCode ( ExceptionCode code ) {
         return 500 ;
     case OWS_OPERATION_NOT_SUPORTED:
         return 501 ;
+    case SERVICE_UNAVAILABLE:
+        return 503 ;
     case HTTP_NOT_FOUND:
         return 404 ;
     case GFI_PYRAMID_VALUES:
@@ -146,6 +152,8 @@ std::string ServiceException::getStatusCodeAsReasonPhrase ( int statusCode ) {
         return "Internal server error" ;
     case 501 :
         return "Not implemented" ;
+    case 503 :
+        return "Service unavailable" ;
     default : 
         return "No reason";
     }
