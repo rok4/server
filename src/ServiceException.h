@@ -161,7 +161,12 @@ typedef enum {
      * \~french Erreur interne
      * \~english Internal issue
      */
-    INTERNAL_SERVER_ERROR = 20
+    INTERNAL_SERVER_ERROR = 20,
+    /**
+     * \~french Erreur interne
+     * \~english Internal issue
+     */
+    SERVICE_UNAVAILABLE = 21
 
 } ExceptionCode;
 

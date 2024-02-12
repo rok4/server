@@ -81,6 +81,8 @@ namespace RequestType {
         UPDATELAYER,
         DELETELAYER,
         BUILDCAPABILITIES,
+        TURNON,
+        TURNOFF,
         GETHEALTHSTATUS,
         GETINFOSTATUS,
         GETTHREADSTATUS,
