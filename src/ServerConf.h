@@ -129,6 +129,13 @@ class ServerConf : public Configuration
          */
         bool supportAdmin;
 
+
+        /**
+         * \~french \brief Définit si le serveur doit honorer les requêtes de consultation
+         * \~english \brief Define whether broadcast request should be honored
+         */
+        bool enabled;
+
     private:
 
         bool parse(json11::Json& doc);
