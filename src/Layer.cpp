@@ -510,7 +510,7 @@ void Layer::calculateTileMatrixLimits() {
 
     std::vector<WmtsTmsInfos> newList;
 
-    // Le premier TMS est ce lui natif : les tuiles limites sont déjà calculée et stockées dans les niveaux
+    // Le premier TMS est celui natif : les tuiles limites sont déjà calculée et stockées dans les niveaux
 
     WmtsTmsInfos infos = WMTSTMSList.at(0);
     infos.limits = std::vector<TileMatrixLimits>();

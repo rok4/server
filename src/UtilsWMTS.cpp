@@ -502,6 +502,14 @@ void Rok4Server::buildWMTSCapabilities() {
 
                 layerEl->LinkEndChild ( tmsLinkEl );
                 usedTMSList.insert ( std::pair<std::string, WmtsTmsInfos> ( layer->getWMTSTMSList().at(i).wmts_id , layer->getWMTSTMSList().at(i)) );
+
+
+                WmtsTmsInfos origin_infos;
+                origin_infos.tms = layer->getWMTSTMSList().at(i).tms;
+                origin_infos.top_level = "";
+                origin_infos.bottom_level = "";
+                origin_infos.wmts_id = origin_infos.tms->getId();
+                usedTMSList.insert ( std::pair<std::string, WmtsTmsInfos> ( origin_infos.wmts_id, origin_infos) );
             }
 
             contentsEl->LinkEndChild ( layerEl );
@@ -541,6 +549,10 @@ void Rok4Server::buildWMTSCapabilities() {
         // TileMatrix
         std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->getOrderedTileMatrix(false);
         bool keep = false;
+        if (itTms->second.top_level == "") {
+            // On est sur un TMS d'origine, on l'exporte en entier
+            keep = true;
+        }
         for (std::pair<std::string, TileMatrix*> element : orderedTM) {
             TileMatrix* tm = element.second;
 
