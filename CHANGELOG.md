@@ -1,3 +1,10 @@
+## 5.4.2
+
+### [Changed]
+
+* WMTS :
+  * On ajoute à la liste des TMS au niveau du getcapabilities les TMS "de base" en entier
+
 ## 5.4.1
 
 ### [Added]
