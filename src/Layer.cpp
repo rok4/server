@@ -218,9 +218,9 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
 
     WmtsTmsInfos infos;
     infos.tms = dataPyramid->getTms();
-    infos.top_level = dataPyramid->getHighestLevel()->getId();
-    infos.bottom_level = dataPyramid->getLowestLevel()->getId();
-    infos.wmts_id = infos.tms->getId() + "_" + infos.top_level + "_" + infos.bottom_level;
+    infos.top_level = "";
+    infos.bottom_level = "";
+    infos.wmts_id = infos.tms->getId();
     WMTSTMSList.push_back(infos);
 
     /********************** Gestion de l'étendue des données */

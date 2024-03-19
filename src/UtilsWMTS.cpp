@@ -541,6 +541,11 @@ void Rok4Server::buildWMTSCapabilities() {
         // TileMatrix
         std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->getOrderedTileMatrix(false);
         bool keep = false;
+        if (itTms->second.top_level == "") {
+            // Pas de niveau du haut, on commence directement
+            keep = true;
+        }
+
         for (std::pair<std::string, TileMatrix*> element : orderedTM) {
             TileMatrix* tm = element.second;
 
