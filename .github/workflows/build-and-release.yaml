@@ -122,7 +122,6 @@ jobs:
           mike deploy --push --update-aliases --branch gh-pages -t "Version ${{ github.ref_name }}" ${{ github.ref_name }} latest
           mike set-default --push --branch gh-pages ${{ github.ref_name }}
 
-
   delete_version:
     name: Remove release and tag if error occured
     needs: build_and_test
