@@ -1872,6 +1872,8 @@ components:
               type: string
             service:
               type: string
+            extra_query_params:
+              type: string
             force_epsg:
               type: boolean
           required:

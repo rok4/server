@@ -664,6 +664,7 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
                     ss << (int)intbuffer[i];
                     strData.push_back(ss.str());
                 }
+                delete[] intbuffer;
                 break;
             }
             case Rok4Format::TIFF_RAW_FLOAT32:
@@ -694,7 +695,7 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
 
     } else if (getFeatureInfoType.compare("EXTERNALWMS") == 0) {
         BOOST_LOG_TRIVIAL(debug) << "GFI sur WMS externe";
-        WebService* myWMSV = new WebService(layer->getGFIBaseUrl(), 1, 1, 10);
+        WebService* myWMS = new WebService(layer->getGFIBaseUrl(), 1, 1, 10);
         std::stringstream vectorRequest;
         std::string crsstring = crs->getRequestCode();
         if (layer->getGFIForceEPSG()) {
@@ -718,6 +719,7 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
                       << "&HEIGHT=" << height
                       << "&I=" << X
                       << "&J=" << Y
+                      << "&" << layer->getGFIExtraParams()
                       // compatibilité 1.1.1
                       << "&SRS=" << crsstring
                       << "&X=" << X
@@ -740,13 +742,13 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
         }
 
         BOOST_LOG_TRIVIAL(debug) << "REQUETE = " << vectorRequest.str();
-        RawDataStream* response = myWMSV->performRequestStream(vectorRequest.str());
+        RawDataStream* response = myWMS->performRequestStream(vectorRequest.str());
         if (response == NULL) {
-            delete myWMSV;
+            delete myWMS;
             return new SERDataStream(new ServiceException("", OWS_NOAPPLICABLE_CODE, "Internal server error", "wms"));
         }
 
-        delete myWMSV;
+        delete myWMS;
         return response;
     } else if (getFeatureInfoType.compare("SQL") == 0) {
         BOOST_LOG_TRIVIAL(debug) << "GFI sur SQL";

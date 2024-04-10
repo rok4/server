@@ -196,7 +196,7 @@ private:
      */
     std::string getFeatureInfoType;
     /**
-     * \~french \brief URL du service WMS-V à utiliser pour le GetFeatureInfo
+     * \~french \brief URL du service WMS à utiliser pour le GetFeatureInfo
      * \~english \brief WMS-V service URL to use for getFeatureInfo
      */
     std::string getFeatureInfoBaseURL;
@@ -220,6 +220,11 @@ private:
      * \~english \brief Parameter layers for the service
      */
     std::string GFILayers;
+    /**
+     * \~french \brief Paramètres de requête additionnels à fournir au service
+     * \~english \brief Additionnal query parameters for the service
+     */
+    std::string GFIExtraParams;
     /**
      * \~french \brief Modification des EPSG autorisé (pour Geoserver)
      * \~english \brief Modification of EPSG is authorized (for Geoserver)
@@ -590,6 +595,15 @@ public:
      * \return version of service used for GFI
      */
     std::string getGFIVersion() ;
+    /**
+     * \~french
+     * \brief Retourne les paramètres de requête additionnels de la requête de GFI
+     * \return paramètres additionnels
+     * \~english
+     * \brief Return the extra query parameters of GFI request
+     * \return extra parameters
+     */
+    std::string getGFIExtraParams() ;
     /**
      * \~french
      * \brief
