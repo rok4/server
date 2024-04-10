@@ -76,6 +76,8 @@ namespace RequestType {
         "UpdateLayer",
         "DeleteLayer",
         "BuildCapabilities",
+        "TurnOn",
+        "TurnOff",
         "GetStatus",
         "GetInfos"
         "GetThreads",
@@ -892,6 +894,18 @@ void Request::determineServiceAndRequest() {
         else if (method == "DELETE" && pathParts.size() == 3 && pathParts.at(1) == "layers") {
             //--> DELETE /admin/layers/{layername}
             request = RequestType::DELETELAYER;
+
+        }
+
+        else if (method == "PUT" && pathParts.size() == 2 && pathParts.at(1) == "on") {
+            //--> PUT /admin/on
+            request = RequestType::TURNON;
+
+        }
+
+        else if (method == "PUT" && pathParts.size() == 2 && pathParts.at(1) == "off") {
+            //--> PUT /admin/off
+            request = RequestType::TURNOFF;
 
         } else {
             // La profondeur de requête ne permet pas de savoir l'action demandée -> ERREUR

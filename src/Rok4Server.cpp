@@ -664,6 +664,7 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
                     ss << (int)intbuffer[i];
                     strData.push_back(ss.str());
                 }
+                delete[] intbuffer;
                 break;
             }
             case Rok4Format::TIFF_RAW_FLOAT32:
@@ -694,7 +695,7 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
 
     } else if (getFeatureInfoType.compare("EXTERNALWMS") == 0) {
         BOOST_LOG_TRIVIAL(debug) << "GFI sur WMS externe";
-        WebService* myWMSV = new WebService(layer->getGFIBaseUrl(), 1, 1, 10);
+        WebService* myWMS = new WebService(layer->getGFIBaseUrl(), 1, 1, 10);
         std::stringstream vectorRequest;
         std::string crsstring = crs->getRequestCode();
         if (layer->getGFIForceEPSG()) {
@@ -718,6 +719,7 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
                       << "&HEIGHT=" << height
                       << "&I=" << X
                       << "&J=" << Y
+                      << "&" << layer->getGFIExtraParams()
                       // compatibilité 1.1.1
                       << "&SRS=" << crsstring
                       << "&X=" << X
@@ -740,13 +742,13 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
         }
 
         BOOST_LOG_TRIVIAL(debug) << "REQUETE = " << vectorRequest.str();
-        RawDataStream* response = myWMSV->performRequestStream(vectorRequest.str());
+        RawDataStream* response = myWMS->performRequestStream(vectorRequest.str());
         if (response == NULL) {
-            delete myWMSV;
+            delete myWMS;
             return new SERDataStream(new ServiceException("", OWS_NOAPPLICABLE_CODE, "Internal server error", "wms"));
         }
 
-        delete myWMSV;
+        delete myWMS;
         return response;
     } else if (getFeatureInfoType.compare("SQL") == 0) {
         BOOST_LOG_TRIVIAL(debug) << "GFI sur SQL";
@@ -806,6 +808,12 @@ void Rok4Server::processAdmin(Request* request, FCGX_Request& fcgxRequest) {
         S.sendresponse(AdminUpdateLayer(request), &fcgxRequest);
     } else if (request->request == RequestType::DELETELAYER) {
         S.sendresponse(AdminDeleteLayer(request), &fcgxRequest);
+    } else if (request->request == RequestType::TURNON) {
+        serverConf->enabled = true;
+        S.sendresponse(new EmptyResponseDataStream (), &fcgxRequest);
+    } else if (request->request == RequestType::TURNOFF) {
+        serverConf->enabled = false;
+        S.sendresponse(new EmptyResponseDataStream (), &fcgxRequest);
     } else {
         S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "admin")), &fcgxRequest);
     }
@@ -816,7 +824,11 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
     std::ostringstream res;
     if (request->request == RequestType::GETHEALTHSTATUS) {
         res << "{\n";
-        res << "  \"status\": \"OK\",\n";
+        if (serverConf->enabled) {
+            res << "  \"status\": \"OK\",\n";
+        } else {
+            res << "  \"status\": \"DISABLED\",\n";
+        }
         res << "  \"version\": \"" << VERSION << "\",\n";
         res << "  \"pid\": " << this->getPID() << ",\n";
         res << "  \"time\": " << this->getTime() << "\n";
@@ -939,7 +951,10 @@ void Rok4Server::processOGCTILES(Request* request, FCGX_Request& fcgxRequest) {
 }
 
 void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
-    if (request->service == ServiceType::GLOBAL) {
+
+    if (request->service != ServiceType::ADMIN && request->service != ServiceType::HEALTHCHECK && ! serverConf->enabled) {
+        S.sendresponse(new SERDataSource(new ServiceException("", SERVICE_UNAVAILABLE, "Consultation services are not enabled", "global")), &fcgxRequest);
+    } else if (request->service == ServiceType::GLOBAL) {
         processGlobal(request, fcgxRequest);
     } else if (servicesConf->supportWMTS && request->service == ServiceType::WMTS) {
         processWMTS(request, fcgxRequest);

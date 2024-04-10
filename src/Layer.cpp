@@ -298,6 +298,9 @@ bool Layer::parse(json11::Json& doc, ServicesConf* servicesConf) {
                     if(doc["get_feature_info"]["force_epsg"].is_bool()) {
                         GFIForceEPSG = doc["get_feature_info"]["force_epsg"].bool_value();
                     }
+                    if(doc["get_feature_info"]["extra_query_params"].is_string()) {
+                        GFIExtraParams = doc["get_feature_info"]["extra_query_params"].string_value();
+                    }
 
                 } 
                 else {
@@ -510,7 +513,7 @@ void Layer::calculateTileMatrixLimits() {
 
     std::vector<WmtsTmsInfos> newList;
 
-    // Le premier TMS est ce lui natif : les tuiles limites sont déjà calculée et stockées dans les niveaux
+    // Le premier TMS est celui natif : les tuiles limites sont déjà calculée et stockées dans les niveaux
 
     WmtsTmsInfos infos = WMTSTMSList.at(0);
     infos.limits = std::vector<TileMatrixLimits>();
@@ -804,6 +807,7 @@ std::vector<MetadataURL> Layer::getMetadataURLs() { return metadataURLs; }
 bool Layer::isGetFeatureInfoAvailable() { return getFeatureInfoAvailability; }
 std::string Layer::getGFIType() { return getFeatureInfoType; }
 std::string Layer::getGFIBaseUrl() { return getFeatureInfoBaseURL; }
+std::string Layer::getGFIExtraParams() { return GFIExtraParams; }
 std::string Layer::getGFILayers() { return GFILayers; }
 std::string Layer::getGFIQueryLayers() { return GFIQueryLayers; }
 std::string Layer::getGFIService() { return GFIService; }

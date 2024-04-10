@@ -47,10 +47,10 @@ paths:
     get:
       tags:
       - Santé du serveur
-      summary: ...
+      summary: Récupère les informations générales du serveur
       responses:
         200:
-          description: ...
+          description: Statut, version, identifiant de processus et date de lancement
           content:
             application/json:
               schema:
@@ -60,10 +60,10 @@ paths:
     get:
       tags:
       - Santé du serveur
-      summary: ...
+      summary: Récupère la liste des identifiants des couches, TMS et styles chargés
       responses:
         200:
-          description: ...
+          description: Liste des identifiants des couches, TMS et styles chargés
           content:
             application/json:
               schema:
@@ -73,10 +73,10 @@ paths:
     get:
       tags:
       - Santé du serveur
-      summary: ...
+      summary: Récupère les informations sur chaque thread
       responses:
         200:
-          description: ...
+          description: Liste des identifiants, statuts, nombre et temps de traitement des requête pour chaque thread
           content:
             application/json:
               schema:
@@ -86,10 +86,10 @@ paths:
     get:
       tags:
       - Santé du serveur
-      summary: ...
+      summary: Récupère le compte des contextes de stockage utilisés
       responses:
         200:
-          description: ...
+          description: Nombre de contexte de stockage utilisés fichier, Swift, S3 et Ceph 
           content:
             application/json:
               schema:
@@ -1378,6 +1378,32 @@ paths:
 
   ######################################### ADMIN
 
+  /admin/on:
+    put:
+      tags:
+      - Administration
+      summary: Active les services
+      description: On active la réponse aux appels sur les routes globales et de consultation
+      operationId: admin_turn_on
+
+      responses:
+        204:
+          description: Activation des services réussie
+
+  /admin/off:
+    put:
+      tags:
+      - Administration
+      summary: Désactive les services
+      description: |
+        On désactive la réponse aux appels sur les routes globales et de consultation (réponse d'un 503 systématique). 
+        On répond toujours aux API admin et de santé.
+      operationId: admin_turn_off
+
+      responses:
+        204:
+          description: Désactivation des services réussie
+
   /admin/layers:
     put:
       tags:
@@ -1658,6 +1684,7 @@ components:
       properties:
         status:
           type: string
+          enum: ['OK', 'DISABLED']
         version:
           type: string
         pid:
@@ -1844,6 +1871,8 @@ components:
             version:
               type: string
             service:
+              type: string
+            extra_query_params:
               type: string
             force_epsg:
               type: boolean
