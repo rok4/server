@@ -1,3 +1,9 @@
+## 5.5.0
+
+### [Added]
+
+* `Layer` : lors de la configuration du get feature info de type EXTERNALWMS, il est possible de fournir des paramètres additionnels à ajouter à la requête vers le WMS source avec le champ "extra_query_params"
+
 ## 5.4.2
 
 ### [Changed]
