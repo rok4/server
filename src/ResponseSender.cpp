@@ -80,7 +80,12 @@ std::string genStatusHeader ( int statusCode ) {
  * \param[in] mime mime type
  * \return filename
  */
-std::string genFileName ( std::string mime ) {
+std::string genFileName ( std::string mime, Request* request ) {
+
+    if (request->hasParam("filename")) {
+        return request->getParam("filename");
+    }
+
     if ( mime.compare ( "image/tiff" ) ==0 )
         return "image.tif";
     else if ( mime.compare ( "image/geotiff" ) ==0 )
@@ -130,40 +135,45 @@ void displayFCGIError ( int error ) {
         BOOST_LOG_TRIVIAL(error) <<   "Erreur inconnue" ;
 }
 
-int ResponseSender::sendresponse ( DataSource* source, FCGX_Request* request ) {
+int ResponseSender::sendresponse ( DataSource* source, FCGX_Request* fcgx_request, Request* request ) {
     // Creation de l'en-tete
     std::string statusHeader = genStatusHeader ( source->getHttpStatus() );
-    FCGX_PutStr ( statusHeader.data(),statusHeader.size(),request->out );
+    FCGX_PutStr ( statusHeader.data(),statusHeader.size(),fcgx_request->out );
 
     if (source->getType() != "") {
-        FCGX_PutStr ( "Content-Type: ",14,request->out );
-        FCGX_PutStr ( source->getType().c_str(), strlen ( source->getType().c_str() ),request->out );
+        FCGX_PutStr ( "Content-Type: ",14,fcgx_request->out );
+        FCGX_PutStr ( source->getType().c_str(), strlen ( source->getType().c_str() ),fcgx_request->out );
     }
 
     if ( ! source->getEncoding().empty() ){
-        FCGX_PutStr ( "\r\nContent-Encoding: ",20,request->out );
-        FCGX_PutStr ( source->getEncoding().c_str(), strlen ( source->getEncoding().c_str() ),request->out );
+        FCGX_PutStr ( "\r\nContent-Encoding: ",20,fcgx_request->out );
+        FCGX_PutStr ( source->getEncoding().c_str(), strlen ( source->getEncoding().c_str() ),fcgx_request->out );
     }
     if ( source->getLength() != 0 ){
         std::stringstream ss;
         ss << source->getLength();
         std::string lengthStr = ss.str();
-        FCGX_PutStr ( "\r\nContent-Length: ",18,request->out );
-        FCGX_PutStr ( lengthStr.c_str(), strlen ( lengthStr.c_str() ),request->out );
+        FCGX_PutStr ( "\r\nContent-Length: ",18,fcgx_request->out );
+        FCGX_PutStr ( lengthStr.c_str(), strlen ( lengthStr.c_str() ),fcgx_request->out );
     }
 
     if (source->getType() != "") {
-        std::string filename = genFileName ( source->getType() );
+        std::string filename = genFileName ( source->getType(), request );
         BOOST_LOG_TRIVIAL(debug) <<  filename ;
-        FCGX_PutStr ( "\r\nContent-Disposition: filename=\"",33,request->out );
-        FCGX_PutStr ( filename.data(),filename.size(), request->out );
-        FCGX_PutStr ( "\"",1,request->out );
+        
+        FCGX_PutStr ( "\r\nContent-Disposition: ",23,fcgx_request->out );
+        if (request->hasParam("filename")) {
+            FCGX_PutStr ( "attachment; ",12,fcgx_request->out );
+        }
+        FCGX_PutStr ( "filename=\"",10,fcgx_request->out );
+        FCGX_PutStr ( filename.data(),filename.size(), fcgx_request->out );
+        FCGX_PutStr ( "\"",1,fcgx_request->out );
     }
 
     if (source->getType() != "" || source->getLength() != 0) {
-        FCGX_PutStr ( "\r\n\r\n",4,request->out );
+        FCGX_PutStr ( "\r\n\r\n",4,fcgx_request->out );
     } else {
-        FCGX_PutStr ( "\r\n",2,request->out );
+        FCGX_PutStr ( "\r\n",2,fcgx_request->out );
     }
 
     // Copie dans le flux de sortie
@@ -173,10 +183,10 @@ int ResponseSender::sendresponse ( DataSource* source, FCGX_Request* request ) {
     // Ecriture iterative de la source de donnees dans le flux de sortie
     while ( wr < buffer_size ) {
         // Taille ecrite dans le flux de sortie
-        int w = FCGX_PutStr ( ( char* ) ( buffer + wr ), buffer_size,request->out );
+        int w = FCGX_PutStr ( ( char* ) ( buffer + wr ), buffer_size,fcgx_request->out );
         if ( w < 0 ) {
-            BOOST_LOG_TRIVIAL(error) <<   "Echec d'ecriture dans le flux de sortie de la requete FCGI " << request->requestId ;
-            displayFCGIError ( FCGX_GetError ( request->out ) );
+            BOOST_LOG_TRIVIAL(error) <<   "Echec d'ecriture dans le flux de sortie de la requete FCGI " << fcgx_request->requestId ;
+            displayFCGIError ( FCGX_GetError ( fcgx_request->out ) );
             delete source;
             //delete[] buffer;
             return -1;
@@ -188,38 +198,42 @@ int ResponseSender::sendresponse ( DataSource* source, FCGX_Request* request ) {
     return 0;
 }
 
-int ResponseSender::sendresponse ( DataStream* stream, FCGX_Request* request ) {
+int ResponseSender::sendresponse ( DataStream* stream, FCGX_Request* fcgx_request, Request* request ) {
 
     // Creation de l'en-tete
     std::string statusHeader= genStatusHeader ( stream->getHttpStatus() );
-    FCGX_PutStr ( statusHeader.data(),statusHeader.size(),request->out );
+    FCGX_PutStr ( statusHeader.data(),statusHeader.size(),fcgx_request->out );
 
     if (stream->getType() != "") {
-        FCGX_PutStr ( "Content-Type: ",14,request->out );
-        FCGX_PutStr ( stream->getType().c_str(), strlen ( stream->getType().c_str() ),request->out );
+        FCGX_PutStr ( "Content-Type: ",14,fcgx_request->out );
+        FCGX_PutStr ( stream->getType().c_str(), strlen ( stream->getType().c_str() ),fcgx_request->out );
     }
 
     if ( stream->getLength() != 0 ) {
         std::stringstream ss;
         ss << stream->getLength();
         std::string lengthStr = ss.str();
-        FCGX_PutStr ( "\r\nContent-Length: ",18,request->out );
-        FCGX_PutStr ( lengthStr.c_str(), strlen ( lengthStr.c_str() ),request->out );
+        FCGX_PutStr ( "\r\nContent-Length: ",18,fcgx_request->out );
+        FCGX_PutStr ( lengthStr.c_str(), strlen ( lengthStr.c_str() ),fcgx_request->out );
     }
 
     if (stream->getType() != "") {
-        std::string filename = genFileName ( stream->getType() );
+        std::string filename = genFileName ( stream->getType(), request );
         BOOST_LOG_TRIVIAL(debug) <<  filename ;
 
-        FCGX_PutStr ( "\r\nContent-Disposition: filename=\"",33,request->out );
-        FCGX_PutStr ( filename.data(),filename.size(), request->out );
-        FCGX_PutStr ( "\"",1,request->out );
+        FCGX_PutStr ( "\r\nContent-Disposition: ",23,fcgx_request->out );
+        if (request->hasParam("filename")) {
+            FCGX_PutStr ( "attachment; ",12,fcgx_request->out );
+        }
+        FCGX_PutStr ( "filename=\"",10,fcgx_request->out );
+        FCGX_PutStr ( filename.data(),filename.size(), fcgx_request->out );
+        FCGX_PutStr ( "\"",1,fcgx_request->out );
     }
     
     if (stream->getType() != "" || stream->getLength() != 0) {
-        FCGX_PutStr ( "\r\n\r\n",4,request->out );
+        FCGX_PutStr ( "\r\n\r\n",4,fcgx_request->out );
     } else {
-        FCGX_PutStr ( "\r\n",2,request->out );
+        FCGX_PutStr ( "\r\n",2,fcgx_request->out );
     }
 
     // Copie dans le flux de sortie
@@ -238,10 +252,10 @@ int ResponseSender::sendresponse ( DataStream* stream, FCGX_Request* request ) {
         // Ecriture iterative de la portion du flux d'entree dans le flux de sortie
         while ( wr < read_size ) {
             // Taille ecrite dans le flux de sortie
-            int w = FCGX_PutStr ( ( char* ) ( buffer + wr ), read_size,request->out );
+            int w = FCGX_PutStr ( ( char* ) ( buffer + wr ), read_size,fcgx_request->out );
             if ( w < 0 ) {
-                BOOST_LOG_TRIVIAL(error) <<   "Echec d'ecriture dans le flux de sortie de la requete FCGI " << request->requestId ;
-                displayFCGIError ( FCGX_GetError ( request->out ) );
+                BOOST_LOG_TRIVIAL(error) <<   "Echec d'ecriture dans le flux de sortie de la requete FCGI " << fcgx_request->requestId ;
+                displayFCGIError ( FCGX_GetError ( fcgx_request->out ) );
                 delete stream;
                 delete[] buffer;
                 return -1;
