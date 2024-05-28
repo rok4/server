@@ -48,6 +48,7 @@
 
 #include <rok4/datastream/DataStream.h>
 #include <rok4/datasource/DataSource.h>
+#include "Request.h"
 #include "fcgiapp.h"
 
 /**
@@ -67,7 +68,7 @@ public:
      * \brief Copy a data source in the FCGX_Request output stream
      * \return -1 if error, else 0
      */
-    int sendresponse ( DataSource* response, FCGX_Request* request );
+    static int sendresponse ( DataSource* response, FCGX_Request* fcgx_request, Request* request );
     /**
      * \~french
      * \brief Copie d'un flux d'entree dans le flux de sortie de l'objet request de type FCGX_Request
@@ -76,7 +77,7 @@ public:
      * \brief Copy a data stream in the FCGX_Request output stream
      * \return -1 if error, else 0
      */
-    int sendresponse ( DataStream* response, FCGX_Request* request );
+    static int sendresponse ( DataStream* response, FCGX_Request* fcgx_request, Request* request );
 };
 
 
