@@ -57,6 +57,10 @@ Le serveur ROK4 est lancé en mode stand alone. Nous utiliserons ici Nginx comme
 
 Leur définition est contrôlée à l'usage.
 
+* Pour le stockage objet
+    - `ROK4_OBJECT_READ_ATTEMPTS` : nombre de tentatives pour les lectures
+    - `ROK4_OBJECT_WRITE_ATTEMPTS` : nombre de tentatives pour les écritures
+    - `ROK4_OBJECT_ATTEMPTS_WAIT` : temps d'attente en secondes entre les tentatives
 * Pour le stockage CEPH
     - `ROK4_CEPH_CONFFILE`
     - `ROK4_CEPH_USERNAME`
@@ -165,7 +169,7 @@ On redémarre nginx : `systemctl restart nginx`
     - WMS : http://localhost/rok4/wms?request=GetCapabilities&service=WMS
     - WMTS : http://localhost/rok4/wmts?request=GetCapabilities&service=WMTS
     - TMS : http://localhost/rok4/tms/1.0.0
-    - OGC API Tiles : http://localhost/rok4/ogcapitiles/collections
+    - OGC API Tiles : http://localhost/rok4/tiles/collections
 * Racine de l'API d'administration : http://localhost/rok4/admin/
 * État de santé du serveur : http://localhost/rok4/healthcheck
 
@@ -179,7 +183,7 @@ Lorsque le serveur reçoit une requête, c'est le premier élément du chemin qu
 * `/healthcheck` -> requête d'état de santé ou statut du serveur
 * `/wmts` -> requête WMTS
 * `/wms` -> requête WMS
-* `/ogcapitiles` -> requête API Tiles
+* `/tiles` -> requête API Tiles
 * `/tms` -> requête TMS
 * `/admin` -> requête d'administration
 
@@ -230,8 +234,8 @@ Pour que les URLs présentes dans les réponses des services soient correctes ma
     "tms": {
         "endpoint_uri": "http://localhost/rok4/tms"
     },
-    "ogctiles": {
-        "endpoint_uri": "http://localhost/rok4/ogcapitiles"
+    "tiles": {
+        "endpoint_uri": "http://localhost/rok4/tiles"
     }
 ```
 

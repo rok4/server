@@ -7,8 +7,8 @@ servers:
 - url: http://localhost/rok4
 
 tags:
-- name: Global
-  description: Informations globales du serveur 
+- name: OGC API Common
+  description: Découverte des services du serveur
 - name: Santé du serveur
   description: Informations de santé sur les serveur 
 - name: Web Map Tile Service
@@ -24,22 +24,22 @@ tags:
 
 paths:
 
-  ######################################### GLOBAL
+  ######################################### COMMON
 
-  /:
+  /common:
     get:
       tags:
-      - Global
+      - OGC API Common
       summary: Retourne la liste des services disponibles
-      operationId: global_get_services
+      operationId: common_get_services
       x-query: "{&parameters*}" # changed the prefix to &
       responses:
-        200:
-          description: Liste des services disponibles
+        501:
+          description: Coming soon !
           content:
             application/xml:
               schema:
-                $ref: '#/components/schemas/global_services'
+                $ref: '#/components/schemas/common_error'
 
   ######################################### SANTÉ DU SERVEUR
   
@@ -813,7 +813,7 @@ paths:
 
   ######################################### OGC API Tiles
 
-  /ogcapitiles/collections:
+  /tiles/collections:
     get:
       tags:
       - OGC API Tiles
@@ -868,7 +868,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ogc_collections'
 
-  /ogcapitiles/collections/{layer}/map/tiles:
+  /tiles/collections/{layer}/map/tiles:
     get:
       tags:
       - OGC API Tiles
@@ -902,7 +902,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ogc_collections_id'
   
-  /ogcapitiles/collections/{layer}/tiles:
+  /tiles/collections/{layer}/tiles:
     get:
       tags:
       - OGC API Tiles
@@ -936,7 +936,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ogc_collections_id'
 
-  /ogcapitiles/tilematrixsets:
+  /tiles/tilematrixsets:
     get:
       tags:
       - OGC API Tiles
@@ -963,7 +963,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ogc_tilematrixsets'
     
-  /ogcapitiles/tilematrixsets/{tms}:
+  /tiles/tilematrixsets/{tms}:
     get:
       tags:
       - OGC API Tiles
@@ -997,7 +997,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ogc_tilematrixsets_id'
 
-  /ogcapitiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}:
+  /tiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}:
     get:
       tags:
       - OGC API Tiles
@@ -1058,7 +1058,7 @@ paths:
                 type: string
                 format: binary
 
-  /ogcapitiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}:
+  /tiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}:
     get:
       tags:
       - OGC API Tiles
@@ -1119,7 +1119,7 @@ paths:
                 type: string
                 format: binary
 
-  /ogcapitiles/map/tiles/{tms}/{level}/{row}/{col}:
+  /tiles/map/tiles/{tms}/{level}/{row}/{col}:
     get:
       tags:
       - OGC API Tiles
@@ -1180,7 +1180,7 @@ paths:
                 type: string
                 format: binary
 
-  /ogcapitiles/tiles/{tms}/{level}/{row}/{col}:
+  /tiles/tiles/{tms}/{level}/{row}/{col}:
    get:
       tags:
       - OGC API Tiles
@@ -1240,7 +1240,7 @@ paths:
                 type: string
                 format: binary
 
-  /ogcapitiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}:
+  /tiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}:
     get:
       tags:
       - OGC API Tiles
@@ -1308,7 +1308,7 @@ paths:
                 type: string
                 format: binary
 
-  /ogcapitiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}:
+  /tiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}:
     get:
       tags:
       - OGC API Tiles
@@ -1534,57 +1534,15 @@ paths:
 components:
   schemas:
 
-    global_services:
+
+    common_error:
       xml:
-        name: 'Services'
+        name: 'Error'
       type: object
       additionalProperties: false
       properties:
-        TileMapService:
-          type: object
-          properties:
-            title:
-              type: string
-              xml:
-                attribute: true
-            version:
-              type: string
-              xml:
-                attribute: true
-            href:
-              type: string
-              xml:
-                attribute: true
-        WebMapService:
-          type: object
-          properties:
-            title:
-              type: string
-              xml:
-                attribute: true
-            version:
-              type: string
-              xml:
-                attribute: true
-            href:
-              type: string
-              xml:
-                attribute: true
-        WebMapTileService:
-          type: object
-          properties:
-            title:
-              type: string
-              xml:
-                attribute: true
-            version:
-              type: string
-              xml:
-                attribute: true
-            href:
-              type: string
-              xml:
-                attribute: true
+        Message:
+          type: string
 
     wms_error:
       xml:
@@ -1618,11 +1576,11 @@ components:
 
     tms_error:
       xml:
-        name: 'ServiceExceptionReport'
+        name: 'TileMapServerError'
       type: object
       additionalProperties: false
       properties:
-        ServiceException:
+        Message:
           type: string
 
     tms_capabilities:
@@ -1882,7 +1840,7 @@ components:
         wms:
           type: object
           properties:
-            authorized:
+            pyramid:
               type: boolean
             crs:
               type: array
@@ -1892,7 +1850,7 @@ components:
         wmts:
           type: object
           properties:
-            authorized:
+            pyramid:
               type: boolean
             tms:
               type: array
@@ -1902,7 +1860,13 @@ components:
         tms:
           type: object
           properties:
-            authorized:
+            pyramid:
+              type: boolean
+            
+        tiles:
+          type: object
+          properties:
+            pyramid:
               type: boolean
 
       required:

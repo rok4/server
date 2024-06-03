@@ -35,128 +35,25 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-class Request;
-
 #ifndef REQUEST_H_
 #define REQUEST_H_
 
 #include <map>
 #include <vector>
-#include <rok4/utils/BoundingBox.h>
-#include <rok4/datasource/DataSource.h>
-#include <rok4/utils/CRS.h>
-#include "Layer.h"
-#include "ServicesConf.h"
+#include <regex>
 #include "fcgiapp.h"
+
+struct Route;
 
 /**
  * \file Request.h
  * \~french
  * \brief Définition de la classe Request, analysant les requêtes HTTP
- * \details Définition de la classe Request et des namespaces RequestType et ServiceType
+ * \details Définition de la classe Request
  * \~english
  * \brief Define the Request Class analysing HTTP requests
- * \details Define class Request and namespaces RequestType and ServiceType
+ * \details Define class Request
  */
-
-namespace RequestType {
-    /**
-     * \~french \brief Énumération des types de requête
-     * \~english \brief Available request type
-     */
-    enum eRequestType {
-        REQUEST_UNKNOWN,
-        REQUEST_MISSING,
-        GETSERVICES,
-        GETCAPABILITIES,
-        GETLAYER,
-        GETLAYERMETADATA,
-        GETLAYERGDAL,
-        GETMAP,
-        GETTILE,
-        GETMAPTILE,
-        GETFEATUREINFO,
-        GETVERSION,
-        ADDLAYER,
-        UPDATELAYER,
-        DELETELAYER,
-        BUILDCAPABILITIES,
-        TURNON,
-        TURNOFF,
-        GETHEALTHSTATUS,
-        GETINFOSTATUS,
-        GETTHREADSTATUS,
-        GETDEPENDSTATUS
-    };
-
-
-    /**
-     * \~french \brief Conversion d'un type de requête vers une chaîne de caractères
-     * \param[in] rt type de requête à convertir
-     * \return la chaîne de caractère nommant le type de requête
-     * \~english \brief Convert a request type to a string
-     * \param[in] rt request type to convert
-     * \return string namming the request type
-     */
-    std::string toString ( eRequestType rt );
-
-}
-
-
-namespace ServiceType {
-    /**
-     * \~french \brief Énumération des services
-     * \~english \brief Available services
-     */
-    enum eServiceType {
-        SERVICE_UNKNOWN,
-        SERVICE_MISSING,
-        WMTS,
-        WMS,
-        TMS,
-        OGCTILES,
-        GLOBAL,
-        ADMIN,
-        HEALTHCHECK
-    };
-
-    /**
-     * \~french \brief Conversion d'un type de service vers une chaîne de caractères
-     * \param[in] st type de service à convertir
-     * \return la chaîne de caractère nommant le type de service
-     * \~english \brief Convert a service type to a string
-     * \param[in] st service type to convert
-     * \return string namming the service type
-     */
-    std::string toString ( eServiceType st );
-}
-
-namespace TemplateOGC {
-    /**
-     * \~french \brief Énumération des templates d'URL OGC
-     */
-    enum eTemplateOGC {
-        // raster tile
-        GETTILERASTERSTYLED,
-        GETTILERASTER,
-        GETTILERASTERSTYLEDBYCOLLECTION,
-        GETTILERASTERBYCOLLECTION,
-        // vector tile
-        GETTILEVECTOR,
-        GETTILEVECTORBYCOLLECTION,
-        // capabilities
-        GETCAPABILITIESBYCOLLECTION,
-        GETCAPABILITIESRASTERBYCOLLECTION,
-        GETCAPABILITIESVECTORBYCOLLECTION,
-        // tilematrixset
-        GETTILEMATRIXSET,
-        GETTILEMATRIXSETBYID
-    };
-    /**
-     * \~french \brief Conversion d'un type vers une chaîne de caractères
-     */
-    std::string toString ( eTemplateOGC r );
-}
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -187,27 +84,29 @@ private:
      */
     void url_decode ( char *src );
 
-    /**
-     * \~french
-     * \brief Identification du service et de la requête
-     * \~english
-     * \brief Service and request type identification
-     */
-    void determineServiceAndRequest();
-
 public:
 
     /**
      * \~french
-     * \brief Transforme la chaîne de caractères en minuscule
-     * \param[in,out] str la chaîne
+     * \brief Récupération de la valeur d'un paramètre dans la requête
+     * \param[in] option liste des paramètres
+     * \param[in] paramName nom du paramètre
+     * \return valeur du parametre ou "" si non présent
      * \~english
-     * \brief Translate the string to lower case
-     * \param[in,out] str the string
+     * \brief Fetch a specific parameter value in the request
+     * \param[in] option parameter list
+     * \param[in] paramName parameter name
+     * \return parameter value or "" if not availlable
      */
-    static void toLowerCase ( char* str ) {
-        if ( str ) for ( int i = 0; str[i]; i++ ) str[i] = tolower ( str[i] );
+    static std::string getParam ( std::map<std::string, std::string>& option, std::string paramName ) {
+        std::map<std::string, std::string>::iterator it = option.find ( paramName );
+        if ( it == option.end() ) {
+            return "";
+        }
+        return it->second;
     }
+
+    FCGX_Request* fcgx_request;
 
     /**
      * \~french
@@ -243,26 +142,6 @@ public:
      * \~english \brief Web Server path of the service
      */
     std::string path;
-    /**
-     * \~french \brief Chemin découpé
-     * \~english \brief Splitted path
-     */
-    std::vector<std::string> pathParts;
-    /**
-     * \~french \brief Nom au sens OGC de la requête effectuée
-     * \~english \brief OGC request name
-     */
-    RequestType::eRequestType request;
-    /**
-     * \~french \brief Type de service (WMS,WMTS,TMS,OGC)
-     * \~english \brief Service type (WMS,WMTS,TMS,OGC)
-     */
-    ServiceType::eServiceType service;
-    /**
-     * \~french \brief Type de templates OGC
-     * \~english \brief Templates OGC
-     */
-    TemplateOGC::eTemplateOGC tmpl;
 
     /**
      * \~french \brief Liste des paramètres de la requête
@@ -277,6 +156,12 @@ public:
     std::map<std::string, std::string> bodyParams;
 
     /**
+     * \~french \brief Liste des paramètres extraits du chemin de la requête
+     * \~english \brief Parameters list from request path
+     */
+    std::vector<std::string> pathParams;
+
+    /**
      * \~french \brief Corps de la requête
      * \~english \brief Request body
      */
@@ -286,12 +171,7 @@ public:
      * \~french \brief Affichage (debug)
      * \~english \brief Display (debug)
      */
-    void print() {
-        BOOST_LOG_TRIVIAL(info) << "path = " << path;
-        BOOST_LOG_TRIVIAL(info) << "method = " << method;
-        BOOST_LOG_TRIVIAL(info) << "service = " << ServiceType::toString(service);
-        BOOST_LOG_TRIVIAL(info) << "request = " << RequestType::toString(request);
-    }
+    void print();
     
     /**
      * \~french
@@ -301,7 +181,7 @@ public:
      * \brief Request Constructor
      * \param fcgxRequest Fcgi request
      */
-    Request ( FCGX_Request& fcgxRequest);
+    Request ( FCGX_Request* fcgxRequest);
 
     /**
      * \~french

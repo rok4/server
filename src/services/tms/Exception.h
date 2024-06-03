@@ -36,55 +36,39 @@
  */
 
 /**
- * \file Message.cpp
- * \~french
- * \brief Implémentation des classes gérant les messages utilisateurs
- * \~english
- * \brief Implement classes handling user messages
+ * \file services/tms/Exception.h
+ ** \~french
+ * \brief Définition de la classe TmsException
+ ** \~english
+ * \brief Define classe TmsException
  */
 
-#include "Message.h"
-#include <boost/log/trivial.hpp>
-#include <iostream>
+#ifndef TMSEXCEPTION_H_
+#define TMSEXCEPTION_H_
 
-inline std::string tagName ( std::string t ) {
-    return ( t=="wms"?"ServiceExceptionReport":"ExceptionReport" ) ;
-}
+#include <string>
+#include "boost/format.hpp"
 
-inline std::string xmlnsUri ( std::string t ) {
-    return ( t=="wms"?"http://www.opengis.net/ogc":"http://www.opengis.net/ows/1.1" ) ;
-}
+#include "DataStreams.h"
 
 /**
- * Methode commune pour generer un Rapport d'exception.
- * @param sex une exception de service
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Gestion des erreurs du service TMS
+ * \details Cette classe est prévue pour être utilisée sans instance. Les erreurs ont le formalisme suivant :
+ * \code{.xml}
+ * <?xml version="1.0" ?>
+ * <TileMapServerError>
+ *    <Message>An error occured</Message>
+ * </TileMapServerError>
+ * \endcode
  */
-std::string genSER ( ServiceException *sex ) {
+class TmsException {
+private:
+    static std::string xml_template;
 
-    BOOST_LOG_TRIVIAL(debug) <<  "service=["<<sex->getService() <<"]"  ;
-    std::string msg = "";
+public:
+    static MessageDataStream* get_error_message(std::string reason, int status);
+};
 
-    if (sex->getFormat() == "application/json") {
-        msg = sex->toString() ;
-    } else {
-        msg+= "<"+tagName ( sex->getService() ) +" xmlns=\""+xmlnsUri ( sex->getService() ) +"\">\n" ;
-        msg+= sex->toString() ;
-        msg+= "</"+tagName ( sex->getService() ) +">" ;
-    }
-
-    BOOST_LOG_TRIVIAL(debug) <<  "SERVICE EXCEPTION : " << msg ;
-
-    return msg ;
-}
-
-SERDataSource::SERDataSource ( ServiceException *sex ) : MessageDataSource ( "",sex->getFormat() ) {
-    this->message= genSER ( sex ) ;
-    this->httpStatus= ServiceException::getCodeAsStatusCode ( sex->getCode() ) ;
-    delete sex;
-}
-
-SERDataStream::SERDataStream ( ServiceException *sex ) : MessageDataStream ( "", sex->getFormat() ) {
-    this->message= genSER ( sex ) ;
-    this->httpStatus= ServiceException::getCodeAsStatusCode ( sex->getCode() ) ;
-    delete sex;
-}
+#endif /* TMSEXCEPTION_H_ */

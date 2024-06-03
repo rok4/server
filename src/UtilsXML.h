@@ -47,6 +47,7 @@ class Attribute;
 
 #include <rok4/utils/Keyword.h>
 #include <rok4/utils/TileMatrixLimits.h>
+#include <rok4/utils/BoundingBox.h>
 
 class UtilsXML
 {
@@ -121,6 +122,28 @@ class UtilsXML
                 nDecimal++;
             }
             return nDecimal;
+        }
+
+        /**
+         * \~french Conversion d'un entier en une chaîne de caractère
+         * \~english Convert an integer in a character string
+         */
+        static std::string numToStr ( long int i ) {
+            std::ostringstream strstr;
+            strstr << i;
+            return strstr.str();
+        }
+
+        /**
+         * \~french Conversion d'un flottant en une chaîne de caractères
+         * \~english Convert a float in a character string
+         */
+        static std::string doubleToStr ( long double d ) {
+            std::ostringstream strstr;
+            strstr.setf ( std::ios::fixed,std::ios::floatfield );
+            strstr.precision ( 16 );
+            strstr << d;
+            return strstr.str();
         }
 
         /**
@@ -202,6 +225,35 @@ class UtilsXML
                 return el;
             }
 
+        }
+
+        /**
+         * \~french
+         * \brief Supprime l'espace de nom (la partie avant :) de la balise XML
+         * \param[in,out] elementName le nom de la balise
+         * \~english
+         * \brief Remove the namespace (before :) in the XML element
+         * \param[in,out] elementName the element name
+         */
+        static void removeNameSpace ( std::string& elementName ) {
+            size_t pos = elementName.find ( ":" );
+            if ( elementName.size() <= pos ) {
+                return;
+            }
+            // Garde le ":" -> "left:right" devient ":right"
+            elementName.erase ( elementName.begin(),elementName.begin() +pos );
+        }
+
+        /**
+         * \~french
+         * \brief Transforme la chaîne de caractères en minuscule
+         * \param[in,out] str la chaîne
+         * \~english
+         * \brief Translate the string to lower case
+         * \param[in,out] str the string
+         */
+        static void toLowerCase ( char* str ) {
+            if ( str ) for ( int i = 0; str[i]; i++ ) str[i] = tolower ( str[i] );
         }
 
 };

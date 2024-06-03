@@ -1,5 +1,5 @@
 /*
- * Copyright © (2011) Institut national de l'information
+ * Copyright © (2011-2013) Institut national de l'information
  *                    géographique et forestière
  *
  * Géoportail SAV <contact.geoservices@ign.fr>
@@ -35,27 +35,18 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-#ifndef GETFEATUREINFOENCODER_H
-#define GETFEATUREINFOENCODER_H
+/**
+ * \file services/tms/Exception.cpp
+ ** \~french
+ * \brief Implémentation de la classe TmsException
+ ** \~english
+ * \brief Implements classe TmsException
+ */
 
-#include <string>
-#include <vector>
-#include "Message.h"
+#include "services/tms/Exception.h"
 
-class GetFeatureInfoEncoder {
+std::string TmsException::xml_template = "<?xml version=\"1.0\" ?><TileMapServerError><Message>%s</Message></TileMapServerError>";
 
-private:
-  std::vector<std::string> data;
-  std::string info_format;
-  DataStream* plainDataStream();
-  DataStream* htmlDataStream();
-  DataStream* jsonDataStream();
-  DataStream* xmlDataStream();
-  
-public:
-   GetFeatureInfoEncoder(std::vector<std::string> data, std::string info_format);
-   ~GetFeatureInfoEncoder();
-   DataStream* getDataStream();
-};
-
-#endif
+MessageDataStream* TmsException::get_error_message(std::string reason, int status) {
+    return new MessageDataStream(str(boost::format(xml_template) % reason), "application/xml", status);
+}

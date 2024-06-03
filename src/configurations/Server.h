@@ -35,6 +35,14 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
+/**
+ * \file configurations/Server.h
+ ** \~french
+ * \brief Définition de la classe ServerConf
+ ** \~english
+ * \brief Define classe ServerConf
+ */
+
 class ServerConf;
 
 #ifndef SERVERXML_H
@@ -43,22 +51,32 @@ class ServerConf;
 #include <vector>
 #include <string>
 #include <map>
-#include "Rok4Server.h"
-#include <rok4/utils/TileMatrixSet.h>
 
+#include <rok4/utils/TileMatrixSet.h>
 #include <rok4/utils/Configuration.h>
-#include "Layer.h"
 #include <rok4/style/Style.h>
+
+#include "configurations/Layer.h"
+#include "Rok4Server.h"
 
 #include "config.h"
 
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Gestion de la configuration générale du serveur
+ */
 class ServerConf : public Configuration
 {
     friend class Rok4Server;
+    friend class CommonService;
+    friend class TmsService;
 
     public:
         ServerConf(std::string path);
         ~ServerConf();
+
+        bool is_enabled();
 
         std::string getLogOutput() ;
         int getLogFilePeriod() ;
@@ -67,7 +85,8 @@ class ServerConf : public Configuration
 
         std::string getServicesConfigFile() ;
 
-        std::string getLayersList() ;
+        std::string get_layers_list() ;
+        std::map<std::string, Layer*>& get_layers() ;
         void addLayer(Layer* l) ;
         void removeLayer(std::string id) ;
         int getNbLayers() ;
@@ -102,14 +121,14 @@ class ServerConf : public Configuration
 
         /**
          * \~french \brief Fichier ou objet contenant la liste des descipteurs de couche
-         * \~english \brief Fil or object containing layers' descriptors list
+         * \~english \brief File or object containing layers' descriptors list
          */
-        std::string layerList;
+        std::string layers_list;
         /**
          * \~french \brief Liste des couches disponibles
          * \~english \brief Available layers list
          */
-        std::map<std::string, Layer*> layersList;
+        std::map<std::string, Layer*> layers;
 
         /**
          * \~french \brief Adresse du socket d'écoute (vide si lancement géré par un tiers)
@@ -121,14 +140,6 @@ class ServerConf : public Configuration
          * \~english \brief Socket listen queue depth
          */
         int backlog;
-
-
-        /**
-         * \~french \brief Définit si le serveur doit honorer les requêtes d'administration
-         * \~english \brief Define whether administration request should be honored
-         */
-        bool supportAdmin;
-
 
         /**
          * \~french \brief Définit si le serveur doit honorer les requêtes de consultation

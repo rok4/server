@@ -36,49 +36,17 @@
  */
 
 /**
- * \file ResponseSender.h
- * \~french
- * \brief Définition des fonctions d'envoie de réponse sur le flux FCGI
- * \~english
- * \brief Define response sender function for the FCGI link
+ * \file services/health/Exception.cpp
+ ** \~french
+ * \brief Implémentation de la classe HealthException
+ ** \~english
+ * \brief Implements classe HealthException
  */
 
-#ifndef _SENDER_
-#define _SENDER_
+#include "services/health/Exception.h"
 
-#include <rok4/datastream/DataStream.h>
-#include <rok4/datasource/DataSource.h>
-#include "fcgiapp.h"
+std::string HealthException::json_template = "{ \"code\": %s, \"message\": \"%s\" }";
 
-/**
- * \author Institut national de l'information géographique et forestière
- * \~french
- * \brief Gestions de l'envoie des réponses dans le flux FCGI
- * \~english
- * \brief FCGI response handler
- */
-class ResponseSender {
-public:
-    /**
-     * \~french
-     * \brief Copie d'une source de données dans le flux de sortie de l'objet request de type FCGX_Request
-     * \return -1 en cas de problème, 0 sinon
-     * \~english
-     * \brief Copy a data source in the FCGX_Request output stream
-     * \return -1 if error, else 0
-     */
-    int sendresponse ( DataSource* response, FCGX_Request* request );
-    /**
-     * \~french
-     * \brief Copie d'un flux d'entree dans le flux de sortie de l'objet request de type FCGX_Request
-     * \return -1 en cas de problème, 0 sinon
-     * \~english
-     * \brief Copy a data stream in the FCGX_Request output stream
-     * \return -1 if error, else 0
-     */
-    int sendresponse ( DataStream* response, FCGX_Request* request );
-};
-
-
-#endif
-
+MessageDataStream* HealthException::get_error_message(std::string reason, int status) {
+    return new MessageDataStream(str(boost::format(json_template) % status % reason), "application/json", status);
+}

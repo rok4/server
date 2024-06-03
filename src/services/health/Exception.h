@@ -36,41 +36,39 @@
  */
 
 /**
- * \file UtilsGlobal.cpp
- * \~french
- * \brief Implémentation des fonctions de générations des GetCapabilities
- * \~english
- * \brief Implement the GetCapabilities generation function
+ * \file services/common/Exception.h
+ ** \~french
+ * \brief Définition de la classe HealthException
+ ** \~english
+ * \brief Define classe HealthException
  */
 
-#include "Rok4Server.h"
-#include <iostream>
-#include <algorithm>
-#include <iomanip>
-#include <vector>
-#include <map>
-#include <set>
-#include <functional>
-#include <cmath>
-#include <rok4/utils/TileMatrixSet.h>
-#include <rok4/utils/Pyramid.h>
-#include "config.h"
+#ifndef HEALTHEXCEPTION_H_
+#define HEALTHEXCEPTION_H_
 
-DataStream* Rok4Server::GlobalGetServices ( Request* request ) {
+#include <string>
+#include "boost/format.hpp"
 
-    std::ostringstream res;
-    res << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-    res << "<Services>\n";
-    if (servicesConf->supportTMS) {
-        res << "  <TileMapService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->tmsPublicUrl << "/1.0.0/\" />\n";
-    }
-    if (servicesConf->supportWMS) {
-        res << "  <WebMapService title=\"" << servicesConf->title << "\" version=\"1.3.0\" href=\"" << servicesConf->wmsPublicUrl << "?SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    if (servicesConf->supportWMTS) {
-        res << "  <WebMapTileService title=\"" << servicesConf->title << "\" version=\"1.0.0\" href=\"" << servicesConf->wmtsPublicUrl << "?SERVICE=WMTS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities\" />\n";
-    }
-    res << "</Services>\n";
+#include "DataStreams.h"
 
-    return new MessageDataStream ( res.str(),"application/xml" );
-}
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Gestion des erreurs du service global
+ * \details Cette classe est prévue pour être utilisée sans instance. Les erreurs ont le formalisme suivant :
+ * \code{.json}
+ * {
+ *    "code": 400
+ *    "message": "An error occured"
+ * }
+ * \endcode
+ */
+class HealthException {
+private:
+    static std::string json_template;
+
+public:
+    static MessageDataStream* get_error_message(std::string reason, int status);
+};
+
+#endif /* HEALTHEXCEPTION_H_ */

@@ -36,7 +36,7 @@
  */
 
 /**
- * \file AttributionURL.h
+ * \file configurations/AttributionURL.h
  * \~french
  * \brief Définition de la classe AttributionURL gérant les liens vers les métadonnées dans les documents de capacités
  * \~english

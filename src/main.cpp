@@ -174,7 +174,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
 
     BOOST_LOG_TRIVIAL(info) << "LAYERS LOADING" ;
     
-    std::string list_path = serverConf->getLayersList();
+    std::string list_path = serverConf->get_layers_list();
 
     if (list_path != "") {
         // Lecture de la liste des couches
@@ -202,7 +202,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
         delete[] data; 
         std::string layer_desc;    
         while (std::getline(list_content, layer_desc)) {
-            Layer* layer = new Layer(layer_desc, servicesConf );
+            Layer* layer = new Layer(layer_desc );
             if ( layer->isOk() ) {
                 serverConf->addLayer ( layer );
             } else {

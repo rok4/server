@@ -35,53 +35,72 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-#ifndef _CONFIG_
-#define _CONFIG_
+/**
+ * \file services/Service.h
+ ** \~french
+ * \brief Définition de la classe Service
+ ** \~english
+ * \brief Define classe Service
+ */
 
-#include <unistd.h>
-#include <stdint.h>
-#include <cstring>
-#include <cstdlib>
-#include <algorithm>
+#ifndef SERVICE_H_
+#define SERVICE_H_
 
-// Variable issues du cmake
-#cmakedefine VERSION "@VERSION@"
+#include <regex>
 
-#include <cassert>
-// Pour déactiver tous les assert, décommenter la ligne suivante
-// #define NDEBUG
+#include <utils/Configuration.h>
+#include <utils/Keyword.h>
+#include <rok4/datastream/DataStream.h>
 
-#include <iostream>
-#include <boost/log/trivial.hpp>
+class Rok4Server;
+class Request;
 
-#define MAX_IMAGE_WIDTH  65536
-#define MAX_IMAGE_HEIGHT 65536
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Abstraction d'un service du serveur
+ */
+class Service : public Configuration {
 
-//Correct value for a 2 factor between TMS resolution and a max image size output of 5000pixels
-#define MAX_TILE_X 40
-#define MAX_TILE_Y 40
+protected:
 
-#define DEFAULT_SERVER_CONF_PATH   "../config/server.json"
-#define DEFAULT_SERVICES_CONF_PATH "../config/services.json"
+    std::string title;
+    std::string abstract;
+    std::vector<Keyword> keywords;
+    std::string endpoint_uri;
+    std::string root_path;
+    bool enabled;
 
-#define DEFAULT_LOG_OUTPUT "rolling_file"
-#define DEFAULT_LOG_FILE_PREFIX "/var/tmp/rok4"
-#define DEFAULT_LOG_FILE_PERIOD 3600
-#define DEFAULT_LOG_LEVEL  boost::log::trivial::error
-#define DEFAULT_NB_THREAD  1
-#define DEFAULT_RECONNECTION_FREQUENCY  60
-#define DEFAULT_NB_PROCESS 1
-#define MAX_NB_PROCESS 100
-#define DEFAULT_LAYER_DIR  "../config/layers/"
-#define DEFAULT_TMS_DIR    "../config/tileMatrixSet"
-#define DEFAULT_STYLE_DIR  "../config/styles"
-#define DEFAULT_RESAMPLING "lanczos_2"
-#define DEFAULT_RETRY 0
-#define DEFAULT_TIMEOUT 300
-#define DEFAULT_INTERVAL 5
-#define DEFAULT_MAX_SIZE_BEFORE_CUT 2000
-#define DEFAULT_MAX_NB_CUT 25
-#define DEFAULT_TIME_PROCESS 300
-#define DEFAULT_MAX_TIME_PROCESS 6000
+    /**
+     * \~french
+     * \brief Teste la requête vis à vis de la route
+     * \details La méthode est comparée. Si la requête correspond à la route, les paramètres du chemin sont extraits
+     * \param[in] route Route de validation de la requête
+     * \param[in] req Requête à valider
+     * \~english
+     * \brief Test if request match the route
+     * \details Method is tested. If request matches the route, path params are extracted
+     * \param[in] route Route to test request
+     * \param[in] req Request to test
+     */
+    bool match_route(std::string path, std::vector<std::string> methods, Request* req);
 
-#endif
+public:
+    /**
+     * \~french
+     * \brief Constructeur d'un service
+     * \~english
+     * \brief Service constructor
+     */
+    Service (json11::Json& doc);
+
+    virtual DataStream* process_request(Request* req, Rok4Server* serv) = 0;
+
+    std::string get_root_path() {return root_path;};
+    bool is_enabled() {return enabled;};
+    bool match_request(Request* req);
+};
+
+#endif /* SERVICE_H_ */
+
+

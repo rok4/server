@@ -36,7 +36,7 @@
  */
 
 /**
- * \file MetadataURL.h
+ * \file configurations/MetadataURL.h
  * \~french
  * \brief Définition de la classe MetadataURL gérant les liens vers les métadonnées dans les documents de capacités
  * \~english

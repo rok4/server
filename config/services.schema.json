@@ -84,9 +84,6 @@
                 "inspire": {
                     "type": "boolean"
                 },
-                "post_mode": {
-                    "type": "boolean"
-                },
                 "crs_restrictions": {
                     "type": "string"
                 },
@@ -99,7 +96,7 @@
         "wms": {
             "type": "object",
             "properties": {
-                "active": {
+                "enabled": {
                     "type": "boolean"
                 },
                 "endpoint_uri": {
@@ -148,7 +145,7 @@
         "wmts": {
             "type": "object",
             "properties": {
-                "active": {
+                "enabled": {
                     "type": "boolean"
                 },
                 "endpoint_uri": {
@@ -160,7 +157,7 @@
         "tms": {
             "type": "object",
             "properties": {
-                "active": {
+                "enabled": {
                     "type": "boolean"
                 },
                 "endpoint_uri": {
@@ -169,10 +166,10 @@
                 "metadata": { "$ref": "#/$defs/metadata" }
             }
         },
-        "ogctiles": {
+        "tiles": {
             "type": "object",
             "properties": {
-                "active": {
+                "enabled": {
                     "type": "boolean"
                 },
                 "endpoint_uri": {

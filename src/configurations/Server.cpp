@@ -35,7 +35,7 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-#include "ServerConf.h"
+#include "configurations/Server.h"
 #include <cmath>
 #include <fstream>
 
@@ -151,21 +151,10 @@ bool ServerConf::parse(json11::Json& doc) {
         backlog = doc["backlog"].int_value();
     }
 
-    // api
-    if (doc["api"].is_null()) {
-        std::cerr << "No api, default value used" << std::endl;
-        supportAdmin = false;
-    } else if (! doc["api"].is_bool()) {
-        errorMessage = "api have to be a boolean";
-        return false;
-    } else {
-        supportAdmin = doc["api"].bool_value();
-    }
-
-    // api
+    // enabled
     if (doc["enabled"].is_null()) {
         enabled = true;
-    } else if (! doc["api"].is_bool()) {
+    } else if (! doc["enabled"].is_bool()) {
         errorMessage = "enabled have to be a boolean";
         return false;
     } else {
@@ -191,12 +180,12 @@ bool ServerConf::parse(json11::Json& doc) {
 
         // layers
         if (configurationsSection["layers"].is_null()) {
-            layerList = "";
+            layers_list = "";
         } else if (! configurationsSection["layers"].is_string()) {
             errorMessage = "configurations.layers have to be a string";
             return false;
         } else {
-            layerList = configurationsSection["layers"].string_value();
+            layers_list = configurationsSection["layers"].string_value();
         }
 
         // styles
@@ -250,7 +239,7 @@ ServerConf::~ServerConf(){
 
     // Les couches
     std::map<std::string, Layer*>::iterator itLay;
-    for ( itLay=layersList.begin(); itLay!=layersList.end(); itLay++ )
+    for ( itLay = layers.begin(); itLay != layers.end(); itLay++ )
         delete itLay->second;
 
 }
@@ -264,27 +253,29 @@ boost::log::v2_mt_posix::trivial::severity_level ServerConf::getLogLevel() {retu
 
 std::string ServerConf::getServicesConfigFile() {return servicesConfigFile;}
 
-std::string ServerConf::getLayersList() {return layerList;}
+std::map<std::string, Layer*>& ServerConf::get_layers() {return layers;}
+std::string ServerConf::get_layers_list() {return layers_list;}
 void ServerConf::addLayer(Layer* l) {
-    layersList.insert ( std::pair<std::string, Layer *> ( l->getId(), l ) );
+    layers.insert ( std::pair<std::string, Layer *> ( l->getId(), l ) );
 }
 int ServerConf::getNbLayers() {
-    return layersList.size();
+    return layers.size();
 }
 Layer* ServerConf::getLayer(std::string id) {
-    std::map<std::string, Layer*>::iterator itLay = layersList.find ( id );
-    if ( itLay == layersList.end() ) {
+    std::map<std::string, Layer*>::iterator itLay = layers.find ( id );
+    if ( itLay == layers.end() ) {
         return NULL;
     }
     return itLay->second;
 }
 void ServerConf::removeLayer(std::string id) {
-    std::map<std::string, Layer*>::iterator itLay = layersList.find ( id );
-    if ( itLay != layersList.end() ) {
+    std::map<std::string, Layer*>::iterator itLay = layers.find ( id );
+    if ( itLay != layers.end() ) {
         delete itLay->second;
-        layersList.erase(itLay);
+        layers.erase(itLay);
     }
 }
 
 int ServerConf::getNbThreads() {return nbThread;}
 std::string ServerConf::getSocket() {return socket;}
+bool ServerConf::is_enabled() {return enabled;}

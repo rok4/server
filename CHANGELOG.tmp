@@ -1,0 +1,6 @@
+* Plus de style par défaut au chargement d'une couche, il faut forcément en fournir un. Pas de détection du style Inspire : ce sera toujours le premier qui sera utilisé par défaut à l'interrogation de la couche
+* Tous les services sont désactivable, routes de santé incluses
+* La racine de consultation des services de diffusion est configurable
+* La route globale des services devient une route du service COMMON (futur OGC API Common)
+* Titre, résumé et mots clés sont définis par service de diffusion
+* OGC API Tiles : dans le fichier de configuration des services, la section devient 'tiles'

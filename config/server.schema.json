@@ -20,10 +20,6 @@
             "description": "Active-t-on les API de consultation automatiquement à la fin du chargement ?",
             "default": true
         },
-        "api": {
-            "type": "boolean",
-            "description": "Active-t-on l'API d'administration"
-        },
         "logger": {
             "type": "object",
             "description": "Paramètres du logger",

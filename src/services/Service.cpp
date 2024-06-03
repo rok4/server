@@ -35,53 +35,59 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-#ifndef _CONFIG_
-#define _CONFIG_
+/**
+ * \file services/Service.cpp
+ ** \~french
+ * \brief Implémentation de la classe Service
+ ** \~english
+ * \brief Implements classe Service
+ */
 
-#include <unistd.h>
-#include <stdint.h>
-#include <cstring>
-#include <cstdlib>
-#include <algorithm>
+#include "services/Service.h"
+#include "Request.h"
 
-// Variable issues du cmake
-#cmakedefine VERSION "@VERSION@"
+bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
 
-#include <cassert>
-// Pour déactiver tous les assert, décommenter la ligne suivante
-// #define NDEBUG
+    if (std::find(methods.begin(), methods.end(), req->method) == methods.end()) {
+        return false;
+    }
 
-#include <iostream>
-#include <boost/log/trivial.hpp>
+    std::smatch m;
+    if (std::regex_match(req->path, m, std::regex(root_path + path))) {
 
-#define MAX_IMAGE_WIDTH  65536
-#define MAX_IMAGE_HEIGHT 65536
+        for(int i = 1; i < m.size(); i++) {
+            req->pathParams.push_back(m[i]);
+            BOOST_LOG_TRIVIAL(debug) << "Path param : " << m[i];
+        }
 
-//Correct value for a 2 factor between TMS resolution and a max image size output of 5000pixels
-#define MAX_TILE_X 40
-#define MAX_TILE_Y 40
+        return true;
+    } else {
+        return false;
+    }
+};
 
-#define DEFAULT_SERVER_CONF_PATH   "../config/server.json"
-#define DEFAULT_SERVICES_CONF_PATH "../config/services.json"
+Service::Service (json11::Json& doc) {
 
-#define DEFAULT_LOG_OUTPUT "rolling_file"
-#define DEFAULT_LOG_FILE_PREFIX "/var/tmp/rok4"
-#define DEFAULT_LOG_FILE_PERIOD 3600
-#define DEFAULT_LOG_LEVEL  boost::log::trivial::error
-#define DEFAULT_NB_THREAD  1
-#define DEFAULT_RECONNECTION_FREQUENCY  60
-#define DEFAULT_NB_PROCESS 1
-#define MAX_NB_PROCESS 100
-#define DEFAULT_LAYER_DIR  "../config/layers/"
-#define DEFAULT_TMS_DIR    "../config/tileMatrixSet"
-#define DEFAULT_STYLE_DIR  "../config/styles"
-#define DEFAULT_RESAMPLING "lanczos_2"
-#define DEFAULT_RETRY 0
-#define DEFAULT_TIMEOUT 300
-#define DEFAULT_INTERVAL 5
-#define DEFAULT_MAX_SIZE_BEFORE_CUT 2000
-#define DEFAULT_MAX_NB_CUT 25
-#define DEFAULT_TIME_PROCESS 300
-#define DEFAULT_MAX_TIME_PROCESS 6000
+    if (doc.is_null()) {
+        enabled = false;
+        return;
+    } else if(! doc.is_object()) {
+        errorMessage = "have to be an object";
+        return;
+    }
 
-#endif
+    if (doc["enabled"].is_bool()) {
+        enabled = doc["enabled"].bool_value();
+    } else if (! doc["enabled"].is_null()) {
+        errorMessage = "'enabled' have to be a boolean";
+        return;
+    } else {
+        enabled = false;
+    }
+};
+
+bool Service::match_request(Request* req) {
+    return enabled && req->path.rfind(root_path, 0) == 0;
+};
+
+

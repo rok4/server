@@ -54,14 +54,14 @@ class Layer;
 #include <rok4/utils/Pyramid.h>
 #include <rok4/utils/CRS.h>
 #include <rok4/style/Style.h>
-#include "ServerConf.h"
-#include "ServicesConf.h"
-#include "MetadataURL.h"
-#include "AttributionURL.h"
 #include <rok4/enums/Interpolation.h>
 #include <rok4/utils/Keyword.h>
 #include <rok4/utils/BoundingBox.h>
 #include <rok4/utils/Configuration.h>
+
+#include "configurations/Server.h"
+#include "configurations/MetadataURL.h"
+#include "configurations/AttributionURL.h"
 
 struct WmtsTmsInfos {
     TileMatrixSet* tms;
@@ -95,8 +95,8 @@ struct WmtsTmsInfos {
 class Layer : public Configuration {
 private:
     /**
-     * \~french \brief Identifiant WMS/WMTS de la couche
-     * \~english \brief WMS/WMTS layer identifier
+     * \~french \brief Identifiant de la couche
+     * \~english \brief Layer identifier
      */
     std::string id;
     /**
@@ -109,37 +109,38 @@ private:
      * \~english \brief abstract
      */
     std::string abstract;
+
     /**
-     * \~french \brief Autorisé le WMS pour ce layer
+     * \~french \brief Autorisation du WMS pour ce layer
      * \~english \brief Authorized WMS for this layer
      */
-    bool WMSAuthorized;
+    bool wms;
     /**
-     * \~french \brief Autorisé le WMTS pour ce layer
+     * \~french \brief Autorisation du WMTS pour ce layer
      * \~english \brief Authorized WMTS for this layer
      */
-    bool WMTSAuthorized;
+    bool wmts;
     /**
-     * \~french \brief Autorisé le TMS pour ce layer
+     * \~french \brief Autorisation du TMS pour ce layer
      * \~english \brief Authorized TMS for this layer
      */
-    bool TMSAuthorized;
+    bool tms;
+    /**
+     * \~french \brief Autorisation de API Tiles pour ce layer
+     * \~english \brief Authorized API Tiles for this layer
+     */
+    bool tiles;
     /**
      * \~french \brief Liste des mots-clés
      * \~english \brief List of keywords
      */
-    std::vector<Keyword> keyWords;
+    std::vector<Keyword> keywords;
     /**
      * \~french \brief Pyramide de tuiles
      * \~english \brief Tile pyramid
      */
-    Pyramid* dataPyramid;
+    Pyramid* pyramid;
 
-    /**
-     * \~french \brief Nom de l'entité propriétaire de la couche
-     * \~english \brief Oo
-     */
-    std::string authority;
     /**
      * \~french \brief Emprise des données en coordonnées géographique (WGS84)
      * \~english \brief Data bounding box in geographic coordinates (WGS84)
@@ -235,7 +236,7 @@ private:
     void calculateNativeTileMatrixLimits();
     void calculateTileMatrixLimits();
 
-    bool parse(json11::Json& doc, ServicesConf* servicesConf);
+    bool parse(json11::Json& doc);
 
 public:
     /**
@@ -250,22 +251,20 @@ public:
     * \param[in] path Path to layer descriptor
     * \param[in] servicesConf Services configuration
     */
-    Layer(std::string path, ServicesConf* servicesConf );
+    Layer(std::string path );
     /**
     * \~french
     * Crée un Layer à partir d'un contenu JSON
     * \brief Constructeur
     * \param[in] layerName Identifiant de la couche
     * \param[in] content Contenu JSON
-    * \param[in] servicesConf Configuration des services
     * \~english
     * Create a Layer from JSON content
     * \brief Constructor
     * \param[in] layerName Layer identifier
     * \param[in] content JSON content
-    * \param[in] servicesConf Services configuration
     */
-    Layer(std::string layerName, std::string content, ServicesConf* servicesConf );
+    Layer(std::string layerName, std::string content );
 
     /**
      * \~french
@@ -284,7 +283,6 @@ public:
      *  - \b 1 erreur de reprojection de l'emprise demandé dans le système de coordonnées de la pyramide
      *  - \b 2 l'emprise demandée nécessite plus de tuiles que le nombre authorisé.
      * \brief Retourne une l'image correspondant à l'emprise demandée
-     * \param [in] servicesConf paramètre de configuration du service WMS
      * \param [in] bbox rectangle englobant demandé
      * \param [in] width largeur de l'image demandé
      * \param [in] height hauteur de l'image demandé
@@ -294,7 +292,6 @@ public:
      * \~english
      * The resulting image is cropped on the coordinates system definition area.
      * \brief
-     * \param [in] servicesConf WMS service configuration
      * \param [in] bbox requested bounding box
      * \param [in] width requested image widht
      * \param [in] height requested image height
@@ -302,7 +299,7 @@ public:
      * \param [in,out] error error code
      * \return an image or a null pointer
      */
-    Image* getbbox (ServicesConf* servicesConf, BoundingBox<double> bbox, int width, int height, CRS* dst_crs, int dpi, int& error );
+    Image* getbbox (BoundingBox<double> bbox, int width, int height, CRS* dst_crs, int dpi, int& error );
     /**
     * \~french
     * \brief Retourne le résumé
@@ -320,7 +317,7 @@ public:
      * \brief Return the right to use WMS
      * \return WMSAuthorized
      */
-    bool getWMSAuthorized() ;
+    bool is_wms_enabled() ;
     /**
      * \~french
      * \brief Retourne le droit d'utiliser un service TMS
@@ -329,7 +326,16 @@ public:
      * \brief Return the right to use TMS
      * \return TMSAuthorized
      */
-    bool getTMSAuthorized() ;
+    bool is_tms_enabled() ;
+    /**
+     * \~french
+     * \brief Retourne le droit d'utiliser le service API Tiles
+     * \return tiles
+     * \~english
+     * \brief Return the right to use API Tiles
+     * \return tiles
+     */
+    bool is_tiles_enabled() ;
     /**
      * \~french
      * \brief Retourne le droit d'utiliser un service WMTS
@@ -338,7 +344,7 @@ public:
      * \brief Return the right to use WMTS
      * \return WMTSAuthorized
      */
-    bool getWMTSAuthorized() ;
+    bool is_wmts_enabled() ;
     /**
      * \~french
      * \brief Retourne la liste des mots-clés
@@ -383,7 +389,7 @@ public:
      * \brief Return the associated data pyramid
      * \return pyramid
      */
-    Pyramid* getDataPyramid() ;
+    Pyramid* get_pyramid() ;
     /**
      * \~french
      * \brief Retourne l'ID WMTS du TMS natif de la pyramide de données associée

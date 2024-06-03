@@ -62,10 +62,13 @@ message(STATUS "Building ROK4 Server")
 
 file(GLOB ROK4SERVER_SRCS 
     "${PROJECT_SOURCE_DIR}/src/*.cpp" 
-    "${PROJECT_SOURCE_DIR}/src/healthcheck/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/services/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/services/*/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/configurations/*.cpp"
 )
 
 add_executable(${PROJECT_NAME} ${ROK4SERVER_SRCS})
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "rok4")
 
 # Lien des librairies dépendantes

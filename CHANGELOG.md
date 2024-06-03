@@ -53,7 +53,7 @@
 * La fonction de copie d'une instance MetadataURL recopie bien le format et le href
 * Lors de l'écriture de nombres flottants dans les réponses à un appel GetFeatureInfo, on précise les décimales
 * Utils API Tiles 
-    * correction l'extraction de la collection et du style lors d'appels à la route `/ogcapitiles/collections/{}/styles/{}/map/tiles/{}/{}/{}/{}(/info)?` 
+    * correction l'extraction de la collection et du style lors d'appels à la route `/tiles/collections/{}/styles/{}/map/tiles/{}/{}/{}/{}(/info)?` 
     * le style par défaut de la couche est bien utilisée lors d'appels sans précision de style
 
 ### [Added]
@@ -73,28 +73,28 @@ Implémentation partielle de l'API OGC Tiles - Part 1 [v1.0.0 final release](htt
 ### [Added]
 
 * Liste de nouvelles routes pour obtenir le **GetCapabilities**: 
-    * /ogcapitiles/collections
+    * /tiles/collections
      avec les paramètres facultatifs : 
        * bbox
        * limit
-    * /ogcapitiles/collections/{layer}/map/tiles
-    * /ogcapitiles/collections/{layer}/tiles
-    * /ogcapitiles/tilematrixsets
-    * /ogcapitiles/tilematrixsets/{tms}
+    * /tiles/collections/{layer}/map/tiles
+    * /tiles/collections/{layer}/tiles
+    * /tiles/tilematrixsets
+    * /tiles/tilematrixsets/{tms}
 
 * Liste des nouvelles routes pour obtenir le **GetTile** :
 
    * Raster
-       * /ogcapitiles/map/tiles/{tms}/{level}/{row}/{col}
+       * /tiles/map/tiles/{tms}/{level}/{row}/{col}
           avec le paramètre obligatoire : collections={layer}
-       * /ogcapitiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
+       * /tiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
          avec le paramètre obligatoire : collections={layer}
-       * /ogcapitiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
-       * /ogcapitiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}
+       * /tiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
+       * /tiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}
 
    * Vecteur
-        * /ogcapitiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}
-        * /ogcapitiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}
+        * /tiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}
+        * /tiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}
 
 ### [Changed]
 
