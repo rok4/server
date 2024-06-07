@@ -49,7 +49,6 @@ class Rok4Server;
 #define _ROK4SERVER_
 
 #include "config.h"
-#include "ResponseSender.h"
 #include <rok4/datasource/DataSource.h>
 #include "Request.h"
 #include <pthread.h>
@@ -83,12 +82,6 @@ private:
      * \~english \brief Threads liste
      */
     std::vector<pthread_t> threads;
-
-    /**
-     * \~french \brief Connecteur sur le flux FCGI
-     * \~english \brief FCGI stream connector
-     */
-    ResponseSender S;
 
     /**
      * \~french \brief Défini si le serveur est en cours d'éxécution

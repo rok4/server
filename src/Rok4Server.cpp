@@ -88,6 +88,7 @@
 #include <fcgiapp.h>
 #include <rok4/utils/Cache.h>
 #include "healthcheck/Threads.h"
+#include "ResponseSender.h"
 
 void hangleSIGALARM(int id) {
     if (id == SIGALRM) {
@@ -761,61 +762,61 @@ DataStream* Rok4Server::CommonGetFeatureInfo(std::string service, Layer* layer, 
 
 void Rok4Server::processWMTS(Request* request, FCGX_Request& fcgxRequest) {
     if (request->request == RequestType::GETCAPABILITIES) {
-        S.sendresponse(WMTSGetCapabilities(request), &fcgxRequest);
+        ResponseSender::sendresponse(WMTSGetCapabilities(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETTILE) {
-        S.sendresponse(getTile(request), &fcgxRequest);
+        ResponseSender::sendresponse(getTile(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETFEATUREINFO) {
-        S.sendresponse(WMTSGetFeatureInfo(request), &fcgxRequest);
+        ResponseSender::sendresponse(WMTSGetFeatureInfo(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETVERSION) {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, ("L'operation ") + request->getParam("request") + " n'est pas prise en charge par ce serveur.", "wmts")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, ("L'operation ") + request->getParam("request") + " n'est pas prise en charge par ce serveur.", "wmts")), &fcgxRequest, request);
     } else if (request->request == RequestType::REQUEST_MISSING) {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_MISSING_PARAMETER_VALUE, ("Le parametre REQUEST n'est pas renseigne."), "wmts")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_MISSING_PARAMETER_VALUE, ("Le parametre REQUEST n'est pas renseigne."), "wmts")), &fcgxRequest, request);
     } else {
-        S.sendresponse(new SERDataSource(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, "L'operation " + request->getParam("request") + " n'est pas prise en charge par ce serveur.", "wmts")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataSource(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, "L'operation " + request->getParam("request") + " n'est pas prise en charge par ce serveur.", "wmts")), &fcgxRequest, request);
     }
 }
 
 void Rok4Server::processGlobal(Request* request, FCGX_Request& fcgxRequest) {
     if (request->request == RequestType::GETSERVICES) {
-        S.sendresponse(GlobalGetServices(request), &fcgxRequest);
+        ResponseSender::sendresponse(GlobalGetServices(request), &fcgxRequest, request);
     } else {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "global")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "global")), &fcgxRequest, request);
     }
 }
 
 void Rok4Server::processTMS(Request* request, FCGX_Request& fcgxRequest) {
     if (request->request == RequestType::GETCAPABILITIES) {
-        S.sendresponse(TMSGetCapabilities(request), &fcgxRequest);
+        ResponseSender::sendresponse(TMSGetCapabilities(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETTILE) {
-        S.sendresponse(getTile(request), &fcgxRequest);
+        ResponseSender::sendresponse(getTile(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETLAYER) {
-        S.sendresponse(TMSGetLayer(request), &fcgxRequest);
+        ResponseSender::sendresponse(TMSGetLayer(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETLAYERMETADATA) {
-        S.sendresponse(TMSGetLayerMetadata(request), &fcgxRequest);
+        ResponseSender::sendresponse(TMSGetLayerMetadata(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETLAYERGDAL) {
-        S.sendresponse(TMSGetLayerGDAL(request), &fcgxRequest);
+        ResponseSender::sendresponse(TMSGetLayerGDAL(request), &fcgxRequest, request);
     } else {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "tms")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "tms")), &fcgxRequest, request);
     }
 }
 
 void Rok4Server::processAdmin(Request* request, FCGX_Request& fcgxRequest) {
     if (request->request == RequestType::ADDLAYER) {
-        S.sendresponse(AdminCreateLayer(request), &fcgxRequest);
+        ResponseSender::sendresponse(AdminCreateLayer(request), &fcgxRequest, request);
     } else if (request->request == RequestType::BUILDCAPABILITIES) {
-        S.sendresponse(AdminBuildCapabilities(request), &fcgxRequest);
+        ResponseSender::sendresponse(AdminBuildCapabilities(request), &fcgxRequest, request);
     } else if (request->request == RequestType::UPDATELAYER) {
-        S.sendresponse(AdminUpdateLayer(request), &fcgxRequest);
+        ResponseSender::sendresponse(AdminUpdateLayer(request), &fcgxRequest, request);
     } else if (request->request == RequestType::DELETELAYER) {
-        S.sendresponse(AdminDeleteLayer(request), &fcgxRequest);
+        ResponseSender::sendresponse(AdminDeleteLayer(request), &fcgxRequest, request);
     } else if (request->request == RequestType::TURNON) {
         serverConf->enabled = true;
-        S.sendresponse(new EmptyResponseDataStream (), &fcgxRequest);
+        ResponseSender::sendresponse(new EmptyResponseDataStream (), &fcgxRequest, request);
     } else if (request->request == RequestType::TURNOFF) {
         serverConf->enabled = false;
-        S.sendresponse(new EmptyResponseDataStream (), &fcgxRequest);
+        ResponseSender::sendresponse(new EmptyResponseDataStream (), &fcgxRequest, request);
     } else {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "admin")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "admin")), &fcgxRequest, request);
     }
 }
 
@@ -834,7 +835,7 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
         res << "  \"time\": " << this->getTime() << "\n";
         res << "}\n";
         
-        S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
+        ResponseSender::sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest, request);
     }
     else if (request->request == RequestType::GETINFOSTATUS)
     {
@@ -885,7 +886,7 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
         res << "    ]\n";
 
         res << "}\n";
-        S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
+        ResponseSender::sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest, request);
     }
     else if (request->request == RequestType::GETTHREADSTATUS)
     {
@@ -895,7 +896,7 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
         res << Threads::print();
         res << "  ]\n";
         res << "}\n";
-        S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
+        ResponseSender::sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest, request);
     }
     else if (request->request == RequestType::GETDEPENDSTATUS)
     {
@@ -912,48 +913,48 @@ void Rok4Server::processHealthCheck(Request *request, FCGX_Request &fcgxRequest)
 
         res << "    }\n";
         res << "}\n";
-        S.sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest);
+        ResponseSender::sendresponse(new MessageDataStream(res.str(), "application/json"), &fcgxRequest, request);
     }
     else
     {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "healthcheck")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "healthcheck")), &fcgxRequest, request);
     }
 }
 
 void Rok4Server::processWMS(Request* request, FCGX_Request& fcgxRequest) {
     if (request->request == RequestType::GETCAPABILITIES) {
-        S.sendresponse(WMSGetCapabilities(request), &fcgxRequest);
+        ResponseSender::sendresponse(WMSGetCapabilities(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETMAP) {
-        S.sendresponse(getMap(request), &fcgxRequest);
+        ResponseSender::sendresponse(getMap(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETFEATUREINFO) {
-        S.sendresponse(WMSGetFeatureInfo(request), &fcgxRequest);
+        ResponseSender::sendresponse(WMSGetFeatureInfo(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETVERSION) {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, ("L'operation ") + request->getParam("request") + " n'est pas prise en charge par ce serveur.", "wms")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, ("L'operation ") + request->getParam("request") + " n'est pas prise en charge par ce serveur.", "wms")), &fcgxRequest, request);
     } else if (request->request == RequestType::REQUEST_MISSING) {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_MISSING_PARAMETER_VALUE, ("Le parametre REQUEST n'est pas renseigne."), "wms")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_MISSING_PARAMETER_VALUE, ("Le parametre REQUEST n'est pas renseigne."), "wms")), &fcgxRequest, request);
     } else {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, ("L'operation ") + request->getParam("request") + " n'est pas prise en charge par ce serveur.", "wms")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, ("L'operation ") + request->getParam("request") + " n'est pas prise en charge par ce serveur.", "wms")), &fcgxRequest, request);
     }
 }
 
 void Rok4Server::processOGCTILES(Request* request, FCGX_Request& fcgxRequest) {
     if (request->request == RequestType::GETCAPABILITIES) {
-        S.sendresponse(OGCTILESGetCapabilities(request), &fcgxRequest);
+        ResponseSender::sendresponse(OGCTILESGetCapabilities(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETMAPTILE) {
-        S.sendresponse(getTile(request), &fcgxRequest);
+        ResponseSender::sendresponse(getTile(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETTILE) {
-        S.sendresponse(getTile(request), &fcgxRequest);
+        ResponseSender::sendresponse(getTile(request), &fcgxRequest, request);
     } else if (request->request == RequestType::GETFEATUREINFO) {
-        S.sendresponse(OGCTILESGetFeatureInfo(request), &fcgxRequest);
+        ResponseSender::sendresponse(OGCTILESGetFeatureInfo(request), &fcgxRequest, request);
     } else {
-        S.sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "ogctiles")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataStream(new ServiceException("", OWS_OPERATION_NOT_SUPORTED, std::string("L'operation n'est pas prise en charge par ce serveur."), "ogctiles")), &fcgxRequest, request);
     }
 }
 
 void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
 
     if (request->service != ServiceType::ADMIN && request->service != ServiceType::HEALTHCHECK && ! serverConf->enabled) {
-        S.sendresponse(new SERDataSource(new ServiceException("", SERVICE_UNAVAILABLE, "Consultation services are not enabled", "global")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataSource(new ServiceException("", SERVICE_UNAVAILABLE, "Consultation services are not enabled", "global")), &fcgxRequest, request);
     } else if (request->service == ServiceType::GLOBAL) {
         processGlobal(request, fcgxRequest);
     } else if (servicesConf->supportWMTS && request->service == ServiceType::WMTS) {
@@ -969,7 +970,7 @@ void Rok4Server::processRequest(Request* request, FCGX_Request& fcgxRequest) {
     } else if (request->service == ServiceType::HEALTHCHECK) {
         processHealthCheck(request, fcgxRequest);
     } else {
-        S.sendresponse(new SERDataSource(new ServiceException("", OWS_INVALID_PARAMETER_VALUE, "Le service est inconnu pour ce serveur.", "global")), &fcgxRequest);
+        ResponseSender::sendresponse(new SERDataSource(new ServiceException("", OWS_INVALID_PARAMETER_VALUE, "Le service est inconnu pour ce serveur.", "global")), &fcgxRequest, request);
     }
 }
 
