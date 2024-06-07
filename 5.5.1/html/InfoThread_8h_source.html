@@ -1,0 +1,148 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+    <meta name="generator" content="Doxygen 1.8.17" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Serveur de diffusion WMS, WMTS et TMS</title>
+    <link href="tabs.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="resize.js"></script>
+    <script type="text/javascript" src="navtreedata.js"></script>
+    <script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="search/searchdata.js"></script>
+    <script type="text/javascript" src="search/search.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css" />
+</head>
+<body><!-- Généré par Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'Recherche');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','Recherche');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('InfoThread_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">InfoThread.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#include &lt;chrono&gt;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160; </div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#ifndef INFOTHREAD_H_</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#define INFOTHREAD_H_</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
+<div class="line"><a name="l00007"></a><span class="lineno"><a class="line" href="classInfoThread.html">    7</a></span>&#160;<span class="keyword">class </span><a class="code" href="classInfoThread.html">InfoThread</a> {</div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        <span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> m_pid;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        std::string m_status;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keywordtype">int</span> m_count;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        std::time_t m_time;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordtype">long</span> <span class="keywordtype">double</span> m_duration;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">   45</a></span>&#160;        <a class="code" href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">InfoThread</a>(){};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <a class="code" href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">InfoThread</a>(<span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>&amp;);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <a class="code" href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">InfoThread</a>(<span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>&amp;, std::string);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classInfoThread.html#a066353fea40b3cd8757e70127e6644fd">   53</a></span>&#160;        <a class="code" href="classInfoThread.html#a066353fea40b3cd8757e70127e6644fd">~InfoThread</a>(){};</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        <span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code" href="classInfoThread.html#a11e2aad519ab805a1a10054bef0a925b">getPID</a>();</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        std::string <a class="code" href="classInfoThread.html#adfe730fdbaab1ec3a5418dbe45b6346e">getStatus</a>();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classInfoThread.html#ab62db09e9cbb6d81d87bb18e495d7c27">setStatus</a>(std::string);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classInfoThread.html#abb496fca774173fd73083e23b47b07f7">getCount</a>();</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classInfoThread.html#a9bc8686987a2e74877305fc8d718c03f">setCount</a>();</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classInfoThread.html#a15df1332c290ede9caaade0ce189eeda">setTime</a>(std::time_t);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="classInfoThread.html#a067962ae36f305f4ae8a52c9a72a6c0e">   99</a></span>&#160;        std::time_t <a class="code" href="classInfoThread.html#a067962ae36f305f4ae8a52c9a72a6c0e">getTime</a>() {</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            <span class="keywordflow">return</span> m_time;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        }</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="classInfoThread.html#a494cb26ab472f98537b93345529c5831">  108</a></span>&#160;        <span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code" href="classInfoThread.html#a494cb26ab472f98537b93345529c5831">getDuration</a>() {</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <span class="keywordflow">return</span> m_duration;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        }</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classInfoThread.html#a6ab1502c13fc8dfda16976f16dc5ef03">setDuration</a>(<span class="keywordtype">long</span> <span class="keywordtype">double</span>);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;};</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* INFOTHREAD_H_ */</span><span class="preprocessor"></span></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<div class="ttc" id="aclassInfoThread_html_abb496fca774173fd73083e23b47b07f7"><div class="ttname"><a href="classInfoThread.html#abb496fca774173fd73083e23b47b07f7">InfoThread::getCount</a></div><div class="ttdeci">int getCount()</div><div class="ttdoc">Get the Count object.</div><div class="ttdef"><b>Definition:</b> InfoThread.cpp:35</div></div>
+<div class="ttc" id="aclassInfoThread_html_adfe730fdbaab1ec3a5418dbe45b6346e"><div class="ttname"><a href="classInfoThread.html#adfe730fdbaab1ec3a5418dbe45b6346e">InfoThread::getStatus</a></div><div class="ttdeci">std::string getStatus()</div><div class="ttdoc">Get the Status object.</div><div class="ttdef"><b>Definition:</b> InfoThread.cpp:27</div></div>
+<div class="ttc" id="aclassInfoThread_html_a9bc8686987a2e74877305fc8d718c03f"><div class="ttname"><a href="classInfoThread.html#a9bc8686987a2e74877305fc8d718c03f">InfoThread::setCount</a></div><div class="ttdeci">void setCount()</div><div class="ttdoc">Set the Count object.</div><div class="ttdef"><b>Definition:</b> InfoThread.cpp:39</div></div>
+<div class="ttc" id="aclassInfoThread_html_a066353fea40b3cd8757e70127e6644fd"><div class="ttname"><a href="classInfoThread.html#a066353fea40b3cd8757e70127e6644fd">InfoThread::~InfoThread</a></div><div class="ttdeci">~InfoThread()</div><div class="ttdoc">Destroy the Stat object.</div><div class="ttdef"><b>Definition:</b> InfoThread.h:53</div></div>
+<div class="ttc" id="aclassInfoThread_html_a11e2aad519ab805a1a10054bef0a925b"><div class="ttname"><a href="classInfoThread.html#a11e2aad519ab805a1a10054bef0a925b">InfoThread::getPID</a></div><div class="ttdeci">long unsigned int getPID()</div><div class="ttdef"><b>Definition:</b> InfoThread.cpp:23</div></div>
+<div class="ttc" id="aclassInfoThread_html_a5e60e05990f056fdfccbb8bc8308ae2b"><div class="ttname"><a href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">InfoThread::InfoThread</a></div><div class="ttdeci">InfoThread()</div><div class="ttdoc">Construct a new Stat object.</div><div class="ttdef"><b>Definition:</b> InfoThread.h:45</div></div>
+<div class="ttc" id="aclassInfoThread_html_a6ab1502c13fc8dfda16976f16dc5ef03"><div class="ttname"><a href="classInfoThread.html#a6ab1502c13fc8dfda16976f16dc5ef03">InfoThread::setDuration</a></div><div class="ttdeci">void setDuration(long double)</div><div class="ttdoc">Set the Duration object.</div><div class="ttdef"><b>Definition:</b> InfoThread.cpp:47</div></div>
+<div class="ttc" id="aclassInfoThread_html"><div class="ttname"><a href="classInfoThread.html">InfoThread</a></div><div class="ttdef"><b>Definition:</b> InfoThread.h:7</div></div>
+<div class="ttc" id="aclassInfoThread_html_a494cb26ab472f98537b93345529c5831"><div class="ttname"><a href="classInfoThread.html#a494cb26ab472f98537b93345529c5831">InfoThread::getDuration</a></div><div class="ttdeci">long double getDuration()</div><div class="ttdoc">Get the Duration object.</div><div class="ttdef"><b>Definition:</b> InfoThread.h:108</div></div>
+<div class="ttc" id="aclassInfoThread_html_a067962ae36f305f4ae8a52c9a72a6c0e"><div class="ttname"><a href="classInfoThread.html#a067962ae36f305f4ae8a52c9a72a6c0e">InfoThread::getTime</a></div><div class="ttdeci">std::time_t getTime()</div><div class="ttdoc">Get the Time object.</div><div class="ttdef"><b>Definition:</b> InfoThread.h:99</div></div>
+<div class="ttc" id="aclassInfoThread_html_a15df1332c290ede9caaade0ce189eeda"><div class="ttname"><a href="classInfoThread.html#a15df1332c290ede9caaade0ce189eeda">InfoThread::setTime</a></div><div class="ttdeci">void setTime(std::time_t)</div><div class="ttdoc">Set the Time object.</div><div class="ttdef"><b>Definition:</b> InfoThread.cpp:43</div></div>
+<div class="ttc" id="aclassInfoThread_html_ab62db09e9cbb6d81d87bb18e495d7c27"><div class="ttname"><a href="classInfoThread.html#ab62db09e9cbb6d81d87bb18e495d7c27">InfoThread::setStatus</a></div><div class="ttdeci">void setStatus(std::string)</div><div class="ttdoc">Set the Status object.</div><div class="ttdef"><b>Definition:</b> InfoThread.cpp:31</div></div>
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_648c7b639953d3639cb020e2aaba660a.html">healthcheck</a></li><li class="navelem"><b>InfoThread.h</b></li>
+    <li class="footer">Généré par
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
+</body>
+</html>
