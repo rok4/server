@@ -57,6 +57,10 @@ Le serveur ROK4 est lancé en mode stand alone. Nous utiliserons ici Nginx comme
 
 Leur définition est contrôlée à l'usage.
 
+* Pour le stockage objet
+    - `ROK4_OBJECT_READ_ATTEMPTS` : nombre de tentatives pour les lectures
+    - `ROK4_OBJECT_WRITE_ATTEMPTS` : nombre de tentatives pour les écritures
+    - `ROK4_OBJECT_ATTEMPTS_WAIT` : temps d'attente en secondes entre les tentatives
 * Pour le stockage CEPH
     - `ROK4_CEPH_CONFFILE`
     - `ROK4_CEPH_USERNAME`
