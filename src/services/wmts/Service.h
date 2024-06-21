@@ -36,58 +36,58 @@
  */
 
 /**
- * \file services/Service.cpp
+ * \file services/wmts/Service.h
  ** \~french
- * \brief Implémentation de la classe Service
+ * \brief Définition de la classe WmtsService
  ** \~english
- * \brief Implements classe Service
+ * \brief Define classe WmtsService
  */
 
+class WmtsService;
+
+#ifndef WMTSSERVICE_H_
+#define WMTSSERVICE_H_
+
 #include "services/Service.h"
-#include "Request.h"
+#include "configurations/Metadata.h"
 
-bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Gestion du service WMTS du serveur
+ */
+class WmtsService : public Service {  
 
-    if (std::find(methods.begin(), methods.end(), req->method) == methods.end()) {
-        return false;
-    }
+private:
+    DataStream* get_capabilities ( Request* req, Rok4Server* serv );
+    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
+    DataStream* get_tile ( Request* req, Rok4Server* serv );
 
-    std::smatch m;
-    if (std::regex_match(req->path, m, std::regex(root_path + path))) {
+    Metadata* metadata;
+    bool reprojection;
+    std::vector<std::string> info_formats;
 
-        for(int i = 1; i < m.size(); i++) {
-            req->path_params.push_back(m[i]);
-            BOOST_LOG_TRIVIAL(debug) << "Path param : " << m[i];
-        }
+public:
+    DataStream* process_request(Request* req, Rok4Server* serv);
 
-        return true;
-    } else {
-        return false;
-    }
+    /**
+     * \~french
+     * \brief Constructeur du service 'wmts'
+     * \~english
+     * \brief Service constructor
+     */
+    WmtsService (json11::Json& doc);
+
+    /**
+     * \~french
+     * \brief Destructeur
+     * \~english
+     * \brief Destructor
+     */
+    ~WmtsService() {
+        if (metadata) delete metadata;
+    };
+
 };
 
-Service::Service (json11::Json& doc) {
-
-    if (doc.is_null()) {
-        enabled = false;
-        return;
-    } else if(! doc.is_object()) {
-        errorMessage = "have to be an object";
-        return;
-    }
-
-    if (doc["enabled"].is_bool()) {
-        enabled = doc["enabled"].bool_value();
-    } else if (! doc["enabled"].is_null()) {
-        errorMessage = "'enabled' have to be a boolean";
-        return;
-    } else {
-        enabled = false;
-    }
-};
-
-bool Service::match_request(Request* req) {
-    return enabled && req->path.rfind(root_path, 0) == 0;
-};
-
-
+#endif /* WMTSSERVICE_H_ */

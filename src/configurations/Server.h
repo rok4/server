@@ -38,12 +38,12 @@
 /**
  * \file configurations/Server.h
  ** \~french
- * \brief Définition de la classe ServerConf
+ * \brief Définition de la classe ServerConfiguration
  ** \~english
- * \brief Define classe ServerConf
+ * \brief Define classe ServerConfiguration
  */
 
-class ServerConf;
+class ServerConfiguration;
 
 #ifndef SERVERXML_H
 #define SERVERXML_H
@@ -66,58 +66,57 @@ class ServerConf;
  * \~french
  * \brief Gestion de la configuration générale du serveur
  */
-class ServerConf : public Configuration
+class ServerConfiguration : public Configuration
 {
     friend class Rok4Server;
     friend class CommonService;
     friend class TmsService;
 
     public:
-        ServerConf(std::string path);
-        ~ServerConf();
+        ServerConfiguration(std::string path);
+        ~ServerConfiguration();
 
         bool is_enabled();
 
-        std::string getLogOutput() ;
-        int getLogFilePeriod() ;
-        std::string getLogFilePrefix() ;
-        boost::log::v2_mt_posix::trivial::severity_level getLogLevel() ;
+        std::string get_log_output() ;
+        int get_log_file_period() ;
+        std::string get_log_file_prefix() ;
+        boost::log::v2_mt_posix::trivial::severity_level get_log_level() ;
 
-        std::string getServicesConfigFile() ;
+        std::string get_services_configuration_file() ;
 
         std::string get_layers_list() ;
         std::map<std::string, Layer*>& get_layers() ;
-        void addLayer(Layer* l) ;
-        void removeLayer(std::string id) ;
-        int getNbLayers() ;
-        Layer* getLayer(std::string id) ;
+        void add_layer(Layer* l) ;
+        void delete_layer(std::string id) ;
+        int get_layers_count() ;
+        Layer* get_layer(std::string id) ;
 
         
-        int getNbThreads() ;
-        std::string getSocket() ;
+        int get_threads_count() ;
+        std::string get_socket() ;
 
     protected:
 
-        std::string serverConfigFile;
-        std::string servicesConfigFile;
+        std::string services_configuration_file;
 
-        std::string logOutput;
-        std::string logFilePrefix;
-        int logFilePeriod;
-        boost::log::v2_mt_posix::trivial::severity_level logLevel;
+        std::string log_output;
+        std::string log_file_prefix;
+        int log_file_period;
+        boost::log::v2_mt_posix::trivial::severity_level log_level;
 
-        int nbThread;
+        int threads_count;
 
         /**
          * \~french \brief Taille du cache des index des dalles
          * \~english \brief Cache size
          */
-        int cacheSize;
+        int cache_size;
         /**
          * \~french \brief Temps de validité du cache en minutes
          * \~english \brief Cache validity period, in minutes
          */
-        int cacheValidity;
+        int cache_validity;
 
         /**
          * \~french \brief Fichier ou objet contenant la liste des descipteurs de couche

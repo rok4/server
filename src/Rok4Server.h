@@ -43,7 +43,7 @@
  * \brief Define the Rok4Server class, handling the event loop
  */
 
-class ServicesConf;
+class ServicesConfiguration;
 class Server;
 
 #ifndef _ROK4SERVER_
@@ -112,13 +112,13 @@ private:
      * \~french \brief Configurations des services
      * \~english \brief Services configuration
      */
-    ServicesConf* servicesConf;
+    ServicesConfiguration* services_configuration;
 
     /**
      * \~french \brief Configuration du serveur
      * \~english \brief Server configuration
      */
-    ServerConf* serverConf;
+    ServerConfiguration* server_configuration;
 
     /**
      * \~french
@@ -137,12 +137,24 @@ public:
      * \~french Retourne la configuration des services
      * \~english Return the services configurations
      */
-    ServicesConf* getServicesConf() ;
+    ServicesConfiguration* get_services_configuration() ;
     /**
      * \~french Retourne la configuration du serveur
      * \~english Return the server configuration
      */
-    ServerConf* getServerConf() ;
+    ServerConfiguration* get_server_configuration() ;
+
+    /**
+     * \~french Active le serveur
+     * \~english Enable server
+     */
+    void turn_on() ;
+
+    /**
+     * \~french Désactive le serveur
+     * \~english Disable server
+     */
+    void turn_off() ;
 
     /**
      * \~french Retourne la liste des threads
@@ -163,7 +175,7 @@ public:
      * \~english
      * \brief Initialize the FastCGI Socket
      */
-    void initFCGI();
+    void initialize_fcgi();
     /**
      * \~french
      * Utilisé pour le rechargement de la configuration du serveur
@@ -173,19 +185,19 @@ public:
      * \brief Get the internal FastCGI socket representation, usefull for configuration reloading.
      * \return the internal FastCGI socket representation
      */
-    int getFCGISocket() ;
+    int get_fcgi_socket() ;
 
     /**
      * \~french
      * Utilisé pour le rechargement de la configuration du serveur
      * \brief Restaure le socket FastCGI
-     * \param sockFCGI la représentation interne du socket
+     * \param socket_fcgi la représentation interne du socket
      * \~english
      * Useful for configuration reloading
      * \brief Set the internal FastCGI socket representation
-     * \param sockFCGI the internal FastCGI socket representation
+     * \param socket_fcgi the internal FastCGI socket representation
      */
-    void setFCGISocket ( int sockFCGI ) ;
+    void set_fcgi_socket ( int socket_fcgi ) ;
     
     /**
      * \~french
@@ -193,7 +205,7 @@ public:
      * \~english
      * \brief Set the main process PID
      */
-    void setPID ( int processID );
+    void set_pid ( int process_id );
 
     /**
      * \~french
@@ -201,7 +213,7 @@ public:
      * \~english
      * \brief Get the main process PID
      */
-    int getPID();
+    int get_pid();
 
     /**
      * \~french
@@ -209,7 +221,7 @@ public:
      * \~english
      * \brief Set the main process time
      */
-    void setTime ( long processTime );
+    void set_time ( long process_time );
 
     /**
      * \~french
@@ -217,7 +229,7 @@ public:
      * \~english
      * \brief Get the main process time
      */
-    long getTime();
+    long get_time();
 
      /**
      * \~french
@@ -235,12 +247,12 @@ public:
      * \brief Return the server state
      * \return true if running
      */
-    bool isRunning() ;
+    bool is_running() ;
 
     /**
      * \brief Construction du serveur
      */
-    Rok4Server ( ServerConf* svr, ServicesConf* svc);
+    Rok4Server ( ServerConfiguration* svr, ServicesConfiguration* svc);
     /**
      * \~french
      * \brief Destructeur par défaut

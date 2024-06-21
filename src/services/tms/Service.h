@@ -49,7 +49,7 @@ class TmsService;
 #define TMSSERVICE_H_
 
 #include "services/Service.h"
-#include "configurations/MetadataURL.h"
+#include "configurations/Metadata.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -65,7 +65,7 @@ private:
     DataStream* get_gdal ( Request* req, Rok4Server* serv );
     DataSource* get_tile ( Request* req, Rok4Server* serv );
 
-    MetadataURL* metadata;
+    Metadata* metadata;
 
 public:
     DataStream* process_request(Request* req, Rok4Server* serv);
@@ -85,7 +85,7 @@ public:
      * \brief Destructor
      */
     ~TmsService() {
-        delete metadata;
+        if (metadata) delete metadata;
     };
 
 };

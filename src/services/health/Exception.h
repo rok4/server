@@ -36,7 +36,7 @@
  */
 
 /**
- * \file services/common/Exception.h
+ * \file services/health/Exception.h
  ** \~french
  * \brief Définition de la classe HealthException
  ** \~english

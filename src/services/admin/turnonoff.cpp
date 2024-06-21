@@ -36,58 +36,28 @@
  */
 
 /**
- * \file services/Service.cpp
+ * \file services/admin/turnonoff.cpp
  ** \~french
- * \brief Implémentation de la classe Service
+ * \brief Implémentation de la classe AdminService
  ** \~english
- * \brief Implements classe Service
+ * \brief Implements classe AdminService
  */
 
-#include "services/Service.h"
-#include "Request.h"
+#include "services/admin/Service.h"
+#include "services/admin/Exception.h"
 
-bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
+#include "Rok4Server.h"
 
-    if (std::find(methods.begin(), methods.end(), req->method) == methods.end()) {
-        return false;
-    }
+DataStream* AdminService::turn_on ( Request* req, Rok4Server* serv ) {
 
-    std::smatch m;
-    if (std::regex_match(req->path, m, std::regex(root_path + path))) {
+    serv->turn_on();
+    return new EmptyResponseDataStream();
 
-        for(int i = 1; i < m.size(); i++) {
-            req->path_params.push_back(m[i]);
-            BOOST_LOG_TRIVIAL(debug) << "Path param : " << m[i];
-        }
+}
 
-        return true;
-    } else {
-        return false;
-    }
-};
+DataStream* AdminService::turn_off ( Request* req, Rok4Server* serv ) {
 
-Service::Service (json11::Json& doc) {
+    serv->turn_off();
+    return new EmptyResponseDataStream();
 
-    if (doc.is_null()) {
-        enabled = false;
-        return;
-    } else if(! doc.is_object()) {
-        errorMessage = "have to be an object";
-        return;
-    }
-
-    if (doc["enabled"].is_bool()) {
-        enabled = doc["enabled"].bool_value();
-    } else if (! doc["enabled"].is_null()) {
-        errorMessage = "'enabled' have to be a boolean";
-        return;
-    } else {
-        enabled = false;
-    }
-};
-
-bool Service::match_request(Request* req) {
-    return enabled && req->path.rfind(root_path, 0) == 0;
-};
-
-
+}

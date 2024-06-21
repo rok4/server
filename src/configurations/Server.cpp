@@ -39,16 +39,16 @@
 #include <cmath>
 #include <fstream>
 
-bool ServerConf::parse(json11::Json& doc) {
+bool ServerConfiguration::parse(json11::Json& doc) {
 
     // logger
     json11::Json loggerSection = doc["logger"];
     if (loggerSection.is_null()) {
         std::cerr << "No logger section, default values used" << std::endl;
-        logOutput = DEFAULT_LOG_OUTPUT;
-        logFilePrefix = DEFAULT_LOG_FILE_PREFIX;
-        logFilePeriod = DEFAULT_LOG_FILE_PERIOD;
-        logLevel = DEFAULT_LOG_LEVEL;
+        log_output = DEFAULT_LOG_OUTPUT;
+        log_file_prefix = DEFAULT_LOG_FILE_PREFIX;
+        log_file_period = DEFAULT_LOG_FILE_PERIOD;
+        log_level = DEFAULT_LOG_LEVEL;
     } else if (! loggerSection.is_object()) {
         errorMessage = "logger have to be an object";
         return false;
@@ -56,13 +56,13 @@ bool ServerConf::parse(json11::Json& doc) {
         // output
         if (loggerSection["output"].is_null()) {
             std::cerr << "No logger.output, default value used" << std::endl;
-            logOutput = DEFAULT_LOG_OUTPUT;
+            log_output = DEFAULT_LOG_OUTPUT;
         } else if (! loggerSection["output"].is_string()) {
             errorMessage = "logger.output have to be a string";
             return false;
         } else {
-            logOutput = loggerSection["output"].string_value();
-            if ( logOutput != "rolling_file" && logOutput != "standard_output" && logOutput != "static_file" ) {
+            log_output = loggerSection["output"].string_value();
+            if ( log_output != "rolling_file" && log_output != "standard_output" && log_output != "static_file" ) {
                 errorMessage = "logger.output '" + loggerSection["output"].string_value() + "' is unknown";
                 return false;
             }
@@ -71,39 +71,39 @@ bool ServerConf::parse(json11::Json& doc) {
         // file_prefix
         if (loggerSection["file_prefix"].is_null()) {
             std::cerr << "No logger.file_prefix, default value used" << std::endl;
-            logFilePrefix = DEFAULT_LOG_FILE_PREFIX;
+            log_file_prefix = DEFAULT_LOG_FILE_PREFIX;
         } else if (! loggerSection["file_prefix"].is_string()) {
             errorMessage = "logger.file_prefix have to be a string";
             return false;
         } else {
-            logFilePrefix = loggerSection["file_prefix"].string_value();
+            log_file_prefix = loggerSection["file_prefix"].string_value();
         }
 
         // file_period
         if (loggerSection["file_period"].is_null()) {
             std::cerr << "No logger.file_period, default value used" << std::endl;
-            logFilePeriod = DEFAULT_LOG_FILE_PERIOD;
+            log_file_period = DEFAULT_LOG_FILE_PERIOD;
         } else if (! loggerSection["file_period"].is_number()) {
             errorMessage = "logger.file_period have to be a number";
             return false;
         } else {
-            logFilePeriod = loggerSection["file_period"].int_value();
+            log_file_period = loggerSection["file_period"].int_value();
         }
 
         // level
         if (loggerSection["level"].is_null()) {
             std::cerr << "No logger.level, default value used" << std::endl;
-            logLevel = DEFAULT_LOG_LEVEL;
+            log_level = DEFAULT_LOG_LEVEL;
         } else if (! loggerSection["level"].is_string()) {
             errorMessage = "logger.level have to be a string";
             return false;
         } else {
             std::string strLogLevel = loggerSection["level"].string_value();
-            if ( strLogLevel == "fatal" ) logLevel=boost::log::trivial::fatal;
-            else if ( strLogLevel == "error" ) logLevel=boost::log::trivial::error;
-            else if ( strLogLevel == "warn" ) logLevel=boost::log::trivial::warning;
-            else if ( strLogLevel == "info" ) logLevel=boost::log::trivial::info;
-            else if ( strLogLevel == "debug" ) logLevel=boost::log::trivial::debug;
+            if ( strLogLevel == "fatal" ) log_level=boost::log::trivial::fatal;
+            else if ( strLogLevel == "error" ) log_level=boost::log::trivial::error;
+            else if ( strLogLevel == "warn" ) log_level=boost::log::trivial::warning;
+            else if ( strLogLevel == "info" ) log_level=boost::log::trivial::info;
+            else if ( strLogLevel == "debug" ) log_level=boost::log::trivial::debug;
             else {
                 errorMessage = "logger.level '" + strLogLevel + "' is unknown";
                 return false;
@@ -112,24 +112,24 @@ bool ServerConf::parse(json11::Json& doc) {
     }
 
     // cache
-    cacheSize = -1;
+    cache_size = -1;
     if (doc["cache"].is_object() && doc["cache"]["size"].is_number() && doc["cache"]["size"].number_value() >= 1) {
-        cacheSize = doc["cache"]["size"].number_value();
+        cache_size = doc["cache"]["size"].number_value();
     }
-    cacheValidity = -1;
+    cache_validity = -1;
     if (doc["cache"].is_object() && doc["cache"]["validity"].is_number() && doc["cache"]["validity"].number_value() >= 1) {
-        cacheValidity = doc["cache"]["validity"].number_value();
+        cache_validity = doc["cache"]["validity"].number_value();
     }
 
     // threads
     if (doc["threads"].is_null()) {
         std::cerr << "No threads, default value used" << std::endl;
-        nbThread = DEFAULT_NB_THREAD;
+        threads_count = DEFAULT_NB_THREAD;
     } else if (! doc["threads"].is_number()) {
         errorMessage = "threads have to be a number";
         return false;
     } else {
-        nbThread = doc["threads"].int_value();
+        threads_count = doc["threads"].int_value();
     }
 
     // port
@@ -175,7 +175,7 @@ bool ServerConf::parse(json11::Json& doc) {
             errorMessage = "configurations.services have to be provided and be a string";
             return false;
         } else {
-            servicesConfigFile = configurationsSection["services"].string_value();
+            services_configuration_file = configurationsSection["services"].string_value();
         }
 
         // layers
@@ -209,7 +209,7 @@ bool ServerConf::parse(json11::Json& doc) {
 }
 
 
-ServerConf::ServerConf(std::string path) : Configuration(path) {
+ServerConfiguration::ServerConfiguration(std::string path) : Configuration(path) {
 
     std::cout << "Loading server configuration from file " << filePath << std::endl;
 
@@ -235,7 +235,7 @@ ServerConf::ServerConf(std::string path) : Configuration(path) {
 
 /*********************** DESTRUCTOR ********************/
 
-ServerConf::~ServerConf(){ 
+ServerConfiguration::~ServerConfiguration(){ 
 
     // Les couches
     std::map<std::string, Layer*>::iterator itLay;
@@ -246,29 +246,29 @@ ServerConf::~ServerConf(){
 
 /******************* GETTERS / SETTERS *****************/
 
-std::string ServerConf::getLogOutput() {return logOutput;}
-int ServerConf::getLogFilePeriod() {return logFilePeriod;}
-std::string ServerConf::getLogFilePrefix() {return logFilePrefix;}
-boost::log::v2_mt_posix::trivial::severity_level ServerConf::getLogLevel() {return logLevel;}
+std::string ServerConfiguration::get_log_output() {return log_output;}
+int ServerConfiguration::get_log_file_period() {return log_file_period;}
+std::string ServerConfiguration::get_log_file_prefix() {return log_file_prefix;}
+boost::log::v2_mt_posix::trivial::severity_level ServerConfiguration::get_log_level() {return log_level;}
 
-std::string ServerConf::getServicesConfigFile() {return servicesConfigFile;}
+std::string ServerConfiguration::get_services_configuration_file() {return services_configuration_file;}
 
-std::map<std::string, Layer*>& ServerConf::get_layers() {return layers;}
-std::string ServerConf::get_layers_list() {return layers_list;}
-void ServerConf::addLayer(Layer* l) {
-    layers.insert ( std::pair<std::string, Layer *> ( l->getId(), l ) );
+std::map<std::string, Layer*>& ServerConfiguration::get_layers() {return layers;}
+std::string ServerConfiguration::get_layers_list() {return layers_list;}
+void ServerConfiguration::add_layer(Layer* l) {
+    layers.insert ( std::pair<std::string, Layer *> ( l->get_id(), l ) );
 }
-int ServerConf::getNbLayers() {
+int ServerConfiguration::get_layers_count() {
     return layers.size();
 }
-Layer* ServerConf::getLayer(std::string id) {
+Layer* ServerConfiguration::get_layer(std::string id) {
     std::map<std::string, Layer*>::iterator itLay = layers.find ( id );
     if ( itLay == layers.end() ) {
         return NULL;
     }
     return itLay->second;
 }
-void ServerConf::removeLayer(std::string id) {
+void ServerConfiguration::delete_layer(std::string id) {
     std::map<std::string, Layer*>::iterator itLay = layers.find ( id );
     if ( itLay != layers.end() ) {
         delete itLay->second;
@@ -276,6 +276,6 @@ void ServerConf::removeLayer(std::string id) {
     }
 }
 
-int ServerConf::getNbThreads() {return nbThread;}
-std::string ServerConf::getSocket() {return socket;}
-bool ServerConf::is_enabled() {return enabled;}
+int ServerConfiguration::get_threads_count() {return threads_count;}
+std::string ServerConfiguration::get_socket() {return socket;}
+bool ServerConfiguration::is_enabled() {return enabled;}

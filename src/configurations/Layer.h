@@ -60,8 +60,8 @@ class Layer;
 #include <rok4/utils/Configuration.h>
 
 #include "configurations/Server.h"
-#include "configurations/MetadataURL.h"
-#include "configurations/AttributionURL.h"
+#include "configurations/Metadata.h"
+#include "configurations/Attribution.h"
 
 struct WmtsTmsInfos {
     TileMatrixSet* tms;
@@ -145,22 +145,22 @@ private:
      * \~french \brief Emprise des données en coordonnées géographique (WGS84)
      * \~english \brief Data bounding box in geographic coordinates (WGS84)
      */
-    BoundingBox<double> geographicBoundingBox;
+    BoundingBox<double> geographic_bbox;
     /**
      * \~french \brief Emprise des données dans le système de coordonnées natif
      * \~english \brief Data bounding box in native coordinates system
      */
-    BoundingBox<double> boundingBox;
+    BoundingBox<double> native_bbox;
     /**
      * \~french \brief Liste des métadonnées associées
      * \~english \brief Linked metadata list
      */
-    std::vector<MetadataURL> metadataURLs;
+    std::vector<Metadata> metadata;
     /**
      * \~french \brief Attribution
      * \~english \brief Attribution
      */
-    AttributionURL* attribution;
+    Attribution* attribution;
     
     /******************* PYRAMIDE RASTER *********************/
 
@@ -174,12 +174,12 @@ private:
      * \~french \brief Liste des systèmes de coordonnées authorisées pour le WMS
      * \~english \brief Authorised coordinates systems list for WMS
      */
-    std::vector<CRS*> WMSCRSList;
+    std::vector<CRS*> wms_crs;
     /**
      * \~french \brief Liste des TMS d'interrogation autorisés en WMTS
      * \~english \brief TMS list for WMTS requests
      */
-    std::vector<WmtsTmsInfos> WMTSTMSList;
+    std::vector<WmtsTmsInfos> wmts_tilematrixsets;
 
     /**
      * \~french \brief Interpolation utilisée pour reprojeter ou recadrer les tuiles
@@ -190,51 +190,51 @@ private:
      * \~french \brief GetFeatureInfo autorisé
      * \~english \brief Authorized GetFeatureInfo
      */
-    bool getFeatureInfoAvailability;
+    bool gfi_enabled;
     /**
      * \~french \brief Source du GetFeatureInfo
      * \~english \brief Source of GetFeatureInfo
      */
-    std::string getFeatureInfoType;
+    std::string gfi_type;
     /**
      * \~french \brief URL du service WMS à utiliser pour le GetFeatureInfo
      * \~english \brief WMS-V service URL to use for getFeatureInfo
      */
-    std::string getFeatureInfoBaseURL;
+    std::string gfi_url;
     /**
      * \~french \brief Type de service (WMS ou WMTS)
      * \~english \brief Type of service (WMS or WMTS)
      */
-    std::string GFIService;
+    std::string gfi_service;
     /**
      * \~french \brief Version du service
      * \~english \brief Version of service
      */
-    std::string GFIVersion;
+    std::string gfi_version;
     /**
      * \~french \brief Paramètre query_layers à fournir au service
      * \~english \brief Parameter query_layers for the service
      */
-    std::string GFIQueryLayers;
+    std::string gfi_query_layers;
     /**
      * \~french \brief Paramètre layers à fournir au service
      * \~english \brief Parameter layers for the service
      */
-    std::string GFILayers;
+    std::string gfi_layers;
     /**
      * \~french \brief Paramètres de requête additionnels à fournir au service
      * \~english \brief Additionnal query parameters for the service
      */
-    std::string GFIExtraParams;
+    std::string gfi_extra_params;
     /**
      * \~french \brief Modification des EPSG autorisé (pour Geoserver)
      * \~english \brief Modification of EPSG is authorized (for Geoserver)
      */
-    bool GFIForceEPSG;
+    bool gfi_force_epsg;
 
-    void calculateBoundingBoxes();
-    void calculateNativeTileMatrixLimits();
-    void calculateTileMatrixLimits();
+    void calculate_bboxes();
+    void calculate_native_tilematrix_limits();
+    void calculate_tilematrix_limits();
 
     bool parse(json11::Json& doc);
 
@@ -244,27 +244,25 @@ public:
     * Crée un Layer à partir d'un fichier JSON
     * \brief Constructeur
     * \param[in] path Chemin vers le descripteur de couche
-    * \param[in] servicesConf Configuration des services
     * \~english
     * Create a Layer from a JSON file
     * \brief Constructor
     * \param[in] path Path to layer descriptor
-    * \param[in] servicesConf Services configuration
     */
     Layer(std::string path );
     /**
     * \~french
     * Crée un Layer à partir d'un contenu JSON
     * \brief Constructeur
-    * \param[in] layerName Identifiant de la couche
+    * \param[in] layer_name Identifiant de la couche
     * \param[in] content Contenu JSON
     * \~english
     * Create a Layer from JSON content
     * \brief Constructor
-    * \param[in] layerName Layer identifier
+    * \param[in] layer_name Layer identifier
     * \param[in] content JSON content
     */
-    Layer(std::string layerName, std::string content );
+    Layer(std::string layer_name, std::string content );
 
     /**
      * \~french
@@ -274,32 +272,8 @@ public:
      * \brief Return the layer's identifier
      * \return identifier
      */
-    std::string getId();
-    /**
-     * \~french
-     * L'image résultante est découpé sur l'emprise de définition du système de coordonnées demandé.
-     * Code d'erreur possible :
-     *  - \b 0 pas d'erreur
-     *  - \b 1 erreur de reprojection de l'emprise demandé dans le système de coordonnées de la pyramide
-     *  - \b 2 l'emprise demandée nécessite plus de tuiles que le nombre authorisé.
-     * \brief Retourne une l'image correspondant à l'emprise demandée
-     * \param [in] bbox rectangle englobant demandé
-     * \param [in] width largeur de l'image demandé
-     * \param [in] height hauteur de l'image demandé
-     * \param [in] dst_crs système de coordonnées du rectangle englobant
-     * \param [in,out] error code de retour d'erreur
-     * \return une image ou un poiteur nul
-     * \~english
-     * The resulting image is cropped on the coordinates system definition area.
-     * \brief
-     * \param [in] bbox requested bounding box
-     * \param [in] width requested image widht
-     * \param [in] height requested image height
-     * \param [in] dst_crs bounding box coordinate system
-     * \param [in,out] error error code
-     * \return an image or a null pointer
-     */
-    Image* getbbox (BoundingBox<double> bbox, int width, int height, CRS* dst_crs, int dpi, int& error );
+    std::string get_id();
+    
     /**
     * \~french
     * \brief Retourne le résumé
@@ -308,7 +282,7 @@ public:
     * \brief Return the abstract
     * \return abstract
     */
-    std::string getAbstract() ;
+    std::string get_abstract() ;
     /**
      * \~french
      * \brief Retourne le droit d'utiliser un service WMS
@@ -353,7 +327,7 @@ public:
      * \brief Return the list of keywords
      * \return keywords
      */
-    std::vector<Keyword>* getKeyWords() ;
+    std::vector<Keyword>* get_keywords() ;
     /**
      * \~french
      * \brief Retourne l'attribution
@@ -362,25 +336,8 @@ public:
      * \brief Return the attribution
      * \return attribution
      */
-    AttributionURL* getAttribution() ;
-    /**
-     * \~french
-     * \brief Retourne l'échelle maximum
-     * \return échelle maximum
-     * \~english
-     * \brief Return the maximum scale
-     * \return maximum scale
-     */
-    double getMaxRes() ;
-    /**
-     * \~french
-     * \brief Retourne l'échelle minimum
-     * \return échelle minimum
-     * \~english
-     * \brief Return the minimum scale
-     * \return minimum scale
-     */
-    double getMinRes() ;
+    Attribution* get_attribution() ;
+
     /**
      * \~french
      * \brief Retourne la pyramide de données associée
@@ -390,17 +347,6 @@ public:
      * \return pyramid
      */
     Pyramid* get_pyramid() ;
-    /**
-     * \~french
-     * \brief Retourne l'ID WMTS du TMS natif de la pyramide de données associée
-     * \details L'identifiant intègre les niveaux du haut et du bas d'utilisation dans son nom
-     * \return Identifiant de TMS
-     * \~english
-     * \brief Return the WMTS ID of associated data pyramid native TMS
-     * \details ID contains used top and bottom levels
-     * \return TMS id
-     */
-    std::string getNativeWmtsTmsId() ;
     
     /**
      * \~french
@@ -410,7 +356,7 @@ public:
      * \brief Return the layer's default style
      * \return style
      */
-    Style* getDefaultStyle() ;
+    Style* get_default_style() ;
     /**
      * \~french
      * \brief Retourne la liste des styles associés à la couche
@@ -419,7 +365,7 @@ public:
      * \brief Return the associated styles list
      * \return styles list
      */
-    std::vector<Style*> getStyles() ;
+    std::vector<Style*> get_styles() ;
     /**
      * \~french
      * \brief Retourne la liste des TMS disponibles
@@ -428,17 +374,7 @@ public:
      * \brief Return the available TMS list
      * \return TMS infos list
      */
-    std::vector<WmtsTmsInfos> getWMTSTMSList() ;
-
-    /**
-     * \~french
-     * \brief Retourne le style associé à la couche (identifiant interne)
-     * \return le style si associé, NULL sinon
-     * \~english
-     * \brief Return the associated style (internal identifier)
-     * \return the style if present, NULL otherwise
-     */
-    Style* getStyle(std::string id) ;
+    std::vector<WmtsTmsInfos> get_wmts_tilematrixsets() ;
 
     /**
      * \~french
@@ -448,7 +384,7 @@ public:
      * \brief Return the associated style (public identifier)
      * \return the style if present, NULL otherwise
      */
-    Style* getStyleByIdentifier(std::string identifier) ;
+    Style* get_style_by_identifier(std::string identifier) ;
 
     /**
      * \~french
@@ -458,17 +394,7 @@ public:
      * \brief Return the title
      * \return title
      */
-    std::string getTitle() ;
-
-    /**
-     * \~french
-     * \brief Retourne la liste des systèmes de coordonnées authorisés
-     * \return liste des CRS
-     * \~english
-     * \brief Return the authorised coordinates systems list
-     * \return CRS list
-     */
-    std::vector<CRS*> getWMSCRSList() ;
+    std::string get_title() ;
 
     /**
      * \~french
@@ -499,7 +425,7 @@ public:
      * \brief Get available TMS for the layer with identifiant
      * \return NULL if not available
      */
-    TileMatrixSet* getTms(std::string id) ;
+    TileMatrixSet* get_tilematrixset(std::string id) ;
 
     /**
      * \~french
@@ -509,7 +435,7 @@ public:
      * \brief Return limits for provided Tile Matrix
      * \return NULL if invalid Tile Matrix
      */
-    TileMatrixLimits* getTmLimits(TileMatrixSet* tms, TileMatrix* tm) ;
+    TileMatrixLimits* get_tilematrix_limits(TileMatrixSet* tms, TileMatrix* tm) ;
 
     /**
      * \~french
@@ -519,7 +445,7 @@ public:
      * \brief Return the data bounding box in geographic coordinates (WGS84)
      * \return bounding box
      */
-    BoundingBox<double> getGeographicBoundingBox() ;
+    BoundingBox<double> get_geographical_bbox() ;
     /**
      * \~french
      * \brief Retourne l'emprise des données dans le système de coordonnées natif
@@ -528,7 +454,19 @@ public:
      * \brief Return the data bounding box in the native coordinates system
      * \return bounding box
      */
-    BoundingBox<double> getBoundingBox() ;
+    BoundingBox<double> get_native_bbox() ;
+
+
+    /**
+     * \~french
+     * \brief Récupère l'interpolation
+     * \return interpolation
+     * \~english
+     * \brief Get resampling
+     * \return resampling
+     */
+    Interpolation::KernelType get_resampling() ;
+
     /**
      * \~french
      * \brief Retourne la liste des métadonnées associées
@@ -537,7 +475,7 @@ public:
      * \brief Return the associated metadata list
      * \return metadata list
      */
-    std::vector<MetadataURL> getMetadataURLs() ;
+    std::vector<Metadata> get_metadata() ;
     /**
      * \~french
      * \brief GFI est-il autorisé
@@ -546,7 +484,7 @@ public:
      * \brief Is GFI authorized
      * \return true if it is
      */
-    bool isGetFeatureInfoAvailable() ;
+    bool is_gfi_enabled() ;
     /**
      * \~french
      * \brief Retourne la source du GFI
@@ -555,7 +493,7 @@ public:
      * \brief Return the source used by GFI
      * \return source used by GFI
      */
-    std::string getGFIType() ;
+    std::string get_gfi_type() ;
     /**
      * \~french
      * \brief Retourne l'URL du service de GFI
@@ -564,7 +502,7 @@ public:
      * \brief Return the URL of the service used for GFI
      * \return URL of the service
      */
-    std::string getGFIBaseUrl() ;
+    std::string get_gfi_url() ;
     /**
      * \~french
      * \brief Retourne le paramètre layers de la requête de GFI
@@ -573,7 +511,7 @@ public:
      * \brief Return the parameter layers of GFI request
      * \return parameter layers
      */
-    std::string getGFILayers() ;
+    std::string get_gfi_layers() ;
     /**
      * \~french
      * \brief Retourne le paramètre query_layers de la requête de GFI
@@ -582,7 +520,7 @@ public:
      * \brief Return the parameter query_layers of GFI request
      * \return parameter query_layers
      */
-    std::string getGFIQueryLayers() ;
+    std::string get_gfi_query_layers() ;
     /**
      * \~french
      * \brief Retourne le type du service de GFI
@@ -591,7 +529,7 @@ public:
      * \brief Return type of service used for GFI
      * \return type of service used for GFI
      */
-    std::string getGFIService() ;
+    std::string get_gfi_service() ;
     /**
      * \~french
      * \brief Retourne la version du service de GFI
@@ -600,7 +538,7 @@ public:
      * \brief Return version of service used for GFI
      * \return version of service used for GFI
      */
-    std::string getGFIVersion() ;
+    std::string get_gfi_version() ;
     /**
      * \~french
      * \brief Retourne les paramètres de requête additionnels de la requête de GFI
@@ -609,7 +547,7 @@ public:
      * \brief Return the extra query parameters of GFI request
      * \return extra parameters
      */
-    std::string getGFIExtraParams() ;
+    std::string get_gfi_extra_params() ;
     /**
      * \~french
      * \brief
@@ -618,7 +556,7 @@ public:
      * \brief
      * \return
      */
-    bool getGFIForceEPSG() ;
+    bool get_gfi_force_epsg() ;
     /**
      * \~french
      * \brief Destructeur par défaut

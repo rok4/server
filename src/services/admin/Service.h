@@ -36,58 +36,46 @@
  */
 
 /**
- * \file services/Service.cpp
+ * \file services/admin/Service.h
  ** \~french
- * \brief Implémentation de la classe Service
+ * \brief Définition de la classe AdminService
  ** \~english
- * \brief Implements classe Service
+ * \brief Define classe AdminService
  */
 
+class AdminService;
+
+#ifndef ADMINSERVICE_H_
+#define ADMINSERVICE_H_
+
 #include "services/Service.h"
-#include "Request.h"
 
-bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Gestion du service d'administration du serveur
+ */
+class AdminService : public Service {  
 
-    if (std::find(methods.begin(), methods.end(), req->method) == methods.end()) {
-        return false;
-    }
+private:
 
-    std::smatch m;
-    if (std::regex_match(req->path, m, std::regex(root_path + path))) {
+    DataStream* turn_on ( Request* req, Rok4Server* serv );
+    DataStream* turn_off ( Request* req, Rok4Server* serv );
+    DataStream* add_layer ( Request* req, Rok4Server* serv );
+    DataStream* update_layer ( Request* req, Rok4Server* serv );
+    DataStream* delete_layer ( Request* req, Rok4Server* serv );
 
-        for(int i = 1; i < m.size(); i++) {
-            req->path_params.push_back(m[i]);
-            BOOST_LOG_TRIVIAL(debug) << "Path param : " << m[i];
-        }
+public:
+    DataStream* process_request(Request* req, Rok4Server* serv);
 
-        return true;
-    } else {
-        return false;
-    }
+    /**
+     * \~french
+     * \brief Constructeur du service 'health'
+     * \~english
+     * \brief Service constructor
+     */
+    AdminService (json11::Json& doc);
+
 };
 
-Service::Service (json11::Json& doc) {
-
-    if (doc.is_null()) {
-        enabled = false;
-        return;
-    } else if(! doc.is_object()) {
-        errorMessage = "have to be an object";
-        return;
-    }
-
-    if (doc["enabled"].is_bool()) {
-        enabled = doc["enabled"].bool_value();
-    } else if (! doc["enabled"].is_null()) {
-        errorMessage = "'enabled' have to be a boolean";
-        return;
-    } else {
-        enabled = false;
-    }
-};
-
-bool Service::match_request(Request* req) {
-    return enabled && req->path.rfind(root_path, 0) == 0;
-};
-
-
+#endif /* ADMINSERVICE_H_ */

@@ -86,26 +86,6 @@ private:
 
 public:
 
-    /**
-     * \~french
-     * \brief Récupération de la valeur d'un paramètre dans la requête
-     * \param[in] option liste des paramètres
-     * \param[in] paramName nom du paramètre
-     * \return valeur du parametre ou "" si non présent
-     * \~english
-     * \brief Fetch a specific parameter value in the request
-     * \param[in] option parameter list
-     * \param[in] paramName parameter name
-     * \return parameter value or "" if not availlable
-     */
-    static std::string getParam ( std::map<std::string, std::string>& option, std::string paramName ) {
-        std::map<std::string, std::string>::iterator it = option.find ( paramName );
-        if ( it == option.end() ) {
-            return "";
-        }
-        return it->second;
-    }
-
     FCGX_Request* fcgx_request;
 
     /**
@@ -118,7 +98,7 @@ public:
      * \param[in] paramName parameter to test
      * \return true if present
      */
-    bool hasParam ( std::string paramName );
+    bool has_query_param ( std::string paramName );
 
     /**
      * \~french
@@ -130,7 +110,7 @@ public:
      * \param[in] paramName parameter name
      * \return parameter value or "" if not availlable
      */
-    std::string getParam ( std::string paramName );
+    std::string get_query_param ( std::string paramName );
 
     /**
      * \~french \brief Méthode de la requête (GET, POST, PUT, DELETE)
@@ -147,19 +127,13 @@ public:
      * \~french \brief Liste des paramètres de la requête
      * \~english \brief Request parameters list
      */
-    std::map<std::string, std::string> queryParams;
-
-    /**
-     * \~french \brief Liste des paramètres extraits du corps de la requête
-     * \~english \brief Parameters list from request body
-     */
-    std::map<std::string, std::string> bodyParams;
+    std::map<std::string, std::string> query_params;
 
     /**
      * \~french \brief Liste des paramètres extraits du chemin de la requête
      * \~english \brief Parameters list from request path
      */
-    std::vector<std::string> pathParams;
+    std::vector<std::string> path_params;
 
     /**
      * \~french \brief Corps de la requête

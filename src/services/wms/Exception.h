@@ -36,58 +36,41 @@
  */
 
 /**
- * \file services/Service.cpp
+ * \file services/wms/Exception.h
  ** \~french
- * \brief Implémentation de la classe Service
+ * \brief Définition de la classe WmsException
  ** \~english
- * \brief Implements classe Service
+ * \brief Define classe WmsException
  */
 
-#include "services/Service.h"
-#include "Request.h"
+#ifndef WMSEXCEPTION_H_
+#define WMSEXCEPTION_H_
 
-bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
+#include <string>
+#include "boost/format.hpp"
 
-    if (std::find(methods.begin(), methods.end(), req->method) == methods.end()) {
-        return false;
-    }
+#include "DataStreams.h"
 
-    std::smatch m;
-    if (std::regex_match(req->path, m, std::regex(root_path + path))) {
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Gestion des erreurs du service WMS
+ * \details Cette classe est prévue pour être utilisée sans instance. Les erreurs ont le formalisme suivant :
+ * \code{.xml}
+ * <ServiceExceptionReport version="1.3.0" xsi:schemaLocation="http://www.opengis.net/ogc https://data.geopf.fr/wms-v/schemas/wms/1.3.0/exceptions_1_3_0.xsd">
+ *     <ServiceException code="Not Found">
+ *         No data found
+ *     </ServiceException>
+ * </ServiceExceptionReport>
+ * \endcode
+ */
+class WmsException {
+private:
+    static std::string xml_template;
 
-        for(int i = 1; i < m.size(); i++) {
-            req->path_params.push_back(m[i]);
-            BOOST_LOG_TRIVIAL(debug) << "Path param : " << m[i];
-        }
-
-        return true;
-    } else {
-        return false;
-    }
+public:
+    static MessageDataStream* get_error_message(std::string reason, std::string code, int status);
 };
 
-Service::Service (json11::Json& doc) {
-
-    if (doc.is_null()) {
-        enabled = false;
-        return;
-    } else if(! doc.is_object()) {
-        errorMessage = "have to be an object";
-        return;
-    }
-
-    if (doc["enabled"].is_bool()) {
-        enabled = doc["enabled"].bool_value();
-    } else if (! doc["enabled"].is_null()) {
-        errorMessage = "'enabled' have to be a boolean";
-        return;
-    } else {
-        enabled = false;
-    }
-};
-
-bool Service::match_request(Request* req) {
-    return enabled && req->path.rfind(root_path, 0) == 0;
-};
-
+#endif /* WMSEXCEPTION_H_ */
 

@@ -36,24 +36,24 @@
  */
 
 /**
- * \file services/tms/Service.cpp
+ * \file services/tiles/Service.cpp
  ** \~french
- * \brief Implémentation de la classe TmsService
+ * \brief Implémentation de la classe TilesService
  ** \~english
- * \brief Implements classe TmsService
+ * \brief Implements classe TilesService
  */
 
 #include <iostream>
 
-#include "services/tms/Exception.h"
-#include "services/tms/Service.h"
+#include "services/tiles/Exception.h"
+#include "services/tiles/Service.h"
 #include "Rok4Server.h"
 
-TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
+TilesService::TilesService (json11::Json& doc) : Service(doc), metadata(NULL) {
 
     if (! isOk()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
-        errorMessage = "TMS service: " + errorMessage;
+        errorMessage = "TILES service: " + errorMessage;
         return;
     }
 
@@ -65,19 +65,19 @@ TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
     if (doc["title"].is_string()) {
         title = doc["title"].string_value();
     } else if (! doc["title"].is_null()) {
-        errorMessage = "TMS service: title have to be a string";
+        errorMessage = "TILES service: title have to be a string";
         return;
     } else {
-        title = "TMS service";
+        title = "TILES service";
     }
 
     if (doc["abstract"].is_string()) {
         abstract = doc["abstract"].string_value();
     } else if (! doc["abstract"].is_null()) {
-        errorMessage = "TMS service: abstract have to be a string";
+        errorMessage = "TILES service: abstract have to be a string";
         return;
     } else {
-        abstract = "TMS service";
+        abstract = "TILES service";
     }
 
     if (doc["keywords"].is_array()) {
@@ -85,65 +85,57 @@ TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
             if (kw.is_string()) {
                 keywords.push_back(Keyword ( kw.string_value()));
             } else {
-                errorMessage = "TMS service: keywords have to be a string array";
+                errorMessage = "TILES service: keywords have to be a string array";
                 return;
             }
         }
     } else if (! doc["keywords"].is_null()) {
-        errorMessage = "TMS service: keywords have to be a string array";
+        errorMessage = "TILES service: keywords have to be a string array";
         return;
     }
 
     if (doc["endpoint_uri"].is_string()) {
         endpoint_uri = doc["endpoint_uri"].string_value();
     } else if (! doc["endpoint_uri"].is_null()) {
-        errorMessage = "TMS service: endpoint_uri have to be a string";
+        errorMessage = "TILES service: endpoint_uri have to be a string";
         return;
     } else {
-        endpoint_uri = "http://localhost/tms";
+        endpoint_uri = "http://localhost/tiles";
     }
 
     if (doc["root_path"].is_string()) {
         root_path = doc["root_path"].string_value();
     } else if (! doc["root_path"].is_null()) {
-        errorMessage = "TMS service: root_path have to be a string";
+        errorMessage = "TILES service: root_path have to be a string";
         return;
     } else {
-        root_path = "/tms";
+        root_path = "/tiles";
     }
 
     if (doc["metadata"].is_object()) {
         metadata = new Metadata ( doc["metadata"] );
         if (metadata->getMissingField() != "") {
-            errorMessage = "TMS service: invalid metadata: have to own a field " + metadata->getMissingField();
+            errorMessage = "TILES service: invalid metadata: have to own a field " + metadata->getMissingField();
             return ;
         }
     }
 }
 
-DataStream* TmsService::process_request(Request* req, Rok4Server* serv) {
-    BOOST_LOG_TRIVIAL(debug) << "TMS service";
+DataStream* TilesService::process_request(Request* req, Rok4Server* serv) {
+    BOOST_LOG_TRIVIAL(debug) << "TILES service";
 
-    if ( match_route( "/([^/]+)/?", {"GET"}, req ) ) {
+    if ( match_route( "/tiles/collections", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
         return get_capabilities(req, serv);
     }
-    else if ( match_route( "/([^/]+)/([^/]+)/?", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETTILES request";
-        return get_tiles(req, serv);
+    else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)/info", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETFEATUREINFO request";
+        return get_feature_info(req, serv);
     }
-    else if ( match_route( "/([^/]+)/([^/]+)/metadata\\.json", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETMETADATA request";
-        return get_metadata(req, serv);
-    }
-    else if ( match_route( "/([^/]+)/([^/]+)/gdal\\.xml", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETGDAL request";
-        return get_gdal(req, serv);
-    }
-    else if ( match_route( "/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)\\.(.*)", {"GET"}, req ) ) {
+    else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILE request";
         return new DataStreamFromDataSource(get_tile(req, serv));
     } else {
-        throw TmsException::get_error_message("Unknown tms request path", 400);
+        throw TilesException::get_error_message("Unknown tms request path", 400);
     }
 };

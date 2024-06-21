@@ -36,58 +36,56 @@
  */
 
 /**
- * \file services/Service.cpp
+ * \file services/tiles/Service.h
  ** \~french
- * \brief Implémentation de la classe Service
+ * \brief Définition de la classe TilesService
  ** \~english
- * \brief Implements classe Service
+ * \brief Define classe TilesService
  */
 
+class TilesService;
+
+#ifndef TILESSERVICE_H_
+#define TILESSERVICE_H_
+
 #include "services/Service.h"
-#include "Request.h"
+#include "configurations/Metadata.h"
 
-bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Gestion du service OGC API Tiles du serveur
+ */
+class TilesService : public Service {  
 
-    if (std::find(methods.begin(), methods.end(), req->method) == methods.end()) {
-        return false;
-    }
+private:
+    DataStream* get_capabilities ( Request* req, Rok4Server* serv );
+    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
+    DataSource* get_tile ( Request* req, Rok4Server* serv );
 
-    std::smatch m;
-    if (std::regex_match(req->path, m, std::regex(root_path + path))) {
+    Metadata* metadata;
 
-        for(int i = 1; i < m.size(); i++) {
-            req->path_params.push_back(m[i]);
-            BOOST_LOG_TRIVIAL(debug) << "Path param : " << m[i];
-        }
+public:
+    DataStream* process_request(Request* req, Rok4Server* serv);
 
-        return true;
-    } else {
-        return false;
-    }
+    /**
+     * \~french
+     * \brief Constructeur du service 'tiles'
+     * \~english
+     * \brief Service constructor
+     */
+    TilesService (json11::Json& doc);
+
+    /**
+     * \~french
+     * \brief Destructeur
+     * \~english
+     * \brief Destructor
+     */
+    ~TilesService() {
+        if (metadata) delete metadata;
+    };
+
 };
 
-Service::Service (json11::Json& doc) {
-
-    if (doc.is_null()) {
-        enabled = false;
-        return;
-    } else if(! doc.is_object()) {
-        errorMessage = "have to be an object";
-        return;
-    }
-
-    if (doc["enabled"].is_bool()) {
-        enabled = doc["enabled"].bool_value();
-    } else if (! doc["enabled"].is_null()) {
-        errorMessage = "'enabled' have to be a boolean";
-        return;
-    } else {
-        enabled = false;
-    }
-};
-
-bool Service::match_request(Request* req) {
-    return enabled && req->path.rfind(root_path, 0) == 0;
-};
-
-
+#endif /* TILESSERVICE_H_ */

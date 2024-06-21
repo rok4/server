@@ -38,9 +38,9 @@
 /**
  * \file configurations/Services.h
  ** \~french
- * \brief Définition de la classe ServicesConf
+ * \brief Définition de la classe ServicesConfiguration
  ** \~english
- * \brief Define classe ServicesConf
+ * \brief Define classe ServicesConfiguration
  */
 
 #ifndef SERVICESCONF_H
@@ -54,10 +54,11 @@
 #include <rok4/utils/Keyword.h>
 
 #include "Rok4Server.h"
-#include "MetadataURL.h"
+#include "configurations/Metadata.h"
 #include "services/common/Service.h"
 #include "services/health/Service.h"
 #include "services/tms/Service.h"
+#include "services/wmts/Service.h"
 
 #include "config.h"
 
@@ -66,160 +67,70 @@
  * \~french
  * \brief Gestion de la configuration des services assurés par le serveur
  */
-class ServicesConf : public Configuration
+class ServicesConfiguration : public Configuration
 {
     friend class Rok4Server;
+    friend class WmtsService;
     
     public:
-        ServicesConf(std::string path);
-        ~ServicesConf();
+        ServicesConfiguration(std::string path);
+        ~ServicesConfiguration();
 
         CommonService* get_common_service() {return common_service;};
         HealthService* get_health_service() {return health_service;};
         TmsService* get_tms_service() {return tms_service;};
-
-        // WMS
-        // unsigned int getMaxTileX() const ;
-        // unsigned int getMaxTileY() const ;
-
-        // bool isInFormatList(std::string f) ;
-        // bool isInInfoFormatList(std::string f) ;
-        // bool isInGlobalCRSList(CRS* c) ;
-        // bool isInGlobalCRSList(std::string c) ;
-        // bool isFullStyleCapable() ;
-
-        // bool isInspire() ;
- 
-        // bool getDoWeUseListOfEqualsCRS();
-        // bool getReprojectionCapability() ;
-
-        // bool are_the_two_CRS_equal( std::string crs1, std::string crs2 );
-    
-        // /**
-        //  * \~french
-        //  * \brief Vérifie que le CRS ou un équivalent se trouve dans la liste des CRS autorisés
-        //  * \~english
-        //  * \brief Check if the CRS or an equivalent is in the allowed CRS list
-        //  */
-        // bool isCRSAllowed(std::string crs);
+        WmtsService* get_wmts_service() {return wmts_service;};
         
-        // /**
-        //  * \~french
-        //  * \brief Retourne la liste des CRS équivalents et valable dans PROJ
-        //  * \~english
-        //  * \brief Return the list of the equivalents CRS who are PROJ compatible
-        //  */
-        // std::vector<CRS*> getEqualsCRS(std::string crs);
+        /**
+         * \~french
+         * \brief Retourne la liste des CRS équivalents et valable dans PROJ
+         * \~english
+         * \brief Return the list of the equivalents CRS who are PROJ compatible
+         */
+        std::vector<CRS*> get_equals_crs(std::string crs);
+
+        bool are_crs_equals( std::string crs1, std::string crs2 );
 
     protected:
 
         // ----------------------- Global 
 
-        std::string serviceProvider;
-        std::string providerSite;
+        std::string service_provider;
+        std::string provider_site;
         std::string fee;
-        std::string accessConstraint;
+        std::string access_constraint;
 
         // ----------------------- Contact 
-        std::string individualName;
-        std::string individualPosition;
+        std::string individual_name;
+        std::string individual_position;
         std::string voice;
         std::string facsimile;
-        std::string addressType;
-        std::string deliveryPoint;
+        std::string address_type;
+        std::string delivery_point;
         std::string city;
-        std::string administrativeArea;
-        std::string postCode;
+        std::string administrative_area;
+        std::string post_code;
         std::string country;
-        std::string electronicMailAddress;
-
-        // ----------------------- Commun à plusieurs services 
-
-        // std::vector<std::string> infoFormatList;
-        // bool fullStyling;
-        // bool inspire;
-        // /**
-        //  * \~french \brief Définit si le serveur doit permettre les reprojections (en WMS et WMTS)
-        //  * \~english \brief Define whether WMS and WMTS reprojections should be honored
-        //  */
-        // bool reprojectionCapability;
-        // bool doweuselistofequalsCRS;
-        // bool dowerestrictCRSList;
-        // std::vector<std::vector<CRS*> > listofequalsCRS;
-        // std::vector<CRS*> restrictedCRSList;
-
-        // ----------------------- WMTS 
-
-        /**
-         * \~french \brief Définit si le serveur doit honorer les requêtes WMTS
-         * \~english \brief Define whether WMTS request should be honored
-         */
-        // bool supportWMTS;
-        // std::string wmtsPublicUrl;
-        // MetadataURL* mtdWMTS;
-
-        // ----------------------- TMS 
-
-        /**
-         * \~french \brief Définit si le serveur doit honorer les requêtes TMS
-         * \~english \brief Define whether TMS request should be honored
-         */
-        // bool supportTMS;
-        // std::string tmsPublicUrl;
-        // MetadataURL* mtdTMS;
-
-        // ----------------------- OGC Tiles
-
-        /**
-         * \~french \brief Définit si le serveur doit honorer les requêtes OGC Tiles
-         * \~english \brief Define whether OGC request should be honored
-         */
-        // bool supportTILES;
-        // std::string tilesPublicUrl;
-        // MetadataURL* mtdTILES;
-
-        // ----------------------- WMS 
-        /**
-         * \~french \brief Définit si le serveur doit honorer les requêtes WMS
-         * \~english \brief Define whether WMS request should be honored
-         */
-        // bool supportWMS;
-        // std::string wmsPublicUrl;
-        // MetadataURL* mtdWMS;
-        // std::string name;
-        // std::string layerRootTitle;
-        // std::string layerRootAbstract;
-        // unsigned int maxWidth;
-        // unsigned int maxHeight;
-        // unsigned int maxTileX;
-        // unsigned int maxTileY;
-        // unsigned int layerLimit;
-        // std::vector<std::string> formatList;
-        // std::vector<CRS*> globalCRSList;
+        std::string email;
 
     private:
 
-        // /**
-        //  * \~french
-        //  * \brief Chargement de la liste des CRS équivalents
-        //  * \~english
-        //  * \brief Load equals CRS
-        //  */
-        // bool loadEqualsCRSList(std::string file);
-
-        // /**
-        //  * \~french
-        //  * \brief Chargement de la liste restreinte des CRS
-        //  * \~english
-        //  * \brief Load restricted CRS list
-        //  */
-        // bool loadRestrictedCRSList(std::string file);
+        /**
+         * \~french
+         * \brief Chargement de la liste des CRS équivalents
+         * \~english
+         * \brief Load equals CRS
+         */
+        bool load_crs_equivalences(std::string file);
 
         bool parse(json11::Json& doc);
 
         CommonService* common_service;
         HealthService* health_service;
         TmsService* tms_service;
+        WmtsService* wmts_service;
+
+        std::map<std::string, std::vector<CRS*> > crs_equivalences;
 };
 
 #endif // SERVICESCONF_H

@@ -45,25 +45,13 @@
 
 WebService::WebService(std::string url, int retry = DEFAULT_RETRY, int interval = DEFAULT_INTERVAL,
                        int timeout = DEFAULT_TIMEOUT) : url(url), retry(retry), interval(interval), timeout(timeout) {
-    responseType = "";
-}
-
-WebService::WebService(WebService* obj) {
-    url = obj->url;
-    timeout = obj->timeout;
-    retry = obj->retry;
-    interval = obj->interval;
-    user = obj->user;
-    pwd = obj->pwd;
-    referer = obj->referer;
-    userAgent = obj->userAgent;
-    responseType = obj->responseType;
+    response_type = "";
 }
 
 WebService::~WebService() {
 }
 
-RawDataSource* WebService::performRequest(std::string request) {
+RawDataSource* WebService::perform_request(std::string request) {
     //----variables
     CURL* curl = CurlPool::getCurlEnv();
     CURLcode res, resC, resT;
@@ -72,7 +60,7 @@ RawDataSource* WebService::performRequest(std::string request) {
     std::string fType;
     struct MemoryStruct chunk;
     bool errors = false;
-    RawDataSource* rawData = NULL;
+    RawDataSource* raw_data = NULL;
     int nbPerformed = 0;
     //----
 
@@ -106,11 +94,11 @@ RawDataSource* WebService::performRequest(std::string request) {
             curl_easy_setopt(curl, CURLOPT_TIMEOUT, long(timeout));
             curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "identity");
             curl_easy_setopt(curl, CURLOPT_USERAGENT, "ROK4");
-            if (userAgent != "") {
-                curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
+            if (user_agent != "") {
+                curl_easy_setopt(curl, CURLOPT_USERAGENT, user_agent.c_str());
             }
             /* send all data to this function  */
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteInMemoryCallback);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_in_memory_callback);
             /* we pass our 'chunk' struct to the callback function */
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
             //----
@@ -138,7 +126,7 @@ RawDataSource* WebService::performRequest(std::string request) {
                 if ((resT == CURLE_OK) && rpType) {
                     std::string rType(rpType);
                     fType = rType;
-                    if (errors || (this->responseType != "" && this->responseType != rType)) {
+                    if (errors || (this->response_type != "" && this->response_type != rType)) {
                         BOOST_LOG_TRIVIAL(error) << "The request returned with a " << rpType << " content type";
                         std::string text = "text/";
                         std::string application = "application/";
@@ -181,22 +169,22 @@ RawDataSource* WebService::performRequest(std::string request) {
     if (!errors) {
         BOOST_LOG_TRIVIAL(debug) << "Sauvegarde de la donnee";
         BOOST_LOG_TRIVIAL(debug) << "content-type de la reponse: " + fType;
-        rawData = new RawDataSource(chunk.memory, chunk.size, fType, "");
+        raw_data = new RawDataSource(chunk.memory, chunk.size, fType, "");
     }
 
     free(chunk.memory);
 
-    return rawData;
+    return raw_data;
 }
 
-RawDataStream* WebService::performRequestStream(std::string request) {
-    RawDataSource* rawData = this->performRequest(request);
-    if (rawData == NULL) {
+RawDataStream* WebService::perform_request_stream(std::string request) {
+    RawDataSource* raw_data = this->perform_request(request);
+    if (raw_data == NULL) {
         return NULL;
     }
-    size_t bufferSize = rawData->getSize();
-    const uint8_t* buffer = rawData->getData(bufferSize);
-    RawDataStream* rawStream = new RawDataStream((uint8_t*)buffer, bufferSize, rawData->getType(), rawData->getEncoding());
-    delete rawData;
+    size_t bufferSize = raw_data->get_size();
+    const uint8_t* buffer = raw_data->get_data(bufferSize);
+    RawDataStream* rawStream = new RawDataStream((uint8_t*)buffer, bufferSize, raw_data->get_type(), raw_data->get_encoding());
+    delete raw_data;
     return rawStream;
 }

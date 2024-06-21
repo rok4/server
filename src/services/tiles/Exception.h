@@ -36,58 +36,39 @@
  */
 
 /**
- * \file services/Service.cpp
+ * \file services/tiles/Exception.h
  ** \~french
- * \brief Implémentation de la classe Service
+ * \brief Définition de la classe TilesException
  ** \~english
- * \brief Implements classe Service
+ * \brief Define classe TilesException
  */
 
-#include "services/Service.h"
-#include "Request.h"
+#ifndef TILESEXCEPTION_H_
+#define TILESEXCEPTION_H_
 
-bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
+#include <string>
+#include "boost/format.hpp"
 
-    if (std::find(methods.begin(), methods.end(), req->method) == methods.end()) {
-        return false;
-    }
+#include "DataStreams.h"
 
-    std::smatch m;
-    if (std::regex_match(req->path, m, std::regex(root_path + path))) {
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french
+ * \brief Gestion des erreurs du service OGC API Tiles
+ * \details Cette classe est prévue pour être utilisée sans instance. Les erreurs ont le formalisme suivant :
+ * \code{.xml}
+ * <?xml version="1.0" ?>
+ * <TilesError>
+ *    <Message>An error occured</Message>
+ * </TileError>
+ * \endcode
+ */
+class TilesException {
+private:
+    static std::string xml_template;
 
-        for(int i = 1; i < m.size(); i++) {
-            req->path_params.push_back(m[i]);
-            BOOST_LOG_TRIVIAL(debug) << "Path param : " << m[i];
-        }
-
-        return true;
-    } else {
-        return false;
-    }
+public:
+    static MessageDataStream* get_error_message(std::string reason, int status);
 };
 
-Service::Service (json11::Json& doc) {
-
-    if (doc.is_null()) {
-        enabled = false;
-        return;
-    } else if(! doc.is_object()) {
-        errorMessage = "have to be an object";
-        return;
-    }
-
-    if (doc["enabled"].is_bool()) {
-        enabled = doc["enabled"].bool_value();
-    } else if (! doc["enabled"].is_null()) {
-        errorMessage = "'enabled' have to be a boolean";
-        return;
-    } else {
-        enabled = false;
-    }
-};
-
-bool Service::match_request(Request* req) {
-    return enabled && req->path.rfind(root_path, 0) == 0;
-};
-
-
+#endif /* TILESEXCEPTION_H_ */

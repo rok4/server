@@ -39,156 +39,25 @@
 
 #include "configurations/Services.h"
 
-// bool ServicesConf::loadEqualsCRSList(std::string file) {
-
-//     BOOST_LOG_TRIVIAL(info) << "Liste des CRS équivalents à partir du fichier " << file  ;
-
-//     std::string delimiter = " ";
-//     std::string crsStr;
-
-//     std::ifstream input ( file.c_str() );
-//     // We test if the stream is empty
-//     //   This can happen when the file can't be loaded or when the file is empty
-//     if ( input.peek() == std::ifstream::traits_type::eof() ) {
-//         errorMessage = "Cannot load equals CRS list file " + file + " or empty file"   ;
-//         return false;
-//     }
-    
-//     for( std::string line; getline(input, line); ) {
-//         if (line[0] == '#' ) {
-//             continue;
-//         }
-
-//         // We split line to process every CRS in line, separated with space
-//         size_t pos = 0;
-//         std::vector<CRS*> crsVector;
-//         while ((pos = line.find(delimiter)) != std::string::npos) {
-//             crsStr = line.substr(0, pos);
-//             line.erase(0, pos + delimiter.length());
-
-//             CRS* crs = new CRS ( crsStr );
-//             if ( ! crs->isDefine() ) {
-//                 BOOST_LOG_TRIVIAL(warning) <<   "The Equivalent CRS [" << crsStr << "] is not present in PROJ"  ;
-//                 delete crs;
-//             } else {
-//                 crsVector.push_back(crs);
-//             }
-//         }
-
-//         CRS* crs = new CRS ( line );
-//         if ( ! crs->isDefine() ) {
-//             BOOST_LOG_TRIVIAL(warning) <<   "The Equivalent CRS [" << line << "] is not present in PROJ"  ;
-//             delete crs;
-//         } else {
-//             crsVector.push_back(crs);
-//         }
-
-//         if (crsVector.size() != 0) {
-//             listofequalsCRS.push_back(crsVector);
-//         }
-//     }
-
-//     return true;
-// }
-
-
-// bool ServicesConf::loadRestrictedCRSList(std::string file) {
-
-//     BOOST_LOG_TRIVIAL(info) <<  "Liste restreinte de CRS à partir du fichier " << file  ;
-
-//     std::ifstream input ( file.c_str() );
-//     // We test if the stream is empty
-//     //   This can happen when the file can't be loaded or when the file is empty
-//     if ( input.peek() == std::ifstream::traits_type::eof() ) {
-//         errorMessage = "Cannot load restricted CRS list file " + file + " or empty file"   ;
-//         return false;
-//     }
-    
-//     for( std::string line; getline(input, line); ) {
-//         if (line[0] == '#' ) {
-//             continue;
-//         }
-
-//         CRS* crs = new CRS ( line );
-//         if ( ! crs->isDefine() ) {
-//             BOOST_LOG_TRIVIAL(warning) <<   "The Equivalent CRS [" << line << "] is not present in PROJ"  ;
-//             delete crs;
-//         } else {
-//             restrictedCRSList.push_back(crs);
-//         }
-//     }
-
-//     if (doweuselistofequalsCRS) {
-//         // On va ajouter des éléments à la liste au fur et à mesure, on ne veut boucler que sur la liste initiale
-//         size_t init_size = restrictedCRSList.size();
-//         // On ajoute les CRS équivalents à ceux autorisés dans la liste
-//         for (unsigned int l = 0 ; l < init_size ; l++) {
-
-//             std::vector<CRS*> eqCRS = getEqualsCRS(restrictedCRSList.at(l)->getRequestCode());
-
-//             for (unsigned int e = 0 ; e < eqCRS.size() ; e++) {
-//                 // On ne remet pas le CRS d'origine
-//                 if (! eqCRS.at(e)->cmpRequestCode(restrictedCRSList.at(l)->getRequestCode())) {
-//                     // On clone bien le CRS, pour ne pas avoir un conflit lors du nettoyage
-//                     restrictedCRSList.push_back(new CRS(eqCRS.at(e)));
-//                 }
-//             }            
-//         }
-//     }
-
-//     return true;
-// }
-
-// std::vector<CRS*> ServicesConf::getEqualsCRS(std::string crs)
-// {
-//     std::vector<CRS*> returnCRS;
-
-//     if (! doweuselistofequalsCRS) {
-//         return returnCRS;
-//     }
-
-//     for ( unsigned int l = 0; l < listofequalsCRS.size(); l++ ) {
-//         for ( unsigned int c = 0; c < listofequalsCRS.at(l).size(); c++ ) {
-//             if (listofequalsCRS.at(l).at(c)->cmpRequestCode(crs)) {
-//                 return listofequalsCRS.at(l);
-//             }
-//         }
-//     }
-//     return returnCRS;
-// }
-
-// bool ServicesConf::isCRSAllowed(std::string crs) {
-
-//     if (! dowerestrictCRSList) {return true;}
-
-//     for (unsigned int l = 0 ; l < restrictedCRSList.size() ; l++) {
-//         if (restrictedCRSList.at(l)->cmpRequestCode(crs)) {
-//             return true;
-//         }
-//     }
-
-//     return false;
-// }
-
-bool ServicesConf::parse(json11::Json& doc) {
+bool ServicesConfiguration::parse(json11::Json& doc) {
 
     /********************** Default values */
 
-    serviceProvider="";
+    service_provider="";
     fee="";
-    accessConstraint="";
-    providerSite="";
-    individualName="";
-    individualPosition="";
+    access_constraint="";
+    provider_site="";
+    individual_name="";
+    individual_position="";
     voice="";
     facsimile="";
-    addressType="";
-    deliveryPoint="";
+    address_type="";
+    delivery_point="";
     city="";
-    administrativeArea="";
-    postCode="";
+    administrative_area="";
+    post_code="";
     country="";
-    electronicMailAddress="";
+    email="";
 
     // ----------------------- Global 
 
@@ -200,23 +69,33 @@ bool ServicesConf::parse(json11::Json& doc) {
     }
 
     if (doc["access_constraint"].is_string()) {
-        accessConstraint = doc["access_constraint"].string_value();
+        access_constraint = doc["access_constraint"].string_value();
     } else if (! doc["access_constraint"].is_null()) {
         errorMessage = "Services configuration: access_constraint have to be a string";
         return false;
     }
 
     if (doc["provider"].is_string()) {
-        serviceProvider = doc["provider"].string_value();
+        service_provider = doc["provider"].string_value();
     } else if (! doc["provider"].is_null()) {
         errorMessage = "Services configuration: provider have to be a string";
         return false;
     }
 
     if (doc["site"].is_string()) {
-        providerSite = doc["site"].string_value();
+        provider_site = doc["site"].string_value();
     } else if (! doc["site"].is_null()) {
         errorMessage = "Services configuration: site have to be a string";
+        return false;
+    }
+
+    if (doc["crs_equivalences"].is_string()) {
+        std::string crs_equivalences_file = doc["crs_equivalences"].string_value();
+        if (! load_crs_equivalences(crs_equivalences_file)) {
+            return false;
+        }
+    } else if (! doc["crs_equivalences"].is_null()) {
+        errorMessage = "crs_equivalences have to be a string";
         return false;
     }
 
@@ -232,13 +111,13 @@ bool ServicesConf::parse(json11::Json& doc) {
     }
     
     if (contactSection["name"].is_string()) {
-        individualName = contactSection["name"].string_value();
+        individual_name = contactSection["name"].string_value();
     } else if (! contactSection["name"].is_null()) {
         errorMessage = "Services configuration: contact.name have to be a string";
         return false;
     }
     if (contactSection["position"].is_string()) {
-        individualPosition = contactSection["position"].string_value();
+        individual_position = contactSection["position"].string_value();
     } else if (! contactSection["position"].is_null()) {
         errorMessage = "Services configuration: contact.position have to be a string";
         return false;
@@ -256,13 +135,13 @@ bool ServicesConf::parse(json11::Json& doc) {
         return false;
     }
     if (contactSection["address_type"].is_string()) {
-        addressType = contactSection["address_type"].string_value();
+        address_type = contactSection["address_type"].string_value();
     } else if (! contactSection["address_type"].is_null()) {
         errorMessage = "Services configuration: contact.address_type have to be a string";
         return false;
     }
     if (contactSection["delivery_point"].is_string()) {
-        deliveryPoint = contactSection["delivery_point"].string_value();
+        delivery_point = contactSection["delivery_point"].string_value();
     } else if (! contactSection["delivery_point"].is_null()) {
         errorMessage = "Services configuration: contact.delivery_point have to be a string";
         return false;
@@ -274,13 +153,13 @@ bool ServicesConf::parse(json11::Json& doc) {
         return false;
     }
     if (contactSection["administrative_area"].is_string()) {
-        administrativeArea = contactSection["administrative_area"].string_value();
+        administrative_area = contactSection["administrative_area"].string_value();
     } else if (! contactSection["administrative_area"].is_null()) {
         errorMessage = "Services configuration: contact.administrative_area have to be a string";
         return false;
     }
     if (contactSection["post_code"].is_string()) {
-        postCode = contactSection["post_code"].string_value();
+        post_code = contactSection["post_code"].string_value();
     } else if (! contactSection["post_code"].is_null()) {
         errorMessage = "Services configuration: contact.post_code have to be a string";
         return false;
@@ -292,7 +171,7 @@ bool ServicesConf::parse(json11::Json& doc) {
         return false;
     }
     if (contactSection["email"].is_string()) {
-        electronicMailAddress = contactSection["email"].string_value();
+        email = contactSection["email"].string_value();
     } else if (! contactSection["email"].is_null()) {
         errorMessage = "Services configuration: contact.email have to be a string";
         return false;
@@ -302,56 +181,10 @@ bool ServicesConf::parse(json11::Json& doc) {
     // json11::Json commonSection = doc["common"];
     // if (commonSection.is_object()) {
         
-    //     if (commonSection["info_formats"].is_array()) {
-    //         for (json11::Json info : commonSection["info_formats"].array_items()) {
-    //             if (info.is_string()) {
-    //                 infoFormatList.push_back ( info.string_value() );
-    //             } else {
-    //                 errorMessage = "common.info_formats have to be a string array";
-    //                 return false;
-    //             }
-    //         }
-    //     } else if (! commonSection["info_formats"].is_null()) {
-    //         errorMessage = "common.info_formats have to be a string array";
-    //         return false;
-    //     }
     //     if (commonSection["styling"].is_bool()) {
     //         fullStyling = commonSection["styling"].bool_value();
     //     } else if (! commonSection["styling"].is_null()) {
     //         errorMessage = "common.styling have to be a boolean";
-    //         return false;
-    //     }
-    //     if (commonSection["reprojection"].is_bool()) {
-    //         reprojectionCapability = commonSection["reprojection"].bool_value();
-    //     } else if (! commonSection["reprojection"].is_null()) {
-    //         errorMessage = "common.reprojection have to be a boolean";
-    //         return false;
-    //     }
-    //     if (commonSection["inspire"].is_bool()) {
-    //         inspire = commonSection["inspire"].bool_value();
-    //     } else if (! commonSection["inspire"].is_null()) {
-    //         errorMessage = "common.inspire have to be a boolean";
-    //         return false;
-    //     }
-    //     StyleBook::set_inspire(inspire);
-    //     if (commonSection["crs_restrictions"].is_string()) {
-    //         std::string restritedCRSListfile = commonSection["crs_restrictions"].string_value();
-    //         if (! loadRestrictedCRSList(restritedCRSListfile)) {
-    //             return false;
-    //         }
-    //         dowerestrictCRSList = true;
-    //     } else if (! commonSection["crs_restrictions"].is_null()) {
-    //         errorMessage = "common.crs_restrictions have to be a string";
-    //         return false;
-    //     }
-    //     if (commonSection["crs_equivalency"].is_string()) {
-    //         std::string equalsCRSListfile = commonSection["crs_equivalency"].string_value();
-    //         if (! loadEqualsCRSList(equalsCRSListfile)) {
-    //             return false;
-    //         }
-    //         doweuselistofequalsCRS = true;
-    //     } else if (! commonSection["crs_equivalency"].is_null()) {
-    //         errorMessage = "common.crs_equivalency have to be a string";
     //         return false;
     //     }
 
@@ -401,6 +234,19 @@ bool ServicesConf::parse(json11::Json& doc) {
         BOOST_LOG_TRIVIAL(info) <<  "TMS service disabled";
     }
 
+    json11::Json wmts_section = doc["wmts"];
+
+    wmts_service = new WmtsService(wmts_section);
+    if (! wmts_service->isOk()) {
+        errorMessage = "Services configuration: " + wmts_service->getErrorMessage();
+        return false;
+    }
+    if (wmts_service->is_enabled()) {
+        BOOST_LOG_TRIVIAL(info) <<  "WMTS service enabled";
+    } else {
+        BOOST_LOG_TRIVIAL(info) <<  "WMTS service disabled";
+    }
+
     // ----------------------- WMS 
     // json11::Json wmsSection = doc["wms"];
     // if (wmsSection.is_null()) {
@@ -410,20 +256,6 @@ bool ServicesConf::parse(json11::Json& doc) {
     //     return false;
     // } else {
 
-    //     if (wmsSection["active"].is_bool()) {
-    //         supportWMS = wmsSection["active"].bool_value();
-    //     } else if (! wmsSection["active"].is_null()) {
-    //         errorMessage = "wms.active have to be a boolean";
-    //         return false;
-    //     }
-    //     if (wmsSection["endpoint_uri"].is_string()) {
-    //         wmsPublicUrl = wmsSection["endpoint_uri"].string_value();
-    //     } else if (! wmsSection["endpoint_uri"].is_null()) {
-    //         errorMessage = "wms.endpoint_uri have to be a string";
-    //         return false;
-    //     } else {
-    //         wmsPublicUrl = "/wms";
-    //     }
     //     if (wmsSection["name"].is_string()) {
     //         name = wmsSection["name"].string_value();
     //     } else if (! wmsSection["name"].is_null()) {
@@ -593,7 +425,7 @@ bool ServicesConf::parse(json11::Json& doc) {
 
     //     // Métadonnée
     //     if (wmsSection["metadata"].is_object()) {
-    //         mtdWMS = new MetadataURL ( wmsSection["metadata"] );
+    //         mtdWMS = new Metadata ( wmsSection["metadata"] );
     //         if (mtdWMS->getMissingField() != "") {
     //             errorMessage = "Invalid WMS metadata: have to own a field " + mtdWMS->getMissingField();
     //             return false;
@@ -606,121 +438,10 @@ bool ServicesConf::parse(json11::Json& doc) {
     // }
 
 
-    // // ----------------------- WMTS 
-    // json11::Json wmtsSection = doc["wmts"];
-    // if (wmtsSection.is_null()) {
-    //     supportWMTS = false;
-    // } else if (! wmtsSection.is_object()) {
-    //     errorMessage = "wmts have to be an object";
-    //     return false;
-    // } else {
-
-    //     if (wmtsSection["active"].is_bool()) {
-    //         supportWMTS = wmtsSection["active"].bool_value();
-    //     } else if (! wmtsSection["active"].is_null()) {
-    //         errorMessage = "wmts.active have to be a boolean";
-    //         return false;
-    //     }
-    //     if (wmtsSection["endpoint_uri"].is_string()) {
-    //         wmtsPublicUrl = wmtsSection["endpoint_uri"].string_value();
-    //     } else if (! wmtsSection["endpoint_uri"].is_null()) {
-    //         errorMessage = "wmts.endpoint_uri have to be a string";
-    //         return false;
-    //     } else {
-    //         wmtsPublicUrl = "/wmts";
-    //     }
-
-    //     // Métadonnée
-    //     if (wmtsSection["metadata"].is_object()) {
-    //         mtdWMTS = new MetadataURL ( wmtsSection["metadata"] );
-    //         if (mtdWMTS->getMissingField() != "") {
-    //             errorMessage = "Invalid WMTS metadata: have to own a field " + mtdWMTS->getMissingField();
-    //             return false;
-    //         }
-    //     } else if (inspire) {
-    //         errorMessage = "Inspire WMTS service require a metadata";
-    //         return false;
-    //     }
-        
-    // }
-
-    // // ----------------------- TMS 
-    // json11::Json tmsSection = doc["tms"];
-    // if (tmsSection.is_null()) {
-    //     supportTMS = false;
-    // } else if (! tmsSection.is_object()) {
-    //     errorMessage = "tms have to be an object";
-    //     return false;
-    // } else {
-
-    //     if (tmsSection["active"].is_bool()) {
-    //         supportTMS = tmsSection["active"].bool_value();
-    //     } else if (! tmsSection["active"].is_null()) {
-    //         errorMessage = "tms.active have to be a boolean";
-    //         return false;
-    //     }
-    //     if (tmsSection["endpoint_uri"].is_string()) {
-    //         tmsPublicUrl = tmsSection["endpoint_uri"].string_value();
-    //     } else if (! tmsSection["endpoint_uri"].is_null()) {
-    //         errorMessage = "tms.endpoint_uri have to be a string";
-    //         return false;
-    //     } else {
-    //         tmsPublicUrl = "/tms";
-    //     }
-
-    //     // Métadonnée
-    //     if (tmsSection["metadata"].is_object()) {
-    //         mtdTMS = new MetadataURL ( tmsSection["metadata"] );
-    //         if (mtdTMS->getMissingField() != "") {
-    //             errorMessage = "Invalid TMS metadata: have to own a field " + mtdTMS->getMissingField();
-    //             return false;
-    //         }
-    //     }
-        
-    // }
-
-    // // ----------------------- OGC 
-    // json11::Json ogcSection = doc["tiles"];
-    // if (ogcSection.is_null()) {
-    //     supportTILES = false;
-    // } else if (! ogcSection.is_object()) {
-    //     errorMessage = "tiles have to be an object";
-    //     return false;
-    // } else {
-
-    //     if (ogcSection["active"].is_bool()) {
-    //         supportTILES = ogcSection["active"].bool_value();
-    //     } else if (! ogcSection["active"].is_null()) {
-    //         errorMessage = "tiles.active have to be a boolean";
-    //         return false;
-    //     }
-    //     if (ogcSection["endpoint_uri"].is_string()) {
-    //         tilesPublicUrl = ogcSection["endpoint_uri"].string_value();
-    //     } else if (! ogcSection["endpoint_uri"].is_null()) {
-    //         errorMessage = "tiles.endpoint_uri have to be a string";
-    //         return false;
-    //     } else {
-    //         tilesPublicUrl = "/tiles";
-    //     }
-
-    //     // Métadonnée
-    //     if (ogcSection["metadata"].is_object()) {
-    //         mtdTILES = new MetadataURL ( ogcSection["metadata"] );
-    //         if (mtdTILES->getMissingField() != "") {
-    //             errorMessage = "Invalid OGC TIles metadata: have to own a field " + mtdTILES->getMissingField();
-    //             return false;
-    //         }
-    //     } else if (inspire) {
-    //         errorMessage = "Inspire OGC API Tiles service require a metadata";
-    //         return false;
-    //     }
-        
-    // }
-
     return true;
 }
 
-ServicesConf::ServicesConf(std::string path) : Configuration(path) {
+ServicesConfiguration::ServicesConfiguration(std::string path) : Configuration(path) {
 
     std::cout << "Loading services configuration from file " << filePath << std::endl;
 
@@ -744,100 +465,110 @@ ServicesConf::ServicesConf(std::string path) : Configuration(path) {
     return;
 }
 
-// bool ServicesConf::are_the_two_CRS_equal( std::string crs1, std::string crs2 ) {
 
-//     if (crs1 == crs2) {
-//         return true;
-//     }
+bool ServicesConfiguration::load_crs_equivalences(std::string file) {
 
-//     if (! doweuselistofequalsCRS) {
-//         return false;
-//     }
+    std::ifstream is(file);
+    std::stringstream ss;
+    ss << is.rdbuf();
 
-//     for ( unsigned int l = 0; l < listofequalsCRS.size(); l++ ) {
-//         bool crs1found = false;
-//         bool crs2found = false;
-//         for ( unsigned int c = 0; c < listofequalsCRS.at(l).size(); c++ ) {
-//             if (listofequalsCRS.at(l).at(c)->cmpRequestCode(crs1)) {
-//                 crs1found = true;
-//             }
-//             if (listofequalsCRS.at(l).at(c)->cmpRequestCode(crs2)) {
-//                 crs2found = true;
-//             }
-//         }
-//         if (crs1found && crs2found) {return true;}
-//     }
+    std::string err;
+    json11::Json doc = json11::Json::parse ( ss.str(), err );
+    if ( doc.is_null() ) {
+        errorMessage = "Cannot load JSON file "  + file + " : " + err ;
+        return false;
+    }
 
-//     return false;
-// }
+    BOOST_LOG_TRIVIAL(info) << "Load CRS equivalences from file " << file  ;
 
-ServicesConf::~ServicesConf(){ 
+    if (! doc.is_object()) {
+        errorMessage = "CRS equivalences file have to be a JSON object";
+        return false;
+    }
+
+    for (auto const& it : doc.object_items()) {
+        std::string index_crs = it.first;
+        std::vector<CRS*> eqs;
+
+        // On met en premier le CRS correspondant à la clé
+        CRS* c = new CRS ( index_crs );
+        if ( ! c->isDefine() ) {
+            BOOST_LOG_TRIVIAL(warning) << "The Equivalent CRS [" << c << "] is not present in PROJ"  ;
+            delete c;
+            continue;
+        } else {
+            eqs.push_back(c);
+        }
+
+        if (it.second.is_array()) {
+            for (json11::Json eq_crs : it.second.array_items()) {
+                if (eq_crs.is_string()) {
+                    c = new CRS ( eq_crs.string_value() );
+                    if ( ! c->isDefine() ) {
+                        BOOST_LOG_TRIVIAL(warning) << "The Equivalent CRS [" << c << "] is not present in PROJ"  ;
+                        delete c;
+                    } else {
+                        eqs.push_back(c);
+                    }
+                } else {
+                    errorMessage = "CRS equivalences file have to be a JSON object where each value is a string array";
+                    return false;
+                }
+            }
+        } else {
+            errorMessage = "CRS equivalences file have to be a JSON object where each value is a string array";
+            return false;
+        }
+
+        crs_equivalences.insert ( std::pair<std::string, std::vector<CRS*> > ( index_crs, eqs ) );
+    }
+
+    return true;
+}
+
+std::vector<CRS*> ServicesConfiguration::get_equals_crs(std::string crs)
+{
+    std::map<std::string, std::vector<CRS*> >::iterator it = crs_equivalences.find ( crs );
+    if ( it == crs_equivalences.end() ) {
+        return {};
+    }
+    return it->second;
+}
+
+bool ServicesConfiguration::are_crs_equals( std::string crs1, std::string crs2 ) {
+
+    if (crs1 == crs2) {
+        return true;
+    }
+
+    std::vector<CRS*> eqs = get_equals_crs(crs1);
+    // On commence à 1, le premier CRS correpondant à la clé
+    for ( unsigned int i = 1; i < eqs.size(); i++ ) {
+        if (eqs.at(i)->cmpRequestCode(crs2)) {
+            return true;
+        }
+    }
+
+    eqs = get_equals_crs(crs2);
+    for ( unsigned int i = 1; i < eqs.size(); i++ ) {
+        if (eqs.at(i)->cmpRequestCode(crs1)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+ServicesConfiguration::~ServicesConfiguration(){ 
     delete common_service;
     delete tms_service;
     delete health_service;
+    delete wmts_service;
 
-    // if (mtdWMTS) {delete mtdWMTS;}
-    // if (mtdTMS) {delete mtdTMS;}
-    // if (mtdTILES) {delete mtdTILES;}
-
-    // for ( unsigned int l = 0; l < listofequalsCRS.size(); l++ ) {
-    //     for ( unsigned int c = 0; c < listofequalsCRS.at(l).size(); c++ ) {
-    //         delete listofequalsCRS.at(l).at(c);
-    //     }
-    // }
-
-    // for (unsigned int l = 0 ; l < restrictedCRSList.size() ; l++) {
-    //     delete restrictedCRSList.at(l);
-    // }
-
-    // for (unsigned int l = 0 ; l < globalCRSList.size() ; l++) {
-    //     delete globalCRSList.at(l);
-    // }
-
+    // Les CRS équivalents
+    std::map<std::string, std::vector<CRS*> >::iterator it;
+    for ( it = crs_equivalences.begin(); it != crs_equivalences.end(); it++ )
+        for (unsigned int i = 0 ; i < it->second.size() ; i++) {
+            delete it->second.at(i);
+        }
 }
-
-// unsigned int ServicesConf::getMaxTileX() const { return maxTileX; }
-// unsigned int ServicesConf::getMaxTileY() const { return maxTileY; }
-// bool ServicesConf::isInFormatList(std::string f) {
-//     for ( unsigned int k = 0; k < formatList.size(); k++ ) {
-//         if ( formatList.at(k) == f ) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-// bool ServicesConf::isInInfoFormatList(std::string f) {
-//     for ( unsigned int k = 0; k < infoFormatList.size(); k++ ) {
-//         if ( infoFormatList.at(k) == f ) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-// bool ServicesConf::isInGlobalCRSList(CRS* c) {
-//     for ( unsigned int k = 0; k < globalCRSList.size(); k++ ) {
-//         if ( c->cmpRequestCode ( globalCRSList.at (k)->getRequestCode() ) ) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-// bool ServicesConf::isInGlobalCRSList(std::string c) {
-//     for ( unsigned int k = 0; k < globalCRSList.size(); k++ ) {
-//         if ( globalCRSList.at (k)->cmpRequestCode ( c ) ) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-
-// bool ServicesConf::isFullStyleCapable() { return fullStyling; }
-// bool ServicesConf::isInspire() {
-//     return inspire;
-// }
-
-// bool ServicesConf::getDoWeUseListOfEqualsCRS() { return doweuselistofequalsCRS; }
-// bool ServicesConf::getReprojectionCapability() { return reprojectionCapability; }

@@ -1404,17 +1404,6 @@ paths:
         204:
           description: Désactivation des services réussie
 
-  /admin/layers:
-    put:
-      tags:
-      - Administration
-      summary: Re-génére les capacités des services
-      operationId: admin_build_capabilities
-
-      responses:
-        204:
-          description: Réécriture des capacités réussie
-
   /admin/layers/{layername}:
     post:
       tags:
@@ -1428,13 +1417,6 @@ paths:
           description: Identifiant de la nouvelle couche
           schema:
             type: string
-        - name: build_capabilities
-          required: false
-          in: query
-          description: Doit-on re-générer les capacités des services (oui par défaut)
-          schema:
-            type: boolean
-            default: true
 
 
       requestBody:
@@ -1471,13 +1453,6 @@ paths:
           description: Identifiant de la couche à modifier
           schema:
             type: string
-        - name: build_capabilities
-          required: false
-          in: query
-          description: Doit-on re-générer les capacités des services (oui par défaut)
-          schema:
-            type: boolean
-            default: true
 
       requestBody:
         content:  
@@ -1513,13 +1488,6 @@ paths:
           description: Identifiant de la couche à supprimer
           schema:
             type: string
-        - name: build_capabilities
-          required: false
-          in: query
-          description: Doit-on re-générer les capacités des services (oui par défaut)
-          schema:
-            type: boolean
-            default: true
 
       responses:
         204:

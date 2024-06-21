@@ -83,6 +83,7 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/log/utility/setup/console.hpp>
+
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
 namespace sinks = boost::log::sinks;
@@ -92,7 +93,7 @@ Rok4Server* Wtmp;
 bool reload;
 static bool loggerInitialised = false;
 
-std::string serverConfigFile;
+std::string server_config_file;
 
 // Minimum time between two signal to be defered.
 // Earlier signal would be ignored.
@@ -123,33 +124,33 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
 
     std::string strServerConfigFile = serverConfigFile;
 
-    ServerConf* serverConf = new ServerConf( strServerConfigFile );
-    if ( ! serverConf->isOk() ) {
+    ServerConfiguration* server_configuration = new ServerConfiguration( strServerConfigFile );
+    if ( ! server_configuration->isOk() ) {
         std::cerr << "FATAL: Cannot load server configuration " << std::endl;
-        std::cerr << "FATAL: " << serverConf->getErrorMessage() << std::endl;
+        std::cerr << "FATAL: " << server_configuration->getErrorMessage() << std::endl;
         return NULL;
     }
 
     if ( ! loggerInitialised ) {
         /* Initialisation du logger */
-        boost::log::core::get()->set_filter( boost::log::trivial::severity >= serverConf->getLogLevel() );
+        boost::log::core::get()->set_filter( boost::log::trivial::severity >= server_configuration->get_log_level() );
         logging::add_common_attributes();
         boost::log::register_simple_formatter_factory< boost::log::trivial::severity_level, char >("Severity");
 
-        if ( serverConf->getLogOutput() == "rolling_file") {
+        if ( server_configuration->get_log_output() == "rolling_file") {
             logging::add_file_log (
-                keywords::file_name = serverConf->getLogFilePrefix()+"-%Y-%m-%d-%H-%M-%S.log",
-                keywords::time_based_rotation = sinks::file::rotation_at_time_interval(boost::posix_time::seconds(serverConf->getLogFilePeriod())),
+                keywords::file_name = server_configuration->get_log_file_prefix()+"-%Y-%m-%d-%H-%M-%S.log",
+                keywords::time_based_rotation = sinks::file::rotation_at_time_interval(boost::posix_time::seconds(server_configuration->get_log_file_period())),
                 keywords::format = "%TimeStamp%\t%ProcessID%\t%ThreadID%\t%Severity%\t%Message%",
                 keywords::auto_flush = true
             );
-        } else if ( serverConf->getLogOutput() == "static_file") {
+        } else if ( server_configuration->get_log_output() == "static_file") {
             logging::add_file_log (
-                keywords::file_name = serverConf->getLogFilePrefix(),
+                keywords::file_name = server_configuration->get_log_file_prefix(),
                 keywords::format = "%TimeStamp%\t%ProcessID%\t%ThreadID%\t%Severity%\t%Message%",
                 keywords::auto_flush = true
             );
-        } else if ( serverConf->getLogOutput() == "standard_output") {
+        } else if ( server_configuration->get_log_output() == "standard_output") {
             logging::add_console_log (
                 std::cout,
                 keywords::format = "%TimeStamp%\t%ProcessID%\t%ThreadID%\t%Severity%\t%Message%"
@@ -162,10 +163,10 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
     }
 
     // Construction des parametres de service
-    ServicesConf* servicesConf = new ServicesConf ( serverConf->getServicesConfigFile() );
-    if ( ! servicesConf->isOk() ) {
+    ServicesConfiguration* services_configuration = new ServicesConfiguration ( server_configuration->get_services_configuration_file() );
+    if ( ! services_configuration->isOk() ) {
         BOOST_LOG_TRIVIAL(fatal) << "Cannot load services configuration " << std::endl;
-        BOOST_LOG_TRIVIAL(fatal) << servicesConf->getErrorMessage() << std::endl;
+        BOOST_LOG_TRIVIAL(fatal) << services_configuration->getErrorMessage() << std::endl;
         sleep ( 1 );    // Pour laisser le temps au logger pour se vider
         return NULL;
     }
@@ -174,7 +175,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
 
     BOOST_LOG_TRIVIAL(info) << "LAYERS LOADING" ;
     
-    std::string list_path = serverConf->get_layers_list();
+    std::string list_path = server_configuration->get_layers_list();
 
     if (list_path != "") {
         // Lecture de la liste des couches
@@ -185,7 +186,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
 
         Context* context = StoragePool::get_context(storage_type, tray_name);
         if (context == NULL) {
-            BOOST_LOG_TRIVIAL(fatal) << "Cannot add " + ContextType::toString(storage_type) + " storage context to read layers list" << std::endl;
+            BOOST_LOG_TRIVIAL(fatal) << "Cannot add " + ContextType::to_string(storage_type) + " storage context to read layers list" << std::endl;
             return NULL;
         }
 
@@ -204,7 +205,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
         while (std::getline(list_content, layer_desc)) {
             Layer* layer = new Layer(layer_desc );
             if ( layer->isOk() ) {
-                serverConf->addLayer ( layer );
+                server_configuration->add_layer ( layer );
             } else {
                 BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layer_desc << ": " << layer->getErrorMessage();
                 delete layer;
@@ -212,10 +213,10 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
         }
     }
 
-    BOOST_LOG_TRIVIAL(info) << serverConf->getNbLayers() << " layer(s) loaded" ;
+    BOOST_LOG_TRIVIAL(info) << server_configuration->get_layers_count() << " layer(s) loaded" ;
 
     // Instanciation du serveur
-    return new Rok4Server ( serverConf, servicesConf );
+    return new Rok4Server ( server_configuration, services_configuration );
 }
 
 /**
@@ -242,7 +243,7 @@ void reloadConfig ( int signum ) {
         reload = true;
         std::cout<<  "Rechargement du serveur rok4" << "["<< getpid() <<"]" <<std::endl;
 
-        Wtmp = loadConfiguration ( serverConfigFile.c_str() );
+        Wtmp = loadConfiguration ( server_config_file.c_str() );
         if ( ! Wtmp ){
             std::cout<<  "Erreur lors du rechargement du serveur rok4" << "["<< getpid() <<"]" <<std::endl;
             return;
@@ -326,7 +327,7 @@ int main ( int argc, char** argv ) {
     }
 
     // Lecture des arguments de la ligne de commande
-    serverConfigFile=DEFAULT_SERVER_CONF_PATH;
+    server_config_file=DEFAULT_SERVER_CONF_PATH;
     for ( int i = 1; i < argc; i++ ) {
         if ( argv[i][0] == '-' ) {
             switch ( argv[i][1] ) {
@@ -336,7 +337,7 @@ int main ( int argc, char** argv ) {
                     usage();
                     return 1;
                 }
-                serverConfigFile.assign ( argv[i] );
+                server_config_file.assign ( argv[i] );
                 break;
             default:
                 usage();
@@ -353,11 +354,11 @@ int main ( int argc, char** argv ) {
         std::cout<<  "Server start " << "["<< pid <<"]" <<std::endl;
 
         if ( firstStart ) {
-            W = loadConfiguration ( serverConfigFile.c_str() );
+            W = loadConfiguration ( server_config_file.c_str() );
             if ( !W ) {
                 return 1;
             }
-            W->initFCGI();
+            W->initialize_fcgi();
             firstStart = false;
         } else {
             std::cout<<  "Configuration update " << "["<< pid <<"]" <<std::endl;
@@ -368,13 +369,13 @@ int main ( int argc, char** argv ) {
                 TmsBook::empty_trash();
                 StyleBook::empty_trash();
             }
-            W->setFCGISocket ( sock );
+            W->set_fcgi_socket ( sock );
         }
 
         auto start = std::chrono::system_clock::now();
         std::time_t time = std::chrono::system_clock::to_time_t(start);
-        W->setPID(pid);
-        W->setTime(time);
+        W->set_pid(pid);
+        W->set_time(time);
 
         // Remove Event Lock
         defer_signal--;
@@ -387,7 +388,7 @@ int main ( int argc, char** argv ) {
         if ( reload ) {
             // Rechargement du serveur
             BOOST_LOG_TRIVIAL(info) << "Configuration reload" ;
-            sock = W->getFCGISocket();
+            sock = W->get_fcgi_socket();
         } else {
             // Extinction du serveur
             BOOST_LOG_TRIVIAL(info) << "Server shutdown" ;

@@ -51,33 +51,9 @@
 #include <boost/log/trivial.hpp>
 
 #include "Request.h"
-#include "UtilsXML.h"
+#include "Utils.h"
 
 #include "config.h"
-
-/**
- * \~french
- * \brief Convertit un caractère héxadécimal (0-9, A-Z, a-z) en décimal
- * \param[in] hex caractère
- * \return 0xFF sur une entrée invalide
- * \~english
- * \brief Converts hex char (0-9, A-Z, a-z) to decimal.
- * \param[in] hex character
- * \return 0xFF on invalid input.
- */
-char hex2int ( unsigned char hex ) {
-    hex = hex - '0';
-    // Si hex <= 9 on a le résultat
-    //   Sinon
-    if ( hex > 9 ) {
-        hex = ( hex + '0' - 1 ) | 0x20; // Pour le passage des majuscules aux minuscules dans la table ASCII
-        hex = hex - 'a' + 11;
-    }
-    if ( hex > 15 ) // En cas d'erreur
-        hex = 0xFF;
-
-    return hex;
-}
 
 void Request::url_decode ( char *src ) {
     unsigned char high, low;
@@ -89,9 +65,9 @@ void Request::url_decode ( char *src ) {
         } else if ( *src == '%' ) {
             *dst = '%';
 
-            high = hex2int ( * ( src + 1 ) );
+            high = Utils::hexadecimal_to_int ( * ( src + 1 ) );
             if ( high != 0xFF ) {
-                low = hex2int ( * ( src + 2 ) );
+                low = Utils::hexadecimal_to_int ( * ( src + 2 ) );
                 if ( low != 0xFF ) {
                     high = ( high << 4 ) | low;
 
@@ -144,39 +120,33 @@ Request::Request ( FCGX_Request* fcgxRequest ) : fcgx_request(fcgxRequest) {
     url_decode ( query );
     BOOST_LOG_TRIVIAL(debug) <<  "Query parameters: " << query ;
     for ( int pos = 0; query[pos]; ) {
-        char* key = query + pos;
+        std::string key = std::string(query + pos);
         for ( ; query[pos] && query[pos] != '=' && query[pos] != '&'; pos++ ); // on trouve le premier "=", "&" ou 0
         char* value = query + pos;
         for ( ; query[pos] && query[pos] != '&'; pos++ ); // on trouve le suivant "&" ou 0
         if ( *value == '=' ) *value++ = 0; // on met un 0 à la place du '=' entre key et value
         if ( query[pos] ) query[pos++] = 0; // on met un 0 à la fin du char* value
 
-        UtilsXML::toLowerCase ( key );
-        queryParams.insert ( std::pair<std::string, std::string> ( key, value ) );
+        std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+        query_params.insert ( std::pair<std::string, std::string> ( key, value ) );
     }
 }
 
 
 Request::~Request() {}
 
-bool Request::hasParam ( std::string paramName ) {
-    std::map<std::string, std::string>::iterator it = queryParams.find ( paramName );
-    if ( it == queryParams.end() ) {
-        it = bodyParams.find ( paramName );
-        if ( it == bodyParams.end() ) {
-            return false;
-        }
+bool Request::has_query_param ( std::string paramName ) {
+    std::map<std::string, std::string>::iterator it = query_params.find ( paramName );
+    if ( it == query_params.end() ) {
+        return false;
     }
     return true;
 }
 
-std::string Request::getParam ( std::string paramName ) {
-    std::map<std::string, std::string>::iterator it = queryParams.find ( paramName );
-    if ( it == queryParams.end() ) {
-        it = bodyParams.find ( paramName );
-        if ( it == bodyParams.end() ) {
-            return "";
-        }
+std::string Request::get_query_param ( std::string paramName ) {
+    std::map<std::string, std::string>::iterator it = query_params.find ( paramName );
+    if ( it == query_params.end() ) {
+        return "";
     }
     return it->second;
 }

@@ -73,16 +73,16 @@ public:
     bool eof() {
         return true;
     }
-    std::string getType() {
+    std::string get_type() {
         return "";
     }
-    std::string getEncoding() {
+    std::string get_encoding() {
         return "";
     }
-    int getHttpStatus() {
+    int get_http_status() {
         return 204;
     }
-    unsigned int getLength(){
+    unsigned int get_length(){
         return 0;
     }
 };
@@ -137,16 +137,16 @@ public:
     bool eof() {
         return ( pos==message.length() );
     }
-    std::string getType() {
+    std::string get_type() {
         return type;
     }
-    std::string getEncoding() {
+    std::string get_encoding() {
         return "";
     }
-    int getHttpStatus() {
+    int get_http_status() {
         return http_status;
     }
-    unsigned int getLength(){
+    unsigned int get_length(){
         return message.length();
     }
 };

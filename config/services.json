@@ -16,6 +16,7 @@
         "country": "",
         "email": ""
     },
+    "crs_equivalences": "/etc/rok4/equals_crs.json",
     "admin": {
         "enabled": true
     },
@@ -70,8 +71,6 @@
         ],
         "styling": true,
         "reprojection": true,
-        "crs_restrictions": "/etc/rok4/restrictedCRSList.txt",
-        "crs_equivalency": "/etc/rok4/listofequalscrs.txt",
         "inspire": false
     },
     "wmts": {

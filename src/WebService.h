@@ -52,7 +52,7 @@ struct MemoryStruct {
 };
 
 
-static size_t WriteInMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+static size_t write_in_memory_callback(void *contents, size_t size, size_t nmemb, void *userp)
 {
   size_t realsize = size * nmemb;
   struct MemoryStruct *mem = (struct MemoryStruct *)userp;
@@ -129,195 +129,16 @@ protected:
      * \~french \brief User-Agent
      * \~english \brief User-Agent
      */
-    std::string userAgent;
+    std::string user_agent;
 
     /**
      * \~french \brief responseType, réponse attendue
      * \~english \brief responseType, expected answer
      */
-    std::string responseType;
+    std::string response_type;
 
 public:
 
-    /**
-     * \~french \brief Récupère l'url
-     * \return url
-     * \~english \brief Get the url
-     * \return url
-     */
-    std::string getUrl(){
-        return url;
-    }
-
-    /**
-     * \~french \brief Modifie l'url
-     * \param[in] url
-     * \~english \brief Set the url
-     * \param[in] url
-     */
-    void setUrl (std::string u) {
-        url = u;
-    }
-
-    /**
-     * \~french \brief Récupère le user
-     * \return user
-     * \~english \brief Get the user
-     * \return user
-     */
-    std::string getUser(){
-        return user;
-    }
-
-    /**
-     * \~french \brief Modifie le user
-     * \param[in] user
-     * \~english \brief Set the user
-     * \param[in] user
-     */
-    void setUser (std::string u) {
-        user = u;
-    }
-
-    /**
-     * \~french \brief Récupère le pwd
-     * \return pwd
-     * \~english \brief Get the pwd
-     * \return pwd
-     */
-    std::string getPassword(){
-        return pwd;
-    }
-
-    /**
-     * \~french \brief Modifie le pwd
-     * \param[in] pwd
-     * \~english \brief Set the pwd
-     * \param[in] pwd
-     */
-    void setPassword (std::string u) {
-        pwd = u;
-    }
-
-    /**
-     * \~french \brief Récupère le referer
-     * \return referer
-     * \~english \brief Get the referer
-     * \return referer
-     */
-    std::string getReferer(){
-        return referer;
-    }
-
-    /**
-     * \~french \brief Modifie le referer
-     * \param[in] referer
-     * \~english \brief Set the referer
-     * \param[in] referer
-     */
-    void setReferer (std::string u) {
-        referer = u;
-    }
-
-    /**
-     * \~french \brief Récupère le userAgent
-     * \return userAgent
-     * \~english \brief Get the userAgent
-     * \return userAgent
-     */
-    std::string getUserAgent(){
-        return userAgent;
-    }
-
-    /**
-     * \~french \brief Modifie le userAgent
-     * \param[in] userAgent
-     * \~english \brief Set the userAgent
-     * \param[in] userAgent
-     */
-    void setUserAgent (std::string u) {
-        userAgent = u;
-    }
-
-    /**
-     * \~french \brief Récupère le timeout
-     * \return timeout
-     * \~english \brief Get the timeout
-     * \return timeout
-     */
-    int getTimeOut(){
-        return timeout;
-    }
-
-    /**
-     * \~french \brief Modifie le timeout
-     * \param[in] timeout
-     * \~english \brief Set the timeout
-     * \param[in] timeout
-     */
-    void setTimeOut (int u) {
-        timeout = u;
-    }
-
-    /**
-     * \~french \brief Récupère le retry
-     * \return retry
-     * \~english \brief Get the retry
-     * \return retry
-     */
-    int getRetry(){
-        return retry;
-    }
-
-    /**
-     * \~french \brief Modifie le retry
-     * \param[in] retry
-     * \~english \brief Set the retry
-     * \param[in] retry
-     */
-    void setRetry (int u) {
-        retry = u;
-    }
-
-    /**
-     * \~french \brief Récupère le interval
-     * \return interval
-     * \~english \brief Get the interval
-     * \return interval
-     */
-    int getInterval(){
-        return interval;
-    }
-
-    /**
-     * \~french \brief Modifie le interval
-     * \param[in] interval
-     * \~english \brief Set the interval
-     * \param[in] interval
-     */
-    void setInterval (int u) {
-        interval = u;
-    }
-
-    /**
-     * \~french \brief Récupère le responseType
-     * \return interval
-     * \~english \brief Get the responseType
-     * \return interval
-     */
-    std::string getResponseType(){
-        return responseType;
-    }
-
-    /**
-     * \~french \brief Modifie le responseType
-     * \param[in] interval
-     * \~english \brief Set the responseType
-     * \param[in] interval
-     */
-    void setResponseType (std::string u) {
-        responseType = u;
-    }
 
     /**
      * \~french
@@ -325,7 +146,7 @@ public:
      * \~english
      * \brief Taking Data from an URL
      */
-    RawDataSource * performRequest(std::string request);
+    RawDataSource * perform_request(std::string request);
     
     /**
      * \~french
@@ -333,7 +154,7 @@ public:
      * \~english
      * \brief Taking Data from an URL
      */
-    RawDataStream * performRequestStream(std::string request);
+    RawDataStream * perform_request_stream(std::string request);
 
 
     /**
@@ -341,12 +162,6 @@ public:
      * \~english \brief Constructor
      */
     WebService(std::string url, int retry, int interval, int timeout);
-    
-    /**
-     * \~french \brief Constructeur à partir d'un autre
-     * \~english \brief Constructor from another
-     */
-    WebService(WebService* obj);
 
     /**
      * \~french \brief Destructeur

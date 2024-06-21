@@ -36,24 +36,26 @@
  */
 
 /**
- * \file services/tms/Service.cpp
+ * \file services/wmts/Service.cpp
  ** \~french
- * \brief Implémentation de la classe TmsService
+ * \brief Implémentation de la classe WmtsService
  ** \~english
- * \brief Implements classe TmsService
+ * \brief Implements classe WmtsService
  */
 
 #include <iostream>
 
-#include "services/tms/Exception.h"
-#include "services/tms/Service.h"
+#include <rok4/datasource/PaletteDataSource.h>
+
+#include "services/wmts/Exception.h"
+#include "services/wmts/Service.h"
 #include "Rok4Server.h"
 
-TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
+WmtsService::WmtsService (json11::Json& doc) : Service(doc), metadata(NULL) {
 
     if (! isOk()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
-        errorMessage = "TMS service: " + errorMessage;
+        errorMessage = "WMTS service: " + errorMessage;
         return;
     }
 
@@ -65,19 +67,19 @@ TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
     if (doc["title"].is_string()) {
         title = doc["title"].string_value();
     } else if (! doc["title"].is_null()) {
-        errorMessage = "TMS service: title have to be a string";
+        errorMessage = "WMTS service: title have to be a string";
         return;
     } else {
-        title = "TMS service";
+        title = "WMTS service";
     }
 
     if (doc["abstract"].is_string()) {
         abstract = doc["abstract"].string_value();
     } else if (! doc["abstract"].is_null()) {
-        errorMessage = "TMS service: abstract have to be a string";
+        errorMessage = "WMTS service: abstract have to be a string";
         return;
     } else {
-        abstract = "TMS service";
+        abstract = "WMTS service";
     }
 
     if (doc["keywords"].is_array()) {
@@ -85,65 +87,97 @@ TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
             if (kw.is_string()) {
                 keywords.push_back(Keyword ( kw.string_value()));
             } else {
-                errorMessage = "TMS service: keywords have to be a string array";
+                errorMessage = "WMTS service: keywords have to be a string array";
                 return;
             }
         }
     } else if (! doc["keywords"].is_null()) {
-        errorMessage = "TMS service: keywords have to be a string array";
+        errorMessage = "WMTS service: keywords have to be a string array";
         return;
     }
 
     if (doc["endpoint_uri"].is_string()) {
         endpoint_uri = doc["endpoint_uri"].string_value();
     } else if (! doc["endpoint_uri"].is_null()) {
-        errorMessage = "TMS service: endpoint_uri have to be a string";
+        errorMessage = "WMTS service: endpoint_uri have to be a string";
         return;
     } else {
-        endpoint_uri = "http://localhost/tms";
+        endpoint_uri = "http://localhost/wmts";
     }
 
     if (doc["root_path"].is_string()) {
         root_path = doc["root_path"].string_value();
     } else if (! doc["root_path"].is_null()) {
-        errorMessage = "TMS service: root_path have to be a string";
+        errorMessage = "WMTS service: root_path have to be a string";
         return;
     } else {
-        root_path = "/tms";
+        root_path = "/wmts";
     }
 
     if (doc["metadata"].is_object()) {
         metadata = new Metadata ( doc["metadata"] );
         if (metadata->getMissingField() != "") {
-            errorMessage = "TMS service: invalid metadata: have to own a field " + metadata->getMissingField();
+            errorMessage = "WMTS service: invalid metadata: have to own a field " + metadata->getMissingField();
             return ;
         }
     }
+
+    if (doc["reprojection"].is_bool()) {
+        reprojection = doc["reprojection"].bool_value();
+    } else if (! doc["reprojection"].is_null()) {
+        errorMessage = "WMTS service: reprojection have to be a boolean";
+        return;
+    } else {
+        reprojection = false;
+    }
+
+    if (doc["info_formats"].is_array()) {
+        for (json11::Json info : doc["info_formats"].array_items()) {
+            if (info.is_string()) {
+                info_formats.push_back ( info.string_value() );
+            } else {
+                errorMessage = "WMTS service: info_formats have to be a string array";
+                return;
+            }
+        }
+    } else if (! doc["info_formats"].is_null()) {
+        errorMessage = "WMTS service: info_formats have to be a string array";
+        return;
+    }
 }
 
-DataStream* TmsService::process_request(Request* req, Rok4Server* serv) {
-    BOOST_LOG_TRIVIAL(debug) << "TMS service";
+DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
+    BOOST_LOG_TRIVIAL(debug) << "WMTS service";
 
-    if ( match_route( "/([^/]+)/?", {"GET"}, req ) ) {
+    // On contrôle le service précisé en paramètre de requête
+    std::string param_service = req->get_query_param("service");
+    std::transform(param_service.begin(), param_service.end(), param_service.begin(), ::tolower);
+
+    if (param_service != "wmts") {
+        throw WmtsException::get_error_message("SERVICE query parameter have to be WMTS", "InvalidParameterValue", 400);
+    }
+
+    // On ne gère que la version 1.0.0
+    std::string param_version = req->get_query_param("version");
+    if (param_version != "1.0.0" && param_version != "") {
+        throw WmtsException::get_error_message("VERSION query parameter have to be 1.0.0 or empty", "InvalidParameterValue", 400);
+    }
+
+    // On récupère le type de requête précisé en paramètre de requête
+    std::string param_request = req->get_query_param("request");
+    std::transform(param_request.begin(), param_request.end(), param_request.begin(), ::tolower);
+    
+    if (param_request == "getcapabilities") {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
         return get_capabilities(req, serv);
-    }
-    else if ( match_route( "/([^/]+)/([^/]+)/?", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETTILES request";
-        return get_tiles(req, serv);
-    }
-    else if ( match_route( "/([^/]+)/([^/]+)/metadata\\.json", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETMETADATA request";
-        return get_metadata(req, serv);
-    }
-    else if ( match_route( "/([^/]+)/([^/]+)/gdal\\.xml", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETGDAL request";
-        return get_gdal(req, serv);
-    }
-    else if ( match_route( "/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)\\.(.*)", {"GET"}, req ) ) {
+    } else if (param_request == "getfeatureinfo") {
+        BOOST_LOG_TRIVIAL(debug) << "GETFEATUREINFO request";
+        return get_feature_info(req, serv);
+    } else if (param_request == "gettile") {
         BOOST_LOG_TRIVIAL(debug) << "GETTILE request";
-        return new DataStreamFromDataSource(get_tile(req, serv));
+        return get_tile(req, serv);
     } else {
-        throw TmsException::get_error_message("Unknown tms request path", 400);
+        throw WmtsException::get_error_message("REQUEST query parameter unknown", "OperationNotSupported", 400);
     }
+
 };

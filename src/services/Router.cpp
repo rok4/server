@@ -54,13 +54,11 @@
 #include "services/common/Service.h"
 #include "services/health/Service.h"
 #include "services/tms/Service.h"
+#include "services/wmts/Service.h"
 
 // #include "services/admin/Service.h"
-// #include "services/wmts/Service.h"
 // #include "services/wms/Service.h"
 // #include "services/tiles/Service.h"
-
-
 
 std::string get_message_from_http_status ( int http_status ) {
     switch ( http_status ) {
@@ -69,7 +67,7 @@ std::string get_message_from_http_status ( int http_status ) {
     case 204 :
         return "No Content" ;
     case 400 :
-        return "BadRequest" ;
+        return "Bad Request" ;
     case 404 :
         return "Not Found" ;
     case 409 :
@@ -173,24 +171,24 @@ void print_fcgi_error ( int error ) {
 int sendresponse ( DataStream* stream, Request* request ) {
 
     // Creation de l'en-tete
-    std::string statusHeader= get_status_header ( stream->getHttpStatus() );
+    std::string statusHeader= get_status_header ( stream->get_http_status() );
     FCGX_PutStr ( statusHeader.data(),statusHeader.size(),request->fcgx_request->out );
 
-    if (stream->getType() != "") {
+    if (stream->get_type() != "") {
         FCGX_PutStr ( "Content-Type: ",14,request->fcgx_request->out );
-        FCGX_PutStr ( stream->getType().c_str(), strlen ( stream->getType().c_str() ),request->fcgx_request->out );
+        FCGX_PutStr ( stream->get_type().c_str(), strlen ( stream->get_type().c_str() ),request->fcgx_request->out );
     }
 
-    if ( stream->getLength() != 0 ) {
+    if ( stream->get_length() != 0 ) {
         std::stringstream ss;
-        ss << stream->getLength();
+        ss << stream->get_length();
         std::string lengthStr = ss.str();
         FCGX_PutStr ( "\r\nContent-Length: ",18,request->fcgx_request->out );
         FCGX_PutStr ( lengthStr.c_str(), strlen ( lengthStr.c_str() ),request->fcgx_request->out );
     }
 
-    if (stream->getType() != "") {
-        std::string filename = get_default_filename ( stream->getType() );
+    if (stream->get_type() != "") {
+        std::string filename = get_default_filename ( stream->get_type() );
         BOOST_LOG_TRIVIAL(debug) <<  filename ;
 
         FCGX_PutStr ( "\r\nContent-Disposition: filename=\"",33,request->fcgx_request->out );
@@ -198,7 +196,7 @@ int sendresponse ( DataStream* stream, Request* request ) {
         FCGX_PutStr ( "\"",1,request->fcgx_request->out );
     }
     
-    if (stream->getType() != "" || stream->getLength() != 0) {
+    if (stream->get_type() != "" || stream->get_length() != 0) {
         FCGX_PutStr ( "\r\n\r\n",4,request->fcgx_request->out );
     } else {
         FCGX_PutStr ( "\r\n",2,request->fcgx_request->out );
@@ -252,8 +250,8 @@ int sendresponse ( DataStream* stream, Request* request ) {
 
 void Router::process_request(Request* req, Rok4Server* serv) {
 
-    ServicesConf* services = serv->getServicesConf();
-    bool enabled = serv->getServerConf()->is_enabled();
+    ServicesConfiguration* services = serv->get_services_configuration();
+    bool enabled = serv->get_server_configuration()->is_enabled();
 
     try {
 
@@ -265,6 +263,9 @@ void Router::process_request(Request* req, Rok4Server* serv) {
         }
         else if (enabled && services->get_tms_service()->match_request(req)) {
             sendresponse(services->get_tms_service()->process_request(req, serv), req);
+        }
+        else if (enabled && services->get_wmts_service()->match_request(req)) {
+            sendresponse(services->get_wmts_service()->process_request(req, serv), req);
         }
         else {
             throw new MessageDataStream("{\"error\": \"Bad Request\", \"error_description\": \"Unknown request path\"}", "application/json", 400);
@@ -282,60 +283,4 @@ void Router::process_request(Request* req, Rok4Server* serv) {
         BOOST_LOG_TRIVIAL(error) << req->method << " " << req->path;
         sendresponse(new MessageDataStream("{\"error\": \"Internal issue\", \"error_description\": \"Routing error\"}", "application/json", 500), req);
     }
-
-    /* else if (req->pathParts.at(0) == AdminService::subdir && serv->supportAdmin()) {
-        req->service = eServiceType::ADMIN;
-        AdminService::process_request(req, serv);
-    } else if (req->pathParts.at(0) == WmsService::subdir && serv->supportWms()) {
-        req->service = eServiceType::WMS;
-        WmsService::process_request(req, serv);
-    } else if (req->pathParts.at(0) == WmtsService::subdir && serv->supportWmts()) {
-        req->service = eServiceType::WMTS;
-        WmtsService::process_request(req, serv);
-    } else if (req->pathParts.at(0) == TmsService::subdir && serv->supportTms()) {
-        req->service = eServiceType::TMS;
-        TmsService::process_request(req, serv);
-    } else if (req->pathParts.at(0) == TilesService::subdir && serv->supportTiles()) {
-        req->service = eServiceType::TILES;
-        TilesService::process_request(req, serv);
-    }
-
-
-    if (req->request == REQUEST_MISSING) {
-        // Pour certains services, cette information n'est pas dans la route, on va donc la chercher dans les paramètres de requête
-        
-        if (req->service == WMS) {
-
-
-
-        } else if (service == WMTS) {
-            if (method == "POST" && body != "") {
-                parsePostContent(body, bodyParams);
-            }
-
-            // On contrôle le service précisé en paramètre (de requête ou body)
-            std::string param_service = getParam("service");
-            std::transform(param_service.begin(), param_service.end(), param_service.begin(), ::tolower);
-
-            if (param_service != "wmts") {
-                service = SERVICE_UNKNOWN;
-            }
-
-            // On récupère le type de requête précisé en paramètre (de requête ou body)
-            std::string param_request = getParam("request");
-            std::transform(param_request.begin(), param_request.end(), param_request.begin(), ::tolower);
-            
-            if (param_request == "getcapabilities") {
-                request = GETCAPABILITIES;
-            } else if (param_request == "getfeatureinfo") {
-                request = GETFEATUREINFO;
-            } else if (param_request == "gettile") {
-                request = GETTILE;
-            } else if (param_request != "") {
-                request = REQUEST_UNKNOWN;
-            }
-
-        }
-    }*/
-
 }

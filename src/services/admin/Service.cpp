@@ -36,58 +36,60 @@
  */
 
 /**
- * \file services/Service.cpp
+ * \file services/admin/Service.cpp
  ** \~french
- * \brief Implémentation de la classe Service
+ * \brief Implémentation de la classe AdminService
  ** \~english
- * \brief Implements classe Service
+ * \brief Implements classe AdminService
  */
 
-#include "services/Service.h"
-#include "Request.h"
+#include "services/admin/Service.h"
+#include "services/admin/Exception.h"
 
-bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
+#include "Rok4Server.h"
 
-    if (std::find(methods.begin(), methods.end(), req->method) == methods.end()) {
-        return false;
+AdminService::AdminService (json11::Json& doc) : Service(doc) {
+
+    if (! isOk()) {
+        // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
+        errorMessage = "ADMIN service: " + errorMessage;
+        return;
     }
-
-    std::smatch m;
-    if (std::regex_match(req->path, m, std::regex(root_path + path))) {
-
-        for(int i = 1; i < m.size(); i++) {
-            req->path_params.push_back(m[i]);
-            BOOST_LOG_TRIVIAL(debug) << "Path param : " << m[i];
-        }
-
-        return true;
-    } else {
-        return false;
-    }
-};
-
-Service::Service (json11::Json& doc) {
 
     if (doc.is_null()) {
-        enabled = false;
-        return;
-    } else if(! doc.is_object()) {
-        errorMessage = "have to be an object";
+        // Le service a déjà été mis comme n'étant pas actif
         return;
     }
 
-    if (doc["enabled"].is_bool()) {
-        enabled = doc["enabled"].bool_value();
-    } else if (! doc["enabled"].is_null()) {
-        errorMessage = "'enabled' have to be a boolean";
-        return;
+    title = "ADMIN service";
+    abstract = "ADMIN service";
+    keywords.push_back(Keyword ( "administration" ));
+    root_path = "/admin";
+}
+
+DataStream* AdminService::process_request(Request* req, Rok4Server* serv) {
+    BOOST_LOG_TRIVIAL(debug) << "ADMIN service";
+
+    if ( match_route( "/admin/layers/([^/]+)", {"POST"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "ADDLAYER request";
+        return add_layer(req, serv);
+    }
+    else if ( match_route( "/admin/layers/([^/]+)", {"PUT"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "UPDATELAYER request";
+        return update_layer(req, serv);
+    }
+    else if ( match_route( "/admin/layers/([^/]+)", {"DELETE"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "DELETELAYER request";
+        return delete_layer(req, serv);
+    }
+    else if ( match_route( "/depends", {"PUT"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "TURNON request";
+        return turn_on(req, serv);
+    }
+    else if ( match_route( "/depends", {"PUT"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "TURNOFF request";
+        return turn_off(req, serv);
     } else {
-        enabled = false;
+        throw AdminException::get_error_message("Unknown admin request path", "Operation not supported", 400);
     }
 };
-
-bool Service::match_request(Request* req) {
-    return enabled && req->path.rfind(root_path, 0) == 0;
-};
-
-

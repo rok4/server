@@ -36,30 +36,30 @@
  */
 
 /**
- * \file configurations/MetadataURL.h
+ * \file configurations/Metadata.h
  * \~french
- * \brief Définition de la classe MetadataURL gérant les liens vers les métadonnées dans les documents de capacités
+ * \brief Définition de la classe Metadata gérant les liens vers les métadonnées dans les documents de capacités
  * \~english
- * \brief Define the MetadataURL Class handling capabilities metadata link elements
+ * \brief Define the Metadata Class handling capabilities metadata link elements
  */
 
-class MetadataURL;
+class Metadata;
 
-#ifndef METADATAURL_H
-#define METADATAURL_H
+#ifndef METADATA_H
+#define METADATA_H
 
 #include <rok4/utils/ResourceLocator.h>
 
 /**
  * \author Institut national de l'information géographique et forestière
  * \~french
- * Une instance MetadataURL représente un lien vers des métadonnées dans les différents documents de capacités.
+ * Une instance Metadata représente un lien vers des métadonnées dans les différents documents de capacités.
  * \brief Gestion des éléments de métadonnées des documents de capacités
  * \~english
- * A MetadataURL represent a metadata link element in the differents capabilities documents.
+ * A Metadata represent a metadata link element in the differents capabilities documents.
  * \brief Metadata handler for the capabilities documents
  */
-class MetadataURL : public ResourceLocator {
+class Metadata : public ResourceLocator {
 private:
     /**
      * \~french \brief Type de la métadonnée
@@ -70,13 +70,13 @@ private:
 public:
     /**
      * \~french
-     * \brief Crée un MetadataURL à partir d'un élément JSON
+     * \brief Crée un Metadata à partir d'un élément JSON
      * \param[in] doc Élément JSON
      * \~english
-     * \brief Create a MetadataURL from JSON element
+     * \brief Create a Metadata from JSON element
      * \param[in] doc JSON element
      */
-    MetadataURL ( json11::Json doc ) : ResourceLocator () {
+    Metadata ( json11::Json doc ) : ResourceLocator () {
 
         if (! doc["format"].is_string()) {
             missingField = "format";
@@ -97,21 +97,21 @@ public:
         type = doc["type"].string_value();
     };
 
-    std::string getTmsXml() {
+    std::string get_tms_xml() {
         return "<Metadata type=\"" + type + "\" mime-type=\"" + format + "\" href=\"" + href + "\" />\n";
     }
 
     /**
      * \~french
-     * Crée un MetadataURL à partir d'un autre
+     * Crée un Metadata à partir d'un autre
      * \brief Constructeur de copie
-     * \param[in] origMtdUrl MetadataURL à copier
+     * \param[in] origMtdUrl Metadata à copier
      * \~english
-     * Create a MetadataURL from another
+     * Create a Metadata from another
      * \brief Copy Constructor
-     * \param[in] origMtdUrl MetadataURL to copy
+     * \param[in] origMtdUrl Metadata to copy
      */
-    MetadataURL ( const MetadataURL & origMtdUrl ) : ResourceLocator ( origMtdUrl ) {
+    Metadata ( const Metadata & origMtdUrl ) : ResourceLocator ( origMtdUrl ) {
         href = origMtdUrl.href;
         format = origMtdUrl.format;
         type = origMtdUrl.type;
@@ -122,7 +122,7 @@ public:
      * \~english
      * \brief Assignement
      */
-    MetadataURL& operator= ( MetadataURL const& other ) {
+    Metadata& operator= ( Metadata const& other ) {
         if ( this != &other ) {
             ResourceLocator::operator= ( other );
             this->type = other.type;
@@ -137,7 +137,7 @@ public:
      * \brief Test whether 2 MetadataURLs are equals
      * \return true if all their attributes are identical
      */
-    bool operator== ( const MetadataURL& other ) const {
+    bool operator== ( const Metadata& other ) const {
         return ( this->type.compare ( other.type ) == 0
                 && this->getFormat().compare ( other.getFormat() ) == 0
                 && this->getHRef().compare ( other.getHRef() ) == 0 );
@@ -150,7 +150,7 @@ public:
      * \brief Test whether 2 MetadataURLs are different
      * \return true if one of their attributes is different
      */
-    bool operator!= ( const MetadataURL& other ) const {
+    bool operator!= ( const Metadata& other ) const {
         return ! ( *this == other );
     };
 
@@ -162,7 +162,7 @@ public:
      * \brief Return the metadata type
      * \return type
      */
-    inline std::string getType() {
+    inline std::string get_type() {
         return type;
     }
 
@@ -172,7 +172,7 @@ public:
      * \~english
      * \brief Default destructor
      */
-    virtual ~MetadataURL() {};
+    virtual ~Metadata() {};
 };
 
-#endif // METADATAURL_H
+#endif // METADATA_H

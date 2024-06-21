@@ -235,7 +235,7 @@ class Threads {
          */
         static std::string print();
 
-        static std::string toString (eThreadStatus st) {
+        static std::string to_string (eThreadStatus st) {
             return std::string ( threadstatus_name[st] );
         }
 };

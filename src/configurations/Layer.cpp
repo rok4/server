@@ -43,17 +43,26 @@
  * \brief Implement the Layer Class handling data layer.
  */
 
-#include "configurations/Layer.h"
-#include <rok4/utils/Pyramid.h>
-#include <rok4/utils/Cache.h>
-
 #include <boost/log/trivial.hpp>
 #include <libgen.h>
 #include <fstream>
 #include <string>
 #include <iostream>
 
+#include <rok4/utils/Pyramid.h>
+#include <rok4/utils/Cache.h>
 #include <rok4/utils/Utils.h>
+#include <rok4/style/Style.h>
+
+#include "configurations/Layer.h"
+
+bool is_style_handled(Style* style) {
+    if (style->get_identifier() == "") return false;
+    if (style->get_titles().size() == 0) return false;
+    if (style->get_aspect() != 0 || style->get_estompage() != 0 || style->get_pente() != 0) return false;
+
+    return true;
+}
 
 bool Layer::parse(json11::Json& doc) {
 
@@ -67,14 +76,14 @@ bool Layer::parse(json11::Json& doc) {
     tms = true;
     tiles = true;
 
-    getFeatureInfoAvailability = false;
-    getFeatureInfoType = "";
-    getFeatureInfoBaseURL = "";
-    GFIService = "";
-    GFIVersion = "";
-    GFIQueryLayers = "";
-    GFILayers = "";
-    GFIForceEPSG = true;
+    gfi_enabled = false;
+    gfi_type = "";
+    gfi_url = "";
+    gfi_service = "";
+    gfi_version = "";
+    gfi_query_layers = "";
+    gfi_layers = "";
+    gfi_force_epsg = true;
 
     // Chargement
 
@@ -108,12 +117,12 @@ bool Layer::parse(json11::Json& doc) {
 
     if (doc["metadata"].is_array()) {
         for (json11::Json mtd : doc["metadata"].array_items()) {
-            MetadataURL m = MetadataURL(mtd);
+            Metadata m = Metadata(mtd);
             if (m.getMissingField() != "") {
                 errorMessage = "Invalid metadata: have to own a field " + m.getMissingField();
                 return false;
             }
-            metadataURLs.push_back (m);
+            metadata.push_back (m);
         }
     } else if (! doc["metadata"].is_null()) {
         errorMessage = "metadata have to be an object array";
@@ -121,7 +130,7 @@ bool Layer::parse(json11::Json& doc) {
     }
 
     if (doc["attribution"].is_object()) {
-        attribution = new AttributionURL(doc["attribution"].object_items());
+        attribution = new Attribution(doc["attribution"].object_items());
         if (attribution->getMissingField() != "") {
             errorMessage = "Invalid attribution: have to own a field " + attribution->getMissingField();
             return false;
@@ -215,7 +224,7 @@ bool Layer::parse(json11::Json& doc) {
     infos.top_level = pyramid->getHighestLevel()->getId();
     infos.bottom_level = pyramid->getLowestLevel()->getId();
     infos.wmts_id = infos.tms->getId() + "_" + infos.top_level + "_" + infos.bottom_level;
-    WMTSTMSList.push_back(infos);
+    wmts_tilematrixsets.push_back(infos);
 
     /********************** Gestion de l'étendue des données */
 
@@ -230,15 +239,15 @@ bool Layer::parse(json11::Json& doc) {
             return false;
         }
 
-        geographicBoundingBox = BoundingBox<double>(doc["bbox"]["west"].number_value(), doc["bbox"]["south"].number_value(), doc["bbox"]["east"].number_value(), doc["bbox"]["north"].number_value() );
-        geographicBoundingBox.crs = "EPSG:4326";
+        geographic_bbox = BoundingBox<double>(doc["bbox"]["west"].number_value(), doc["bbox"]["south"].number_value(), doc["bbox"]["east"].number_value(), doc["bbox"]["north"].number_value() );
+        geographic_bbox.crs = "EPSG:4326";
         
-        boundingBox = BoundingBox<double>(geographicBoundingBox);
-        boundingBox.reproject(CRS::getEpsg4326(), pyramid->getTms()->getCrs());
-        calculateNativeTileMatrixLimits();
+        native_bbox = BoundingBox<double>(geographic_bbox);
+        native_bbox.reproject(CRS::getEpsg4326(), pyramid->getTms()->getCrs());
+        calculate_native_tilematrix_limits();
     } else {
         /* Calcul de la bbox dans la projection des données, à partir des tuiles limites des niveaux de la pyramide */
-        calculateBoundingBoxes();
+        calculate_bboxes();
     }
 
 
@@ -256,47 +265,47 @@ bool Layer::parse(json11::Json& doc) {
         tiles = doc["tiles"]["enabled"].bool_value();
     }
 
-    if (Rok4Format::isRaster(pyramid->getFormat())) {
+    if (Rok4Format::is_raster(pyramid->getFormat())) {
         /******************* CAS RASTER *********************/
 
         // Configuration du GET FEATURE INFO
         if (doc["get_feature_info"].is_object()) {
-            getFeatureInfoAvailability = true;
+            gfi_enabled = true;
             
             if (doc["get_feature_info"]["type"].is_string()) {
 
                 if(doc["get_feature_info"]["type"].string_value().compare("PYRAMID") == 0) {
                     // Donnee elle-meme
-                    getFeatureInfoType = "PYRAMID";
+                    gfi_type = "PYRAMID";
                 }
                 else if(doc["get_feature_info"]["type"].string_value().compare("EXTERNALWMS") == 0) {
 
-                    getFeatureInfoType = "EXTERNALWMS";
+                    gfi_type = "EXTERNALWMS";
 
                     if(doc["get_feature_info"]["url"].is_string()) {
-                        getFeatureInfoBaseURL = doc["get_feature_info"]["url"].string_value();
-                        std::string a = getFeatureInfoBaseURL.substr(getFeatureInfoBaseURL.length()-1, 1);
+                        gfi_url = doc["get_feature_info"]["url"].string_value();
+                        std::string a = gfi_url.substr(gfi_url.length()-1, 1);
                         if ( a.compare("?") != 0 ) {
-                            getFeatureInfoBaseURL = getFeatureInfoBaseURL + "?";
+                            gfi_url = gfi_url + "?";
                         }
                     }
                     if(doc["get_feature_info"]["layers"].is_string()) {
-                        GFILayers = doc["get_feature_info"]["layers"].string_value();
+                        gfi_layers = doc["get_feature_info"]["layers"].string_value();
                     }
                     if(doc["get_feature_info"]["query_layers"].is_string()) {
-                        GFIQueryLayers = doc["get_feature_info"]["query_layers"].string_value();
+                        gfi_query_layers = doc["get_feature_info"]["query_layers"].string_value();
                     }
                     if(doc["get_feature_info"]["version"].is_string()) {
-                        GFIVersion = doc["get_feature_info"]["version"].string_value();
+                        gfi_version = doc["get_feature_info"]["version"].string_value();
                     }
                     if(doc["get_feature_info"]["service"].is_string()) {
-                        GFIService = doc["get_feature_info"]["service"].string_value();
+                        gfi_service = doc["get_feature_info"]["service"].string_value();
                     }
                     if(doc["get_feature_info"]["force_epsg"].is_bool()) {
-                        GFIForceEPSG = doc["get_feature_info"]["force_epsg"].bool_value();
+                        gfi_force_epsg = doc["get_feature_info"]["force_epsg"].bool_value();
                     }
                     if(doc["get_feature_info"]["extra_query_params"].is_string()) {
-                        GFIExtraParams = doc["get_feature_info"]["extra_query_params"].string_value();
+                        gfi_extra_params = doc["get_feature_info"]["extra_query_params"].string_value();
                     }
 
                 } 
@@ -322,7 +331,7 @@ bool Layer::parse(json11::Json& doc) {
                         BOOST_LOG_TRIVIAL(warning) <<  "Style " << styleName <<" unknown or unloadable"  ;
                         continue;
                     }
-                    if ( ! sty->isUsableForBroadcast() ) {
+                    if ( ! is_style_handled(sty) ) {
                         BOOST_LOG_TRIVIAL(warning) << "Style " << styleName << " not usable for broadcast" ;
                         continue;
                     }
@@ -342,129 +351,102 @@ bool Layer::parse(json11::Json& doc) {
             return false;
         }
 
-        // // Configuration des reprojections possibles
-        // if ( servicesConf->getReprojectionCapability() ) {
+        // Configuration des reprojections possibles
 
-        //     // TMS additionnels pour le WMTS
-        //     if (doc["wmts"].is_object() && doc["wmts"]["tms"].is_array()) {
-        //         for (json11::Json t : doc["wmts"]["tms"].array_items()) {
-        //             if (! t.is_string()) {
-        //                 errorMessage =  "wmts.tms have to be a string array"  ;
-        //                 return false;
-        //             }
-        //             TileMatrixSet* tms = TmsBook::get_tms(t.string_value());
-        //             if ( tms == NULL ) {
-        //                 BOOST_LOG_TRIVIAL(warning) <<  "TMS " << t.string_value() <<" unknown"  ;
-        //                 continue;
-        //             }
-        //             if (! servicesConf->isCRSAllowed(tms->getCrs()->getRequestCode())) {
-        //                 BOOST_LOG_TRIVIAL(warning) <<  "Forbiden CRS for TMS " << t.string_value();
-        //                 continue;
-        //             }
+        // TMS additionnels pour le WMTS
+        if (doc["wmts"].is_object() && doc["wmts"]["tms"].is_array()) {
+            for (json11::Json t : doc["wmts"]["tms"].array_items()) {
+                if (! t.is_string()) {
+                    errorMessage =  "wmts.tms have to be a string array"  ;
+                    return false;
+                }
+                TileMatrixSet* tms = TmsBook::get_tms(t.string_value());
+                if ( tms == NULL ) {
+                    BOOST_LOG_TRIVIAL(warning) <<  "TMS " << t.string_value() <<" unknown"  ;
+                    continue;
+                }
 
-        //             if (getTms(tms->getId()) != NULL) {
-        //                 // Le TMS est déjà dans la liste ou est celui natif de la pyramide
-        //                 continue;
-        //             }
+                if (get_tilematrixset(tms->getId()) != NULL) {
+                    // Le TMS est déjà dans la liste ou est celui natif de la pyramide
+                    continue;
+                }
 
-        //             infos.tms = tms;
-        //             // On calculera plus tard (dans calculateTileMatrixLimits) les informations de niveaux de haut et bas (et donc l'ID WMTS de ce TMS)
-        //             WMTSTMSList.push_back(infos);
-        //         }
-        //     }
+                infos.tms = tms;
+                // On calculera plus tard (dans calculate_tilematrix_limits) les informations de niveaux de haut et bas (et donc l'ID WMTS de ce TMS)
+                wmts_tilematrixsets.push_back(infos);
+            }
+        }
 
-        //     // Projections additionnelles pour le WMS
-        //     if (doc["wms"].is_object() && doc["wms"]["crs"].is_array()) {
-        //         for (json11::Json c : doc["wms"]["crs"].array_items()) {
-        //             if (! c.is_string()) {
-        //                 errorMessage =  "wms.crs have to be a string array"  ;
-        //                 return false;
-        //             }
-        //             std::string str_crs = c.string_value();
-        //             // On commence par regarder si la projection n'est pas déjà dans nos liste
-        //             if (servicesConf->isInGlobalCRSList(str_crs) || isInWMSCRSList(str_crs)) {
-        //                 continue;
-        //             }
-        //             if (! servicesConf->isCRSAllowed(str_crs)) {
-        //                 BOOST_LOG_TRIVIAL(warning) <<  "Forbiden CRS " << str_crs   ;
-        //                 continue;
-        //             }
-        //             // On verifie que la CRS figure dans la liste des CRS de proj (sinon, le serveur n est pas capable de la gerer)
-        //             CRS* crs = new CRS ( str_crs );
-                    
-        //             if ( ! crs->isDefine() ) {
-        //                 BOOST_LOG_TRIVIAL(warning) << "CRS " << str_crs << " is not handled by PROJ";
-        //                 delete crs;
-        //                 continue;
-        //             }
+        // Projections additionnelles pour le WMS
+        if (doc["wms"].is_object() && doc["wms"]["crs"].is_array()) {
+            for (json11::Json c : doc["wms"]["crs"].array_items()) {
+                if (! c.is_string()) {
+                    errorMessage =  "wms.crs have to be a string array"  ;
+                    return false;
+                }
+                std::string str_crs = c.string_value();
+                // On verifie que la CRS figure dans la liste des CRS de proj (sinon, le serveur n est pas capable de la gerer)
+                CRS* crs = new CRS ( str_crs );
+                
+                if ( ! crs->isDefine() ) {
+                    BOOST_LOG_TRIVIAL(warning) << "CRS " << str_crs << " is not handled by PROJ";
+                    delete crs;
+                    continue;
+                }
 
-        //             // Test if the current layer bounding box is compatible with the current CRS
-        //             if ( ! geographicBoundingBox.intersectAreaOfCRS(crs) ) {
-        //                 BOOST_LOG_TRIVIAL(warning) << "CRS " << str_crs << " is not compatible with the layer extent";
-        //                 delete crs;
-        //                 continue;
-        //             }
+                // Test if the current layer bounding box is compatible with the current CRS
+                if ( ! geographic_bbox.intersectAreaOfCRS(crs) ) {
+                    BOOST_LOG_TRIVIAL(warning) << "CRS " << str_crs << " is not compatible with the layer extent";
+                    delete crs;
+                    continue;
+                }
 
-        //             WMSCRSList.push_back ( crs );
-
-        //             // On voudra aussi ajouter les CRS équivalents si le service est configuré pour
-        //             if (servicesConf->getDoWeUseListOfEqualsCRS()) {
-        //                 std::vector<CRS*> eqCRS = servicesConf->getEqualsCRS(str_crs );
-
-        //                 for (unsigned int l = 0; l < eqCRS.size(); l++) {
-        //                     if ( isInWMSCRSList(eqCRS.at( l )) ) {
-        //                         continue;
-        //                     }
-        //                     // On clone bien le CRS, pour ne pas avoir un conflit lors du nettoyage
-        //                     WMSCRSList.push_back( new CRS( eqCRS.at(l) ) );
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                wms_crs.push_back ( crs );
+            }
+        }
 
         if (doc["resampling"].is_string()) {
-            resampling = Interpolation::fromString ( doc["resampling"].string_value() );
+            resampling = Interpolation::from_string ( doc["resampling"].string_value() );
             if (resampling == Interpolation::KernelType::UNKNOWN) {
                 errorMessage =  "Resampling " + doc["resampling"].string_value() +" unknown"  ;
                 return false;
             }
         } else {
-            resampling = Interpolation::fromString ( DEFAULT_RESAMPLING );
+            resampling = Interpolation::from_string ( DEFAULT_RESAMPLING );
         }
     }
 
     return true;
 }
 
-void Layer::calculateBoundingBoxes() {
+void Layer::calculate_bboxes() {
 
     // On calcule la bbox à partir des tuiles limites du niveau le mieux résolu de la pyramide
     std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->getOrderedLevels(true);
 
     Level * level = orderedLevels.begin()->second;
-    boundingBox = BoundingBox<double>(level->getBboxFromTileLimits());
-    boundingBox.crs = pyramid->getTms()->getCrs()->getRequestCode();
+    native_bbox = BoundingBox<double>(level->getBboxFromTileLimits());
+    native_bbox.crs = pyramid->getTms()->getCrs()->getRequestCode();
 
-    geographicBoundingBox = BoundingBox<double>(boundingBox);
-    geographicBoundingBox.reproject(pyramid->getTms()->getCrs(), CRS::getEpsg4326());
+    geographic_bbox = BoundingBox<double>(native_bbox);
+    geographic_bbox.reproject(pyramid->getTms()->getCrs(), CRS::getEpsg4326());
 }
 
-void Layer::calculateNativeTileMatrixLimits() {
+void Layer::calculate_native_tilematrix_limits() {
 
     std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->getOrderedLevels(true);
     for (std::pair<std::string, Level*> element : orderedLevels) {
-        element.second->setTileLimitsFromBbox(boundingBox);
+        element.second->setTileLimitsFromBbox(native_bbox);
     }
 }
 
-void Layer::calculateTileMatrixLimits() {
+void Layer::calculate_tilematrix_limits() {
 
     std::vector<WmtsTmsInfos> newList;
 
     // Le premier TMS est celui natif : les tuiles limites sont déjà calculée et stockées dans les niveaux
 
-    WmtsTmsInfos infos = WMTSTMSList.at(0);
+    WmtsTmsInfos infos = wmts_tilematrixsets.at(0);
     infos.limits = std::vector<TileMatrixLimits>();
 
     std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->getOrderedLevels(false);
@@ -475,15 +457,15 @@ void Layer::calculateTileMatrixLimits() {
     newList.push_back(infos);
 
     // On calcule les tuiles limites pour tous les TMS supplémentaires, que l'on filtre
-    for (unsigned i = 1 ; i < WMTSTMSList.size(); i++) {
-        TileMatrixSet* tms = WMTSTMSList.at(i).tms;
+    for (unsigned i = 1 ; i < wmts_tilematrixsets.size(); i++) {
+        TileMatrixSet* tms = wmts_tilematrixsets.at(i).tms;
 
         BOOST_LOG_TRIVIAL(debug) <<  "Tile limits calculation for TMS " << tms->getId() ;
 
         infos.tms = tms;
         infos.limits = std::vector<TileMatrixLimits>();
 
-        BoundingBox<double> tmp = geographicBoundingBox;
+        BoundingBox<double> tmp = geographic_bbox;
         tmp.print();
         tmp = tmp.cropToAreaOfCRS(tms->getCrs());
         BOOST_LOG_TRIVIAL(warning) <<  tms->getCrs()->getRequestCode();
@@ -551,7 +533,7 @@ void Layer::calculateTileMatrixLimits() {
     }
 
     // La nouvelle liste ne contient pas les TMS pour lesquels nous n'avons pas pu calculer les niveaux et les limites
-    WMTSTMSList = newList;
+    wmts_tilematrixsets = newList;
 }
 
 Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution(NULL) {
@@ -575,7 +557,7 @@ Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution
 
     Context* context = StoragePool::get_context(storage_type, tray_name);
     if (context == NULL) {
-        errorMessage = "Cannot add " + ContextType::toString(storage_type) + " storage context to read style";
+        errorMessage = "Cannot add " + ContextType::to_string(storage_type) + " storage context to read style";
         return;
     }
 
@@ -603,13 +585,13 @@ Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution
         return;
     }
 
-    if (Rok4Format::isRaster(pyramid->getFormat())) {
-        calculateTileMatrixLimits();
+    if (Rok4Format::is_raster(pyramid->getFormat())) {
+        calculate_tilematrix_limits();
     } else {
         // Une pyramide vecteur n'est diffusée qu'en TMS et le GFI n'est pas possible
         wms = false;
         wmts = false;
-        getFeatureInfoAvailability = false;
+        gfi_enabled = false;
     }
 
     return;
@@ -640,74 +622,63 @@ Layer::Layer(std::string layerName, std::string content ) : Configuration(), id(
         return;
     }
 
-    if (Rok4Format::isRaster(pyramid->getFormat())) {
-        calculateTileMatrixLimits();
+    if (Rok4Format::is_raster(pyramid->getFormat())) {
+        calculate_tilematrix_limits();
     } else {
         // Une pyramide vecteur n'est diffusée qu'en WMTS et TMS et le GFI n'est pas possible
         wms = false;
         wmts = false;
-        getFeatureInfoAvailability = false;
+        gfi_enabled = false;
     }
     
     return;
 }
 
-
-Image* Layer::getbbox (BoundingBox<double> bbox, int width, int height, CRS* dst_crs, int dpi, int& error ) {
-    error=0;
-
-    // bool crs_equals = servicesConf->are_the_two_CRS_equal( pyramid->getTms()->getCrs()->getProjCode(), dst_crs->getProjCode() );
-
-    // return pyramid->getbbox (servicesConf->getMaxTileX(), servicesConf->getMaxTileY(), bbox, width, height, dst_crs, crs_equals, resampling, dpi, error );
-}
-
-std::string Layer::getId() {
+std::string Layer::get_id() {
     return id;
 }
 
 Layer::~Layer() {
 
-    for (unsigned int l = 0 ; l < WMSCRSList.size() ; l++) {
-        delete WMSCRSList.at(l);
+    for (unsigned int l = 0 ; l < wms_crs.size() ; l++) {
+        delete wms_crs.at(l);
     }
     if (attribution != NULL) delete attribution;
     if (pyramid != NULL) delete pyramid;
 }
 
 
-std::string Layer::getAbstract() { return abstract; }
+std::string Layer::get_abstract() { return abstract; }
 bool Layer::is_wms_enabled() { return wms; }
 bool Layer::is_tms_enabled() { return tms; }
 bool Layer::is_wmts_enabled() { return wmts; }
 bool Layer::is_tiles_enabled() { return tiles; }
-std::vector<Keyword>* Layer::getKeyWords() { return &keywords; }
-double Layer::getMaxRes() { return pyramid->getHighestLevel()->getRes(); }
-double Layer::getMinRes() { return pyramid->getLowestLevel()->getRes(); }
+std::vector<Keyword>* Layer::get_keywords() { return &keywords; }
 Pyramid* Layer::get_pyramid() { return pyramid; }
-Style* Layer::getDefaultStyle() {
+Style* Layer::get_default_style() {
     if (styles.size() > 0) {
         return styles[0];
     } else {
         return NULL;
     }
 }
-std::vector<Style*> Layer::getStyles() { return styles; }
+std::vector<Style*> Layer::get_styles() { return styles; }
 
-std::vector<WmtsTmsInfos> Layer::getWMTSTMSList() { return WMTSTMSList; }
-TileMatrixSet* Layer::getTms(std::string wmts_id) {
-    for ( unsigned int k = 0; k < WMTSTMSList.size(); k++ ) {
-        if ( wmts_id == WMTSTMSList.at(k).wmts_id || wmts_id == WMTSTMSList.at(k).tms->getId() ) {
-            return WMTSTMSList.at(k).tms;
+std::vector<WmtsTmsInfos> Layer::get_wmts_tilematrixsets() { return wmts_tilematrixsets; }
+TileMatrixSet* Layer::get_tilematrixset(std::string wmts_id) {
+    for ( unsigned int k = 0; k < wmts_tilematrixsets.size(); k++ ) {
+        if ( wmts_id == wmts_tilematrixsets.at(k).wmts_id || wmts_id == wmts_tilematrixsets.at(k).tms->getId() ) {
+            return wmts_tilematrixsets.at(k).tms;
         }
     }
     return NULL;
 }
-TileMatrixLimits* Layer::getTmLimits(TileMatrixSet* tms, TileMatrix* tm) {
-    for ( unsigned int k = 0; k < WMTSTMSList.size(); k++ ) {
-        if ( tms->getId() == WMTSTMSList.at (k).tms->getId() ) {
-            for ( unsigned int l = 0; l < WMTSTMSList.at (k).limits.size(); l++ ) {
-                if ( tm->getId() == WMTSTMSList.at (k).limits.at(l).tileMatrixId ) {
-                    return &(WMTSTMSList.at (k).limits.at(l));
+TileMatrixLimits* Layer::get_tilematrix_limits(TileMatrixSet* tms, TileMatrix* tm) {
+    for ( unsigned int k = 0; k < wmts_tilematrixsets.size(); k++ ) {
+        if ( tms->getId() == wmts_tilematrixsets.at (k).tms->getId() ) {
+            for ( unsigned int l = 0; l < wmts_tilematrixsets.at (k).limits.size(); l++ ) {
+                if ( tm->getId() == wmts_tilematrixsets.at (k).limits.at(l).tileMatrixId ) {
+                    return &(wmts_tilematrixsets.at (k).limits.at(l));
                 }
             }
         }
@@ -715,54 +686,43 @@ TileMatrixLimits* Layer::getTmLimits(TileMatrixSet* tms, TileMatrix* tm) {
     return NULL;
 }
 
-Style* Layer::getStyle(std::string id) {
+Style* Layer::get_style_by_identifier(std::string identifier) {
     for ( unsigned int i = 0; i < styles.size(); i++ ) {
-        if ( id == styles[i]->getId() )
+        if ( identifier == styles[i]->get_identifier() )
             return styles[i];
     }
     return NULL;
 }
 
-Style* Layer::getStyleByIdentifier(std::string identifier) {
-    for ( unsigned int i = 0; i < styles.size(); i++ ) {
-        if ( identifier == styles[i]->getIdentifier() )
-            return styles[i];
-    }
-    return NULL;
-}
-
-std::string Layer::getTitle() { return title; }
-std::vector<CRS*> Layer::getWMSCRSList() { return WMSCRSList; }
+std::string Layer::get_title() { return title; }
 bool Layer::isInWMSCRSList(CRS* c) {
-    for ( unsigned int k = 0; k < WMSCRSList.size(); k++ ) {
-        if ( c->cmpRequestCode ( WMSCRSList.at (k)->getRequestCode() ) ) {
+    for ( unsigned int k = 0; k < wms_crs.size(); k++ ) {
+        if ( c->cmpRequestCode ( wms_crs.at (k)->getRequestCode() ) ) {
             return true;
         }
     }
     return false;
 }
 bool Layer::isInWMSCRSList(std::string c) {
-    for ( unsigned int k = 0; k < WMSCRSList.size(); k++ ) {
-        if ( WMSCRSList.at (k)->cmpRequestCode ( c ) ) {
+    for ( unsigned int k = 0; k < wms_crs.size(); k++ ) {
+        if ( wms_crs.at (k)->cmpRequestCode ( c ) ) {
             return true;
         }
     }
     return false;
 }
 
-AttributionURL* Layer::getAttribution() { return attribution; }
-BoundingBox<double> Layer::getGeographicBoundingBox() { return geographicBoundingBox; }
-BoundingBox<double> Layer::getBoundingBox() { return boundingBox; }
-std::vector<MetadataURL> Layer::getMetadataURLs() { return metadataURLs; }
-bool Layer::isGetFeatureInfoAvailable() { return getFeatureInfoAvailability; }
-std::string Layer::getGFIType() { return getFeatureInfoType; }
-std::string Layer::getGFIBaseUrl() { return getFeatureInfoBaseURL; }
-std::string Layer::getGFIExtraParams() { return GFIExtraParams; }
-std::string Layer::getGFILayers() { return GFILayers; }
-std::string Layer::getGFIQueryLayers() { return GFIQueryLayers; }
-std::string Layer::getGFIService() { return GFIService; }
-std::string Layer::getGFIVersion() { return GFIVersion; }
-bool Layer::getGFIForceEPSG() { return GFIForceEPSG; }
-std::string Layer::getNativeWmtsTmsId() { 
-    return WMTSTMSList.at(0).wmts_id;
-}
+Attribution* Layer::get_attribution() { return attribution; }
+BoundingBox<double> Layer::get_geographical_bbox() { return geographic_bbox; }
+BoundingBox<double> Layer::get_native_bbox() { return native_bbox; }
+std::vector<Metadata> Layer::get_metadata() { return metadata; }
+bool Layer::is_gfi_enabled() { return gfi_enabled; }
+std::string Layer::get_gfi_type() { return gfi_type; }
+std::string Layer::get_gfi_url() { return gfi_url; }
+std::string Layer::get_gfi_extra_params() { return gfi_extra_params; }
+std::string Layer::get_gfi_layers() { return gfi_layers; }
+std::string Layer::get_gfi_query_layers() { return gfi_query_layers; }
+std::string Layer::get_gfi_service() { return gfi_service; }
+std::string Layer::get_gfi_version() { return gfi_version; }
+Interpolation::KernelType Layer::get_resampling() { return resampling; }
+bool Layer::get_gfi_force_epsg() { return gfi_force_epsg; }

@@ -36,31 +36,32 @@
  */
 
 /**
- * \file configurations/AttributionURL.h
+ * \file configurations/Attribution.h
  * \~french
- * \brief Définition de la classe AttributionURL gérant les liens vers les métadonnées dans les documents de capacités
+ * \brief Définition de la classe Attribution gérant les liens vers les métadonnées dans les documents de capacités
  * \~english
- * \brief Define the AttributionURL Class handling capabilities metadata link elements
+ * \brief Define the Attribution Class handling capabilities metadata link elements
  */
 
-class AttributionURL;
+#ifndef ATTRIBUTION_H
+#define ATTRIBUTION_H
 
-#ifndef ATTRIBUTIONURL_H
-#define ATTRIBUTIONURL_H
+#include <tinyxml.h>
 
 #include <rok4/utils/ResourceLocator.h>
-#include "UtilsXML.h"
+
+#include "Utils.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
  * \~french
- * Une instance AttributionURL représente un lien vers une attribution
+ * Une instance Attribution représente un lien vers une attribution
  * \brief Gestion des éléments d'attribution des documents de capacités
  * \~english
- * A AttributionURL represent a attribution link element in the differents capabilities documents.
+ * A Attribution represent a attribution link element in the differents capabilities documents.
  * \brief Attribution handler for the capabilities documents
  */
-class AttributionURL : public ResourceLocator {
+class Attribution : public ResourceLocator {
 private:
     /**
      * \~french \brief Titre de l'attribution
@@ -87,13 +88,13 @@ private:
 public:
     /**
      * \~french
-     * \brief Crée un AttributionURL à partir d'un élément JSON
+     * \brief Crée un Attribution à partir d'un élément JSON
      * \param[in] doc Élément JSON
      * \~english
-     * \brief Create a AttributionURL from JSON element
+     * \brief Create a Attribution from JSON element
      * \param[in] doc JSON element
      */
-    AttributionURL ( json11::Json doc ) : ResourceLocator (), logo(NULL) {
+    Attribution ( json11::Json doc ) : ResourceLocator (), logo(NULL) {
 
         if (! doc["title"].is_string()) {
             missingField = "title";
@@ -137,7 +138,7 @@ public:
      * \~english \brief XML export for TMS GetCapabilities
      * \param[in] elName XML element name
      */
-    std::string getTmsXml() {
+    std::string get_tms_xml() {
         std::string res = "<Attribution><Title>" + title + "</Title>";
         if (logo != NULL) {
             res += "<Logo width=\"" + std::to_string(width) + "\" height=\"" + std::to_string(height) + "\" href=\"" + logo->getHRef() + "\" mime-type=\"" + logo->getFormat() + "\" />\n";
@@ -150,9 +151,9 @@ public:
      * \~french \brief Export XML pour le GetCapabilities WMS
      * \~english \brief XML export for WMS GetCapabilities
      */
-    TiXmlElement* getWmsXml() {
+    TiXmlElement* get_wms_xml() {
         TiXmlElement* el = new TiXmlElement ( "Attribution" );
-        el->LinkEndChild ( UtilsXML::buildTextNode ( "Title", title ) );
+        el->LinkEndChild ( Utils::build_text_node ( "Title", title ) );
 
         TiXmlElement* orEl = new TiXmlElement ( "OnlineResource" );
         orEl->SetAttribute ( "xlink:type","simple" );
@@ -163,7 +164,7 @@ public:
             TiXmlElement* logoEl = new TiXmlElement ( "LogoURL" );
             logoEl->SetAttribute ( "width", width );
             logoEl->SetAttribute ( "height", height );
-            logoEl->LinkEndChild ( UtilsXML::buildTextNode ( "Format", logo->getFormat() ) );
+            logoEl->LinkEndChild ( Utils::build_text_node ( "Format", logo->getFormat() ) );
 
             TiXmlElement* logoOrEl = new TiXmlElement ( "OnlineResource" );
             logoOrEl->SetAttribute ( "xlink:type","simple" );
@@ -182,9 +183,9 @@ public:
      * \~english
      * \brief Default destructor
      */
-    virtual ~AttributionURL() {
+    virtual ~Attribution() {
         if (logo != NULL) delete logo;
     };
 };
 
-#endif // ATTRIBUTIONURL_H
+#endif // ATTRIBUTION_H

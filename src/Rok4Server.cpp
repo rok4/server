@@ -85,7 +85,7 @@ void* Rok4Server::thread_loop(void* arg) {
         BOOST_LOG_TRIVIAL(fatal) << "Le listener FCGI ne peut etre initialise";
     }
 
-    while (server->isRunning()) {
+    while (server->is_running()) {
         std::string content;
 
         int rc;
@@ -118,32 +118,32 @@ void* Rok4Server::thread_loop(void* arg) {
     return 0;
 }
 
-Rok4Server::Rok4Server(ServerConf* svr, ServicesConf* svc) {
+Rok4Server::Rok4Server(ServerConfiguration* svr, ServicesConfiguration* svc) {
     sock = 0;
-    servicesConf = svc;
-    serverConf = svr;
+    services_configuration = svc;
+    server_configuration = svr;
     
-    if (svr->cacheValidity > 0) {
-        IndexCache::setValidity(svr->cacheValidity * 60);
+    if (svr->cache_validity > 0) {
+        IndexCache::setValidity(svr->cache_validity * 60);
     }
-    if (svr->cacheSize > 0) {
-        IndexCache::setCacheSize(svr->cacheSize);
+    if (svr->cache_size > 0) {
+        IndexCache::setCacheSize(svr->cache_size);
     }
 
-    threads = std::vector<pthread_t>(serverConf->getNbThreads());
+    threads = std::vector<pthread_t>(server_configuration->get_threads_count());
 
     running = false;
 }
 
 Rok4Server::~Rok4Server() {
-    delete serverConf;
-    delete servicesConf;
+    delete server_configuration;
+    delete services_configuration;
 }
 
-void Rok4Server::initFCGI() {
+void Rok4Server::initialize_fcgi() {
     int init = FCGX_Init();
-    BOOST_LOG_TRIVIAL(info) << "Listening on " << serverConf->socket;
-    sock = FCGX_OpenSocket(serverConf->socket.c_str(), serverConf->backlog);
+    BOOST_LOG_TRIVIAL(info) << "Listening on " << server_configuration->socket;
+    sock = FCGX_OpenSocket(server_configuration->socket.c_str(), server_configuration->backlog);
 }
 
 void Rok4Server::run(sig_atomic_t signal_pending) {
@@ -173,14 +173,17 @@ void Rok4Server::terminate() {
 
 /******************* GETTERS / SETTERS *****************/
 
-ServicesConf* Rok4Server::getServicesConf() { return servicesConf; }
-ServerConf* Rok4Server::getServerConf() { return serverConf; }
+ServicesConfiguration* Rok4Server::get_services_configuration() { return services_configuration; }
+ServerConfiguration* Rok4Server::get_server_configuration() { return server_configuration; }
+void Rok4Server::turn_off() {server_configuration->enabled = false; }
+void Rok4Server::turn_on() {server_configuration->enabled = true; }
+
 std::vector<pthread_t>& Rok4Server::get_threads() {return threads;}
 
-int Rok4Server::getFCGISocket() { return sock; }
-void Rok4Server::setFCGISocket(int sockFCGI) { sock = sockFCGI; }
-int Rok4Server::getPID() { return pid; }
-void Rok4Server::setPID(int processID) { pid = processID; }
-long Rok4Server::getTime() { return time; }
-void Rok4Server::setTime(long processTime) { time = processTime; }
-bool Rok4Server::isRunning() { return running; }
+int Rok4Server::get_fcgi_socket() { return sock; }
+void Rok4Server::set_fcgi_socket(int sockFCGI) { sock = sockFCGI; }
+int Rok4Server::get_pid() { return pid; }
+void Rok4Server::set_pid(int processID) { pid = processID; }
+long Rok4Server::get_time() { return time; }
+void Rok4Server::set_time(long processTime) { time = processTime; }
+bool Rok4Server::is_running() { return running; }
