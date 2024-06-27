@@ -286,9 +286,18 @@ DataStream* Rok4Server::TMSGetLayerMetadata ( Request* request ) {
 
     std::ostringstream res;
     std::string jsondesc;
+
+    std::string description = layer->getAbstract();
+    // on double les backslash, en évitant de traiter les backslash déjà doublés
+    boost::replace_all(description, "\\\\", "\\");
+    boost::replace_all(description, "\\", "\\\\");
+    // On échappe les doubles quotes
+    boost::replace_all(description, "\"", "\\\"");
+
+
     res << "{\n";
     res << "  \"name\": \"" << layer->getId() << "\",\n";
-    res << "  \"description\": \"" << layer->getAbstract() << "\",\n";
+    res << "  \"description\": \"" << description << "\",\n";
     res << "  \"minzoom\": " << minzoom << ",\n";
     res << "  \"maxzoom\": " << maxzoom << ",\n";
     res << "  \"crs\": \"" << layer->getDataPyramid()->getTms()->getCrs()->getRequestCode() << "\",\n";
