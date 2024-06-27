@@ -1,3 +1,9 @@
+## 5.5.2
+
+### [Fixed]
+
+* `TMS` : les backslash sont échappés dans l'abstract pour éviter la casse du metadata.json
+
 ## 5.5.1
 
 ### [Added]
