@@ -1,0 +1,261 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+    <meta name="generator" content="Doxygen 1.8.17" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Serveur de diffusion WMS, WMTS et TMS</title>
+    <link href="tabs.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="resize.js"></script>
+    <script type="text/javascript" src="navtreedata.js"></script>
+    <script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="search/searchdata.js"></script>
+    <script type="text/javascript" src="search/search.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css" />
+</head>
+<body><!-- Généré par Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'Recherche');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','Recherche');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('ServicesConf_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">ServicesConf.h</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright © (2011-2013) Institut national de l&#39;information</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> *                    géographique et forestière</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment"> * Géoportail SAV &lt;contact.geoservices@ign.fr&gt;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"> * This software is a computer program whose purpose is to publish geographic</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment"> * data using OGC WMS and WMTS protocol.</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * This software is governed by the CeCILL-C license under French law and</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> * abiding by the rules of distribution of free software.  You can  use,</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment"> * modify and/ or redistribute the software under the terms of the CeCILL-C</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment"> * license as circulated by CEA, CNRS and INRIA at the following URL</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment"> * &quot;http://www.cecill.info&quot;.</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"> * As a counterpart to the access to the source code and  rights to copy,</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment"> * modify and redistribute granted by the license, users are provided only</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment"> * with a limited warranty  and the software&#39;s author,  the holder of the</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment"> * economic rights,  and the successive licensors  have only  limited</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment"> * liability.</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment"> * In this respect, the user&#39;s attention is drawn to the risks associated</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment"> * with loading,  using,  modifying and/or developing or reproducing the</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment"> * software by the user in light of its specific status of free software,</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment"> * that may mean  that it is complicated to manipulate,  and  that  also</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment"> * therefore means  that it is reserved for developers  and  experienced</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment"> * professionals having in-depth computer knowledge. Users are therefore</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment"> * encouraged to load and test the software&#39;s suitability as regards their</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment"> * requirements in conditions enabling the security of their systems and/or</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment"> * data to be ensured and,  more generally, to use and operate it in the</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment"> * same conditions as regards security.</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment"> * The fact that you are presently reading this means that you have had</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment"> * knowledge of the CeCILL-C license and that you accept its terms.</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">class </span><a class="code" href="classServicesConf.html">ServicesConf</a>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#ifndef SERVICESXML_H</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#define SERVICESXML_H</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Rok4Server_8h.html">Rok4Server.h</a>&quot;</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include &lt;rok4/utils/Keyword.h&gt;</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="MetadataURL_8h.html">MetadataURL.h</a>&quot;</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include &lt;rok4/utils/CRS.h&gt;</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#include &lt;rok4/utils/Configuration.h&gt;</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#include &quot;config.h&quot;</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classServicesConf.html">   54</a></span>&#160;<span class="keyword">class </span><a class="code" href="classServicesConf.html">ServicesConf</a> : <span class="keyword">public</span> Configuration</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;{</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classRok4Server.html">Rok4Server</a>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <a class="code" href="classServicesConf.html">ServicesConf</a>(std::string path);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        ~<a class="code" href="classServicesConf.html">ServicesConf</a>();</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="comment">// WMS</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> getMaxTileX() <span class="keyword">const</span> ;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> getMaxTileY() <span class="keyword">const</span> ;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordtype">bool</span> isInFormatList(std::string f) ;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keywordtype">bool</span> isInInfoFormatList(std::string f) ;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordtype">bool</span> isInGlobalCRSList(CRS* c) ;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordtype">bool</span> isInGlobalCRSList(std::string c) ;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordtype">bool</span> isFullStyleCapable() ;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordtype">bool</span> isInspire() ;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keywordtype">bool</span> getDoWeUseListOfEqualsCRS();</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordtype">bool</span> getReprojectionCapability() ;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordtype">bool</span> are_the_two_CRS_equal( std::string crs1, std::string crs2 );</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classServicesConf.html#acc2ed7a2ba896bee9106b5f3b96f693a">isCRSAllowed</a>(std::string crs);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        </div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        std::vector&lt;CRS*&gt; <a class="code" href="classServicesConf.html#a23a4162e4b727784dd253abe7528c3b3">getEqualsCRS</a>(std::string crs);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="comment">// ----------------------- Global </span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        std::string title;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        std::string <span class="keyword">abstract</span>;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        std::vector&lt;Keyword&gt; keyWords;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        std::string serviceProvider;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        std::string providerSite;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        std::string fee;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        std::string accessConstraint;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="comment">// ----------------------- Contact </span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        std::string individualName;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        std::string individualPosition;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        std::string voice;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        std::string facsimile;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        std::string addressType;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        std::string deliveryPoint;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        std::string city;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        std::string administrativeArea;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        std::string postCode;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        std::string country;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        std::string electronicMailAddress;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="comment">// ----------------------- Commun à plusieurs services </span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordtype">bool</span> postMode;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        std::vector&lt;std::string&gt; infoFormatList;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordtype">bool</span> fullStyling;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordtype">bool</span> inspire;</div>
+<div class="line"><a name="l00130"></a><span class="lineno"><a class="line" href="classServicesConf.html#a019bcac4bc6845ad7cf64b15a824837d">  130</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classServicesConf.html#a019bcac4bc6845ad7cf64b15a824837d">reprojectionCapability</a>;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        <span class="keywordtype">bool</span> doweuselistofequalsCRS;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordtype">bool</span> dowerestrictCRSList;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        std::vector&lt;std::vector&lt;CRS*&gt; &gt; listofequalsCRS;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        std::vector&lt;CRS*&gt; restrictedCRSList;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="comment">// ----------------------- WMTS </span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="classServicesConf.html#aac4580a937d28b2c13015aa2fbbe07eb">  142</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classServicesConf.html#aac4580a937d28b2c13015aa2fbbe07eb">supportWMTS</a>;</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        std::string wmtsPublicUrl;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <a class="code" href="classMetadataURL.html">MetadataURL</a>* mtdWMTS;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        <span class="comment">// ----------------------- TMS </span></div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00152"></a><span class="lineno"><a class="line" href="classServicesConf.html#ade3395e9f82f82adcd336b40e2f49805">  152</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classServicesConf.html#ade3395e9f82f82adcd336b40e2f49805">supportTMS</a>;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        std::string tmsPublicUrl;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <a class="code" href="classMetadataURL.html">MetadataURL</a>* mtdTMS;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="comment">// ----------------------- OGC Tiles</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00162"></a><span class="lineno"><a class="line" href="classServicesConf.html#a4e69a7e833acf52641e1574d3c43ec6b">  162</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classServicesConf.html#a4e69a7e833acf52641e1574d3c43ec6b">supportOGCTILES</a>;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        std::string ogctilesPublicUrl;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <a class="code" href="classMetadataURL.html">MetadataURL</a>* mtdOGCTILES;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <span class="comment">// ----------------------- WMS </span></div>
+<div class="line"><a name="l00171"></a><span class="lineno"><a class="line" href="classServicesConf.html#a4d4fdf507bbef34e2d8b2e6ce64c871b">  171</a></span>&#160;<span class="comment"></span>        <span class="keywordtype">bool</span> <a class="code" href="classServicesConf.html#a4d4fdf507bbef34e2d8b2e6ce64c871b">supportWMS</a>;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        std::string wmsPublicUrl;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <a class="code" href="classMetadataURL.html">MetadataURL</a>* mtdWMS;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        std::string name;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        std::string layerRootTitle;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        std::string layerRootAbstract;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxWidth;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxHeight;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxTileX;</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> maxTileY;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> layerLimit;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        std::vector&lt;std::string&gt; formatList;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        std::vector&lt;CRS*&gt; globalCRSList;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160; </div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keywordtype">bool</span> loadEqualsCRSList(std::string file);</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keywordtype">bool</span> loadRestrictedCRSList(std::string file);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keywordtype">bool</span> parse(json11::Json&amp; doc);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;};</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="preprocessor">#endif // SERVICESXML_H</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<div class="ttc" id="aclassServicesConf_html_acc2ed7a2ba896bee9106b5f3b96f693a"><div class="ttname"><a href="classServicesConf.html#acc2ed7a2ba896bee9106b5f3b96f693a">ServicesConf::isCRSAllowed</a></div><div class="ttdeci">bool isCRSAllowed(std::string crs)</div><div class="ttdoc">Vérifie que le CRS ou un équivalent se trouve dans la liste des CRS autorisés.</div><div class="ttdef"><b>Definition:</b> ServicesConf.cpp:159</div></div>
+<div class="ttc" id="aclassServicesConf_html_a019bcac4bc6845ad7cf64b15a824837d"><div class="ttname"><a href="classServicesConf.html#a019bcac4bc6845ad7cf64b15a824837d">ServicesConf::reprojectionCapability</a></div><div class="ttdeci">bool reprojectionCapability</div><div class="ttdoc">Définit si le serveur doit permettre les reprojections (en WMS et WMTS)</div><div class="ttdef"><b>Definition:</b> ServicesConf.h:130</div></div>
+<div class="ttc" id="aclassServicesConf_html_a4d4fdf507bbef34e2d8b2e6ce64c871b"><div class="ttname"><a href="classServicesConf.html#a4d4fdf507bbef34e2d8b2e6ce64c871b">ServicesConf::supportWMS</a></div><div class="ttdeci">bool supportWMS</div><div class="ttdoc">Définit si le serveur doit honorer les requêtes WMS.</div><div class="ttdef"><b>Definition:</b> ServicesConf.h:171</div></div>
+<div class="ttc" id="aclassServicesConf_html_aac4580a937d28b2c13015aa2fbbe07eb"><div class="ttname"><a href="classServicesConf.html#aac4580a937d28b2c13015aa2fbbe07eb">ServicesConf::supportWMTS</a></div><div class="ttdeci">bool supportWMTS</div><div class="ttdoc">Définit si le serveur doit honorer les requêtes WMTS.</div><div class="ttdef"><b>Definition:</b> ServicesConf.h:142</div></div>
+<div class="ttc" id="aclassServicesConf_html_a23a4162e4b727784dd253abe7528c3b3"><div class="ttname"><a href="classServicesConf.html#a23a4162e4b727784dd253abe7528c3b3">ServicesConf::getEqualsCRS</a></div><div class="ttdeci">std::vector&lt; CRS * &gt; getEqualsCRS(std::string crs)</div><div class="ttdoc">Retourne la liste des CRS équivalents et valable dans PROJ.</div><div class="ttdef"><b>Definition:</b> ServicesConf.cpp:141</div></div>
+<div class="ttc" id="aRok4Server_8h_html"><div class="ttname"><a href="Rok4Server_8h.html">Rok4Server.h</a></div><div class="ttdoc">Definition de la classe Rok4Server et du programme principal.</div></div>
+<div class="ttc" id="aMetadataURL_8h_html"><div class="ttname"><a href="MetadataURL_8h.html">MetadataURL.h</a></div><div class="ttdoc">Définition de la classe MetadataURL gérant les liens vers les métadonnées dans les documents de capac...</div></div>
+<div class="ttc" id="aclassServicesConf_html"><div class="ttname"><a href="classServicesConf.html">ServicesConf</a></div><div class="ttdef"><b>Definition:</b> ServicesConf.h:54</div></div>
+<div class="ttc" id="aclassServicesConf_html_a4e69a7e833acf52641e1574d3c43ec6b"><div class="ttname"><a href="classServicesConf.html#a4e69a7e833acf52641e1574d3c43ec6b">ServicesConf::supportOGCTILES</a></div><div class="ttdeci">bool supportOGCTILES</div><div class="ttdoc">Définit si le serveur doit honorer les requêtes OGC Tiles.</div><div class="ttdef"><b>Definition:</b> ServicesConf.h:162</div></div>
+<div class="ttc" id="aclassRok4Server_html"><div class="ttname"><a href="classRok4Server.html">Rok4Server</a></div><div class="ttdoc">Gestion du programme principal, lien entre les modules.</div><div class="ttdef"><b>Definition:</b> Rok4Server.h:78</div></div>
+<div class="ttc" id="aclassServicesConf_html_ade3395e9f82f82adcd336b40e2f49805"><div class="ttname"><a href="classServicesConf.html#ade3395e9f82f82adcd336b40e2f49805">ServicesConf::supportTMS</a></div><div class="ttdeci">bool supportTMS</div><div class="ttdoc">Définit si le serveur doit honorer les requêtes TMS.</div><div class="ttdef"><b>Definition:</b> ServicesConf.h:152</div></div>
+<div class="ttc" id="aclassMetadataURL_html"><div class="ttname"><a href="classMetadataURL.html">MetadataURL</a></div><div class="ttdoc">Gestion des éléments de métadonnées des documents de capacités.</div><div class="ttdef"><b>Definition:</b> MetadataURL.h:62</div></div>
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><b>ServicesConf.h</b></li>
+    <li class="footer">Généré par
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
+</body>
+</html>

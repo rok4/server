@@ -1,0 +1,402 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+    <meta name="generator" content="Doxygen 1.8.17" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Serveur de diffusion WMS, WMTS et TMS</title>
+    <link href="tabs.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="resize.js"></script>
+    <script type="text/javascript" src="navtreedata.js"></script>
+    <script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="search/searchdata.js"></script>
+    <script type="text/javascript" src="search/search.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css" />
+</head>
+<body><!-- Généré par Doxygen 1.8.17 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'Recherche');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(function() {
+  initMenu('',true,false,'search.php','Recherche');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('classServiceException.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Fonctions membres publiques</a> &#124;
+<a href="#pub-static-methods">Fonctions membres publiques statiques</a> &#124;
+<a href="classServiceException-members.html">Liste de tous les membres</a>  </div>
+  <div class="headertitle">
+<div class="title">Référence de la classe ServiceException</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>Gestion des exceptions de service.  
+ <a href="classServiceException.html#details">Plus de détails...</a></p>
+
+<p><code>#include &lt;<a class="el" href="ServiceException_8h_source.html">ServiceException.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Fonctions membres publiques</h2></td></tr>
+<tr class="memitem:a051ba92083401a2aeae93bf64d5b2c53"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceException.html#a051ba92083401a2aeae93bf64d5b2c53">ServiceException</a> (std::string locator, <a class="el" href="ServiceException_8h.html#a1bce8cee2a10ca86d84a7c784f5ef6fb">ExceptionCode</a> code, std::string message, std::string service, std::string format=&quot;text/xml&quot;)</td></tr>
+<tr class="separator:a051ba92083401a2aeae93bf64d5b2c53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad666343308b0f8835279b84b72d184e2"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceException.html#ad666343308b0f8835279b84b72d184e2">toString</a> ()</td></tr>
+<tr class="memdesc:ad666343308b0f8835279b84b72d184e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Génère la chaîne de caracteres relative à l'exception décrite par l'objet.  <a href="classServiceException.html#ad666343308b0f8835279b84b72d184e2">Plus de détails...</a><br /></td></tr>
+<tr class="separator:ad666343308b0f8835279b84b72d184e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95e4b25bdd3c16beba14fdd44742470f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceException.html#a95e4b25bdd3c16beba14fdd44742470f">getService</a> ()</td></tr>
+<tr class="memdesc:a95e4b25bdd3c16beba14fdd44742470f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retourne le nom du service.  <a href="classServiceException.html#a95e4b25bdd3c16beba14fdd44742470f">Plus de détails...</a><br /></td></tr>
+<tr class="separator:a95e4b25bdd3c16beba14fdd44742470f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c6bea752131be1640429f48ebd631aa"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceException.html#a9c6bea752131be1640429f48ebd631aa">getFormat</a> ()</td></tr>
+<tr class="memdesc:a9c6bea752131be1640429f48ebd631aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retourne le format du message.  <a href="classServiceException.html#a9c6bea752131be1640429f48ebd631aa">Plus de détails...</a><br /></td></tr>
+<tr class="separator:a9c6bea752131be1640429f48ebd631aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe5bb620e6816ebcd5ebb39a55829546"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ServiceException_8h.html#a1bce8cee2a10ca86d84a7c784f5ef6fb">ExceptionCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceException.html#abe5bb620e6816ebcd5ebb39a55829546">getCode</a> ()</td></tr>
+<tr class="memdesc:abe5bb620e6816ebcd5ebb39a55829546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retourne le code de l'erreur.  <a href="classServiceException.html#abe5bb620e6816ebcd5ebb39a55829546">Plus de détails...</a><br /></td></tr>
+<tr class="separator:abe5bb620e6816ebcd5ebb39a55829546"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Fonctions membres publiques statiques</h2></td></tr>
+<tr class="memitem:af4b3a488ada1d4bfc56cbe7d2cdd3bd2"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceException.html#af4b3a488ada1d4bfc56cbe7d2cdd3bd2">getCodeAsString</a> (<a class="el" href="ServiceException_8h.html#a1bce8cee2a10ca86d84a7c784f5ef6fb">ExceptionCode</a> code)</td></tr>
+<tr class="memdesc:af4b3a488ada1d4bfc56cbe7d2cdd3bd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retourne le code d'erreur sous forme de texte.  <a href="classServiceException.html#af4b3a488ada1d4bfc56cbe7d2cdd3bd2">Plus de détails...</a><br /></td></tr>
+<tr class="separator:af4b3a488ada1d4bfc56cbe7d2cdd3bd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd154ba8beacd1f49b131a10271a847e"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceException.html#afd154ba8beacd1f49b131a10271a847e">getCodeAsStatusCode</a> (<a class="el" href="ServiceException_8h.html#a1bce8cee2a10ca86d84a7c784f5ef6fb">ExceptionCode</a> code)</td></tr>
+<tr class="memdesc:afd154ba8beacd1f49b131a10271a847e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retourne le status code HTTP associe à l'exception.  <a href="classServiceException.html#afd154ba8beacd1f49b131a10271a847e">Plus de détails...</a><br /></td></tr>
+<tr class="separator:afd154ba8beacd1f49b131a10271a847e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad72cfe12f65d2752e98c7ad16aa90598"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classServiceException.html#ad72cfe12f65d2752e98c7ad16aa90598">getStatusCodeAsReasonPhrase</a> (int statusCode)</td></tr>
+<tr class="memdesc:ad72cfe12f65d2752e98c7ad16aa90598"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retourne la phrase explicative associée au status code http.  <a href="classServiceException.html#ad72cfe12f65d2752e98c7ad16aa90598">Plus de détails...</a><br /></td></tr>
+<tr class="separator:ad72cfe12f65d2752e98c7ad16aa90598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Description détaillée</h2>
+<div class="textblock"><p>Gestion des exceptions de service. </p>
+<dl class="section author"><dt>Auteur</dt><dd>Institut national de l'information géographique et forestière</dd></dl>
+<p>Gère les informations permettant de générer la partie du message d'erreur XML suivante:</p>
+<div class="fragment"><div class="line">&lt;<span class="keywordtype">ServiceException</span> <span class="keyword">code</span>=<span class="stringliteral">&#39;__CODE__&#39;</span> <span class="keyword">locator</span>=<span class="stringliteral">&#39;__LOCATOR__&#39;</span> &gt;</div>
+<div class="line">             <span class="keyword">__MESSAGE__</span></div>
+<div class="line">&lt;/<span class="keywordtype">ServiceException</span>&gt;</div>
+</div><!-- fragment --> </div><h2 class="groupheader">Documentation des constructeurs et destructeur</h2>
+<a id="a051ba92083401a2aeae93bf64d5b2c53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a051ba92083401a2aeae93bf64d5b2c53">&#9670;&nbsp;</a></span>ServiceException()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ServiceException::ServiceException </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>locator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="ServiceException_8h.html#a1bce8cee2a10ca86d84a7c784f5ef6fb">ExceptionCode</a>&#160;</td>
+          <td class="paramname"><em>code</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>message</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>service</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>format</em> = <code>&quot;text/xml&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>constructeur d'une exception </p><dl class="params"><dt>Paramètres</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">locator</td><td>la valeur de l'attribut locator (selon specs OGC) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">code</td><td>la valeur de l'attribut code (selon specs OGC) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">message</td><td>le texte du message d'erreur </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">service</td><td>le type de service ("wms" ou "wmts") </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">format</td><td>le format du message à retourner ("text/xml" ou "application/json") </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Documentation des fonctions membres</h2>
+<a id="abe5bb620e6816ebcd5ebb39a55829546"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe5bb620e6816ebcd5ebb39a55829546">&#9670;&nbsp;</a></span>getCode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="ServiceException_8h.html#a1bce8cee2a10ca86d84a7c784f5ef6fb">ExceptionCode</a> ServiceException::getCode </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retourne le code de l'erreur. </p>
+<dl class="section return"><dt>Renvoie</dt><dd>code </dd></dl>
+
+</div>
+</div>
+<a id="afd154ba8beacd1f49b131a10271a847e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd154ba8beacd1f49b131a10271a847e">&#9670;&nbsp;</a></span>getCodeAsStatusCode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ServiceException::getCodeAsStatusCode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ServiceException_8h.html#a1bce8cee2a10ca86d84a7c784f5ef6fb">ExceptionCode</a>&#160;</td>
+          <td class="paramname"><em>code</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retourne le status code HTTP associe à l'exception. </p>
+<dl class="params"><dt>Paramètres</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">code</td><td>le code d'erreur énuméré </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Renvoie</dt><dd>code de status HTTP </dd></dl>
+
+</div>
+</div>
+<a id="af4b3a488ada1d4bfc56cbe7d2cdd3bd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4b3a488ada1d4bfc56cbe7d2cdd3bd2">&#9670;&nbsp;</a></span>getCodeAsString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string ServiceException::getCodeAsString </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ServiceException_8h.html#a1bce8cee2a10ca86d84a7c784f5ef6fb">ExceptionCode</a>&#160;</td>
+          <td class="paramname"><em>code</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retourne le code d'erreur sous forme de texte. </p>
+<dl class="params"><dt>Paramètres</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">code</td><td>le code d'erreur énuméré </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Renvoie</dt><dd>réprésentation textuelle </dd></dl>
+
+</div>
+</div>
+<a id="a9c6bea752131be1640429f48ebd631aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c6bea752131be1640429f48ebd631aa">&#9670;&nbsp;</a></span>getFormat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string ServiceException::getFormat </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retourne le format du message. </p>
+<dl class="section return"><dt>Renvoie</dt><dd>format </dd></dl>
+
+</div>
+</div>
+<a id="a95e4b25bdd3c16beba14fdd44742470f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95e4b25bdd3c16beba14fdd44742470f">&#9670;&nbsp;</a></span>getService()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string ServiceException::getService </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retourne le nom du service. </p>
+<dl class="section return"><dt>Renvoie</dt><dd>service </dd></dl>
+
+</div>
+</div>
+<a id="ad72cfe12f65d2752e98c7ad16aa90598"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad72cfe12f65d2752e98c7ad16aa90598">&#9670;&nbsp;</a></span>getStatusCodeAsReasonPhrase()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string ServiceException::getStatusCodeAsReasonPhrase </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>statusCode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retourne la phrase explicative associée au status code http. </p>
+<dl class="params"><dt>Paramètres</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">statusCode</td><td>code de status HTTP </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Renvoie</dt><dd>phrase explicative </dd></dl>
+
+</div>
+</div>
+<a id="ad666343308b0f8835279b84b72d184e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad666343308b0f8835279b84b72d184e2">&#9670;&nbsp;</a></span>toString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string ServiceException::toString </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Génère la chaîne de caracteres relative à l'exception décrite par l'objet. </p>
+<dl class="section return"><dt>Renvoie</dt><dd>représentation textuelle de l'exception </dd></dl>
+
+</div>
+</div>
+<hr/>La documentation de cette classe a été générée à partir des fichiers suivants :<ul>
+<li>src/<a class="el" href="ServiceException_8h_source.html">ServiceException.h</a></li>
+<li>src/<a class="el" href="ServiceException_8cpp.html">ServiceException.cpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classServiceException.html">ServiceException</a></li>
+    <li class="footer">Généré par
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
+</body>
+</html>
