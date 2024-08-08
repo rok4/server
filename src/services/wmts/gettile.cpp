@@ -144,7 +144,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     std::string str_layer = req->get_query_param("layer");
     if (str_layer == "") throw WmtsException::get_error_message("LAYER query parameter missing", "MissingParameterValue", 400);
 
-    if (containForbiddenChars(str_layer)) {
+    if (contain_chars(str_layer, "<>")) {
         BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMTS layer: " << str_layer;
         throw WmtsException::get_error_message("Layer unknown", "InvalidParameterValue", 400);
     }
@@ -158,7 +158,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     std::string str_tms = req->get_query_param("tilematrixset");
     if (str_tms == "") throw WmtsException::get_error_message("TILEMATRIXSET query parameter missing", "MissingParameterValue", 400);
 
-    if (containForbiddenChars(str_tms)) {
+    if (contain_chars(str_tms, "<>")) {
         BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMTS tile matrix set: " << str_tms;
         throw WmtsException::get_error_message("Tile matrix set unknown", "InvalidParameterValue", 400);
     }
@@ -172,12 +172,12 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     std::string str_tm = req->get_query_param("tilematrix");
     if (str_tm == "") throw WmtsException::get_error_message("TILEMATRIX query parameter missing", "MissingParameterValue", 400);
 
-    if (containForbiddenChars(str_tm)) {
+    if (contain_chars(str_tm, "<>")) {
         BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMTS tile matrix: " << str_tm;
         throw WmtsException::get_error_message("Tile matrix unknown", "InvalidParameterValue", 400);
     }
 
-    TileMatrix* tm = tms->getTm(str_tm);
+    TileMatrix* tm = tms->get_tm(str_tm);
     if (tm == NULL) throw WmtsException::get_error_message("Tile matrix " + str_tm + " unknown", "InvalidParameterValue", 400);
 
     // La colonne
@@ -199,7 +199,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
         // On est hors niveau -> erreur
         throw WmtsException::get_error_message("No data found", "Not Found", 404);
     }
-    if (!tml->containTile(column, row)) {
+    if (!tml->contain_tile(column, row)) {
         // On est hors tuiles -> erreur
         throw WmtsException::get_error_message("No data found", "Not Found", 404);
     }
@@ -208,30 +208,30 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     std::string format = req->get_query_param("format");
     if (format == "") throw WmtsException::get_error_message("FORMAT query parameter missing", "MissingParameterValue", 400);
 
-    if (containForbiddenChars(format)) {
+    if (contain_chars(format, "<>")) {
         // On a détecté un caractère interdit, on ne met pas le format fourni dans la réponse pour éviter une injection
         BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMTS format: " << format;
         throw WmtsException::get_error_message("Format unknown", "InvalidParameterValue", 400);
     }
 
-    if (format.compare(Rok4Format::to_mime_type((layer->get_pyramid()->getFormat()))) != 0)
+    if (format.compare(Rok4Format::to_mime_type((layer->get_pyramid()->get_format()))) != 0)
         throw WmtsException::get_error_message("Format " + format + " unknown", "InvalidParameterValue", 400);
 
     std::string str_style = req->get_query_param("style");
     if (str_style == "") throw WmtsException::get_error_message("STYLE query parameter missing", "MissingParameterValue", 400);
 
     Style* style = NULL;
-    if (Rok4Format::is_raster(layer->get_pyramid()->getFormat())) {
+    if (Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
         style = layer->get_style_by_identifier(str_style);
 
         if (style == NULL) throw WmtsException::get_error_message("Style " + str_style + " unknown", "InvalidParameterValue", 400);
     }
 
-    if (tms->getId() == layer->get_pyramid()->getTms()->getId()) {
+    if (tms->get_id() == layer->get_pyramid()->get_tms()->get_id()) {
         // TMS d'interrogation natif
-        Level* level = layer->get_pyramid()->getLevel(tm->getId());
+        Level* level = layer->get_pyramid()->get_level(tm->get_id());
 
-        DataSource* d = level->getTile(column, row);
+        DataSource* d = level->get_tile(column, row);
         if (d == NULL) {
             throw WmtsException::get_error_message("No data found", "Not Found", 404);
         }
@@ -244,13 +244,13 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     } else {
         // TMS d'interrogation à la demande
 
-        BoundingBox<double> bbox = tm->tileIndicesToBbox(column, row);
-        int height = tm->getTileH();
-        int width = tm->getTileW();
-        CRS* crs = tms->getCrs();
-        bbox.crs = crs->getRequestCode();
+        BoundingBox<double> bbox = tm->tile_indices_to_bbox(column, row);
+        int height = tm->get_tile_height();
+        int width = tm->get_tile_width();
+        CRS* crs = tms->get_crs();
+        bbox.crs = crs->get_request_code();
 
-        bool crs_equals = serv->get_services_configuration()->are_crs_equals(layer->get_pyramid()->getTms()->getCrs()->getProjCode(), crs->getProjCode());
+        bool crs_equals = serv->get_services_configuration()->are_crs_equals(layer->get_pyramid()->get_tms()->get_crs()->get_proj_code(), crs->get_proj_code());
 
         int error;
         // On se donne maxium 3 tuiles sur 3 dans la pyramide source pour calculer cette tuile
@@ -287,7 +287,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
 
             // La donnée ne peut être retournée que dans le format de la pyramide source utilisée
 
-            switch (layer->get_pyramid()->getFormat()) {
+            switch (layer->get_pyramid()->get_format()) {
                 case Rok4Format::TIFF_RAW_UINT8:
                 case Rok4Format::TIFF_LZW_UINT8:
                 case Rok4Format::TIFF_ZIP_UINT8:

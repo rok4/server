@@ -53,7 +53,7 @@ WebService::~WebService() {
 
 RawDataSource* WebService::perform_request(std::string request) {
     //----variables
-    CURL* curl = CurlPool::getCurlEnv();
+    CURL* curl = CurlPool::get_curl_env();
     CURLcode res, resC, resT;
     long responseCode = 0;
     char* rpType;

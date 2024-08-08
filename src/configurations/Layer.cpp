@@ -90,14 +90,14 @@ bool Layer::parse(json11::Json& doc) {
     if (doc["title"].is_string()) {
         title = doc["title"].string_value();
     } else {
-        errorMessage = "title have to be provided and be a string";
+        error_message = "title have to be provided and be a string";
         return false;
     }
 
     if (doc["abstract"].is_string()) {
         abstract = doc["abstract"].string_value();
     } else {
-        errorMessage = "abstract have to be provided and be a string";
+        error_message = "abstract have to be provided and be a string";
         return false;
     }
 
@@ -106,33 +106,33 @@ bool Layer::parse(json11::Json& doc) {
             if (kw.is_string()) {
                 keywords.push_back(Keyword ( kw.string_value()));
             } else {
-                errorMessage = "keywords have to be a string array";
+                error_message = "keywords have to be a string array";
                 return false;
             }
         }
     } else if (! doc["keywords"].is_null()) {
-        errorMessage = "keywords have to be a string array";
+        error_message = "keywords have to be a string array";
         return false;
     }
 
     if (doc["metadata"].is_array()) {
         for (json11::Json mtd : doc["metadata"].array_items()) {
             Metadata m = Metadata(mtd);
-            if (m.getMissingField() != "") {
-                errorMessage = "Invalid metadata: have to own a field " + m.getMissingField();
+            if (m.get_missing_field() != "") {
+                error_message = "Invalid metadata: have to own a field " + m.get_missing_field();
                 return false;
             }
             metadata.push_back (m);
         }
     } else if (! doc["metadata"].is_null()) {
-        errorMessage = "metadata have to be an object array";
+        error_message = "metadata have to be an object array";
         return false;
     }
 
     if (doc["attribution"].is_object()) {
         attribution = new Attribution(doc["attribution"].object_items());
-        if (attribution->getMissingField() != "") {
-            errorMessage = "Invalid attribution: have to own a field " + attribution->getMissingField();
+        if (attribution->get_missing_field() != "") {
+            error_message = "Invalid attribution: have to own a field " + attribution->get_missing_field();
             return false;
         }
     }
@@ -152,28 +152,28 @@ bool Layer::parse(json11::Json& doc) {
                 if (pyr["path"].is_string()) {
                     pyr_path = pyr["path"].string_value();
                 } else {
-                    errorMessage =  "pyramids element have to own a 'path' string attribute";
+                    error_message =  "pyramids element have to own a 'path' string attribute";
                     return false;
                 }
 
                 if (pyr["top_level"].is_string()) {
                     topLevels.push_back(pyr["top_level"].string_value());
                 } else {
-                    errorMessage =  "pyramids element have to own a 'top_level' string attribute";
+                    error_message =  "pyramids element have to own a 'top_level' string attribute";
                     return false;
                 }
 
                 if (pyr["bottom_level"].is_string()) {
                     bottomLevels.push_back(pyr["bottom_level"].string_value());
                 } else {
-                    errorMessage =  "pyramids element have to own a 'bottom_level' string attribute";
+                    error_message =  "pyramids element have to own a 'bottom_level' string attribute";
                     return false;
                 }
 
                 Pyramid* p = new Pyramid( pyr_path );
-                if ( ! p->isOk() ) {
-                    BOOST_LOG_TRIVIAL(error) << p->getErrorMessage();
-                    errorMessage =  "Pyramid " + pyr_path +" cannot be loaded"  ;
+                if ( ! p->is_ok() ) {
+                    BOOST_LOG_TRIVIAL(error) << p->get_error_message();
+                    error_message =  "Pyramid " + pyr_path +" cannot be loaded"  ;
                     delete p;
                     return false;
                 }
@@ -181,17 +181,17 @@ bool Layer::parse(json11::Json& doc) {
                 pyramids.push_back(p);
 
             } else {
-                errorMessage = "pyramids have to be an object array";
+                error_message = "pyramids have to be an object array";
                 return false;
             }
         }
     } else {
-        errorMessage = "pyramids have to be provided and be an object array";
+        error_message = "pyramids have to be provided and be an object array";
         return false;
     }
 
     if (pyramids.size() == 0) {
-        errorMessage =  "No pyramid to broadcast"  ;
+        error_message =  "No pyramid to broadcast"  ;
         return false;
     }
 
@@ -200,11 +200,11 @@ bool Layer::parse(json11::Json& doc) {
     BOOST_LOG_TRIVIAL(debug) << "pyramide composée de " << pyramids.size() << " pyramide(s)";
 
     for (int i = 0; i < pyramids.size(); i++) {
-        if (! pyramid->addLevels(pyramids.at(i), bottomLevels.at(i), topLevels.at(i))) {
+        if (! pyramid->add_levels(pyramids.at(i), bottomLevels.at(i), topLevels.at(i))) {
             BOOST_LOG_TRIVIAL(error) << "Cannot compose pyramid to broadcast with input pyramid " << i;
             delete pyramid;
             pyramid = NULL;
-            errorMessage = "Pyramid to broadcast cannot be loaded";
+            error_message = "Pyramid to broadcast cannot be loaded";
             break;
         }
     }
@@ -220,9 +220,9 @@ bool Layer::parse(json11::Json& doc) {
     }
 
     WmtsTmsInfos infos;
-    infos.tms = pyramid->getTms();
-    infos.top_level = pyramid->getHighestLevel()->getId();
-    infos.bottom_level = pyramid->getLowestLevel()->getId();
+    infos.tms = pyramid->get_tms();
+    infos.top_level = pyramid->get_highest_level()->get_id();
+    infos.bottom_level = pyramid->get_lowest_level()->get_id();
     infos.wmts_id = infos.tms->getId() + "_" + infos.top_level + "_" + infos.bottom_level;
     wmts_tilematrixsets.push_back(infos);
 
@@ -230,12 +230,12 @@ bool Layer::parse(json11::Json& doc) {
 
     if (doc["bbox"].is_object()) {
         if (! doc["bbox"]["north"].is_number() || ! doc["bbox"]["south"].is_number() || ! doc["bbox"]["east"].is_number() || ! doc["bbox"]["west"].is_number()) {
-            errorMessage = "Provided bbox is not valid";
+            error_message = "Provided bbox is not valid";
             return false;
         }
 
         if (doc["bbox"]["north"].number_value() < doc["bbox"]["south"].number_value() || doc["bbox"]["east"].number_value() < doc["bbox"]["west"].number_value()) {
-            errorMessage = "Provided bbox is not consistent";
+            error_message = "Provided bbox is not consistent";
             return false;
         }
 
@@ -243,7 +243,7 @@ bool Layer::parse(json11::Json& doc) {
         geographic_bbox.crs = "EPSG:4326";
         
         native_bbox = BoundingBox<double>(geographic_bbox);
-        native_bbox.reproject(CRS::getEpsg4326(), pyramid->getTms()->getCrs());
+        native_bbox.reproject(CRS::get_epsg4326(), pyramid->get_tms()->get_crs());
         calculate_native_tilematrix_limits();
     } else {
         /* Calcul de la bbox dans la projection des données, à partir des tuiles limites des niveaux de la pyramide */
@@ -265,7 +265,7 @@ bool Layer::parse(json11::Json& doc) {
         tiles = doc["tiles"]["enabled"].bool_value();
     }
 
-    if (Rok4Format::is_raster(pyramid->getFormat())) {
+    if (Rok4Format::is_raster(pyramid->get_format())) {
         /******************* CAS RASTER *********************/
 
         // Configuration du GET FEATURE INFO
@@ -310,12 +310,12 @@ bool Layer::parse(json11::Json& doc) {
 
                 } 
                 else {
-                    errorMessage = "get_feature_info.type unknown";
+                    error_message = "get_feature_info.type unknown";
                     return false;
                 }
 
             } else {
-                errorMessage = "If get_feature_info is provided, get_feature_info.type is a required string";
+                error_message = "If get_feature_info is provided, get_feature_info.type is a required string";
                 return false;
             }
         }
@@ -337,17 +337,17 @@ bool Layer::parse(json11::Json& doc) {
                     }
                     styles.push_back ( sty );
                 } else {
-                    errorMessage = "styles have to be a string array";
+                    error_message = "styles have to be a string array";
                     return false;
                 }
             }
         } else if (! doc["styles"].is_null()) {
-            errorMessage = "styles have to be a string array";
+            error_message = "styles have to be a string array";
             return false;
         }
 
         if ( styles.size() == 0 ) {
-            errorMessage =  "No provided valid style, the layer is not valid"  ;
+            error_message =  "No provided valid style, the layer is not valid"  ;
             return false;
         }
 
@@ -357,7 +357,7 @@ bool Layer::parse(json11::Json& doc) {
         if (doc["wmts"].is_object() && doc["wmts"]["tms"].is_array()) {
             for (json11::Json t : doc["wmts"]["tms"].array_items()) {
                 if (! t.is_string()) {
-                    errorMessage =  "wmts.tms have to be a string array"  ;
+                    error_message =  "wmts.tms have to be a string array"  ;
                     return false;
                 }
                 TileMatrixSet* tms = TmsBook::get_tms(t.string_value());
@@ -381,21 +381,21 @@ bool Layer::parse(json11::Json& doc) {
         if (doc["wms"].is_object() && doc["wms"]["crs"].is_array()) {
             for (json11::Json c : doc["wms"]["crs"].array_items()) {
                 if (! c.is_string()) {
-                    errorMessage =  "wms.crs have to be a string array"  ;
+                    error_message =  "wms.crs have to be a string array"  ;
                     return false;
                 }
                 std::string str_crs = c.string_value();
                 // On verifie que la CRS figure dans la liste des CRS de proj (sinon, le serveur n est pas capable de la gerer)
                 CRS* crs = new CRS ( str_crs );
                 
-                if ( ! crs->isDefine() ) {
+                if ( ! crs->is_define() ) {
                     BOOST_LOG_TRIVIAL(warning) << "CRS " << str_crs << " is not handled by PROJ";
                     delete crs;
                     continue;
                 }
 
                 // Test if the current layer bounding box is compatible with the current CRS
-                if ( ! geographic_bbox.intersectAreaOfCRS(crs) ) {
+                if ( ! geographic_bbox.intersect_crs_area(crs) ) {
                     BOOST_LOG_TRIVIAL(warning) << "CRS " << str_crs << " is not compatible with the layer extent";
                     delete crs;
                     continue;
@@ -408,7 +408,7 @@ bool Layer::parse(json11::Json& doc) {
         if (doc["resampling"].is_string()) {
             resampling = Interpolation::from_string ( doc["resampling"].string_value() );
             if (resampling == Interpolation::KernelType::UNKNOWN) {
-                errorMessage =  "Resampling " + doc["resampling"].string_value() +" unknown"  ;
+                error_message =  "Resampling " + doc["resampling"].string_value() +" unknown"  ;
                 return false;
             }
         } else {
@@ -422,21 +422,21 @@ bool Layer::parse(json11::Json& doc) {
 void Layer::calculate_bboxes() {
 
     // On calcule la bbox à partir des tuiles limites du niveau le mieux résolu de la pyramide
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->getOrderedLevels(true);
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->get_ordered_levels(true);
 
     Level * level = orderedLevels.begin()->second;
-    native_bbox = BoundingBox<double>(level->getBboxFromTileLimits());
-    native_bbox.crs = pyramid->getTms()->getCrs()->getRequestCode();
+    native_bbox = BoundingBox<double>(level->get_bbox_from_tile_limits());
+    native_bbox.crs = pyramid->get_tms()->get_crs()->get_request_code();
 
     geographic_bbox = BoundingBox<double>(native_bbox);
-    geographic_bbox.reproject(pyramid->getTms()->getCrs(), CRS::getEpsg4326());
+    geographic_bbox.reproject(pyramid->get_tms()->get_crs(), CRS::get_epsg4326());
 }
 
 void Layer::calculate_native_tilematrix_limits() {
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->getOrderedLevels(true);
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->get_ordered_levels(true);
     for (std::pair<std::string, Level*> element : orderedLevels) {
-        element.second->setTileLimitsFromBbox(native_bbox);
+        element.second->set_tile_limits_from_bbox(native_bbox);
     }
 }
 
@@ -449,9 +449,9 @@ void Layer::calculate_tilematrix_limits() {
     WmtsTmsInfos infos = wmts_tilematrixsets.at(0);
     infos.limits = std::vector<TileMatrixLimits>();
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->getOrderedLevels(false);
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->get_ordered_levels(false);
     for (std::pair<std::string, Level*> element : orderedLevels) {
-        infos.limits.push_back(element.second->getTileLimits());
+        infos.limits.push_back(element.second->get_tile_limits());
     }
 
     newList.push_back(infos);
@@ -467,22 +467,22 @@ void Layer::calculate_tilematrix_limits() {
 
         BoundingBox<double> tmp = geographic_bbox;
         tmp.print();
-        tmp = tmp.cropToAreaOfCRS(tms->getCrs());
-        BOOST_LOG_TRIVIAL(warning) <<  tms->getCrs()->getRequestCode();
-        if ( tmp.hasNullArea()  ) {
+        tmp = tmp.crop_to_crs_area(tms->get_crs());
+        BOOST_LOG_TRIVIAL(warning) <<  tms->get_crs()->get_request_code();
+        if ( tmp.has_null_area()  ) {
             BOOST_LOG_TRIVIAL(warning) <<  "La couche n'est pas dans l'aire de définition du CRS du TMS supplémentaire " << tms->getId() ;
             continue;
         }
-        if ( ! tmp.reproject ( CRS::getEpsg4326(), tms->getCrs() ) ) {
+        if ( ! tmp.reproject ( CRS::get_epsg4326(), tms->get_crs() ) ) {
             BOOST_LOG_TRIVIAL(warning) <<  "Impossible de reprojeter la bbox de la couche dans le CRS du TMS supplémentaire " << tms->getId() ;
             continue;
         }
 
         // Recherche du niveau du haut du TMS supplémentaire
         TileMatrix* tmTop = NULL;
-        std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->getOrderedLevels(false);
+        std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->get_ordered_levels(false);
         for (std::pair<std::string, Level*> element : orderedLevels) {
-            tmTop = tms->getCorrespondingTileMatrix(element.second->getTm(), pyramid->getTms()) ;
+            tmTop = tms->get_corresponding_tm(element.second->get_tm(), pyramid->get_tms()) ;
             if (tmTop != NULL) {
                 // On a trouvé un niveau du haut du TMS supplémentaire satisfaisant pour la pyramide
                 break;
@@ -495,9 +495,9 @@ void Layer::calculate_tilematrix_limits() {
 
         // Recherche du niveau du bas du TMS supplémentaire
         TileMatrix* tmBottom = NULL;
-        orderedLevels = pyramid->getOrderedLevels(true);
+        orderedLevels = pyramid->get_ordered_levels(true);
         for (std::pair<std::string, Level*> element : orderedLevels) {
-            tmBottom = tms->getCorrespondingTileMatrix(element.second->getTm(), pyramid->getTms()) ;
+            tmBottom = tms->get_corresponding_tm(element.second->get_tm(), pyramid->get_tms()) ;
             if (tmBottom != NULL) {
                 // On a trouvé un niveau du bas du TMS supplémentaire satisfaisant pour la pyramide
                 break;
@@ -510,7 +510,7 @@ void Layer::calculate_tilematrix_limits() {
 
         // Pour chaque niveau entre le haut et le base, on va calculer les tuiles limites
 
-        std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->getOrderedTileMatrix(false);
+        std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->get_ordered_tm(false);
         bool begin = false;
         for (std::pair<std::string, TileMatrix*> element : orderedTM) {
             TileMatrix* tm = element.second;
@@ -519,7 +519,7 @@ void Layer::calculate_tilematrix_limits() {
                 continue;
             }
             begin = true;
-            infos.limits.push_back(tm->bboxToTileLimits(tmp));
+            infos.limits.push_back(tm->bbox_to_tile_limits(tmp));
             if (tm->getId() == tmBottom->getId()) {
                 break;
             }
@@ -540,10 +540,10 @@ Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution
 
     /********************** Id */
 
-    id = Configuration::getFileName(filePath, ".json");
+    id = Configuration::get_filename(file_path, ".json");
 
-    if ( containForbiddenChars(id) ) {
-        errorMessage =  "Layer identifier contains forbidden chars" ;
+    if ( contain_chars(id, "<>") ) {
+        error_message =  "Layer identifier contains forbidden chars" ;
         return;
     }
 
@@ -557,16 +557,16 @@ Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution
 
     Context* context = StoragePool::get_context(storage_type, tray_name);
     if (context == NULL) {
-        errorMessage = "Cannot add " + ContextType::to_string(storage_type) + " storage context to read style";
+        error_message = "Cannot add " + ContextType::to_string(storage_type) + " storage context to read style";
         return;
     }
 
 
     int size = -1;
-    uint8_t* data = context->readFull(size, fo_name);
+    uint8_t* data = context->read_full(size, fo_name);
 
     if (size < 0) {
-        errorMessage = "Cannot read style "  + path ;
+        error_message = "Cannot read style "  + path ;
         if (data != NULL) delete[] data;
         return;
     }
@@ -574,7 +574,7 @@ Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution
     std::string err;
     json11::Json doc = json11::Json::parse ( std::string((char*) data, size), err );
     if ( doc.is_null() ) {
-        errorMessage = "Cannot load JSON file "  + path + " : " + err ;
+        error_message = "Cannot load JSON file "  + path + " : " + err ;
         return;
     }
     if (data != NULL) delete[] data;
@@ -585,7 +585,7 @@ Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution
         return;
     }
 
-    if (Rok4Format::is_raster(pyramid->getFormat())) {
+    if (Rok4Format::is_raster(pyramid->get_format())) {
         calculate_tilematrix_limits();
     } else {
         // Une pyramide vecteur n'est diffusée qu'en TMS et le GFI n'est pas possible
@@ -602,8 +602,8 @@ Layer::Layer(std::string layerName, std::string content ) : Configuration(), id(
 
     /********************** Id */
 
-    if ( containForbiddenChars(id) ) {
-        errorMessage =  "Layer identifier contains forbidden chars" ;
+    if ( contain_chars(id, "<>") ) {
+        error_message =  "Layer identifier contains forbidden chars" ;
         return;
     }
 
@@ -612,7 +612,7 @@ Layer::Layer(std::string layerName, std::string content ) : Configuration(), id(
     std::string err;
     json11::Json doc = json11::Json::parse ( content, err );
     if ( doc.is_null() ) {
-        errorMessage = "Cannot load JSON content : " + err ;
+        error_message = "Cannot load JSON content : " + err ;
         return;
     }
 
@@ -622,7 +622,7 @@ Layer::Layer(std::string layerName, std::string content ) : Configuration(), id(
         return;
     }
 
-    if (Rok4Format::is_raster(pyramid->getFormat())) {
+    if (Rok4Format::is_raster(pyramid->get_format())) {
         calculate_tilematrix_limits();
     } else {
         // Une pyramide vecteur n'est diffusée qu'en WMTS et TMS et le GFI n'est pas possible
@@ -677,7 +677,7 @@ TileMatrixLimits* Layer::get_tilematrix_limits(TileMatrixSet* tms, TileMatrix* t
     for ( unsigned int k = 0; k < wmts_tilematrixsets.size(); k++ ) {
         if ( tms->getId() == wmts_tilematrixsets.at (k).tms->getId() ) {
             for ( unsigned int l = 0; l < wmts_tilematrixsets.at (k).limits.size(); l++ ) {
-                if ( tm->getId() == wmts_tilematrixsets.at (k).limits.at(l).tileMatrixId ) {
+                if ( tm->getId() == wmts_tilematrixsets.at (k).limits.at(l).tm_id ) {
                     return &(wmts_tilematrixsets.at (k).limits.at(l));
                 }
             }
@@ -697,7 +697,7 @@ Style* Layer::get_style_by_identifier(std::string identifier) {
 std::string Layer::get_title() { return title; }
 bool Layer::isInWMSCRSList(CRS* c) {
     for ( unsigned int k = 0; k < wms_crs.size(); k++ ) {
-        if ( c->cmpRequestCode ( wms_crs.at (k)->getRequestCode() ) ) {
+        if ( c->cmp_request_code ( wms_crs.at (k)->get_request_code() ) ) {
             return true;
         }
     }
@@ -705,7 +705,7 @@ bool Layer::isInWMSCRSList(CRS* c) {
 }
 bool Layer::isInWMSCRSList(std::string c) {
     for ( unsigned int k = 0; k < wms_crs.size(); k++ ) {
-        if ( wms_crs.at (k)->cmpRequestCode ( c ) ) {
+        if ( wms_crs.at (k)->cmp_request_code ( c ) ) {
             return true;
         }
     }

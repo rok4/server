@@ -120,14 +120,14 @@ void usage() {
 * \return : pointeur sur le serveur ROK4, NULL en cas d'erreur (forcement fatale)
 */
 
-Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
+Rok4Server* load_configuration ( const char* serverConfigFile ) {
 
     std::string strServerConfigFile = serverConfigFile;
 
     ServerConfiguration* server_configuration = new ServerConfiguration( strServerConfigFile );
-    if ( ! server_configuration->isOk() ) {
+    if ( ! server_configuration->is_ok() ) {
         std::cerr << "FATAL: Cannot load server configuration " << std::endl;
-        std::cerr << "FATAL: " << server_configuration->getErrorMessage() << std::endl;
+        std::cerr << "FATAL: " << server_configuration->get_error_message() << std::endl;
         return NULL;
     }
 
@@ -164,9 +164,9 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
 
     // Construction des parametres de service
     ServicesConfiguration* services_configuration = new ServicesConfiguration ( server_configuration->get_services_configuration_file() );
-    if ( ! services_configuration->isOk() ) {
+    if ( ! services_configuration->is_ok() ) {
         BOOST_LOG_TRIVIAL(fatal) << "Cannot load services configuration " << std::endl;
-        BOOST_LOG_TRIVIAL(fatal) << services_configuration->getErrorMessage() << std::endl;
+        BOOST_LOG_TRIVIAL(fatal) << services_configuration->get_error_message() << std::endl;
         sleep ( 1 );    // Pour laisser le temps au logger pour se vider
         return NULL;
     }
@@ -191,7 +191,7 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
         }
 
         int size = -1;
-        uint8_t* data = context->readFull(size, fo_name);
+        uint8_t* data = context->read_full(size, fo_name);
 
         if (size < 0) {
             BOOST_LOG_TRIVIAL(fatal) << "Cannot read layers list " + list_path << std::endl;
@@ -204,10 +204,10 @@ Rok4Server* loadConfiguration ( const char* serverConfigFile ) {
         std::string layer_desc;    
         while (std::getline(list_content, layer_desc)) {
             Layer* layer = new Layer(layer_desc );
-            if ( layer->isOk() ) {
+            if ( layer->is_ok() ) {
                 server_configuration->add_layer ( layer );
             } else {
-                BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layer_desc << ": " << layer->getErrorMessage();
+                BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layer_desc << ": " << layer->get_error_message();
                 delete layer;
             }
         }
@@ -243,7 +243,7 @@ void reloadConfig ( int signum ) {
         reload = true;
         std::cout<<  "Rechargement du serveur rok4" << "["<< getpid() <<"]" <<std::endl;
 
-        Wtmp = loadConfiguration ( server_config_file.c_str() );
+        Wtmp = load_configuration ( server_config_file.c_str() );
         if ( ! Wtmp ){
             std::cout<<  "Erreur lors du rechargement du serveur rok4" << "["<< getpid() <<"]" <<std::endl;
             return;
@@ -354,7 +354,7 @@ int main ( int argc, char** argv ) {
         std::cout<<  "Server start " << "["<< pid <<"]" <<std::endl;
 
         if ( firstStart ) {
-            W = loadConfiguration ( server_config_file.c_str() );
+            W = load_configuration ( server_config_file.c_str() );
             if ( !W ) {
                 return 1;
             }
@@ -399,10 +399,10 @@ int main ( int argc, char** argv ) {
 
     TmsBook::empty_trash();
     StyleBook::empty_trash();
-    CurlPool::cleanCurlPool();
-    ProjPool::cleanProjPool();
-    StoragePool::cleanStoragePool();
-    IndexCache::cleanCache();
+    CurlPool::clean_curls();
+    ProjPool::clean_projs();
+    StoragePool::clean_storages();
+    IndexCache::clean_indexes();
 
     //CRYPTO clean - one time for the whole program
     EVP_cleanup();

@@ -52,9 +52,9 @@
 
 CommonService::CommonService (json11::Json& doc) : Service(doc) {
 
-    if (! isOk()) {
+    if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
-        errorMessage = "COMMON service: " + errorMessage;
+        error_message = "COMMON service: " + error_message;
         return;
     }
 
@@ -66,7 +66,7 @@ CommonService::CommonService (json11::Json& doc) : Service(doc) {
     if (doc["title"].is_string()) {
         title = doc["title"].string_value();
     } else if (! doc["title"].is_null()) {
-        errorMessage = "COMMON service: title have to be a string";
+        error_message = "COMMON service: title have to be a string";
         return;
     } else {
         title = "COMMON service";
@@ -75,7 +75,7 @@ CommonService::CommonService (json11::Json& doc) : Service(doc) {
     if (doc["abstract"].is_string()) {
         abstract = doc["abstract"].string_value();
     } else if (! doc["abstract"].is_null()) {
-        errorMessage = "COMMON service: abstract have to be a string";
+        error_message = "COMMON service: abstract have to be a string";
         return;
     } else {
         abstract = "COMMON service";
@@ -86,19 +86,19 @@ CommonService::CommonService (json11::Json& doc) : Service(doc) {
             if (kw.is_string()) {
                 keywords.push_back(Keyword ( kw.string_value()));
             } else {
-                errorMessage = "COMMON service: keywords have to be a string array";
+                error_message = "COMMON service: keywords have to be a string array";
                 return;
             }
         }
     } else if (! doc["keywords"].is_null()) {
-        errorMessage = "COMMON service: keywords have to be a string array";
+        error_message = "COMMON service: keywords have to be a string array";
         return;
     }
 
     if (doc["endpoint_uri"].is_string()) {
         endpoint_uri = doc["endpoint_uri"].string_value();
     } else if (! doc["endpoint_uri"].is_null()) {
-        errorMessage = "COMMON service: endpoint_uri have to be a string";
+        error_message = "COMMON service: endpoint_uri have to be a string";
         return;
     } else {
         endpoint_uri = "http://localhost/common";
@@ -107,7 +107,7 @@ CommonService::CommonService (json11::Json& doc) : Service(doc) {
     if (doc["root_path"].is_string()) {
         root_path = doc["root_path"].string_value();
     } else if (! doc["root_path"].is_null()) {
-        errorMessage = "COMMON service: root_path have to be a string";
+        error_message = "COMMON service: root_path have to be a string";
         return;
     } else {
         root_path = "/common";

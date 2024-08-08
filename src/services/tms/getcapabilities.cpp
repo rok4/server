@@ -60,7 +60,7 @@ DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     res += "  <Abstract>" + abstract + "</Abstract>\n";
 
     if ( metadata ) {
-        res += "  <Metadata type=\"" + metadata->get_type() + "\" mime-type=\"text/xml\" href=\"" + metadata->getHRef() + "\" />\n";
+        res += "  <Metadata type=\"" + metadata->get_type() + "\" mime-type=\"text/xml\" href=\"" + metadata->get_href() + "\" />\n";
     }
 
     res += "  <TileMaps>\n";
@@ -73,9 +73,9 @@ DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
             std::string ln = std::regex_replace(lay->get_title(), std::regex("\""), "&quot;");
             res += "    <TileMap\n";
             res += "      title=\"" + ln + "\" \n";
-            res += "      srs=\"" + lay->get_pyramid()->getTms()->getCrs()->getRequestCode() + "\" \n";
+            res += "      srs=\"" + lay->get_pyramid()->get_tms()->get_crs()->get_request_code() + "\" \n";
             res += "      profile=\"none\" \n";
-            res += "      extension=\"" + Rok4Format::to_extension ( ( lay->get_pyramid()->getFormat() ) ) + "\" \n";
+            res += "      extension=\"" + Rok4Format::to_extension ( ( lay->get_pyramid()->get_format() ) ) + "\" \n";
             res += "      href=\"" + endpoint_uri + "/1.0.0/" + lay->get_id() + "\" />\n";
         }
     }
@@ -94,7 +94,7 @@ DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
 
     // La couche
     std::string str_layer = req->path_params.at(1);
-    if ( containForbiddenChars(str_layer)) {
+    if ( contain_chars(str_layer, "<>")) {
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TMS layer: " << str_layer ;
         throw TmsException::get_error_message("Layer unknown", 400);
     }
@@ -110,7 +110,7 @@ DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
     res << "  <Title>" << layer->get_title() << "</Title>\n";
 
     for ( unsigned int i=0; i < layer->get_keywords()->size(); i++ ) {
-        res << "  <KeywordList>" << layer->get_keywords()->at(i).getContent() << "</KeywordList>\n";
+        res << "  <KeywordList>" << layer->get_keywords()->at(i).get_content() << "</KeywordList>\n";
     }
 
     for ( unsigned int i = 0; i < layer->get_metadata().size(); i++ ) {
@@ -121,35 +121,35 @@ DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
         res << "  " << layer->get_attribution()->get_tms_xml();
     }
 
-    res << "  <SRS>" << layer->get_pyramid()->getTms()->getCrs()->getRequestCode() << "</SRS>\n";
+    res << "  <SRS>" << layer->get_pyramid()->get_tms()->get_crs()->get_request_code() << "</SRS>\n";
     res << "  <BoundingBox minx=\"" <<
         layer->get_native_bbox().xmin << "\" miny=\"" <<
         layer->get_native_bbox().ymin << "\" maxx=\"" <<
         layer->get_native_bbox().xmax << "\" maxy=\"" <<
         layer->get_native_bbox().ymax << "\" />\n";
 
-    TileMatrix* tm = layer->get_pyramid()->getTms()->getTmList()->begin()->second;
+    TileMatrix* tm = layer->get_pyramid()->get_tms()->getTmList()->begin()->second;
 
-    res << "  <Origin x=\"" << tm->getX0() << "\" y=\"" << tm->getY0() << "\" />\n";
+    res << "  <Origin x=\"" << tm->get_x0() << "\" y=\"" << tm->get_y0() << "\" />\n";
 
-    res << "  <TileFormat width=\"" << tm->getTileW() << 
-        "\" height=\"" << tm->getTileH() <<
-        "\" mime-type=\"" << Rok4Format::to_mime_type ( ( layer->get_pyramid()->getFormat() ) ) << 
-        "\" extension=\"" << Rok4Format::to_extension ( ( layer->get_pyramid()->getFormat() ) ) << "\" />\n";
+    res << "  <TileFormat width=\"" << tm->get_tile_width() << 
+        "\" height=\"" << tm->get_tile_height() <<
+        "\" mime-type=\"" << Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) ) << 
+        "\" extension=\"" << Rok4Format::to_extension ( ( layer->get_pyramid()->get_format() ) ) << "\" />\n";
 
     res << "  <TileSets profile=\"none\">\n";
 
     int order = 0;
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = layer->get_pyramid()->getOrderedLevels(false);
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = layer->get_pyramid()->get_ordered_levels(false);
 
     for (std::pair<std::string, Level*> element : orderedLevels) {
         Level * level = element.second;
-        tm = level->getTm();
+        tm = level->get_tm();
         res << "    <TileSet href=\"" << endpoint_uri << "/1.0.0/" << layer->get_id() << "/" << tm->getId() << 
-            "\" minrow=\"" << level->getMinTileRow() << "\" maxrow=\"" << level->getMaxTileRow() << 
-            "\" mincol=\"" << level->getMinTileCol() << "\" maxcol=\"" << level->getMaxTileCol() <<
-            "\" units-per-pixel=\"" << tm->getRes() << "\" order=\"" << order << "\" />\n";
+            "\" minrow=\"" << level->get_min_tile_row() << "\" maxrow=\"" << level->get_max_tile_row() << 
+            "\" mincol=\"" << level->get_min_tile_col() << "\" maxcol=\"" << level->get_max_tile_col() <<
+            "\" units-per-pixel=\"" << tm->get_res() << "\" order=\"" << order << "\" />\n";
         order++;
     }
 
@@ -167,7 +167,7 @@ DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
 
     // La couche
     std::string str_layer = req->path_params.at(1);
-    if ( containForbiddenChars(str_layer)) {
+    if ( contain_chars(str_layer, "<>")) {
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TMS layer: " << str_layer ;
         throw TmsException::get_error_message("Layer unknown", 400);
     }
@@ -177,7 +177,7 @@ DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Layer " +str_layer+" unknown", 400);
     }
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = layer->get_pyramid()->getOrderedLevels(true);
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = layer->get_pyramid()->get_ordered_levels(true);
 
     int order = 0;
     std::string minzoom, maxzoom;
@@ -192,20 +192,20 @@ DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
 
         if (order == 0) {
             // Le premier niveau lu est le plus détaillé, on va l'utiliser pour définir plusieurs choses
-            maxzoom = level->getId();
+            maxzoom = level->get_id();
         }
         // Zooms min et max
-        minzoom = level->getId();
+        minzoom = level->get_id();
 
-        std::vector<Table>* levelTables = level->getTables();
+        std::vector<Table>* levelTables = level->get_tables();
         for (int i = 0; i < levelTables->size(); i++) {
-            std::string t = levelTables->at(i).getName();
+            std::string t = levelTables->at(i).get_name();
             std::map<std::string, std::string>::iterator it = mins.find ( t );
             if ( it == mins.end() ) {
                 tablesNames.push_back(t);
                 tablesInfos.insert ( std::pair<std::string, Table*> ( t, &(levelTables->at(i)) ) );
-                maxs.insert ( std::pair<std::string, std::string> ( t, level->getId() ) );
-                mins.insert ( std::pair<std::string, std::string> ( t, level->getId() ) );
+                maxs.insert ( std::pair<std::string, std::string> ( t, level->get_id() ) );
+                mins.insert ( std::pair<std::string, std::string> ( t, level->get_id() ) );
             } else {
                 it->second = minzoom;
             }
@@ -222,7 +222,7 @@ DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
     res << "  \"description\": \"" << layer->get_abstract() << "\",\n";
     res << "  \"minzoom\": " << minzoom << ",\n";
     res << "  \"maxzoom\": " << maxzoom << ",\n";
-    res << "  \"crs\": \"" << layer->get_pyramid()->getTms()->getCrs()->getRequestCode() << "\",\n";
+    res << "  \"crs\": \"" << layer->get_pyramid()->get_tms()->get_crs()->get_request_code() << "\",\n";
 
     res << std::fixed << "  \"center\": [" <<
         ((layer->get_geographical_bbox().xmax + layer->get_geographical_bbox().xmin) / 2.) << "," << 
@@ -235,15 +235,15 @@ DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
         layer->get_geographical_bbox().ymax << 
     "],\n";
 
-    res << "  \"format\": \"" << Rok4Format::to_extension ( ( layer->get_pyramid()->getFormat() ) ) << "\",\n";
-    res << "  \"tiles\":[\"" << endpoint_uri << "/1.0.0/" << layer->get_id() << "/{z}/{x}/{y}." << Rok4Format::to_extension ( ( layer->get_pyramid()->getFormat() ) ) << "\"]";
+    res << "  \"format\": \"" << Rok4Format::to_extension ( ( layer->get_pyramid()->get_format() ) ) << "\",\n";
+    res << "  \"tiles\":[\"" << endpoint_uri << "/1.0.0/" << layer->get_id() << "/{z}/{x}/{y}." << Rok4Format::to_extension ( ( layer->get_pyramid()->get_format() ) ) << "\"]";
 
 
-    if (! Rok4Format::is_raster(layer->get_pyramid()->getFormat())) {
+    if (! Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
         res << ",\n  \"vector_layers\": [\n";
         for (int i = 0; i < tablesNames.size(); i++) {
             if (i != 0) res << ",\n";
-            res << "      " << tablesInfos.at(tablesNames.at(i))->getMetadataJson(maxs.at(tablesNames.at(i)),mins.at(tablesNames.at(i)));
+            res << "      " << tablesInfos.at(tablesNames.at(i))->get_metadata_json(maxs.at(tablesNames.at(i)),mins.at(tablesNames.at(i)));
         }
         res << "\n  ]";
     }
@@ -282,7 +282,7 @@ DataStream* TmsService::get_gdal ( Request* req, Rok4Server* serv ) {
 
     // La couche
     std::string str_layer = req->path_params.at(1);
-    if ( containForbiddenChars(str_layer)) {
+    if ( contain_chars(str_layer, "<>")) {
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TMS layer: " << str_layer ;
         throw TmsException::get_error_message("Layer unknown", 400);
     }
@@ -292,37 +292,37 @@ DataStream* TmsService::get_gdal ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Layer " +str_layer+" unknown", 400);
     }
 
-    if (! Rok4Format::is_raster(layer->get_pyramid()->getFormat())) {
+    if (! Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
         throw TmsException::get_error_message("Layer " +str_layer+" is vector data: cannot describe it with this format", 400);
     }
 
-    if (! layer->get_pyramid()->getTms()->getIsQTree()) {
+    if (! layer->get_pyramid()->get_tms()->is_qtree()) {
         throw TmsException::get_error_message("Layer " +str_layer+" data is not a quad tree: cannot describe it with this format", 400);
     }
 
-    Level* best = layer->get_pyramid()->getLowestLevel();
+    Level* best = layer->get_pyramid()->get_lowest_level();
 
     std::ostringstream res;
     res << "<GDAL_WMS>\n";
 
     res << "  <Service name=\"TMS\">\n";
-    res << "    <ServerUrl>" << endpoint_uri << "/1.0.0/" << layer->get_id() << "/${z}/${x}/${y}." << Rok4Format::to_extension ( ( layer->get_pyramid()->getFormat() ) ) << "</ServerUrl>\n";
+    res << "    <ServerUrl>" << endpoint_uri << "/1.0.0/" << layer->get_id() << "/${z}/${x}/${y}." << Rok4Format::to_extension ( ( layer->get_pyramid()->get_format() ) ) << "</ServerUrl>\n";
     res << "  </Service>\n";
 
     res << "  <DataWindow>\n";
-    res << "    <UpperLeftX>" << Utils::double_to_string(best->getTm()->getX0()) << "</UpperLeftX>\n";
-    res << "    <UpperLeftY>" << Utils::double_to_string(best->getTm()->getY0()) << "</UpperLeftY>\n";
-    res << "    <LowerRightX>" << Utils::double_to_string(best->getTm()->getX0() + best->getTm()->getMatrixW() * best->getTm()->getTileW() * best->getTm()->getRes()) << "</LowerRightX>\n";
-    res << "    <LowerRightY>" << Utils::double_to_string(best->getTm()->getY0() - best->getTm()->getMatrixH() * best->getTm()->getTileH() * best->getTm()->getRes()) << "</LowerRightY>\n";
-    res << "    <TileLevel>" << best->getTm()->getId() << "</TileLevel>\n";
+    res << "    <UpperLeftX>" << Utils::double_to_string(best->get_tm()->get_x0()) << "</UpperLeftX>\n";
+    res << "    <UpperLeftY>" << Utils::double_to_string(best->get_tm()->get_y0()) << "</UpperLeftY>\n";
+    res << "    <LowerRightX>" << Utils::double_to_string(best->get_tm()->get_x0() + best->get_tm()->get_matrix_width() * best->get_tm()->get_tile_width() * best->get_tm()->get_res()) << "</LowerRightX>\n";
+    res << "    <LowerRightY>" << Utils::double_to_string(best->get_tm()->get_y0() - best->get_tm()->get_matrix_height() * best->get_tm()->get_tile_height() * best->get_tm()->get_res()) << "</LowerRightY>\n";
+    res << "    <TileLevel>" << best->get_tm()->getId() << "</TileLevel>\n";
     res << "    <TileCountX>1</TileCountX>\n";
     res << "    <TileCountY>1</TileCountY>\n";
     res << "    <YOrigin>top</YOrigin>\n";
     res << "  </DataWindow>\n";
 
-    res << "  <Projection>" << layer->get_pyramid()->getTms()->getCrs()->getProjCode() << "</Projection>\n";
-    res << "  <BlockSizeX>" << best->getTm()->getTileW() << "</BlockSizeX>\n";
-    res << "  <BlockSizeY>" << best->getTm()->getTileH() << "</BlockSizeY>\n";
+    res << "  <Projection>" << layer->get_pyramid()->get_tms()->get_crs()->get_proj_code() << "</Projection>\n";
+    res << "  <BlockSizeX>" << best->get_tm()->get_tile_width() << "</BlockSizeX>\n";
+    res << "  <BlockSizeY>" << best->get_tm()->get_tile_height() << "</BlockSizeY>\n";
     res << "  <ZeroBlockHttpCodes>204,404</ZeroBlockHttpCodes>\n";
     res << "  <BandsCount>" << layer->get_pyramid()->get_channels() << "</BandsCount>\n";
 

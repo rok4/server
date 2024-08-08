@@ -138,7 +138,7 @@ class InfoThread {
          * 
          * @return int 
          */
-        int getCount();
+        int get_count();
 
         /**
          * @brief Set the Count object

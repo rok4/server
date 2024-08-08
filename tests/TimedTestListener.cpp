@@ -79,11 +79,11 @@ double TimedTestListener::getTime ( std::string testName ) {
 void TimedTestListener::setStartTime ( CppUnit::Test *test ) {
     timeval teststart;
     gettimeofday ( &teststart, NULL );
-    testStartTime[test->getName()]=teststart;
+    testStartTime[test->get_name()]=teststart;
 }
 
 void TimedTestListener::setEndTime ( CppUnit::Test *test ) {
     timeval testend;
     gettimeofday ( &testend, NULL );
-    testEndTime[test->getName()]=testend;
+    testEndTime[test->get_name()]=testend;
 }

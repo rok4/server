@@ -85,9 +85,9 @@ class Utils {
      */
     static TiXmlElement* get_xml(std::string element_name, Keyword k) {
         TiXmlElement* el = new TiXmlElement(element_name);
-        el->LinkEndChild(new TiXmlText(k.getContent()));
+        el->LinkEndChild(new TiXmlText(k.get_content()));
 
-        for (std::map<std::string, std::string>::const_iterator it = k.getAttributes()->begin(); it != k.getAttributes()->end(); it++) {
+        for (std::map<std::string, std::string>::const_iterator it = k.get_attributes()->begin(); it != k.get_attributes()->end(); it++) {
             el->SetAttribute((*it).first, (*it).second);
         }
 
@@ -192,11 +192,11 @@ class Utils {
      */
     static TiXmlElement* get_xml(TileMatrixLimits tml) {
         TiXmlElement* tmLimitsEl = new TiXmlElement("TileMatrixLimits");
-        tmLimitsEl->LinkEndChild(build_text_node("TileMatrix", tml.tileMatrixId));
-        tmLimitsEl->LinkEndChild(build_text_node("MinTileRow", std::to_string(tml.minTileRow)));
-        tmLimitsEl->LinkEndChild(build_text_node("MaxTileRow", std::to_string(tml.maxTileRow)));
-        tmLimitsEl->LinkEndChild(build_text_node("MinTileCol", std::to_string(tml.minTileCol)));
-        tmLimitsEl->LinkEndChild(build_text_node("MaxTileCol", std::to_string(tml.maxTileCol)));
+        tmLimitsEl->LinkEndChild(build_text_node("TileMatrix", tml.tm_id));
+        tmLimitsEl->LinkEndChild(build_text_node("MinTileRow", std::to_string(tml.min_tile_row)));
+        tmLimitsEl->LinkEndChild(build_text_node("MaxTileRow", std::to_string(tml.max_tile_row)));
+        tmLimitsEl->LinkEndChild(build_text_node("MinTileCol", std::to_string(tml.min_tile_col)));
+        tmLimitsEl->LinkEndChild(build_text_node("MaxTileCol", std::to_string(tml.max_tile_col)));
 
         return tmLimitsEl;
     }

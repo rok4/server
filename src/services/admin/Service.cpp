@@ -50,9 +50,9 @@
 
 AdminService::AdminService (json11::Json& doc) : Service(doc) {
 
-    if (! isOk()) {
+    if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
-        errorMessage = "ADMIN service: " + errorMessage;
+        error_message = "ADMIN service: " + error_message;
         return;
     }
 

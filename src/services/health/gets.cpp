@@ -142,7 +142,7 @@ DataStream* HealthService::get_dependencies ( Request* req, Rok4Server* serv ) {
     res << "    \"storage\": {\n";
 
     int file_count, s3_count, ceph_count, swift_count;
-    StoragePool::getStorageCounts(file_count, s3_count, ceph_count, swift_count);
+    StoragePool::get_storages_count(file_count, s3_count, ceph_count, swift_count);
     
     res << "      \"file\": " << file_count << ",\n";
     res << "      \"s3\": " << s3_count << ",\n";

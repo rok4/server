@@ -97,35 +97,35 @@ public:
     Attribution ( json11::Json doc ) : ResourceLocator (), logo(NULL) {
 
         if (! doc["title"].is_string()) {
-            missingField = "title";
+            missing_field = "title";
             return;
         }
         title = doc["title"].string_value();
 
         if (! doc["url"].is_string()) {
-            missingField = "url";
+            missing_field = "url";
             return;
         }
         href = doc["url"].string_value();
 
         if (doc["logo"].is_object()) {
             if (! doc["logo"]["width"].is_number()) {
-                missingField = "logo.width";
+                missing_field = "logo.width";
                 return;
             }
             width = doc["logo"]["width"].number_value();
             if (! doc["logo"]["height"].is_number()) {
-                missingField = "logo.height";
+                missing_field = "logo.height";
                 return;
             }
             height = doc["logo"]["height"].number_value();
 
             if (! doc["logo"]["format"].is_string()) {
-                missingField = "logo.format";
+                missing_field = "logo.format";
                 return;
             }
             if (! doc["logo"]["url"].is_string()) {
-                missingField = "logo.url";
+                missing_field = "logo.url";
                 return;
             }
             logo = new ResourceLocator(doc["logo"]["format"].string_value(), doc["logo"]["url"].string_value());
@@ -141,7 +141,7 @@ public:
     std::string get_tms_xml() {
         std::string res = "<Attribution><Title>" + title + "</Title>";
         if (logo != NULL) {
-            res += "<Logo width=\"" + std::to_string(width) + "\" height=\"" + std::to_string(height) + "\" href=\"" + logo->getHRef() + "\" mime-type=\"" + logo->getFormat() + "\" />\n";
+            res += "<Logo width=\"" + std::to_string(width) + "\" height=\"" + std::to_string(height) + "\" href=\"" + logo->get_href() + "\" mime-type=\"" + logo->get_format() + "\" />\n";
         }
         res += "</Attribution>";
         return res;
@@ -164,11 +164,11 @@ public:
             TiXmlElement* logoEl = new TiXmlElement ( "LogoURL" );
             logoEl->SetAttribute ( "width", width );
             logoEl->SetAttribute ( "height", height );
-            logoEl->LinkEndChild ( Utils::build_text_node ( "Format", logo->getFormat() ) );
+            logoEl->LinkEndChild ( Utils::build_text_node ( "Format", logo->get_format() ) );
 
             TiXmlElement* logoOrEl = new TiXmlElement ( "OnlineResource" );
             logoOrEl->SetAttribute ( "xlink:type","simple" );
-            logoOrEl->SetAttribute ( "xlink:href", logo->getHRef() );
+            logoOrEl->SetAttribute ( "xlink:href", logo->get_href() );
             logoEl->LinkEndChild ( logoOrEl );
 
             el->LinkEndChild ( logoEl );

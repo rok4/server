@@ -58,8 +58,8 @@ DataStream* AdminService::add_layer ( Request* req, Rok4Server* serv ) {
     if ( layer != NULL ) throw AdminException::get_error_message("Layer " + str_layer +" already exists.", "Configuration conflict", 409);
 
     layer = new Layer( str_layer, req->body );
-    if ( ! layer->isOk() ) {
-        std::string msg = layer->getErrorMessage();
+    if ( ! layer->is_ok() ) {
+        std::string msg = layer->get_error_message();
         delete layer;
         throw AdminException::get_error_message(msg, "Configuration issue", 400);
     }
@@ -78,8 +78,8 @@ DataStream* AdminService::update_layer ( Request* req, Rok4Server* serv ) {
     if ( layer == NULL ) throw AdminException::get_error_message("Layer " + str_layer + " does not exists.", "Not found", 404);
 
     Layer* new_layer = new Layer( str_layer, req->body );
-    if ( ! new_layer->isOk() ) {
-        std::string msg = new_layer->getErrorMessage();
+    if ( ! new_layer->is_ok() ) {
+        std::string msg = new_layer->get_error_message();
         delete new_layer;
         throw AdminException::get_error_message(msg, "Configuration issue", 400);
     }

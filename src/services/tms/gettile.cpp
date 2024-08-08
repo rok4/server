@@ -59,7 +59,7 @@ DataSource* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
 
     // La couche
     std::string str_layer = req->path_params.at(1);
-    if ( containForbiddenChars(str_layer)) {
+    if ( contain_chars(str_layer, "<>")) {
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TMS layer: " << str_layer ;
         throw TmsException::get_error_message("Layer unknown", 400);
     }
@@ -70,16 +70,16 @@ DataSource* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
     }
 
     // Le niveau
-    TileMatrixSet* tms = layer->get_pyramid()->getTms();
+    TileMatrixSet* tms = layer->get_pyramid()->get_tms();
 
     std::string str_tm = req->path_params.at(2);
 
-    if ( containForbiddenChars(str_tm)) {
+    if ( contain_chars(str_tm, "<>")) {
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TMS tileMatrix: " << str_tm ;
         throw TmsException::get_error_message("Level unknown", 400);
     }
 
-    TileMatrix* tm = tms->getTm(str_tm);
+    TileMatrix* tm = tms->get_tm(str_tm);
     if ( tm == NULL )
         throw TmsException::get_error_message("Level " + str_tm + " unknown", 400);
 
@@ -104,14 +104,14 @@ DataSource* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("No data found", 404);
     }
 
-    if (! tml->containTile(column, row)) {
+    if (! tml->contain_tile(column, row)) {
         // On est hors tuiles -> erreur
         throw TmsException::get_error_message("No data found", 404);
     }
 
     // Le style
     Style* style;
-    if (Rok4Format::is_raster(layer->get_pyramid()->getFormat())) {
+    if (Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
         style = layer->get_default_style();
     }
 
@@ -120,18 +120,18 @@ DataSource* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
     if ( extension == "" )
         throw TmsException::get_error_message("Empty extension", 400);
 
-    if ( containForbiddenChars(extension)) {
+    if ( contain_chars(extension, "<>")) {
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TMS extension: " << extension ;
         throw TmsException::get_error_message("Invalid extension", 400);
     }
 
-    if ( extension.compare ( Rok4Format::to_extension ( ( layer->get_pyramid()->getFormat() ) ) ) != 0 ) {
+    if ( extension.compare ( Rok4Format::to_extension ( ( layer->get_pyramid()->get_format() ) ) ) != 0 ) {
         throw TmsException::get_error_message("Invalid extension " + extension, 400);
     }
 
-    std::string format = Rok4Format::to_mime_type ( ( layer->get_pyramid()->getFormat() ) );
+    std::string format = Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) );
 
-    DataSource* d = layer->get_pyramid()->getLevel(tm->getId())->getTile(column, row);
+    DataSource* d = layer->get_pyramid()->get_level(tm->get_id())->get_tile(column, row);
     if (d == NULL) {
         throw TmsException::get_error_message("No data found", 404);
     }

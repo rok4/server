@@ -149,7 +149,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     TiXmlElement * dcpEl = new TiXmlElement ( "ows:DCP" );
     TiXmlElement * httpEl = new TiXmlElement ( "ows:HTTP" );
     TiXmlElement * getEl = new TiXmlElement ( "ows:Get" );
-    getEl->SetAttribute ( "xlink:href", endpoint_uri );
+    getEl->SetAttribute ( "xlink:href", endpoint_uri + "?SERVICE=WMTS&" );
     TiXmlElement * constraintEl = new TiXmlElement ( "ows:Constraint" );
     constraintEl->SetAttribute ( "name","GetEncoding" );
     TiXmlElement * allowedValuesEl = new TiXmlElement ( "ows:AllowedValues" );
@@ -168,7 +168,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     dcpEl = new TiXmlElement ( "ows:DCP" );
     httpEl = new TiXmlElement ( "ows:HTTP" );
     getEl = new TiXmlElement ( "ows:Get" );
-    getEl->SetAttribute ( "xlink:href", endpoint_uri );
+    getEl->SetAttribute ( "xlink:href", endpoint_uri + "?SERVICE=WMTS&" );
     constraintEl = new TiXmlElement ( "ows:Constraint" );
     constraintEl->SetAttribute ( "name","GetEncoding" );
     allowedValuesEl = new TiXmlElement ( "ows:AllowedValues" );
@@ -187,7 +187,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     dcpEl = new TiXmlElement ( "ows:DCP" );
     httpEl = new TiXmlElement ( "ows:HTTP" );
     getEl = new TiXmlElement ( "ows:Get" );
-    getEl->SetAttribute ( "xlink:href", endpoint_uri );
+    getEl->SetAttribute ( "xlink:href", endpoint_uri + "?SERVICE=WMTS&" );
     constraintEl = new TiXmlElement ( "ows:Constraint" );
     constraintEl->SetAttribute ( "name","GetEncoding" );
     allowedValuesEl = new TiXmlElement ( "ows:AllowedValues" );
@@ -209,7 +209,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
         // Metadata
         TiXmlElement * metadataUrlEl = new TiXmlElement ( "inspire_common:MetadataUrl" );
-        metadataUrlEl->LinkEndChild ( Utils::build_text_node ( "inspire_common:URL", metadata->getHRef() ) );
+        metadataUrlEl->LinkEndChild ( Utils::build_text_node ( "inspire_common:URL", metadata->get_href() ) );
         metadataUrlEl->LinkEndChild ( Utils::build_text_node ( "inspire_common:MediaType", metadata->get_type() ) );
         extendedCapabilititesEl->LinkEndChild ( metadataUrlEl );
 
@@ -303,16 +303,16 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
                     for ( j=0 ; j < style->get_legends().size(); ++j ) {
                         LegendURL legendURL = style->get_legends() [j];
                         TiXmlElement* legendURLEl = new TiXmlElement ( "LegendURL" );
-                        legendURLEl->SetAttribute ( "format", legendURL.getFormat() );
-                        legendURLEl->SetAttribute ( "xlink:href", legendURL.getHRef() );
+                        legendURLEl->SetAttribute ( "format", legendURL.get_format() );
+                        legendURLEl->SetAttribute ( "xlink:href", legendURL.get_href() );
                         if ( legendURL.get_width() !=0 )
                             legendURLEl->SetAttribute ( "width", legendURL.get_width() );
                         if ( legendURL.get_height() !=0 )
                             legendURLEl->SetAttribute ( "height", legendURL.get_height() );
-                        if ( legendURL.getMinScaleDenominator() !=0.0 )
-                            legendURLEl->SetAttribute ( "minScaleDenominator", legendURL.getMinScaleDenominator() );
-                        if ( legendURL.getMaxScaleDenominator() !=0.0 )
-                            legendURLEl->SetAttribute ( "maxScaleDenominator", legendURL.getMaxScaleDenominator() );
+                        if ( legendURL.get_min_scale_denominator() !=0.0 )
+                            legendURLEl->SetAttribute ( "minScaleDenominator", legendURL.get_min_scale_denominator() );
+                        if ( legendURL.get_max_scale_denominator() !=0.0 )
+                            legendURLEl->SetAttribute ( "maxScaleDenominator", legendURL.get_max_scale_denominator() );
                         styleEl->LinkEndChild ( legendURLEl );
                     }
                     layerEl->LinkEndChild ( styleEl );
@@ -320,7 +320,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
             }
 
             // Contrainte : 1 layer = 1 pyramide = 1 format
-            layerEl->LinkEndChild ( Utils::build_text_node ( "Format",Rok4Format::to_mime_type ( ( layer->get_pyramid()->getFormat() ) ) ) );
+            layerEl->LinkEndChild ( Utils::build_text_node ( "Format",Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) ) ) );
             if (layer->is_gfi_enabled()){
                 for ( unsigned int i = 0; i < info_formats.size(); i++ ) {
                     layerEl->LinkEndChild ( Utils::build_text_node ( "InfoFormat", info_formats.at ( i ) ) );
@@ -350,7 +350,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
                     origin_infos.tms = layer->get_wmts_tilematrixsets().at(i).tms;
                     origin_infos.top_level = "";
                     origin_infos.bottom_level = "";
-                    origin_infos.wmts_id = origin_infos.tms->getId();
+                    origin_infos.wmts_id = origin_infos.tms->get_id();
                     used_tms_list.insert ( std::pair<std::string, WmtsTmsInfos> ( origin_infos.wmts_id, origin_infos) );
                 }
             }
@@ -369,28 +369,28 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
         tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:Identifier", itTms->first ) );
 
         TileMatrixSet* tms = itTms->second.tms;
-        if ( ! ( tms->getTitle().empty() ) ) {
-            tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:Title", tms->getTitle().c_str() ) );
+        if ( ! ( tms->get_title().empty() ) ) {
+            tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:Title", tms->get_title().c_str() ) );
         }
 
-        if ( ! ( tms->getAbstract().empty() ) ) {
-            tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:Abstract", tms->getAbstract().c_str() ) );
+        if ( ! ( tms->get_abstract().empty() ) ) {
+            tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:Abstract", tms->get_abstract().c_str() ) );
         }
 
-        if ( tms->getKeyWords()->size() != 0 ) {
+        if ( tms->get_keywords()->size() != 0 ) {
 
             TiXmlElement * kwlEl = new TiXmlElement ( "ows:Keywords" );
-            for ( unsigned int i=0; i < tms->getKeyWords()->size(); i++ ) {
-                kwlEl->LinkEndChild ( Utils::get_xml("ows:Keyword", tms->getKeyWords()->at ( i )) );
+            for ( unsigned int i=0; i < tms->get_keywords()->size(); i++ ) {
+                kwlEl->LinkEndChild ( Utils::get_xml("ows:Keyword", tms->get_keywords()->at ( i )) );
             }
             tmsEl->LinkEndChild ( kwlEl );
 
         }
 
-        tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:SupportedCRS",tms->getCrs()->getRequestCode() ) );
+        tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:SupportedCRS",tms->get_crs()->get_request_code() ) );
         
         // TileMatrix
-        std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->getOrderedTileMatrix(false);
+        std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->get_ordered_tm(false);
         bool keep = false;
         if (itTms->second.top_level == "") {
             // On est sur un TMS d'origine, on l'exporte en entier
@@ -399,27 +399,27 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
         for (std::pair<std::string, TileMatrix*> element : orderedTM) {
             TileMatrix* tm = element.second;
 
-            if (! keep && tm->getId() != itTms->second.top_level) {
+            if (! keep && tm->get_id() != itTms->second.top_level) {
                 continue;
             } else {
                 keep = true;
             }
 
             TiXmlElement * tmEl = new TiXmlElement ( "TileMatrix" );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "ows:Identifier",tm->getId() ) );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "ScaleDenominator",Utils::double_to_string ( ( long double ) ( tm->getRes() * tms->getCrs()->getMetersPerUnit() ) /0.00028 ) ) );
-            if (tms->getCrs()->getAuthority() == "EPSG" && tms->getCrs()->isLongLat()) {
-                tmEl->LinkEndChild ( Utils::build_text_node ( "TopLeftCorner",Utils::double_to_string ( tm->getY0() ) + " " + Utils::double_to_string ( tm->getX0() ) ) );
+            tmEl->LinkEndChild ( Utils::build_text_node ( "ows:Identifier",tm->get_id() ) );
+            tmEl->LinkEndChild ( Utils::build_text_node ( "ScaleDenominator",Utils::double_to_string ( ( long double ) ( tm->get_res() * tms->get_crs()->gte_meters_per_unit() ) /0.00028 ) ) );
+            if (tms->get_crs()->get_authority() == "EPSG" && tms->get_crs()->is_lon_lat()) {
+                tmEl->LinkEndChild ( Utils::build_text_node ( "TopLeftCorner",Utils::double_to_string ( tm->get_y0() ) + " " + Utils::double_to_string ( tm->get_x0() ) ) );
             } else {
-                tmEl->LinkEndChild ( Utils::build_text_node ( "TopLeftCorner",Utils::double_to_string ( tm->getX0() ) + " " + Utils::double_to_string ( tm->getY0() ) ) );
+                tmEl->LinkEndChild ( Utils::build_text_node ( "TopLeftCorner",Utils::double_to_string ( tm->get_x0() ) + " " + Utils::double_to_string ( tm->get_y0() ) ) );
             }
-            tmEl->LinkEndChild ( Utils::build_text_node ( "TileWidth",Utils::int_to_string ( tm->getTileW() ) ) );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "TileHeight",Utils::int_to_string ( tm->getTileH() ) ) );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "MatrixWidth",Utils::int_to_string ( tm->getMatrixW() ) ) );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "MatrixHeight",Utils::int_to_string ( tm->getMatrixH() ) ) );
+            tmEl->LinkEndChild ( Utils::build_text_node ( "TileWidth",Utils::int_to_string ( tm->get_tile_width() ) ) );
+            tmEl->LinkEndChild ( Utils::build_text_node ( "TileHeight",Utils::int_to_string ( tm->get_tile_height() ) ) );
+            tmEl->LinkEndChild ( Utils::build_text_node ( "MatrixWidth",Utils::int_to_string ( tm->get_matrix_width() ) ) );
+            tmEl->LinkEndChild ( Utils::build_text_node ( "MatrixHeight",Utils::int_to_string ( tm->get_matrix_height() ) ) );
             tmsEl->LinkEndChild ( tmEl );
 
-            if (tm->getId() == itTms->second.bottom_level) {
+            if (tm->get_id() == itTms->second.bottom_level) {
                 break;
             }
         }

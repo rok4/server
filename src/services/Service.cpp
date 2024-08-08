@@ -72,14 +72,14 @@ Service::Service (json11::Json& doc) {
         enabled = false;
         return;
     } else if(! doc.is_object()) {
-        errorMessage = "have to be an object";
+        error_message = "have to be an object";
         return;
     }
 
     if (doc["enabled"].is_bool()) {
         enabled = doc["enabled"].bool_value();
     } else if (! doc["enabled"].is_null()) {
-        errorMessage = "'enabled' have to be a boolean";
+        error_message = "'enabled' have to be a boolean";
         return;
     } else {
         enabled = false;

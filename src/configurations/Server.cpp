@@ -50,7 +50,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
         log_file_period = DEFAULT_LOG_FILE_PERIOD;
         log_level = DEFAULT_LOG_LEVEL;
     } else if (! loggerSection.is_object()) {
-        errorMessage = "logger have to be an object";
+        error_message = "logger have to be an object";
         return false;
     } else {
         // output
@@ -58,12 +58,12 @@ bool ServerConfiguration::parse(json11::Json& doc) {
             std::cerr << "No logger.output, default value used" << std::endl;
             log_output = DEFAULT_LOG_OUTPUT;
         } else if (! loggerSection["output"].is_string()) {
-            errorMessage = "logger.output have to be a string";
+            error_message = "logger.output have to be a string";
             return false;
         } else {
             log_output = loggerSection["output"].string_value();
             if ( log_output != "rolling_file" && log_output != "standard_output" && log_output != "static_file" ) {
-                errorMessage = "logger.output '" + loggerSection["output"].string_value() + "' is unknown";
+                error_message = "logger.output '" + loggerSection["output"].string_value() + "' is unknown";
                 return false;
             }
         }
@@ -73,7 +73,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
             std::cerr << "No logger.file_prefix, default value used" << std::endl;
             log_file_prefix = DEFAULT_LOG_FILE_PREFIX;
         } else if (! loggerSection["file_prefix"].is_string()) {
-            errorMessage = "logger.file_prefix have to be a string";
+            error_message = "logger.file_prefix have to be a string";
             return false;
         } else {
             log_file_prefix = loggerSection["file_prefix"].string_value();
@@ -84,7 +84,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
             std::cerr << "No logger.file_period, default value used" << std::endl;
             log_file_period = DEFAULT_LOG_FILE_PERIOD;
         } else if (! loggerSection["file_period"].is_number()) {
-            errorMessage = "logger.file_period have to be a number";
+            error_message = "logger.file_period have to be a number";
             return false;
         } else {
             log_file_period = loggerSection["file_period"].int_value();
@@ -95,7 +95,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
             std::cerr << "No logger.level, default value used" << std::endl;
             log_level = DEFAULT_LOG_LEVEL;
         } else if (! loggerSection["level"].is_string()) {
-            errorMessage = "logger.level have to be a string";
+            error_message = "logger.level have to be a string";
             return false;
         } else {
             std::string strLogLevel = loggerSection["level"].string_value();
@@ -105,7 +105,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
             else if ( strLogLevel == "info" ) log_level=boost::log::trivial::info;
             else if ( strLogLevel == "debug" ) log_level=boost::log::trivial::debug;
             else {
-                errorMessage = "logger.level '" + strLogLevel + "' is unknown";
+                error_message = "logger.level '" + strLogLevel + "' is unknown";
                 return false;
             }
         }
@@ -126,7 +126,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
         std::cerr << "No threads, default value used" << std::endl;
         threads_count = DEFAULT_NB_THREAD;
     } else if (! doc["threads"].is_number()) {
-        errorMessage = "threads have to be a number";
+        error_message = "threads have to be a number";
         return false;
     } else {
         threads_count = doc["threads"].int_value();
@@ -145,7 +145,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
         std::cerr << "No backlog, default value used" << std::endl;
         backlog = 0;
     } else if (! doc["backlog"].is_number()) {
-        errorMessage = "backlog have to be a number";
+        error_message = "backlog have to be a number";
         return false;
     } else {
         backlog = doc["backlog"].int_value();
@@ -155,7 +155,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
     if (doc["enabled"].is_null()) {
         enabled = true;
     } else if (! doc["enabled"].is_bool()) {
-        errorMessage = "enabled have to be a boolean";
+        error_message = "enabled have to be a boolean";
         return false;
     } else {
         enabled = doc["enabled"].bool_value();
@@ -164,15 +164,15 @@ bool ServerConfiguration::parse(json11::Json& doc) {
     // configurations
     json11::Json configurationsSection = doc["configurations"];
     if (configurationsSection.is_null()) {
-        errorMessage = "No configuration section";
+        error_message = "No configuration section";
         return false;
     } else if (! configurationsSection.is_object()) {
-        errorMessage = "configuration have to be an object";
+        error_message = "configuration have to be an object";
         return false;
     } else {
         // services
         if (configurationsSection["services"].is_null() || ! configurationsSection["services"].is_string()) {
-            errorMessage = "configurations.services have to be provided and be a string";
+            error_message = "configurations.services have to be provided and be a string";
             return false;
         } else {
             services_configuration_file = configurationsSection["services"].string_value();
@@ -182,7 +182,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
         if (configurationsSection["layers"].is_null()) {
             layers_list = "";
         } else if (! configurationsSection["layers"].is_string()) {
-            errorMessage = "configurations.layers have to be a string";
+            error_message = "configurations.layers have to be a string";
             return false;
         } else {
             layers_list = configurationsSection["layers"].string_value();
@@ -190,7 +190,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
 
         // styles
         if (configurationsSection["styles"].is_null() || ! configurationsSection["styles"].is_string()) {
-            errorMessage = "configurations.styles have to be provided and be a string";
+            error_message = "configurations.styles have to be provided and be a string";
             return false;
         } else {
             StyleBook::set_directory(configurationsSection["styles"].string_value());
@@ -198,7 +198,7 @@ bool ServerConfiguration::parse(json11::Json& doc) {
 
         // tile_matrix_sets
         if (configurationsSection["tile_matrix_sets"].is_null() || ! configurationsSection["tile_matrix_sets"].is_string()) {
-            errorMessage = "configurations.tile_matrix_sets have to be provided and be a string";
+            error_message = "configurations.tile_matrix_sets have to be provided and be a string";
             return false;
         } else {
             TmsBook::set_directory(configurationsSection["tile_matrix_sets"].string_value());
@@ -211,16 +211,16 @@ bool ServerConfiguration::parse(json11::Json& doc) {
 
 ServerConfiguration::ServerConfiguration(std::string path) : Configuration(path) {
 
-    std::cout << "Loading server configuration from file " << filePath << std::endl;
+    std::cout << "Loading server configuration from file " << file_path << std::endl;
 
-    std::ifstream is(filePath);
+    std::ifstream is(file_path);
     std::stringstream ss;
     ss << is.rdbuf();
 
     std::string err;
     json11::Json doc = json11::Json::parse ( ss.str(), err );
     if ( doc.is_null() ) {
-        errorMessage = "Cannot load JSON file "  + filePath + " : " + err ;
+        error_message = "Cannot load JSON file "  + file_path + " : " + err ;
         return;
     }
 

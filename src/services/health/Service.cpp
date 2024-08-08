@@ -53,9 +53,9 @@
 
 HealthService::HealthService (json11::Json& doc) : Service(doc) {
 
-    if (! isOk()) {
+    if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
-        errorMessage = "HEALTH service: " + errorMessage;
+        error_message = "HEALTH service: " + error_message;
         return;
     }
 

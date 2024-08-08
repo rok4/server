@@ -79,19 +79,19 @@ public:
     Metadata ( json11::Json doc ) : ResourceLocator () {
 
         if (! doc["format"].is_string()) {
-            missingField = "format";
+            missing_field = "format";
             return;
         }
         format = doc["format"].string_value();
 
         if (! doc["url"].is_string()) {
-            missingField = "url";
+            missing_field = "url";
             return;
         }
         href = doc["url"].string_value();
         
         if (! doc["type"].is_string()) {
-            missingField = "type";
+            missing_field = "type";
             return;
         }
         type = doc["type"].string_value();
@@ -139,8 +139,8 @@ public:
      */
     bool operator== ( const Metadata& other ) const {
         return ( this->type.compare ( other.type ) == 0
-                && this->getFormat().compare ( other.getFormat() ) == 0
-                && this->getHRef().compare ( other.getHRef() ) == 0 );
+                && this->get_format().compare ( other.get_format() ) == 0
+                && this->get_href().compare ( other.get_href() ) == 0 );
     };
     /**
      * \~french

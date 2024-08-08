@@ -51,5 +51,7 @@
 
 DataSource* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
+    // IGNGPF-3546 : si bbox en dehors de l'aire de définition du CRS, on doit répondre de l'image vide (et pas une erreur)
+
     throw WmsException::get_error_message("Coming soon !", "NotImplemented", 501);
 }

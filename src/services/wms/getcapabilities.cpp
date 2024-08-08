@@ -51,6 +51,11 @@
 
 DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
+    // IGNGPF-3548 : revoir les formats de GFI pour ne pas proposer ce que geoserver ne veut pas (pas application/xml mais text/xml)
+    // Voir la même chose pour les formats d'image : est ce qu'on ne devrait pas les définir pour chaque couche
+
+    // IGNGPF-3556 : ajouter aux URL des opérations ?SERVICE=WMS&
+
     throw WmsException::get_error_message("Coming soon !", "NotImplemented", 501);
 
 }

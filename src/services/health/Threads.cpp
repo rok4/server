@@ -101,7 +101,7 @@ void Threads::status(long unsigned int i, eThreadStatus value) {
         it->second.setDuration(duration);
         BOOST_LOG_TRIVIAL(debug) << "duration update : " << it->second.getDuration();
         it->second.setCount();
-        BOOST_LOG_TRIVIAL(debug) << "count update : " << it->second.getCount();
+        BOOST_LOG_TRIVIAL(debug) << "count update : " << it->second.get_count();
     }
 
 }
@@ -114,7 +114,7 @@ std::string Threads::print() {
         res << "  {\n";
         res << "    \"pid\":" << it->second.getPID() << ",\n";
         res << "    \"status\":" << "\"" << it->second.getStatus() << "\",\n";
-        res << "    \"count\":" << it->second.getCount() << ",\n";
+        res << "    \"count\":" << it->second.get_count() << ",\n";
         res << "    \"time\":" << it->second.getTime() << ",\n";
         res << "    \"duration\":" << it->second.getDuration() << "\n";
         res << "  }";
@@ -154,7 +154,7 @@ void InfoThread::setStatus(std::string s) {
     m_status = s;
 }
 
-int InfoThread::getCount() {
+int InfoThread::get_count() {
     return m_count;
 }
 
