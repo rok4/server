@@ -68,14 +68,14 @@ void Threads::status(eThreadStatus value) {
 }
 
 void Threads::status(long unsigned int i, eThreadStatus value) {
-    BOOST_LOG_TRIVIAL(debug) << "status : " << Threads::toString(value) << "(call thread " << i << ")";
+    BOOST_LOG_TRIVIAL(debug) << "status : " << Threads::to_string(value) << "(call thread " << i << ")";
     std::map<long unsigned int, InfoThread>::iterator it;
     it = m_threads.find(i);
     if (it == m_threads.end()) {
         BOOST_LOG_TRIVIAL(debug) << "thread " << i << " not found !?";
         return;
     }
-    it->second.setStatus(Threads::toString(value));
+    it->second.setStatus(Threads::to_string(value));
     BOOST_LOG_TRIVIAL(debug) << "status update : " << it->second.getStatus();
 
     if (value == eThreadStatus::PENDING) {
@@ -128,7 +128,7 @@ std::string Threads::print() {
 
 InfoThread::InfoThread(long unsigned int& i) {
     m_pid = i;
-    m_status = Threads::toString(eThreadStatus::PENDING);
+    m_status = Threads::to_string(eThreadStatus::PENDING);
     m_count = 0;
     m_duration = 0;
     m_time = 0;

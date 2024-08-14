@@ -89,15 +89,15 @@ void Request::url_decode ( char *src ) {
     *dst = '\0';
 }
 
-Request::Request ( FCGX_Request* fcgxRequest ) : fcgx_request(fcgxRequest) {
+Request::Request ( FCGX_Request* fcgx ) : fcgx_request(fcgx) {
     
     // Méthode
-    method = std::string(FCGX_GetParam ( "REQUEST_METHOD",fcgxRequest->envp ));
+    method = std::string(FCGX_GetParam ( "REQUEST_METHOD",fcgx->envp ));
 
     // Body
     if (method == "POST" || method == "PUT") {
         char* contentBuffer = ( char* ) malloc ( sizeof ( char ) *200 );
-        while ( FCGX_GetLine ( contentBuffer, 200, fcgxRequest->in ) ) {
+        while ( FCGX_GetLine ( contentBuffer, 200, fcgx->in ) ) {
             body.append ( contentBuffer );
         }
         free ( contentBuffer );
@@ -107,7 +107,7 @@ Request::Request ( FCGX_Request* fcgxRequest ) : fcgx_request(fcgxRequest) {
     }
 
     // Chemin
-    path = std::string(FCGX_GetParam ( "SCRIPT_NAME",fcgxRequest->envp ));
+    path = std::string(FCGX_GetParam ( "SCRIPT_NAME",fcgx->envp ));
     // Suppression du slash final
     if (path.compare ( path.size()-1,1,"/" ) == 0) {
         path.pop_back();
@@ -116,19 +116,18 @@ Request::Request ( FCGX_Request* fcgxRequest ) : fcgx_request(fcgxRequest) {
     BOOST_LOG_TRIVIAL(debug) <<  "Request: " << method << " " << path ;
 
     // Query parameters
-    char* query = FCGX_GetParam ( "QUERY_STRING",fcgxRequest->envp );
-    url_decode ( query );
+    char* query = FCGX_GetParam ( "QUERY_STRING",fcgx->envp );
     BOOST_LOG_TRIVIAL(debug) <<  "Query parameters: " << query ;
-    for ( int pos = 0; query[pos]; ) {
-        std::string key = std::string(query + pos);
-        for ( ; query[pos] && query[pos] != '=' && query[pos] != '&'; pos++ ); // on trouve le premier "=", "&" ou 0
-        char* value = query + pos;
-        for ( ; query[pos] && query[pos] != '&'; pos++ ); // on trouve le suivant "&" ou 0
-        if ( *value == '=' ) *value++ = 0; // on met un 0 à la place du '=' entre key et value
-        if ( query[pos] ) query[pos++] = 0; // on met un 0 à la fin du char* value
+    url_decode ( query );
 
+    std::map<std::string, std::string> params = Utils::string_to_map(std::string(query), "&", "=");
+
+    // On stocke les paramètres de requête avec la clé en minuscule
+    std::map<std::string, std::string>::iterator it;
+    for ( it = params.begin(); it != params.end(); it++ ) {
+        std::string key = it->first;
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-        query_params.insert ( std::pair<std::string, std::string> ( key, value ) );
+        query_params.insert ( std::pair<std::string, std::string> ( key, it->second ) );
     }
 }
 
@@ -154,4 +153,9 @@ std::string Request::get_query_param ( std::string paramName ) {
 void Request::print() {
     BOOST_LOG_TRIVIAL(info) << "path = " << path;
     BOOST_LOG_TRIVIAL(info) << "method = " << method;
+}
+    
+bool Request::is_inspire() {
+    std::string inspire = get_query_param("inspire");
+    return inspire == "true" || inspire == "1";
 }

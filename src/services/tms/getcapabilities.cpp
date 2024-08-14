@@ -146,7 +146,7 @@ DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
     for (std::pair<std::string, Level*> element : orderedLevels) {
         Level * level = element.second;
         tm = level->get_tm();
-        res << "    <TileSet href=\"" << endpoint_uri << "/1.0.0/" << layer->get_id() << "/" << tm->getId() << 
+        res << "    <TileSet href=\"" << endpoint_uri << "/1.0.0/" << layer->get_id() << "/" << tm->get_id() << 
             "\" minrow=\"" << level->get_min_tile_row() << "\" maxrow=\"" << level->get_max_tile_row() << 
             "\" mincol=\"" << level->get_min_tile_col() << "\" maxcol=\"" << level->get_max_tile_col() <<
             "\" units-per-pixel=\"" << tm->get_res() << "\" order=\"" << order << "\" />\n";
@@ -314,7 +314,7 @@ DataStream* TmsService::get_gdal ( Request* req, Rok4Server* serv ) {
     res << "    <UpperLeftY>" << Utils::double_to_string(best->get_tm()->get_y0()) << "</UpperLeftY>\n";
     res << "    <LowerRightX>" << Utils::double_to_string(best->get_tm()->get_x0() + best->get_tm()->get_matrix_width() * best->get_tm()->get_tile_width() * best->get_tm()->get_res()) << "</LowerRightX>\n";
     res << "    <LowerRightY>" << Utils::double_to_string(best->get_tm()->get_y0() - best->get_tm()->get_matrix_height() * best->get_tm()->get_tile_height() * best->get_tm()->get_res()) << "</LowerRightY>\n";
-    res << "    <TileLevel>" << best->get_tm()->getId() << "</TileLevel>\n";
+    res << "    <TileLevel>" << best->get_tm()->get_id() << "</TileLevel>\n";
     res << "    <TileCountX>1</TileCountX>\n";
     res << "    <TileCountY>1</TileCountY>\n";
     res << "    <YOrigin>top</YOrigin>\n";

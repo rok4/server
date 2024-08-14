@@ -45,21 +45,32 @@
 
 #include <iostream>
 
+#include <rok4/utils/CRS.h>
+
 #include "services/wms/Exception.h"
 #include "services/wms/Service.h"
 #include "Rok4Server.h"
 
-WmsService::WmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
+WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service(doc), metadata(NULL) {
 
     if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
-        error_message = "WMTS service: " + error_message;
+        error_message = "WMS service: " + error_message;
         return;
     }
 
     if (doc.is_null()) {
         // Le service a déjà été mis comme n'étant pas actif
         return;
+    }
+
+    if (doc["name"].is_string()) {
+        name = doc["name"].string_value();
+    } else if (! doc["name"].is_null()) {
+        error_message = "WMS service: name have to be a string";
+        return;
+    } else {
+        name = "WMS";
     }
 
     if (doc["title"].is_string()) {
@@ -129,6 +140,33 @@ WmsService::WmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
         reprojection = false;
     }
 
+    if (doc["formats"].is_array()) {
+        for (json11::Json f : doc["formats"].array_items()) {
+            if (f.is_string()) {
+                std::string format = f.string_value();
+                if ( format != "image/jpeg" &&
+                    format != "image/png"  &&
+                    format != "image/tiff" &&
+                    format != "image/geotiff" &&
+                    format != "image/x-bil;bits=32" &&
+                    format != "image/gif" && 
+                    format != "text/asc" ) {
+                    error_message = "WMS service: format [" + format + "] is not an handled MIME format";
+                    return;
+                } else {
+                    formats.push_back ( format );
+                }
+                formats.push_back ( f.string_value() );
+            } else {
+                error_message = "WMS service: formats have to be a string array";
+                return;
+            }
+        }
+    } else if (! doc["formats"].is_null()) {
+        error_message = "WMS service: formats have to be a string array";
+        return;
+    }
+
     if (doc["info_formats"].is_array()) {
         for (json11::Json info : doc["info_formats"].array_items()) {
             if (info.is_string()) {
@@ -142,7 +180,171 @@ WmsService::WmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
         error_message = "WMS service: info_formats have to be a string array";
         return;
     }
+
+    if (doc["root_layer"].is_object()) {
+        if (doc["root_layer"]["title"].is_string()) {
+            root_layer_title = doc["root_layer"]["title"].string_value();
+        } else if (! doc["root_layer"]["title"].is_null()) {
+            error_message = "WMS service: root_layer.title have to be a string";
+            return;
+        } else {
+            root_layer_title = "WMS layers";
+        }
+
+        if (doc["root_layer"]["abstract"].is_string()) {
+            root_layer_abstract = doc["root_layer"]["abstract"].string_value();
+        } else if (! doc["root_layer"]["abstract"].is_null()) {
+            error_message = "WMS service: root_layer.abstract have to be a string";
+            return;
+        } else {
+            root_layer_abstract = "WMS layers";
+        }
+    } else if (! doc["root_layer"].is_null()) {
+        error_message = "WMS service: root_layer have to be an object";
+        return;
+    } else {
+        root_layer_title = "WMS layers";
+        root_layer_abstract = "WMS layers";
+    }
+
+    if (doc["limits"].is_object()) {
+        if (doc["limits"]["layers_count"].is_number() && doc["limits"]["layers_count"].number_value() >= 1) {
+            max_layers_count = doc["limits"]["layers_count"].number_value();
+        } else if (! doc["limits"]["layers_count"].is_null()) {
+            error_message = "WMS service: limits.layers_count have to be an integer >= 1";
+            return;
+        } else {
+            max_layers_count = 1;
+        }
+
+        if (doc["limits"]["width"].is_number() && doc["limits"]["width"].number_value() >= 1) {
+            max_width = doc["limits"]["width"].number_value();
+        } else if (! doc["limits"]["width"].is_null()) {
+            error_message = "WMS service: limits.width have to be an integer >= 1";
+            return;
+        } else {
+            max_width = 5000;
+        }
+
+        if (doc["limits"]["height"].is_number() && doc["limits"]["height"].number_value() >= 1) {
+            max_height = doc["limits"]["height"].number_value();
+        } else if (! doc["limits"]["height"].is_null()) {
+            error_message = "WMS service: limits.height have to be an integer >= 1";
+            return;
+        } else {
+            max_height = 5000;
+        }
+
+        if (doc["limits"]["tile_x"].is_number() && doc["limits"]["tile_x"].number_value() >= 1) {
+            max_tile_x = doc["limits"]["tile_x"].number_value();
+        } else if (! doc["limits"]["tile_x"].is_null()) {
+            error_message = "WMS service: limits.tile_x have to be an integer >= 1";
+            return;
+        } else {
+            max_tile_x = 32;
+        }
+
+        if (doc["limits"]["tile_y"].is_number() && doc["limits"]["tile_y"].number_value() >= 1) {
+            max_tile_y = doc["limits"]["tile_y"].number_value();
+        } else if (! doc["limits"]["tile_y"].is_null()) {
+            error_message = "WMS service: limits.tile_y have to be an integer >= 1";
+            return;
+        } else {
+            max_tile_y = 32;
+        }
+
+    } else if (! doc["limits"].is_null()) {
+        error_message = "WMS service: limits have to be an object";
+        return;
+    } else {
+        max_layers_count = 1;
+        max_width = 5000;
+        max_height = 5000;
+        max_tile_x = 32;
+        max_tile_y = 32;
+    }
+
+    bool crs84_present = false;
+    if (doc["crs"].is_array()) {
+        for (json11::Json c : doc["crs"].array_items()) {
+            if (c.is_string()) {
+                std::string crs_string = c.string_value();
+
+                CRS* crs = new CRS( crs_string );
+                if ( ! crs->is_define() ) {
+                    BOOST_LOG_TRIVIAL(warning) << "The (WMS) CRS [" << crs_string <<"] is not present in PROJ"  ;
+                    continue;
+                }
+
+                BOOST_LOG_TRIVIAL(info) <<  "Adding global CRS " << crs->get_request_code()   ;
+                crss.push_back(crs);
+                if (crs->get_request_code() == "CRS:84") {
+                    crs84_present = true;
+                }
+
+                if (svc->handle_crs_equivalences()) {
+                    std::vector<CRS*> eqs = svc->get_equals_crs(crs->get_request_code());
+                    size_t init_size = crss.size();
+                    for (unsigned int e = 0; e < eqs.size(); e++) {
+                        bool already_in = false;
+                        for ( int i = 0; i < init_size ; i++ ) {
+                            if (crss.at( i )->cmp_request_code(eqs.at(e)->get_request_code() ) ){
+                                already_in = true;
+                                break;
+                            }
+                        }
+                        if (! already_in) {
+                            BOOST_LOG_TRIVIAL(info) <<  "Adding equivalent global CRS [" << eqs.at(e)->get_request_code() <<"] of [" << crs->get_request_code() << "]"  ;
+                            // On clone bien le CRS, pour ne pas avoir un conflit lors du nettoyage
+                            crss.push_back(new CRS(eqs.at(e)));
+                            if (eqs.at(e)->get_request_code() == "CRS:84") {
+                                crs84_present = true;
+                            }
+                        }
+                    }
+                }
+            } else {
+                error_message = "WMS service: crs have to be a string array";
+                return;
+            }
+        }
+    } else if (! doc["crs"].is_null()) {
+        error_message = "WMS service: crs have to be a string array";
+        return;
+    }
+
+    if (! crs84_present) {
+        BOOST_LOG_TRIVIAL(info) <<  "CRS:84 not found -> adding global CRS CRS:84"   ;
+        CRS* crs = new CRS( "CRS:84" );
+
+        if ( ! crs->is_define() ) {
+            error_message = "WMS service: The CRS [CRS:84] is not present in PROJ"  ;
+            return;
+        }
+
+        crss.push_back ( crs );
+
+        if (svc->handle_crs_equivalences()) {
+            std::vector<CRS*> eqs = svc->get_equals_crs(crs->get_request_code());
+            size_t init_size = crss.size();
+            for (unsigned int e = 0; e < eqs.size(); e++) {
+                bool already_in = false;
+                for ( int i = 0; i < init_size ; i++ ) {
+                    if (crss.at( i )->cmp_request_code(eqs.at(e)->get_request_code() ) ){
+                        already_in = true;
+                    }
+                }
+                if (! already_in) {
+                    BOOST_LOG_TRIVIAL(info) <<  "Adding equivalent global CRS [" << eqs.at(e)->get_request_code() <<"] of [CRS:84]"  ;
+                    // On clone bien le CRS, pour ne pas avoir un conflit lors du nettoyage
+                    crss.push_back(new CRS(eqs.at(e)));
+                }
+            }
+        }
+    }  
+
 }
+
 
 DataStream* WmsService::process_request(Request* req, Rok4Server* serv) {
     BOOST_LOG_TRIVIAL(debug) << "WMS service";

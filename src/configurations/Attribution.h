@@ -46,8 +46,6 @@
 #ifndef ATTRIBUTION_H
 #define ATTRIBUTION_H
 
-#include <tinyxml.h>
-
 #include <rok4/utils/ResourceLocator.h>
 
 #include "Utils.h"
@@ -151,31 +149,31 @@ public:
      * \~french \brief Export XML pour le GetCapabilities WMS
      * \~english \brief XML export for WMS GetCapabilities
      */
-    TiXmlElement* get_wms_xml() {
-        TiXmlElement* el = new TiXmlElement ( "Attribution" );
-        el->LinkEndChild ( Utils::build_text_node ( "Title", title ) );
+    // TiXmlElement* get_wms_xml() {
+    //     TiXmlElement* el = new TiXmlElement ( "Attribution" );
+    //     el->LinkEndChild ( Utils::build_text_node ( "Title", title ) );
 
-        TiXmlElement* orEl = new TiXmlElement ( "OnlineResource" );
-        orEl->SetAttribute ( "xlink:type","simple" );
-        orEl->SetAttribute ( "xlink:href", href );
-        el->LinkEndChild ( orEl );
+    //     TiXmlElement* orEl = new TiXmlElement ( "OnlineResource" );
+    //     orEl->SetAttribute ( "xlink:type","simple" );
+    //     orEl->SetAttribute ( "xlink:href", href );
+    //     el->LinkEndChild ( orEl );
 
-        if (logo != NULL) {
-            TiXmlElement* logoEl = new TiXmlElement ( "LogoURL" );
-            logoEl->SetAttribute ( "width", width );
-            logoEl->SetAttribute ( "height", height );
-            logoEl->LinkEndChild ( Utils::build_text_node ( "Format", logo->get_format() ) );
+    //     if (logo != NULL) {
+    //         TiXmlElement* logoEl = new TiXmlElement ( "LogoURL" );
+    //         logoEl->SetAttribute ( "width", width );
+    //         logoEl->SetAttribute ( "height", height );
+    //         logoEl->LinkEndChild ( Utils::build_text_node ( "Format", logo->get_format() ) );
 
-            TiXmlElement* logoOrEl = new TiXmlElement ( "OnlineResource" );
-            logoOrEl->SetAttribute ( "xlink:type","simple" );
-            logoOrEl->SetAttribute ( "xlink:href", logo->get_href() );
-            logoEl->LinkEndChild ( logoOrEl );
+    //         TiXmlElement* logoOrEl = new TiXmlElement ( "OnlineResource" );
+    //         logoOrEl->SetAttribute ( "xlink:type","simple" );
+    //         logoOrEl->SetAttribute ( "xlink:href", logo->get_href() );
+    //         logoEl->LinkEndChild ( logoOrEl );
 
-            el->LinkEndChild ( logoEl );
-        }
+    //         el->LinkEndChild ( logoEl );
+    //     }
         
-        return el;
-    }
+    //     return el;
+    // }
 
     /**
      * \~french

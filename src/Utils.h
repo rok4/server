@@ -41,7 +41,6 @@
 #include <rok4/utils/BoundingBox.h>
 #include <rok4/utils/Keyword.h>
 #include <rok4/utils/TileMatrixLimits.h>
-#include <tinyxml.h>
 
 #include <iomanip>
 #include <string>
@@ -49,50 +48,8 @@
 
 class Utils {
    public:
-    /**
-     * \~french Construit un noeud xml simple (de type text)
-     * \~english Create a simple XML text node
-     */
-    static TiXmlElement* build_text_node(std::string elementName, std::string value) {
-        TiXmlElement* elem = new TiXmlElement(elementName);
-        TiXmlText* text = new TiXmlText(value);
-        elem->LinkEndChild(text);
-        return elem;
-    }
 
-    /**
-     * \~french Récupère le texte d'un noeud simple
-     * \~english Get text form simple XML node
-     */
-    static const std::string get_text_from_elem(TiXmlElement* pElem) {
-        const TiXmlNode* child = pElem->FirstChild();
-        if (child) {
-            const TiXmlText* childText = child->ToText();
-            if (childText) {
-                return childText->ValueStr();
-            }
-        }
-        return "";
-    }
 
-    /**
-     * \~french \brief Export XML du mot clé pour le GetCapabilities
-     * \param[in] element_name Nom de l'élément XML
-     * \param[in] k Mot clé à exporter
-     * \~english \brief Keyword XML export for GetCapabilities
-     * \param[in] element_name XML element name
-     * \param[in] k Keyword to export
-     */
-    static TiXmlElement* get_xml(std::string element_name, Keyword k) {
-        TiXmlElement* el = new TiXmlElement(element_name);
-        el->LinkEndChild(new TiXmlText(k.get_content()));
-
-        for (std::map<std::string, std::string>::const_iterator it = k.get_attributes()->begin(); it != k.get_attributes()->end(); it++) {
-            el->SetAttribute((*it).first, (*it).second);
-        }
-
-        return el;
-    }
 
     /**
      * \~french
@@ -106,15 +63,15 @@ class Utils {
      * \param[in] arg a double
      * \return int value
      */
-    static int get_decimal_places(double dbVal) {
-        dbVal = fmod(dbVal, 1);
+    static int get_decimal_places(double value) {
+        value = fmod(value, 1);
         static const int MAX_DP = 10;
         double THRES = pow(0.1, MAX_DP);
-        if (dbVal == 0.0)
+        if (value == 0.0)
             return 0;
         int nDecimal = 0;
-        while (dbVal - floor(dbVal) > THRES && nDecimal < MAX_DP && ceil(dbVal) - dbVal > THRES) {
-            dbVal *= 10.0;
+        while (value - floor(value) > THRES && nDecimal < MAX_DP && ceil(value) - value > THRES) {
+            value *= 10.0;
             THRES *= 10.0;
             nDecimal++;
         }
@@ -171,95 +128,25 @@ class Utils {
         size_t pos_item = 0;
         std::map<std::string, std::string> res;
 
-        while ((pos_item = s.find(item_separator)) != std::string::npos) {
-            std::string item = s.substr(0, pos_item);
+        std::string item;
+        while (true) {
+            pos_item = s.find(item_separator);
+            item = s.substr(0, pos_item);
             s.erase(0, pos_item + item_separator.length());
 
             size_t pos_kv = item.find(kv_separator);
             if (pos_kv != std::string::npos) {
-                res.insert ( std::pair<std::string, std::string> ( s.substr(0, pos_kv), s.substr(pos_kv + kv_separator.length(), std::string::npos) ) );
+                res.insert ( std::pair<std::string, std::string> ( item.substr(0, pos_kv), item.substr(pos_kv + kv_separator.length(), std::string::npos) ) );
+            }
+
+            if (pos_item == std::string::npos) {
+                break;
             }
         }
 
         return res;
     }
 
-    /**
-     * \~french \brief Export XML des tuiles limites pour un niveau
-     * \param[in] tml Tuiles limites du niveau
-     * \~english \brief XML export for tiles' limits for a level
-     * \param[in] tml Level's tiles limits
-     */
-    static TiXmlElement* get_xml(TileMatrixLimits tml) {
-        TiXmlElement* tmLimitsEl = new TiXmlElement("TileMatrixLimits");
-        tmLimitsEl->LinkEndChild(build_text_node("TileMatrix", tml.tm_id));
-        tmLimitsEl->LinkEndChild(build_text_node("MinTileRow", std::to_string(tml.min_tile_row)));
-        tmLimitsEl->LinkEndChild(build_text_node("MaxTileRow", std::to_string(tml.max_tile_row)));
-        tmLimitsEl->LinkEndChild(build_text_node("MinTileCol", std::to_string(tml.min_tile_col)));
-        tmLimitsEl->LinkEndChild(build_text_node("MaxTileCol", std::to_string(tml.max_tile_col)));
-
-        return tmLimitsEl;
-    }
-
-    /**
-     * \~french \brief Export XML d'une bbox, en géographique ou dans le CRS fourni
-     * \details La bbox fournie doit être en coordonnées géographique ou dans le CRS fourni
-     * \param[in] bbox Bounding box
-     * \param[in] crs CRS spécifique
-     * \~english \brief XML export for bounding box, geographical or with provided CRS
-     * \details Provided bbox have to be geographical or with the provided CRS
-     * \param[in] bbox Bounding box
-     * \param[in] crs Specific CRS
-     */
-    static TiXmlElement* get_xml(BoundingBox<double> bbox, std::string crs = "") {
-        std::ostringstream os;
-
-        if (crs == "") {
-            TiXmlElement* el = new TiXmlElement("EX_GeographicBoundingBox");
-
-            os.str("");
-            os << bbox.xmin;
-            el->LinkEndChild(Utils::build_text_node("westBoundLongitude", os.str()));
-            os.str("");
-            os << bbox.xmax;
-            el->LinkEndChild(Utils::build_text_node("eastBoundLongitude", os.str()));
-            os.str("");
-            os << bbox.ymin;
-            el->LinkEndChild(Utils::build_text_node("southBoundLatitude", os.str()));
-            os.str("");
-            os << bbox.ymax;
-            el->LinkEndChild(Utils::build_text_node("northBoundLatitude", os.str()));
-            os.str("");
-
-            return el;
-        } else {
-            TiXmlElement* el = new TiXmlElement("BoundingBox");
-
-            el->SetAttribute("CRS", crs);
-            int floatprecision = get_decimal_places(bbox.xmin);
-            floatprecision = std::max(floatprecision, get_decimal_places(bbox.xmax));
-            floatprecision = std::max(floatprecision, get_decimal_places(bbox.ymin));
-            floatprecision = std::max(floatprecision, get_decimal_places(bbox.ymax));
-            floatprecision = std::min(floatprecision, 9);  // FIXME gestion du nombre maximal de décimal.
-
-            os.str("");
-            os << std::fixed << std::setprecision(floatprecision);
-            os << bbox.xmin;
-            el->SetAttribute("minx", os.str());
-            os.str("");
-            os << bbox.ymin;
-            el->SetAttribute("miny", os.str());
-            os.str("");
-            os << bbox.xmax;
-            el->SetAttribute("maxx", os.str());
-            os.str("");
-            os << bbox.ymax;
-            el->SetAttribute("maxy", os.str());
-            os.str("");
-
-            return el;
-        }
-    }
 };
 
 #endif  // UTILSERV_H

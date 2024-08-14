@@ -223,7 +223,7 @@ bool Layer::parse(json11::Json& doc) {
     infos.tms = pyramid->get_tms();
     infos.top_level = pyramid->get_highest_level()->get_id();
     infos.bottom_level = pyramid->get_lowest_level()->get_id();
-    infos.wmts_id = infos.tms->getId() + "_" + infos.top_level + "_" + infos.bottom_level;
+    infos.wmts_id = infos.tms->get_id() + "_" + infos.top_level + "_" + infos.bottom_level;
     wmts_tilematrixsets.push_back(infos);
 
     /********************** Gestion de l'étendue des données */
@@ -366,7 +366,7 @@ bool Layer::parse(json11::Json& doc) {
                     continue;
                 }
 
-                if (get_tilematrixset(tms->getId()) != NULL) {
+                if (get_tilematrixset(tms->get_id()) != NULL) {
                     // Le TMS est déjà dans la liste ou est celui natif de la pyramide
                     continue;
                 }
@@ -460,7 +460,7 @@ void Layer::calculate_tilematrix_limits() {
     for (unsigned i = 1 ; i < wmts_tilematrixsets.size(); i++) {
         TileMatrixSet* tms = wmts_tilematrixsets.at(i).tms;
 
-        BOOST_LOG_TRIVIAL(debug) <<  "Tile limits calculation for TMS " << tms->getId() ;
+        BOOST_LOG_TRIVIAL(debug) <<  "Tile limits calculation for TMS " << tms->get_id() ;
 
         infos.tms = tms;
         infos.limits = std::vector<TileMatrixLimits>();
@@ -470,11 +470,11 @@ void Layer::calculate_tilematrix_limits() {
         tmp = tmp.crop_to_crs_area(tms->get_crs());
         BOOST_LOG_TRIVIAL(warning) <<  tms->get_crs()->get_request_code();
         if ( tmp.has_null_area()  ) {
-            BOOST_LOG_TRIVIAL(warning) <<  "La couche n'est pas dans l'aire de définition du CRS du TMS supplémentaire " << tms->getId() ;
+            BOOST_LOG_TRIVIAL(warning) <<  "La couche n'est pas dans l'aire de définition du CRS du TMS supplémentaire " << tms->get_id() ;
             continue;
         }
         if ( ! tmp.reproject ( CRS::get_epsg4326(), tms->get_crs() ) ) {
-            BOOST_LOG_TRIVIAL(warning) <<  "Impossible de reprojeter la bbox de la couche dans le CRS du TMS supplémentaire " << tms->getId() ;
+            BOOST_LOG_TRIVIAL(warning) <<  "Impossible de reprojeter la bbox de la couche dans le CRS du TMS supplémentaire " << tms->get_id() ;
             continue;
         }
 
@@ -489,7 +489,7 @@ void Layer::calculate_tilematrix_limits() {
             }
         }
         if ( tmTop == NULL ) {
-            BOOST_LOG_TRIVIAL(warning) <<  "Impossible de trouver un niveau du haut satisfaisant dans le TMS supplémentaire " << tms->getId() ;
+            BOOST_LOG_TRIVIAL(warning) <<  "Impossible de trouver un niveau du haut satisfaisant dans le TMS supplémentaire " << tms->get_id() ;
             continue;
         }
 
@@ -504,7 +504,7 @@ void Layer::calculate_tilematrix_limits() {
             }
         }
         if ( tmBottom == NULL ) {
-            BOOST_LOG_TRIVIAL(warning) <<  "Impossible de trouver un niveau du bas satisfaisant dans le TMS supplémentaire " << tms->getId() ;
+            BOOST_LOG_TRIVIAL(warning) <<  "Impossible de trouver un niveau du bas satisfaisant dans le TMS supplémentaire " << tms->get_id() ;
             continue;
         }
 
@@ -515,19 +515,19 @@ void Layer::calculate_tilematrix_limits() {
         for (std::pair<std::string, TileMatrix*> element : orderedTM) {
             TileMatrix* tm = element.second;
 
-            if (! begin && tm->getId() != tmTop->getId()) {
+            if (! begin && tm->get_id() != tmTop->get_id()) {
                 continue;
             }
             begin = true;
             infos.limits.push_back(tm->bbox_to_tile_limits(tmp));
-            if (tm->getId() == tmBottom->getId()) {
+            if (tm->get_id() == tmBottom->get_id()) {
                 break;
             }
         }
 
-        infos.bottom_level = tmBottom->getId();
-        infos.top_level = tmTop->getId();
-        infos.wmts_id = infos.tms->getId() + "_" + infos.top_level + "_" + infos.bottom_level;
+        infos.bottom_level = tmBottom->get_id();
+        infos.top_level = tmTop->get_id();
+        infos.wmts_id = infos.tms->get_id() + "_" + infos.top_level + "_" + infos.bottom_level;
 
         newList.push_back(infos);
     }
@@ -667,7 +667,7 @@ std::vector<Style*> Layer::get_styles() { return styles; }
 std::vector<WmtsTmsInfos> Layer::get_wmts_tilematrixsets() { return wmts_tilematrixsets; }
 TileMatrixSet* Layer::get_tilematrixset(std::string wmts_id) {
     for ( unsigned int k = 0; k < wmts_tilematrixsets.size(); k++ ) {
-        if ( wmts_id == wmts_tilematrixsets.at(k).wmts_id || wmts_id == wmts_tilematrixsets.at(k).tms->getId() ) {
+        if ( wmts_id == wmts_tilematrixsets.at(k).wmts_id || wmts_id == wmts_tilematrixsets.at(k).tms->get_id() ) {
             return wmts_tilematrixsets.at(k).tms;
         }
     }
@@ -675,9 +675,9 @@ TileMatrixSet* Layer::get_tilematrixset(std::string wmts_id) {
 }
 TileMatrixLimits* Layer::get_tilematrix_limits(TileMatrixSet* tms, TileMatrix* tm) {
     for ( unsigned int k = 0; k < wmts_tilematrixsets.size(); k++ ) {
-        if ( tms->getId() == wmts_tilematrixsets.at (k).tms->getId() ) {
+        if ( tms->get_id() == wmts_tilematrixsets.at (k).tms->get_id() ) {
             for ( unsigned int l = 0; l < wmts_tilematrixsets.at (k).limits.size(); l++ ) {
-                if ( tm->getId() == wmts_tilematrixsets.at (k).limits.at(l).tm_id ) {
+                if ( tm->get_id() == wmts_tilematrixsets.at (k).limits.at(l).tm_id ) {
                     return &(wmts_tilematrixsets.at (k).limits.at(l));
                 }
             }

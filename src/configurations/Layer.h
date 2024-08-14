@@ -50,6 +50,8 @@ class Layer;
 
 #include <vector>
 #include <string>
+#include <boost/property_tree/ptree.hpp>
+using boost::property_tree::ptree;
 
 #include <rok4/utils/Pyramid.h>
 #include <rok4/utils/CRS.h>
@@ -62,6 +64,8 @@ class Layer;
 #include "configurations/Server.h"
 #include "configurations/Metadata.h"
 #include "configurations/Attribution.h"
+
+#include "services/wmts/Service.h"
 
 struct WmtsTmsInfos {
     TileMatrixSet* tms;
@@ -93,6 +97,9 @@ struct WmtsTmsInfos {
  *
  */
 class Layer : public Configuration {
+
+friend class WmtsService;
+
 private:
     /**
      * \~french \brief Identifiant de la couche

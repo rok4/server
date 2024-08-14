@@ -55,10 +55,14 @@
 
 #include "Rok4Server.h"
 #include "configurations/Metadata.h"
+#include "configurations/Contact.h"
 #include "services/common/Service.h"
 #include "services/health/Service.h"
 #include "services/tms/Service.h"
 #include "services/wmts/Service.h"
+#include "services/wms/Service.h"
+#include "services/tiles/Service.h"
+#include "services/admin/Service.h"
 
 #include "config.h"
 
@@ -80,6 +84,9 @@ class ServicesConfiguration : public Configuration
         HealthService* get_health_service() {return health_service;};
         TmsService* get_tms_service() {return tms_service;};
         WmtsService* get_wmts_service() {return wmts_service;};
+        WmsService* get_wms_service() {return wms_service;};
+        AdminService* get_admin_service() {return admin_service;};
+        TilesService* get_tiles_service() {return tiles_service;};
         
         /**
          * \~french
@@ -88,7 +95,9 @@ class ServicesConfiguration : public Configuration
          * \brief Return the list of the equivalents CRS who are PROJ compatible
          */
         std::vector<CRS*> get_equals_crs(std::string crs);
-
+        bool handle_crs_equivalences() {
+            return ! crs_equivalences.empty();
+        };
         bool are_crs_equals( std::string crs1, std::string crs2 );
 
     protected:
@@ -100,18 +109,7 @@ class ServicesConfiguration : public Configuration
         std::string fee;
         std::string access_constraint;
 
-        // ----------------------- Contact 
-        std::string individual_name;
-        std::string individual_position;
-        std::string voice;
-        std::string facsimile;
-        std::string address_type;
-        std::string delivery_point;
-        std::string city;
-        std::string administrative_area;
-        std::string post_code;
-        std::string country;
-        std::string email;
+        Contact* contact;
 
     private:
 
@@ -129,6 +127,9 @@ class ServicesConfiguration : public Configuration
         HealthService* health_service;
         TmsService* tms_service;
         WmtsService* wmts_service;
+        WmsService* wms_service;
+        AdminService* admin_service;
+        TilesService* tiles_service;
 
         std::map<std::string, std::vector<CRS*> > crs_equivalences;
 };

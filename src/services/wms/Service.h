@@ -50,6 +50,7 @@ class WmsService;
 
 #include "services/Service.h"
 #include "configurations/Metadata.h"
+#include "configurations/Services.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -63,9 +64,22 @@ private:
     DataStream* get_feature_info ( Request* req, Rok4Server* serv );
     DataSource* get_map ( Request* req, Rok4Server* serv );
 
+    std::string name;
     Metadata* metadata;
     bool reprojection;
     std::vector<std::string> info_formats;
+    std::vector<std::string> formats;
+
+    std::string root_layer_title;
+    std::string root_layer_abstract;
+
+    int max_layers_count;
+    int max_width;
+    int max_height;
+    int max_tile_x;
+    int max_tile_y;
+
+    std::vector<CRS*> crss;
 
 public:
     DataStream* process_request(Request* req, Rok4Server* serv);
@@ -76,7 +90,7 @@ public:
      * \~english
      * \brief Service constructor
      */
-    WmsService (json11::Json& doc);
+    WmsService (json11::Json& doc, ServicesConfiguration* svc);
 
     /**
      * \~french
@@ -86,6 +100,9 @@ public:
      */
     ~WmsService() {
         if (metadata) delete metadata;
+        for (CRS* c : crss) {
+            delete c;
+        }
     };
 
 };

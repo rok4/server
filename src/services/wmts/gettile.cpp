@@ -49,6 +49,10 @@
 #include <rok4/datastream/JPEGEncoder.h>
 #include <rok4/datastream/PNGEncoder.h>
 #include <rok4/datastream/TiffEncoder.h>
+#include <rok4/datastream/TiffPackBitsEncoder.h>
+#include <rok4/datastream/TiffLZWEncoder.h>
+#include <rok4/datastream/TiffDeflateEncoder.h>
+#include <rok4/datastream/TiffRawEncoder.h>
 #include <rok4/image/PaletteImage.h>
 
 #include <iostream>
@@ -56,88 +60,6 @@
 #include "Rok4Server.h"
 #include "services/wmts/Exception.h"
 #include "services/wmts/Service.h"
-
-DataStream* format_image(Image* image, std::string format, Rok4Format::eFormat pyr_type,
-                         std::map<std::string, std::string> format_option,
-                         int size, ) {
-    if (format == "image/png") {
-        if (size == 1) {
-            return new PNGEncoder(image, style->get_palette());
-        } else {
-            return new PNGEncoder(image, NULL);
-        }
-
-    } else if (format == "image/tiff" || format == "image/geotiff") {
-        switch (pyr_type) {
-            case Rok4Format::TIFF_RAW_FLOAT32:
-            case Rok4Format::TIFF_ZIP_FLOAT32:
-            case Rok4Format::TIFF_LZW_FLOAT32:
-            case Rok4Format::TIFF_PKB_FLOAT32:
-
-                if (opt.compare("lzw") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_LZW_FLOAT32, is_geotiff);
-                }
-                if (opt.compare("deflate") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_ZIP_FLOAT32, is_geotiff);
-                }
-                if (opt.compare("raw") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_RAW_FLOAT32, is_geotiff);
-                }
-                if (opt.compare("packbits") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_PKB_FLOAT32, is_geotiff);
-                }
-                return TiffEncoder::get_tiff_encoder(image, pyr_type, is_geotiff);
-            case Rok4Format::TIFF_RAW_UINT8:
-            case Rok4Format::TIFF_ZIP_UINT8:
-            case Rok4Format::TIFF_LZW_UINT8:
-            case Rok4Format::TIFF_PKB_UINT8:
-                if (opt.compare("lzw") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_LZW_UINT8, is_geotiff);
-                }
-                if (opt.compare("deflate") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_ZIP_UINT8, is_geotiff);
-                }
-                if (opt.compare("raw") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_RAW_UINT8, is_geotiff);
-                }
-                if (opt.compare("packbits") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_PKB_UINT8, is_geotiff);
-                }
-                return TiffEncoder::get_tiff_encoder(image, pyr_type, is_geotiff);
-            default:
-                if (opt.compare("lzw") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_LZW_UINT8, is_geotiff);
-                }
-                if (opt.compare("deflate") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_ZIP_UINT8, is_geotiff);
-                }
-                if (opt.compare("packbits") == 0) {
-                    return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_PKB_UINT8, is_geotiff);
-                }
-                return TiffEncoder::get_tiff_encoder(image, Rok4Format::TIFF_RAW_UINT8, is_geotiff);
-        }
-    } else if (format == "image/jpeg") {
-        int quality = 75;
-        if (pyr_type == Rok4Format::TIFF_JPG90_UINT8 || getParam(format_option, "quality").compare("90") == 0) {
-            quality = 90;
-        }
-
-        return new JPEGEncoder(image, quality);
-    } else if (format == "image/x-bil;bits=32") {
-        return new BilEncoder(image);
-    } else if (format == "text/asc") {
-        // On ne traite le format asc que sur les image à un seul channel
-        if (image->get_channels() != 1) {
-            BOOST_LOG_TRIVIAL(error) << "Le format " << format << " ne concerne que les images à 1 canal";
-        } else {
-            return new AscEncoder(image);
-        }
-    }
-
-    BOOST_LOG_TRIVIAL(error) << "Le format " << format << " ne peut etre traite";
-
-    return new SERDataStream(new ServiceException("", WMS_INVALID_FORMAT, "Le format " + format + " ne peut etre traite", "wms"));
-}
 
 DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     // La couche
@@ -236,7 +158,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
             throw WmtsException::get_error_message("No data found", "Not Found", 404);
         }
 
-        if (format == "image/png" && style->get_palette() && !style->get_palette()->is_empty()) {
+        if (format == "image/png" && style->get_palette() && ! style->get_palette()->is_empty()) {
             return new DataStreamFromDataSource(new PaletteDataSource(d, style->get_palette()));
         } else {
             return new DataStreamFromDataSource(d);
@@ -276,7 +198,8 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
 
         if (format == "image/png") {
             return new PNGEncoder(image, style->get_palette());
-        } else if (format == "image/tiff" || format == "image/geotiff") {
+        }
+        else if (format == "image/tiff" || format == "image/geotiff") {
             bool is_geotiff = (format == "image/geotiff");
 
             std::map<std::string, std::string>::iterator it = format_options.find("compression");
@@ -296,10 +219,10 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
                         return new TiffLZWEncoder<uint8_t>(image, is_geotiff);
                     }
                     if (opt.compare("deflate") == 0) {
-                        return new TiffRawEncoder<uint8_t>(image, is_geotiff);
-                    }
-                    if (opt.compare("raw") == 0) {
                         return new TiffDeflateEncoder<uint8_t>(image, is_geotiff);
+                    }
+                    if (opt.compare("raw") == 0 || opt == "") {
+                        return new TiffRawEncoder<uint8_t>(image, is_geotiff);
                     }
                     if (opt.compare("packbits") == 0) {
                         return new TiffPackBitsEncoder<uint8_t>(image, is_geotiff);
@@ -335,35 +258,13 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
             // On ne traite le format asc que sur les image à un seul channel
             if (image->get_channels() != 1) {
                 BOOST_LOG_TRIVIAL(error) << "Le format " << format << " ne concerne que les images à 1 canal";
+                throw WmtsException::get_error_message("No data found", "Not Found", 404);
             } else {
                 return new AscEncoder(image);
             }
         }
     }
 
-    return TiffEncoder::get_tiff_encoder(image, pyr_type, is_geotiff);
-
-    switch (format) {
-        case Rok4Format::TIFF_RAW_UINT8:
-            return new TiffRawEncoder<uint8_t>(image, is_geotiff);
-        case Rok4Format::TIFF_LZW_UINT8:
-            return new TiffLZWEncoder<uint8_t>(image, is_geotiff);
-        case Rok4Format::TIFF_ZIP_UINT8:
-            return new TiffDeflateEncoder<uint8_t>(image, is_geotiff);
-        case Rok4Format::TIFF_PKB_UINT8:
-            return new TiffPackBitsEncoder<uint8_t>(image, is_geotiff);
-        case Rok4Format::TIFF_RAW_FLOAT32:
-            return new TiffRawEncoder<float>(image, is_geotiff);
-        case Rok4Format::TIFF_LZW_FLOAT32:
-            return new TiffLZWEncoder<float>(image, is_geotiff);
-        case Rok4Format::TIFF_ZIP_FLOAT32:
-            return new TiffDeflateEncoder<float>(image, is_geotiff);
-        case Rok4Format::TIFF_PKB_FLOAT32:
-            return new TiffPackBitsEncoder<float>(image, is_geotiff);
-        default:
-            return NULL;
-    }
-
-    return stream;
-}
+    BOOST_LOG_TRIVIAL(error) << "On ne devrait pas passer par là";
+    throw WmtsException::get_error_message("No data found", "Not Found", 404);
 }

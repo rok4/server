@@ -47,17 +47,6 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
     fee="";
     access_constraint="";
     provider_site="";
-    individual_name="";
-    individual_position="";
-    voice="";
-    facsimile="";
-    address_type="";
-    delivery_point="";
-    city="";
-    administrative_area="";
-    post_code="";
-    country="";
-    email="";
 
     // ----------------------- Global 
 
@@ -101,97 +90,13 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
 
     // ----------------------- Contact
 
-    json11::Json contactSection = doc["contact"];
-    if (contactSection.is_null()) {
-        error_message = "No contact section";
-        return false;
-    } else if (! contactSection.is_object()) {
-        error_message = "Services configuration: contact have to be an object";
-        return false;
-    }
-    
-    if (contactSection["name"].is_string()) {
-        individual_name = contactSection["name"].string_value();
-    } else if (! contactSection["name"].is_null()) {
-        error_message = "Services configuration: contact.name have to be a string";
-        return false;
-    }
-    if (contactSection["position"].is_string()) {
-        individual_position = contactSection["position"].string_value();
-    } else if (! contactSection["position"].is_null()) {
-        error_message = "Services configuration: contact.position have to be a string";
-        return false;
-    }
-    if (contactSection["voice"].is_string()) {
-        voice = contactSection["voice"].string_value();
-    } else if (! contactSection["voice"].is_null()) {
-        error_message = "Services configuration: contact.voice have to be a string";
-        return false;
-    }
-    if (contactSection["facsimile"].is_string()) {
-        facsimile = contactSection["facsimile"].string_value();
-    } else if (! contactSection["facsimile"].is_null()) {
-        error_message = "Services configuration: contact.facsimile have to be a string";
-        return false;
-    }
-    if (contactSection["address_type"].is_string()) {
-        address_type = contactSection["address_type"].string_value();
-    } else if (! contactSection["address_type"].is_null()) {
-        error_message = "Services configuration: contact.address_type have to be a string";
-        return false;
-    }
-    if (contactSection["delivery_point"].is_string()) {
-        delivery_point = contactSection["delivery_point"].string_value();
-    } else if (! contactSection["delivery_point"].is_null()) {
-        error_message = "Services configuration: contact.delivery_point have to be a string";
-        return false;
-    }
-    if (contactSection["city"].is_string()) {
-        city = contactSection["city"].string_value();
-    } else if (! contactSection["city"].is_null()) {
-        error_message = "Services configuration: contact.city have to be a string";
-        return false;
-    }
-    if (contactSection["administrative_area"].is_string()) {
-        administrative_area = contactSection["administrative_area"].string_value();
-    } else if (! contactSection["administrative_area"].is_null()) {
-        error_message = "Services configuration: contact.administrative_area have to be a string";
-        return false;
-    }
-    if (contactSection["post_code"].is_string()) {
-        post_code = contactSection["post_code"].string_value();
-    } else if (! contactSection["post_code"].is_null()) {
-        error_message = "Services configuration: contact.post_code have to be a string";
-        return false;
-    }
-    if (contactSection["country"].is_string()) {
-        country = contactSection["country"].string_value();
-    } else if (! contactSection["country"].is_null()) {
-        error_message = "Services configuration: contact.country have to be a string";
-        return false;
-    }
-    if (contactSection["email"].is_string()) {
-        email = contactSection["email"].string_value();
-    } else if (! contactSection["email"].is_null()) {
-        error_message = "Services configuration: contact.email have to be a string";
-        return false;
-    }
+    json11::Json contact_section = doc["contact"];
 
-    // ----------------------- Commun à plusieurs services 
-    // json11::Json commonSection = doc["common"];
-    // if (commonSection.is_object()) {
-        
-    //     if (commonSection["styling"].is_bool()) {
-    //         fullStyling = commonSection["styling"].bool_value();
-    //     } else if (! commonSection["styling"].is_null()) {
-    //         error_message = "common.styling have to be a boolean";
-    //         return false;
-    //     }
-
-    // } else if (! commonSection.is_null()) {
-    //     error_message = "common have to be an object";
-    //     return false;
-    // }
+    contact = new Contact(contact_section);
+    if (! contact->is_ok()) {
+        error_message = "Services configuration: " + contact->get_error_message();
+        return false;
+    }
 
     // ----------------------- Chargement des services
 
@@ -247,196 +152,44 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
         BOOST_LOG_TRIVIAL(info) <<  "WMTS service disabled";
     }
 
-    // ----------------------- WMS 
-    // json11::Json wmsSection = doc["wms"];
-    // if (wmsSection.is_null()) {
-    //     supportWMS = false;
-    // } else if (! wmsSection.is_object()) {
-    //     error_message = "wms have to be an object";
-    //     return false;
-    // } else {
+    json11::Json wms_section = doc["wms"];
 
-    //     if (wmsSection["name"].is_string()) {
-    //         name = wmsSection["name"].string_value();
-    //     } else if (! wmsSection["name"].is_null()) {
-    //         error_message = "wms.name have to be a string";
-    //         return false;
-    //     }
-    //     if (wmsSection["layer_root_title"].is_string()) {
-    //         layerRootTitle = wmsSection["layer_root_title"].string_value();
-    //     } else if (! wmsSection["layer_root_title"].is_null()) {
-    //         error_message = "wms.layer_root_title have to be a string";
-    //         return false;
-    //     } else {
-    //         layerRootTitle = "WMS layers";
-    //     }
-    //     if (wmsSection["layer_root_abstract"].is_string()) {
-    //         layerRootAbstract = wmsSection["layer_root_abstract"].string_value();
-    //     } else if (! wmsSection["layer_root_abstract"].is_null()) {
-    //         error_message = "wms.layer_root_abstract have to be a string";
-    //         return false;
-    //     } else {
-    //         layerRootAbstract = "WMS layers";
-    //     }
-    //     if (wmsSection["max_width"].is_number()) {
-    //         maxWidth = wmsSection["max_width"].int_value();
-    //     } else if (! wmsSection["max_width"].is_null()) {
-    //         error_message = "wms.max_width have to be an integer";
-    //         return false;
-    //     }
-    //     if (wmsSection["max_height"].is_number()) {
-    //         maxHeight = wmsSection["max_height"].int_value();
-    //     } else if (! wmsSection["max_height"].is_null()) {
-    //         error_message = "wms.max_height have to be an integer";
-    //         return false;
-    //     }
-    //     if (wmsSection["layer_limit"].is_number()) {
-    //         layerLimit = wmsSection["layer_limit"].int_value();
-    //     } else if (! wmsSection["layer_limit"].is_null()) {
-    //         error_message = "wms.layer_limit have to be an integer";
-    //         return false;
-    //     }
-    //     if (wmsSection["max_tile_x"].is_number()) {
-    //         maxTileX = wmsSection["max_tile_x"].int_value();
-    //     } else if (! wmsSection["max_tile_x"].is_null()) {
-    //         error_message = "wms.max_tile_x have to be an integer";
-    //         return false;
-    //     }
-    //     if (wmsSection["max_tile_y"].is_number()) {
-    //         maxTileY = wmsSection["max_tile_y"].int_value();
-    //     } else if (! wmsSection["max_tile_y"].is_null()) {
-    //         error_message = "wms.max_tile_y have to be an integer";
-    //         return false;
-    //     }
-    //     if (wmsSection["formats"].is_array()) {
-    //         for (json11::Json f : wmsSection["formats"].array_items()) {
-    //             if (f.is_string()) {
-    //                 std::string format = f.string_value();
-    //                 if ( format != "image/jpeg" &&
-    //                     format != "image/png"  &&
-    //                     format != "image/tiff" &&
-    //                     format != "image/geotiff" &&
-    //                     format != "image/x-bil;bits=32" &&
-    //                     format != "image/gif" && 
-    //                     format != "text/asc" ) {
-    //                     error_message = "WMS image format [" + format + "] is not an handled MIME format";
-    //                     return false;
-    //                 } else {
-    //                     formatList.push_back ( format );
-    //                 }
-    //             } else {
-    //                 error_message = "wms.formats have to be a string array";
-    //                 return false;
-    //             }
-    //         }
-    //     } else if (! wmsSection["formats"].is_null()) {
-    //         error_message = "wms.formats have to be a string array";
-    //         return false;
-    //     }
+    wms_service = new WmsService(wms_section, this);
+    if (! wms_service->is_ok()) {
+        error_message = "Services configuration: " + wms_service->get_error_message();
+        return false;
+    }
+    if (wms_service->is_enabled()) {
+        BOOST_LOG_TRIVIAL(info) <<  "WMS service enabled";
+    } else {
+        BOOST_LOG_TRIVIAL(info) <<  "WMS service disabled";
+    }
 
-    //     // WMS Global CRS List
-    //     bool isCRS84 = false;
-    //     if (wmsSection["crs"].is_array()) {
-    //         for (json11::Json c : wmsSection["crs"].array_items()) {
-    //             if (c.is_string()) {
-    //                 std::string crsStr = c.string_value();
-    //                 if (! isCRSAllowed(crsStr)) {
-    //                     BOOST_LOG_TRIVIAL(warning) <<  "Forbiden global CRS " << crsStr ;
-    //                     continue;
-    //                 }
-    //                 if (isInGlobalCRSList(crsStr)) {
-    //                     continue;
-    //                 }
+    json11::Json admin_section = doc["admin"];
 
-    //                 CRS* crs = new CRS( crsStr );
-    //                 if ( ! crs->is_define() ) {
-    //                     BOOST_LOG_TRIVIAL(warning) << "The (WMS) CRS [" << crsStr <<"] is not present in PROJ"  ;
-    //                     continue;
-    //                 }
+    admin_service = new AdminService(admin_section);
+    if (! admin_service->is_ok()) {
+        error_message = "Services configuration: " + admin_service->get_error_message();
+        return false;
+    }
+    if (admin_service->is_enabled()) {
+        BOOST_LOG_TRIVIAL(info) <<  "ADMIN service enabled";
+    } else {
+        BOOST_LOG_TRIVIAL(info) <<  "ADMIN service disabled";
+    }
 
-    //                 BOOST_LOG_TRIVIAL(info) <<  "Adding global CRS " << crs->get_request_code()   ;
-    //                 globalCRSList.push_back(crs);
-    //                 if (crs->get_request_code() == "CRS:84") {
-    //                     isCRS84 = true;
-    //                 }
+    json11::Json tiles_section = doc["tiles"];
 
-    //                 if (doweuselistofequalsCRS) {
-    //                     std::vector<CRS*> eqCRS = getEqualsCRS(crs->get_request_code());
-    //                     size_t init_size = globalCRSList.size();
-    //                     for (unsigned int e = 0; e < eqCRS.size(); e++) {
-    //                         bool already_in = false;
-    //                         for ( int i = 0; i < init_size ; i++ ) {
-    //                             if (globalCRSList.at( i )->cmp_request_code(eqCRS.at(e)->get_request_code() ) ){
-    //                                 already_in = true;
-    //                                 break;
-    //                             }
-    //                         }
-    //                         if (! already_in) {
-    //                             BOOST_LOG_TRIVIAL(info) <<  "Adding equivalent global CRS [" << eqCRS.at(e)->get_request_code() <<"] of [" << crs->get_request_code() << "]"  ;
-    //                             // On clone bien le CRS, pour ne pas avoir un conflit lors du nettoyage
-    //                             globalCRSList.push_back(new CRS(eqCRS.at(e)));
-    //                             if (eqCRS.at(e)->get_request_code() == "CRS:84") {
-    //                                 isCRS84 = true;
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-
-
-    //             } else {
-    //                 error_message = "wms.crs have to be a string array";
-    //                 return false;
-    //             }
-    //         }
-    //     } else if (! wmsSection["crs"].is_null()) {
-    //         error_message = "wms.crs have to be a string array";
-    //         return false;
-    //     }
-    //     // On veut forcément CRS:84 comme CRS global
-    //     if (! isCRS84) {
-    //         BOOST_LOG_TRIVIAL(info) <<  "CRS:84 not found -> adding global CRS CRS:84"   ;
-    //         CRS* crs = new CRS( "CRS:84" );
-
-    //         if ( ! crs->is_define() ) {
-    //             error_message = "The CRS [CRS:84] is not present in PROJ"  ;
-    //             return false;
-    //         }
-
-    //         globalCRSList.push_back ( crs );
-
-    //         if (doweuselistofequalsCRS) {
-    //             std::vector<CRS*> eqCRS = getEqualsCRS(crs->get_request_code());
-    //             size_t init_size = globalCRSList.size();
-    //             for (unsigned int e = 0; e < eqCRS.size(); e++) {
-    //                 bool already_in = false;
-    //                 for ( int i = 0; i < init_size ; i++ ) {
-    //                     if (globalCRSList.at( i )->cmp_request_code(eqCRS.at(e)->get_request_code() ) ){
-    //                         already_in = true;
-    //                     }
-    //                 }
-    //                 if (! already_in) {
-    //                     BOOST_LOG_TRIVIAL(info) <<  "Adding equivalent global CRS [" << eqCRS.at(e)->get_request_code() <<"] of [CRS:84]"  ;
-    //                     // On clone bien le CRS, pour ne pas avoir un conflit lors du nettoyage
-    //                     globalCRSList.push_back(new CRS(eqCRS.at(e)));
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     // Métadonnée
-    //     if (wmsSection["metadata"].is_object()) {
-    //         mtdWMS = new Metadata ( wmsSection["metadata"] );
-    //         if (mtdWMS->get_missing_field() != "") {
-    //             error_message = "Invalid WMS metadata: have to own a field " + mtdWMS->get_missing_field();
-    //             return false;
-    //         }
-    //     } else if (inspire) {
-    //         error_message = "Inspire WMS service require a metadata";
-    //         return false;
-    //     }
-        
-    // }
-
+    tiles_service = new TilesService(tiles_section);
+    if (! tiles_service->is_ok()) {
+        error_message = "Services configuration: " + tiles_service->get_error_message();
+        return false;
+    }
+    if (tiles_service->is_enabled()) {
+        BOOST_LOG_TRIVIAL(info) <<  "TILES service enabled";
+    } else {
+        BOOST_LOG_TRIVIAL(info) <<  "TILES service disabled";
+    }
 
     return true;
 }
@@ -492,6 +245,7 @@ bool ServicesConfiguration::load_crs_equivalences(std::string file) {
 
         // On met en premier le CRS correspondant à la clé
         CRS* c = new CRS ( index_crs );
+        index_crs = c->get_request_code();
         if ( ! c->is_define() ) {
             BOOST_LOG_TRIVIAL(warning) << "The Equivalent CRS [" << c << "] is not present in PROJ"  ;
             delete c;
@@ -528,7 +282,7 @@ bool ServicesConfiguration::load_crs_equivalences(std::string file) {
 
 std::vector<CRS*> ServicesConfiguration::get_equals_crs(std::string crs)
 {
-    std::map<std::string, std::vector<CRS*> >::iterator it = crs_equivalences.find ( crs );
+    std::map<std::string, std::vector<CRS*> >::iterator it = crs_equivalences.find ( to_upper_case(crs) );
     if ( it == crs_equivalences.end() ) {
         return {};
     }
@@ -564,6 +318,10 @@ ServicesConfiguration::~ServicesConfiguration(){
     delete tms_service;
     delete health_service;
     delete wmts_service;
+    delete wms_service;
+    delete admin_service;
+    delete tiles_service;
+    delete contact;
 
     // Les CRS équivalents
     std::map<std::string, std::vector<CRS*> >::iterator it;

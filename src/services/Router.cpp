@@ -55,10 +55,9 @@
 #include "services/health/Service.h"
 #include "services/tms/Service.h"
 #include "services/wmts/Service.h"
-
-// #include "services/admin/Service.h"
-// #include "services/wms/Service.h"
-// #include "services/tiles/Service.h"
+#include "services/admin/Service.h"
+#include "services/tiles/Service.h"
+#include "services/wms/Service.h"
 
 std::string get_message_from_http_status ( int http_status ) {
     switch ( http_status ) {
@@ -258,6 +257,9 @@ void Router::process_request(Request* req, Rok4Server* serv) {
         if (services->get_health_service()->match_request(req)) {
             sendresponse(services->get_health_service()->process_request(req, serv), req);
         }
+        else if (services->get_admin_service()->match_request(req)) {
+            sendresponse(services->get_admin_service()->process_request(req, serv), req);
+        }
         else if (enabled && services->get_common_service()->match_request(req)) {
             sendresponse(services->get_common_service()->process_request(req, serv), req);
         }
@@ -266,6 +268,12 @@ void Router::process_request(Request* req, Rok4Server* serv) {
         }
         else if (enabled && services->get_wmts_service()->match_request(req)) {
             sendresponse(services->get_wmts_service()->process_request(req, serv), req);
+        }
+        else if (enabled && services->get_tiles_service()->match_request(req)) {
+            sendresponse(services->get_tiles_service()->process_request(req, serv), req);
+        }
+        else if (enabled && services->get_wms_service()->match_request(req)) {
+            sendresponse(services->get_wms_service()->process_request(req, serv), req);
         }
         else {
             throw new MessageDataStream("{\"error\": \"Bad Request\", \"error_description\": \"Unknown request path\"}", "application/json", 400);

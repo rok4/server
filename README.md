@@ -21,7 +21,6 @@ Installations système requises (listées dans le paquet debian, installées ave
 * `libcurl4-openssl-dev`
 * `libssl-dev`
 * `libfcgi-dev`
-* `libtinyxml-dev`
 * `libproj-dev`
 * `libboost-log-dev`
 * `libboost-filesystem-dev`

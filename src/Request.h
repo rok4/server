@@ -146,16 +146,22 @@ public:
      * \~english \brief Display (debug)
      */
     void print();
+
+    /**
+     * \~french \brief Est une requête INSPIRE ?
+     * \~english \brief Is a INSPIRE request ?
+     */
+    bool is_inspire();
     
     /**
      * \~french
      * \brief Constructeur d'une requête
-     * \param fcgxRequest Requête fcgi
+     * \param fcgx Requête fcgi
      * \~english
      * \brief Request Constructor
-     * \param fcgxRequest Fcgi request
+     * \param fcgx Fcgi request
      */
-    Request ( FCGX_Request* fcgxRequest);
+    Request ( FCGX_Request* fcgx);
 
     /**
      * \~french

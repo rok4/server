@@ -88,12 +88,12 @@ namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
 namespace sinks = boost::log::sinks;
 
-Rok4Server* W;
-Rok4Server* Wtmp;
+Rok4Server* rok4server_instance;
+Rok4Server* rok4server_instance_tmp;
 bool reload;
-static bool loggerInitialised = false;
+static bool logger_initialized = false;
 
-std::string server_config_file;
+std::string server_configuration_path;
 
 // Minimum time between two signal to be defered.
 // Earlier signal would be ignored.
@@ -111,27 +111,24 @@ volatile timeval signal_timestamp;
  * \brief Display the command line parameters
  */
 void usage() {
-    std::cerr << "Usage : rok4 [-f server_config_file]" <<std::endl;
+    std::cerr << "Usage : rok4 [-f server_configuration_path]" <<std::endl;
 }
 
 /**
 * \brief Initialisation du serveur ROK4
-* \param serverConfigFile : nom du fichier de configuration des parametres techniques
 * \return : pointeur sur le serveur ROK4, NULL en cas d'erreur (forcement fatale)
 */
 
-Rok4Server* load_configuration ( const char* serverConfigFile ) {
+Rok4Server* load_configuration() {
 
-    std::string strServerConfigFile = serverConfigFile;
-
-    ServerConfiguration* server_configuration = new ServerConfiguration( strServerConfigFile );
+    ServerConfiguration* server_configuration = new ServerConfiguration( server_configuration_path );
     if ( ! server_configuration->is_ok() ) {
         std::cerr << "FATAL: Cannot load server configuration " << std::endl;
         std::cerr << "FATAL: " << server_configuration->get_error_message() << std::endl;
         return NULL;
     }
 
-    if ( ! loggerInitialised ) {
+    if ( ! logger_initialized ) {
         /* Initialisation du logger */
         boost::log::core::get()->set_filter( boost::log::trivial::severity >= server_configuration->get_log_level() );
         logging::add_common_attributes();
@@ -159,7 +156,7 @@ Rok4Server* load_configuration ( const char* serverConfigFile ) {
 
         std::cout <<  "Envoi des messages dans la sortie du logger" << std::endl;
         BOOST_LOG_TRIVIAL(info) <<   "*** DEBUT DU FONCTIONNEMENT DU LOGGER ***" ;
-        loggerInitialised = true;
+        logger_initialized = true;
     }
 
     // Construction des parametres de service
@@ -225,7 +222,7 @@ Rok4Server* load_configuration ( const char* serverConfigFile ) {
  * \~english
  * \brief Force configuration reload
  */
-void reloadConfig ( int signum ) {
+void reload_configuration ( int signum ) {
     if ( defer_signal ) {
         timeval now;
         gettimeofday ( &now, NULL );
@@ -243,12 +240,12 @@ void reloadConfig ( int signum ) {
         reload = true;
         std::cout<<  "Rechargement du serveur rok4" << "["<< getpid() <<"]" <<std::endl;
 
-        Wtmp = load_configuration ( server_config_file.c_str() );
-        if ( ! Wtmp ){
+        rok4server_instance_tmp = load_configuration();
+        if ( ! rok4server_instance_tmp ){
             std::cout<<  "Erreur lors du rechargement du serveur rok4" << "["<< getpid() <<"]" <<std::endl;
             return;
         }
-        W->terminate();
+        rok4server_instance->terminate();
     }
 }
 /**
@@ -257,13 +254,13 @@ void reloadConfig ( int signum ) {
  * \~english
  * \brief Force server shutdown
  */
-void shutdownServer ( int signum ) {
+void shutdown_server ( int signum ) {
     if ( defer_signal ) {
         // Do nothing because rok4 is going to shutdown...
     } else {
         defer_signal++;
         reload = false;
-        W->terminate();
+        rok4server_instance->terminate();
     }
 }
 
@@ -275,7 +272,7 @@ void shutdownServer ( int signum ) {
  * \brief Return the translation files path
  * \return translation directory
  */
-std::string getlocalepath() {
+std::string get_locale_path() {
     char result[ 4096 ];
     char procPath[20];
     sprintf ( procPath,"/proc/%u/exe",getpid() );
@@ -296,7 +293,7 @@ std::string getlocalepath() {
  */
 int main ( int argc, char** argv ) {
 
-    bool firstStart = true;
+    bool first_start = true;
     int sock = 0;
     reload = true;
     defer_signal = 1;
@@ -304,10 +301,10 @@ int main ( int argc, char** argv ) {
     struct sigaction sa;
     sigemptyset ( &sa.sa_mask );
     sa.sa_flags = 0;
-    sa.sa_handler = reloadConfig;
+    sa.sa_handler = reload_configuration;
     sigaction ( SIGHUP, &sa,0 );
 
-    sa.sa_handler = shutdownServer;
+    sa.sa_handler = shutdown_server;
     sigaction ( SIGQUIT, &sa,0 );
 
     // On n'utilise pas la locale pour les numériques, pour garder le point comme séparateur de décimale
@@ -321,13 +318,13 @@ int main ( int argc, char** argv ) {
     curl_global_init(CURL_GLOBAL_ALL);
 
     /* the following loop is for fcgi debugging purpose */
-    int stopSleep = 0;
-    while ( getenv ( "SLEEP" ) != NULL && stopSleep == 0 ) {
+    int stop_sleep = 0;
+    while ( getenv ( "SLEEP" ) != NULL && stop_sleep == 0 ) {
         sleep ( 2 );
     }
 
     // Lecture des arguments de la ligne de commande
-    server_config_file=DEFAULT_SERVER_CONF_PATH;
+    server_configuration_path=DEFAULT_SERVER_CONF_PATH;
     for ( int i = 1; i < argc; i++ ) {
         if ( argv[i][0] == '-' ) {
             switch ( argv[i][1] ) {
@@ -337,7 +334,7 @@ int main ( int argc, char** argv ) {
                     usage();
                     return 1;
                 }
-                server_config_file.assign ( argv[i] );
+                server_configuration_path.assign ( argv[i] );
                 break;
             default:
                 usage();
@@ -353,34 +350,34 @@ int main ( int argc, char** argv ) {
         int pid = getpid();
         std::cout<<  "Server start " << "["<< pid <<"]" <<std::endl;
 
-        if ( firstStart ) {
-            W = load_configuration ( server_config_file.c_str() );
-            if ( !W ) {
+        if ( first_start ) {
+            rok4server_instance = load_configuration();
+            if ( !rok4server_instance ) {
                 return 1;
             }
-            W->initialize_fcgi();
-            firstStart = false;
+            rok4server_instance->initialize_fcgi();
+            first_start = false;
         } else {
             std::cout<<  "Configuration update " << "["<< pid <<"]" <<std::endl;
-            if ( Wtmp ) {
+            if ( rok4server_instance_tmp ) {
                 std::cout<<  "Servers switch " << "["<< pid <<"]" <<std::endl;
-                W = Wtmp;
-                Wtmp = 0;
+                rok4server_instance = rok4server_instance_tmp;
+                rok4server_instance_tmp = 0;
                 TmsBook::empty_trash();
                 StyleBook::empty_trash();
             }
-            W->set_fcgi_socket ( sock );
+            rok4server_instance->set_fcgi_socket ( sock );
         }
 
         auto start = std::chrono::system_clock::now();
         std::time_t time = std::chrono::system_clock::to_time_t(start);
-        W->set_pid(pid);
-        W->set_time(time);
+        rok4server_instance->set_pid(pid);
+        rok4server_instance->set_time(time);
 
         // Remove Event Lock
         defer_signal--;
         
-        W->run(signal_pending);
+        rok4server_instance->run(signal_pending);
 
         TmsBook::send_to_trash();
         StyleBook::send_to_trash();
@@ -388,13 +385,13 @@ int main ( int argc, char** argv ) {
         if ( reload ) {
             // Rechargement du serveur
             BOOST_LOG_TRIVIAL(info) << "Configuration reload" ;
-            sock = W->get_fcgi_socket();
+            sock = rok4server_instance->get_fcgi_socket();
         } else {
             // Extinction du serveur
             BOOST_LOG_TRIVIAL(info) << "Server shutdown" ;
         }
 
-        delete W;
+        delete rok4server_instance;
     }
 
     TmsBook::empty_trash();

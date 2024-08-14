@@ -46,13 +46,13 @@ XmlTimedTestOutputterHook::XmlTimedTestOutputterHook ( TimedTestListener* _ttlis
 
 void XmlTimedTestOutputterHook::successfulTestAdded ( CppUnit::XmlDocument* document, CppUnit::XmlElement* testElement, CppUnit::Test* test ) {
     std::ostringstream sstream;
-    sstream << std::setprecision ( 4 ) << std::fixed << ttlisten->getTime ( test->get_name() );
+    sstream << std::setprecision ( 4 ) << std::fixed << ttlisten->getTime ( test->getName() );
     testElement->addElement ( new CppUnit::XmlElement ( "Duration", sstream.str() ) ) ;
 }
 
 void XmlTimedTestOutputterHook::failTestAdded ( CppUnit::XmlDocument* document, CppUnit::XmlElement* testElement, CppUnit::Test* test, CppUnit::TestFailure* failure ) {
     std::ostringstream sstream;
-    sstream << std::setprecision ( 4 ) << std::fixed << ttlisten->getTime ( test->get_name() );
+    sstream << std::setprecision ( 4 ) << std::fixed << ttlisten->getTime ( test->getName() );
     testElement->addElement ( new CppUnit::XmlElement ( "Duration", sstream.str() ) ) ;
 }
 

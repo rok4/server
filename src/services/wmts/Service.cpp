@@ -151,6 +151,7 @@ DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
 
     // On contrôle le service précisé en paramètre de requête
     std::string param_service = req->get_query_param("service");
+
     std::transform(param_service.begin(), param_service.end(), param_service.begin(), ::tolower);
 
     if (param_service != "wmts") {

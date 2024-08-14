@@ -45,6 +45,13 @@
 
 #include <iostream>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+using boost::property_tree::ptree;
+using boost::property_tree::write_xml;
+using boost::property_tree::xml_writer_settings;
+
 #include "services/wmts/Exception.h"
 #include "services/wmts/Service.h"
 #include "Rok4Server.h"
@@ -57,382 +64,230 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     // La clé est un triplet : nom du TMS, niveau du haut, niveau du bas
     std::map< std::string, WmtsTmsInfos> used_tms_list;
 
-    TiXmlDocument doc;
-    TiXmlDeclaration * decl = new TiXmlDeclaration ( "1.0", "UTF-8", "" );
-    doc.LinkEndChild ( decl );
+    ptree tree;
 
-    TiXmlElement * capabilitiesEl = new TiXmlElement ( "Capabilities" );
-    capabilitiesEl->SetAttribute ( "version","1.0.0" );
-    // attribut UpdateSequence à ajouter quand on en aura besoin
-    capabilitiesEl->SetAttribute ( "xmlns","http://www.opengis.net/wmts/1.0" );
-    capabilitiesEl->SetAttribute ( "xmlns:ows","http://www.opengis.net/ows/1.1" );
-    capabilitiesEl->SetAttribute ( "xmlns:xlink","http://www.w3.org/1999/xlink" );
-    capabilitiesEl->SetAttribute ( "xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance" );
-    capabilitiesEl->SetAttribute ( "xmlns:gml","http://www.opengis.net/gml" );
-    capabilitiesEl->SetAttribute ( "xsi:schemaLocation","http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd" );
+    ptree& root = tree.add("Capabilities", "");
+    root.add("<xmlattr>.version", "1.0.0");
+    root.add("<xmlattr>.xmlns","http://www.opengis.net/wmts/1.0" );
+    root.add("<xmlattr>.xmlns:ows","http://www.opengis.net/ows/1.1" );
+    root.add("<xmlattr>.xmlns:xlink","http://www.w3.org/1999/xlink" );
+    root.add("<xmlattr>.xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance" );
+    root.add("<xmlattr>.xmlns:gml","http://www.opengis.net/gml" );
     
-    // À activer selon un paramètre de requête
-    // if ( "inspire" ) {
-    //     capabilitiesEl->SetAttribute ( "xmlns:inspire_common","http://inspire.ec.europa.eu/schemas/common/1.0" );
-    //     capabilitiesEl->SetAttribute ( "xmlns:inspire_vs","http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0" );
-    //     capabilitiesEl->SetAttribute ( "xsi:schemaLocation","http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0 http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0/inspire_vs_ows_11.xsd" );
-    // }
+    if ( req->is_inspire() ) {
+        root.add("<xmlattr>.xmlns:inspire_common","http://inspire.ec.europa.eu/schemas/common/1.0" );
+        root.add("<xmlattr>.xmlns:inspire_vs","http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0" );
+        root.add("<xmlattr>.xsi:schemaLocation","http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0 http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0/inspire_vs_ows_11.xsd" );
+    } else {
+        root.add("<xmlattr>.xsi:schemaLocation","http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd" );
+    }
 
-
-    //----------------------------------------------------------------------
-    // ServiceIdentification
-    //----------------------------------------------------------------------
-    TiXmlElement * serviceEl = new TiXmlElement ( "ows:ServiceIdentification" );
-
-    serviceEl->LinkEndChild ( Utils::build_text_node ( "ows:Title", title ) );
-    serviceEl->LinkEndChild ( Utils::build_text_node ( "ows:Abstract", abstract ) );
-    //KeywordList
+    ptree& identification_node = root.add("ows:ServiceIdentification", "");
+    identification_node.add("ows:Title", title);
+    identification_node.add("ows:Abstract", abstract);
     if ( keywords.size() != 0 ) {
-        TiXmlElement * kwlEl = new TiXmlElement ( "ows:Keywords" );
+        ptree& keywords_node = identification_node.add("ows:Keywords", "");
         for ( unsigned int i=0; i < keywords.size(); i++ ) {
-            kwlEl->LinkEndChild ( Utils::get_xml("ows:Keyword", keywords.at ( i )) );
+            keywords.at(i).add_node(keywords_node);
         }
-        serviceEl->LinkEndChild ( kwlEl );
     }
-    serviceEl->LinkEndChild ( Utils::build_text_node ( "ows:ServiceType", "OGC WMTS" ) );
-    serviceEl->LinkEndChild ( Utils::build_text_node ( "ows:ServiceTypeVersion", "1.0.0" ) );
-    serviceEl->LinkEndChild ( Utils::build_text_node ( "ows:Fees", services->fee ) );
-    serviceEl->LinkEndChild ( Utils::build_text_node ( "ows:AccessConstraints", services->access_constraint ) );
 
+    identification_node.add("ows:ServiceType", "OGC WMTS");
+    identification_node.add("ows:ServiceTypeVersion", "1.0.0");
+    identification_node.add("ows:Fees", services->fee);
+    identification_node.add("ows:AccessConstraints", services->access_constraint);
 
-    capabilitiesEl->LinkEndChild ( serviceEl );
+    ptree& provider_node = root.add("ows:ServiceProvider", "");
+    provider_node.add("ows:ProviderName", services->provider_site);
+    provider_node.add("ows:ProviderSite.<xmlattr>.xlink:href", services->provider_site);
 
-    //----------------------------------------------------------------------
-    // service_provider (facultatif)
-    //----------------------------------------------------------------------
-    TiXmlElement * serviceProviderEl = new TiXmlElement ( "ows:ServiceProvider" );
+    services->contact->add_node(provider_node);
 
-    serviceProviderEl->LinkEndChild ( Utils::build_text_node ( "ows:ProviderName",services->service_provider ) );
-    TiXmlElement * providerSiteEl = new TiXmlElement ( "ows:ProviderSite" );
-    providerSiteEl->SetAttribute ( "xlink:href",services->provider_site );
-    serviceProviderEl->LinkEndChild ( providerSiteEl );
+    ptree& op_getcapabilities = root.add("ows:OperationsMetadata.ows:Operation", "");
+    op_getcapabilities.add("<xmlattr>.name", "GetCapabilities");
+    op_getcapabilities.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMTS&");
+    op_getcapabilities.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.<xmlattr>.name", "GetEncoding");
+    op_getcapabilities.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.ows:AllowedValues.ows:Value", "KVP");
 
-    TiXmlElement * serviceContactEl = new TiXmlElement ( "ows:ServiceContact" );
+    ptree& op_gettile = root.add("ows:OperationsMetadata.ows:Operation", "");
+    op_gettile.add("<xmlattr>.name", "GetTile");
+    op_gettile.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMTS&");
+    op_gettile.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.<xmlattr>.name", "GetEncoding");
+    op_gettile.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.ows:AllowedValues.ows:Value", "KVP");
 
-    serviceContactEl->LinkEndChild ( Utils::build_text_node ( "ows:IndividualName",services->individual_name ) );
-    serviceContactEl->LinkEndChild ( Utils::build_text_node ( "ows:PositionName",services->individual_position ) );
+    ptree& op_getfeatureinfo = root.add("ows:OperationsMetadata.ows:Operation", "");
+    op_getfeatureinfo.add("<xmlattr>.name", "GetFeatureInfo");
+    op_getfeatureinfo.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMTS&");
+    op_getfeatureinfo.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.<xmlattr>.name", "GetEncoding");
+    op_getfeatureinfo.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.ows:AllowedValues.ows:Value", "KVP");
 
-    TiXmlElement * contactInfoEl = new TiXmlElement ( "ows:ContactInfo" );
-    TiXmlElement * contactInfoPhoneEl = new TiXmlElement ( "ows:Phone" );
+    if (req->is_inspire()) {
+        ptree& inspire_extension = root.add("inspire_vs:ExtendedCapabilities", "");
 
-    contactInfoPhoneEl->LinkEndChild ( Utils::build_text_node ( "ows:Voice",services->voice ) );
-    contactInfoPhoneEl->LinkEndChild ( Utils::build_text_node ( "ows:Facsimile",services->facsimile ) );
-
-    contactInfoEl->LinkEndChild ( contactInfoPhoneEl );
-
-    TiXmlElement * contactAddressEl = new TiXmlElement ( "ows:Address" );
-    contactAddressEl->LinkEndChild ( Utils::build_text_node ( "ows:DeliveryPoint",services->delivery_point ) );
-    contactAddressEl->LinkEndChild ( Utils::build_text_node ( "ows:City",services->city ) );
-    contactAddressEl->LinkEndChild ( Utils::build_text_node ( "ows:AdministrativeArea",services->administrative_area ) );
-    contactAddressEl->LinkEndChild ( Utils::build_text_node ( "ows:PostalCode",services->post_code ) );
-    contactAddressEl->LinkEndChild ( Utils::build_text_node ( "ows:Country",services->country ) );
-    contactAddressEl->LinkEndChild ( Utils::build_text_node ( "ows:ElectronicMailAddress",services->email ) );
-    contactInfoEl->LinkEndChild ( contactAddressEl );
-
-    serviceContactEl->LinkEndChild ( contactInfoEl );
-
-    serviceProviderEl->LinkEndChild ( serviceContactEl );
-    capabilitiesEl->LinkEndChild ( serviceProviderEl );
-
-
-    //----------------------------------------------------------------------
-    // OperationsMetadata
-    //----------------------------------------------------------------------
-    TiXmlElement * opMtdEl = new TiXmlElement ( "ows:OperationsMetadata" );
-    TiXmlElement * opEl = new TiXmlElement ( "ows:Operation" );
-    opEl->SetAttribute ( "name","GetCapabilities" );
-    TiXmlElement * dcpEl = new TiXmlElement ( "ows:DCP" );
-    TiXmlElement * httpEl = new TiXmlElement ( "ows:HTTP" );
-    TiXmlElement * getEl = new TiXmlElement ( "ows:Get" );
-    getEl->SetAttribute ( "xlink:href", endpoint_uri + "?SERVICE=WMTS&" );
-    TiXmlElement * constraintEl = new TiXmlElement ( "ows:Constraint" );
-    constraintEl->SetAttribute ( "name","GetEncoding" );
-    TiXmlElement * allowedValuesEl = new TiXmlElement ( "ows:AllowedValues" );
-    allowedValuesEl->LinkEndChild ( Utils::build_text_node ( "ows:Value", "KVP" ) );
-    constraintEl->LinkEndChild ( allowedValuesEl );
-    getEl->LinkEndChild ( constraintEl );
-    httpEl->LinkEndChild ( getEl );
-
-    dcpEl->LinkEndChild ( httpEl );
-    opEl->LinkEndChild ( dcpEl );
-
-    opMtdEl->LinkEndChild ( opEl );
-
-    opEl = new TiXmlElement ( "ows:Operation" );
-    opEl->SetAttribute ( "name","GetTile" );
-    dcpEl = new TiXmlElement ( "ows:DCP" );
-    httpEl = new TiXmlElement ( "ows:HTTP" );
-    getEl = new TiXmlElement ( "ows:Get" );
-    getEl->SetAttribute ( "xlink:href", endpoint_uri + "?SERVICE=WMTS&" );
-    constraintEl = new TiXmlElement ( "ows:Constraint" );
-    constraintEl->SetAttribute ( "name","GetEncoding" );
-    allowedValuesEl = new TiXmlElement ( "ows:AllowedValues" );
-    allowedValuesEl->LinkEndChild ( Utils::build_text_node ( "ows:Value", "KVP" ) );
-    constraintEl->LinkEndChild ( allowedValuesEl );
-    getEl->LinkEndChild ( constraintEl );
-    httpEl->LinkEndChild ( getEl );
-
-    dcpEl->LinkEndChild ( httpEl );
-    opEl->LinkEndChild ( dcpEl );
-
-    opMtdEl->LinkEndChild ( opEl );
-    
-    opEl = new TiXmlElement ( "ows:Operation" );
-    opEl->SetAttribute ( "name","GetFeatureInfo" );
-    dcpEl = new TiXmlElement ( "ows:DCP" );
-    httpEl = new TiXmlElement ( "ows:HTTP" );
-    getEl = new TiXmlElement ( "ows:Get" );
-    getEl->SetAttribute ( "xlink:href", endpoint_uri + "?SERVICE=WMTS&" );
-    constraintEl = new TiXmlElement ( "ows:Constraint" );
-    constraintEl->SetAttribute ( "name","GetEncoding" );
-    allowedValuesEl = new TiXmlElement ( "ows:AllowedValues" );
-    allowedValuesEl->LinkEndChild ( Utils::build_text_node ( "ows:Value", "KVP" ) );
-    constraintEl->LinkEndChild ( allowedValuesEl );
-    getEl->LinkEndChild ( constraintEl );
-    httpEl->LinkEndChild ( getEl );
-
-    dcpEl->LinkEndChild ( httpEl );
-    opEl->LinkEndChild ( dcpEl );
-
-    opMtdEl->LinkEndChild ( opEl );
-
-
-    // Inspire (extended Capability)
-    // TODO : en dur. A mettre dans la configuration du service (prevoir differents profils d'application possibles)
-    if (metadata) {
-        TiXmlElement * extendedCapabilititesEl = new TiXmlElement ( "inspire_vs:ExtendedCapabilities" );
-
-        // Metadata
-        TiXmlElement * metadataUrlEl = new TiXmlElement ( "inspire_common:MetadataUrl" );
-        metadataUrlEl->LinkEndChild ( Utils::build_text_node ( "inspire_common:URL", metadata->get_href() ) );
-        metadataUrlEl->LinkEndChild ( Utils::build_text_node ( "inspire_common:MediaType", metadata->get_type() ) );
-        extendedCapabilititesEl->LinkEndChild ( metadataUrlEl );
-
-        // Languages
-        TiXmlElement * supportedLanguagesEl = new TiXmlElement ( "inspire_common:SupportedLanguages" );
-        TiXmlElement * defaultLanguageEl = new TiXmlElement ( "inspire_common:DefaultLanguage" );
-        TiXmlElement * languageEl = new TiXmlElement ( "inspire_common:Language" );
-        TiXmlText * lfre = new TiXmlText ( "fre" );
-        languageEl->LinkEndChild ( lfre );
-        defaultLanguageEl->LinkEndChild ( languageEl );
-        supportedLanguagesEl->LinkEndChild ( defaultLanguageEl );
-        extendedCapabilititesEl->LinkEndChild ( supportedLanguagesEl );
-        // Responselanguage
-        TiXmlElement * responseLanguageEl = new TiXmlElement ( "inspire_common:ResponseLanguage" );
-        responseLanguageEl->LinkEndChild ( Utils::build_text_node ( "inspire_common:Language","fre" ) );
-        extendedCapabilititesEl->LinkEndChild ( responseLanguageEl );
-
-        opMtdEl->LinkEndChild ( extendedCapabilititesEl );
+        if (metadata) {
+            inspire_extension.add("inspire_common:MetadataUrl.inspire_common:URL", metadata->get_href());
+            inspire_extension.add("inspire_common:MetadataUrl.inspire_common:MediaType", metadata->get_type());
+        }
+        
+        inspire_extension.add("inspire_common:SupportedLanguages.inspire_common:DefaultLanguage.inspire_common:Language", "fre");
+        inspire_extension.add("inspire_common:ResponseLanguage.inspire_common:Language", "fre");
     }
-    capabilitiesEl->LinkEndChild ( opMtdEl );
 
-    //----------------------------------------------------------------------
-    // Contents
-    //----------------------------------------------------------------------
-    TiXmlElement * contentsEl=new TiXmlElement ( "Contents" );
+    ptree& contents_node = root.add("Contents", "");
 
-    // Layer
-    //------------------------------------------------------------------
-    std::map<std::string, Layer*>::iterator itLay ( serv->get_server_configuration()->get_layers().begin() ), itLayEnd ( serv->get_server_configuration()->get_layers().end() );
-    for ( ; itLay!=itLayEnd; ++itLay ) {
-        //Look if the layer is published in WMTS
-        if (itLay->second->is_wmts_enabled()) {
-            TiXmlElement * layerEl=new TiXmlElement ( "Layer" );
-            Layer* layer = itLay->second;
+    std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
+    for ( ; layers_iterator != layers_end; ++layers_iterator ) {
+        if (layers_iterator->second->is_wmts_enabled()) {
+            Layer* layer = layers_iterator->second;
+            ptree& layer_node = contents_node.add("Layer", "");
+            layer_node.add("ows:Title", layer->title);
+            layer_node.add("ows:Abstract", layer->abstract);
 
-            layerEl->LinkEndChild ( Utils::build_text_node ( "ows:Title", layer->get_title() ) );
-            layerEl->LinkEndChild ( Utils::build_text_node ( "ows:Abstract", layer->get_abstract() ) );
-            if ( layer->get_keywords()->size() != 0 ) {
-                TiXmlElement * kwlEl = new TiXmlElement ( "ows:Keywords" );
-                for ( unsigned int i=0; i < layer->get_keywords()->size(); i++ ) {
-                    kwlEl->LinkEndChild ( Utils::get_xml("ows:Keyword", layer->get_keywords()->at ( i )) );
+            if ( layer->keywords.size() != 0 ) {
+                ptree& keywords_node = layer_node.add("ows:Keywords", "");
+                for ( unsigned int i = 0; i < layer->keywords.size(); i++ ) {
+                    keywords.at(i).add_node(keywords_node);
                 }
-                layerEl->LinkEndChild ( kwlEl );
             }
-            //ows:WGS84BoundingBox (0,n)
 
-
-            TiXmlElement * wgsBBEl = new TiXmlElement ( "ows:WGS84BoundingBox" );
             std::ostringstream os;
+            os << layer->geographic_bbox.xmin << " " << layer->geographic_bbox.ymin;
+            layer_node.add("ows:WGS84BoundingBox.ows:LowerCorner", os.str());
             os.str ( "" );
-            os<<layer->get_geographical_bbox().xmin;
-            os<<" ";
-            os<<layer->get_geographical_bbox().ymin;
-            wgsBBEl->LinkEndChild ( Utils::build_text_node ( "ows:LowerCorner", os.str() ) );
-            os.str ( "" );
-            os<<layer->get_geographical_bbox().xmax;
-            os<<" ";
-            os<<layer->get_geographical_bbox().ymax;
-            wgsBBEl->LinkEndChild ( Utils::build_text_node ( "ows:UpperCorner", os.str() ) );
-            os.str ( "" );
-            layerEl->LinkEndChild ( wgsBBEl );
+            os << layer->geographic_bbox.xmax << " " << layer->geographic_bbox.ymax;
+            layer_node.add("ows:WGS84BoundingBox.ows:UpperCorner", os.str());
+            
+            layer_node.add("ows:Identifier", layer->id);
 
+            for ( unsigned int i = 0; i < layer->styles.size(); i++ ) {
+                ptree& style_node = layer_node.add("Style", "");
+                if ( i == 0 ) {
+                    style_node.add("<xmlattr>.isDefault", "true");
+                }
+                
+                Style* style = layer->styles.at(i);
+                for (int j = 0 ; j < style->get_titles().size(); ++j ) {
+                    BOOST_LOG_TRIVIAL(debug) <<  "Title : " << style->get_titles() [j].c_str()  ;
+                    style_node.add("ows:Title", style->get_titles()[j]);
+                }
+                for (int j = 0 ; j < style->get_abstracts().size(); ++j ) {
+                    BOOST_LOG_TRIVIAL(debug) <<  "Abstract : " << style->get_abstracts() [j].c_str()  ;
+                    style_node.add("ows:Abstract", style->get_abstracts()[j]);
+                }
 
-            layerEl->LinkEndChild ( Utils::build_text_node ( "ows:Identifier", layer->get_id() ) );
-
-            //Style
-            if ( layer->get_styles().size() != 0 ) {
-                for ( unsigned int i=0; i < layer->get_styles().size(); i++ ) {
-                    TiXmlElement * styleEl= new TiXmlElement ( "Style" );
-                    if ( i==0 ) styleEl->SetAttribute ( "isDefault","true" );
-                    Style* style = layer->get_styles() [i];
-                    int j;
-                    for ( j=0 ; j < style->get_titles().size(); ++j ) {
-                        BOOST_LOG_TRIVIAL(debug) <<  "Title : " << style->get_titles() [j].c_str()  ;
-                        styleEl->LinkEndChild ( Utils::build_text_node ( "ows:Title", style->get_titles() [j].c_str() ) );
+                if ( style->get_keywords()->size() != 0 ) {
+                    ptree& style_keywords_node = style_node.add("ows:Keywords", "");
+                    for ( unsigned int j = 0; j < style->get_keywords()->size(); j++ ) {
+                        style->get_keywords()->at ( j ).add_node(style_keywords_node);
                     }
-                    for ( j=0 ; j < style->get_abstracts().size(); ++j ) {
-                        BOOST_LOG_TRIVIAL(debug) <<  "Abstract : " << style->get_abstracts() [j].c_str()  ;
-                        styleEl->LinkEndChild ( Utils::build_text_node ( "ows:Abstract", style->get_abstracts() [j].c_str() ) );
-                    }
+                }
 
-                    if ( style->get_keywords()->size() != 0 ) {
-                        TiXmlElement * kwlEl = new TiXmlElement ( "ows:Keywords" );
-                        for ( unsigned int i=0; i < style->get_keywords()->size(); i++ ) {
-                            kwlEl->LinkEndChild ( Utils::get_xml("ows:Keyword", style->get_keywords()->at ( i )) );
-                        }
-                        styleEl->LinkEndChild ( kwlEl );
-                    }
-
-                    styleEl->LinkEndChild ( Utils::build_text_node ( "ows:Identifier", style->get_identifier() ) );
-                    for ( j=0 ; j < style->get_legends().size(); ++j ) {
-                        LegendURL legendURL = style->get_legends() [j];
-                        TiXmlElement* legendURLEl = new TiXmlElement ( "LegendURL" );
-                        legendURLEl->SetAttribute ( "format", legendURL.get_format() );
-                        legendURLEl->SetAttribute ( "xlink:href", legendURL.get_href() );
-                        if ( legendURL.get_width() !=0 )
-                            legendURLEl->SetAttribute ( "width", legendURL.get_width() );
-                        if ( legendURL.get_height() !=0 )
-                            legendURLEl->SetAttribute ( "height", legendURL.get_height() );
-                        if ( legendURL.get_min_scale_denominator() !=0.0 )
-                            legendURLEl->SetAttribute ( "minScaleDenominator", legendURL.get_min_scale_denominator() );
-                        if ( legendURL.get_max_scale_denominator() !=0.0 )
-                            legendURLEl->SetAttribute ( "maxScaleDenominator", legendURL.get_max_scale_denominator() );
-                        styleEl->LinkEndChild ( legendURLEl );
-                    }
-                    layerEl->LinkEndChild ( styleEl );
+                style_node.add("ows:Identifier", style->get_identifier());
+                for ( int j = 0 ; j < style->get_legends().size(); j++ ) {
+                    style->get_legends() [j].add_node(style_node);
                 }
             }
 
-            // Contrainte : 1 layer = 1 pyramide = 1 format
-            layerEl->LinkEndChild ( Utils::build_text_node ( "Format",Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) ) ) );
-            if (layer->is_gfi_enabled()){
-                for ( unsigned int i = 0; i < info_formats.size(); i++ ) {
-                    layerEl->LinkEndChild ( Utils::build_text_node ( "InfoFormat", info_formats.at ( i ) ) );
+            layer_node.add("Format", Rok4Format::to_mime_type ( layer->pyramid->get_format() ));
+
+            if (layer->gfi_enabled){
+                for ( unsigned int j = 0; j < info_formats.size(); j++ ) {
+                    layer_node.add("InfoFormat", info_formats.at ( j ));
                 }
             }
 
             if (reprojection) {
                 // On ajoute les TMS disponibles avec les tuiles limites
-                for ( unsigned int i=0; i < layer->get_wmts_tilematrixsets().size(); i++ ) {
-                    TiXmlElement * tmsLinkEl = new TiXmlElement ( "TileMatrixSetLink" );
-                    tmsLinkEl->LinkEndChild ( Utils::build_text_node ( "TileMatrixSet", layer->get_wmts_tilematrixsets().at(i).wmts_id ) );
-                    
-                    TiXmlElement * tmsLimitsEl = new TiXmlElement ( "TileMatrixSetLimits" );
+                for ( unsigned int i = 0; i < layer->get_wmts_tilematrixsets().size(); i++ ) {
+                    ptree& tms_node = layer_node.add("TileMatrixSetLink", "");
+                    tms_node.add("TileMatrixSet", layer->get_wmts_tilematrixsets().at(i).wmts_id);
 
+                    ptree& tms_limits_node = tms_node.add("TileMatrixSetLimits", "");
+                    
                     // Niveaux
                     for ( unsigned int j = 0; j < layer->get_wmts_tilematrixsets().at(i).limits.size(); j++ ) { 
-                        tmsLimitsEl->LinkEndChild ( Utils::get_xml(layer->get_wmts_tilematrixsets().at(i).limits.at(j)) );
+                        layer->get_wmts_tilematrixsets().at(i).limits.at(j).add_node(tms_limits_node);
                     }
 
-                    tmsLinkEl->LinkEndChild ( tmsLimitsEl );
-
-                    layerEl->LinkEndChild ( tmsLinkEl );
                     used_tms_list.insert ( std::pair<std::string, WmtsTmsInfos> ( layer->get_wmts_tilematrixsets().at(i).wmts_id , layer->get_wmts_tilematrixsets().at(i)) );
-
-
-                    WmtsTmsInfos origin_infos;
-                    origin_infos.tms = layer->get_wmts_tilematrixsets().at(i).tms;
-                    origin_infos.top_level = "";
-                    origin_infos.bottom_level = "";
-                    origin_infos.wmts_id = origin_infos.tms->get_id();
-                    used_tms_list.insert ( std::pair<std::string, WmtsTmsInfos> ( origin_infos.wmts_id, origin_infos) );
                 }
             }
 
-            contentsEl->LinkEndChild ( layerEl );
+            // On veut ajouter le TMS natif des données dans sa version originale
+            WmtsTmsInfos origin_infos;
+            origin_infos.tms = layer->get_pyramid()->get_tms();
+            origin_infos.top_level = "";
+            origin_infos.bottom_level = "";
+            origin_infos.wmts_id = origin_infos.tms->get_id();
+            used_tms_list.insert ( std::pair<std::string, WmtsTmsInfos> ( origin_infos.wmts_id, origin_infos) );
         }
-
     }
 
-    // TileMatrixSet
-    //--------------------------------------------------------
-    std::map<std::string, WmtsTmsInfos>::iterator itTms ( used_tms_list.begin() ), itTmsEnd ( used_tms_list.end() );
-    for ( ; itTms!=itTmsEnd; ++itTms ) {
 
-        TiXmlElement * tmsEl = new TiXmlElement ( "TileMatrixSet" );
-        tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:Identifier", itTms->first ) );
+    std::map<std::string, WmtsTmsInfos>::iterator tms_iterator ( used_tms_list.begin() ), tms_end ( used_tms_list.end() );
+    for ( ; tms_iterator!=tms_end; ++tms_iterator ) {
 
-        TileMatrixSet* tms = itTms->second.tms;
+        ptree& tms_node = contents_node.add("TileMatrixSet", "");
+
+        tms_node.add( "ows:Identifier", tms_iterator->first );
+
+        TileMatrixSet* tms = tms_iterator->second.tms;
+
         if ( ! ( tms->get_title().empty() ) ) {
-            tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:Title", tms->get_title().c_str() ) );
+            tms_node.add ( "ows:Title", tms->get_title() );
         }
 
         if ( ! ( tms->get_abstract().empty() ) ) {
-            tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:Abstract", tms->get_abstract().c_str() ) );
+            tms_node.add ( "ows:Abstract", tms->get_abstract() );
         }
 
         if ( tms->get_keywords()->size() != 0 ) {
-
-            TiXmlElement * kwlEl = new TiXmlElement ( "ows:Keywords" );
-            for ( unsigned int i=0; i < tms->get_keywords()->size(); i++ ) {
-                kwlEl->LinkEndChild ( Utils::get_xml("ows:Keyword", tms->get_keywords()->at ( i )) );
+            ptree& tms_keywords_node = tms_node.add("ows:Keywords", "");
+            for ( unsigned int j = 0; j < tms->get_keywords()->size(); j++ ) {
+                tms->get_keywords()->at ( j ).add_node(tms_keywords_node);
             }
-            tmsEl->LinkEndChild ( kwlEl );
-
         }
 
-        tmsEl->LinkEndChild ( Utils::build_text_node ( "ows:SupportedCRS",tms->get_crs()->get_request_code() ) );
+        tms_node.add ( "ows:SupportedCRS",tms->get_crs()->get_request_code() );
         
         // TileMatrix
         std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->get_ordered_tm(false);
         bool keep = false;
-        if (itTms->second.top_level == "") {
+        if (tms_iterator->second.top_level == "") {
             // On est sur un TMS d'origine, on l'exporte en entier
             keep = true;
         }
         for (std::pair<std::string, TileMatrix*> element : orderedTM) {
             TileMatrix* tm = element.second;
 
-            if (! keep && tm->get_id() != itTms->second.top_level) {
+            if (! keep && tm->get_id() != tms_iterator->second.top_level) {
                 continue;
             } else {
                 keep = true;
             }
 
-            TiXmlElement * tmEl = new TiXmlElement ( "TileMatrix" );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "ows:Identifier",tm->get_id() ) );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "ScaleDenominator",Utils::double_to_string ( ( long double ) ( tm->get_res() * tms->get_crs()->gte_meters_per_unit() ) /0.00028 ) ) );
-            if (tms->get_crs()->get_authority() == "EPSG" && tms->get_crs()->is_lon_lat()) {
-                tmEl->LinkEndChild ( Utils::build_text_node ( "TopLeftCorner",Utils::double_to_string ( tm->get_y0() ) + " " + Utils::double_to_string ( tm->get_x0() ) ) );
-            } else {
-                tmEl->LinkEndChild ( Utils::build_text_node ( "TopLeftCorner",Utils::double_to_string ( tm->get_x0() ) + " " + Utils::double_to_string ( tm->get_y0() ) ) );
-            }
-            tmEl->LinkEndChild ( Utils::build_text_node ( "TileWidth",Utils::int_to_string ( tm->get_tile_width() ) ) );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "TileHeight",Utils::int_to_string ( tm->get_tile_height() ) ) );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "MatrixWidth",Utils::int_to_string ( tm->get_matrix_width() ) ) );
-            tmEl->LinkEndChild ( Utils::build_text_node ( "MatrixHeight",Utils::int_to_string ( tm->get_matrix_height() ) ) );
-            tmsEl->LinkEndChild ( tmEl );
+            ptree& tm_node = tms_node.add("TileMatrix", "");
 
-            if (tm->get_id() == itTms->second.bottom_level) {
+            tm_node.add( "ows:Identifier",tm->get_id() );
+            tm_node.add( "ScaleDenominator",Utils::double_to_string ( ( long double ) ( tm->get_res() * tms->get_crs()->get_meters_per_unit() ) /0.00028 ) );
+            if (tms->get_crs()->get_authority() == "EPSG" && tms->get_crs()->is_lon_lat()) {
+                tm_node.add ( "TopLeftCorner", Utils::double_to_string ( tm->get_y0() ) + " " + Utils::double_to_string ( tm->get_x0() ) );
+            } else {
+                tm_node.add ( "TopLeftCorner", Utils::double_to_string ( tm->get_x0() ) + " " + Utils::double_to_string ( tm->get_y0() ) );
+            }
+            tm_node.add( "TileWidth",Utils::int_to_string ( tm->get_tile_width() ) );
+            tm_node.add("TileHeight",Utils::int_to_string ( tm->get_tile_height() ) );
+            tm_node.add( "MatrixWidth",Utils::int_to_string ( tm->get_matrix_width() ) );
+            tm_node.add( "MatrixHeight",Utils::int_to_string ( tm->get_matrix_height() ) );
+
+            if (tm->get_id() == tms_iterator->second.bottom_level) {
                 break;
             }
         }
-
-        contentsEl->LinkEndChild ( tmsEl );
     }
 
-    capabilitiesEl->LinkEndChild ( contentsEl );
-    doc.LinkEndChild ( capabilitiesEl );
+    std::stringstream ss;
+    write_xml(ss, tree);
+    return new MessageDataStream ( ss.str(), "application/xml", 200 );
 
-    std::string res;
-    res << doc;  // ecriture non formatée dans un std::string
-    doc.Clear();
-
-    return new MessageDataStream ( res, "application/xml", 200 );
 }
