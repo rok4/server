@@ -38,19 +38,27 @@
 #ifndef UTILSERV_H
 #define UTILSERV_H
 
-#include <rok4/utils/BoundingBox.h>
-#include <rok4/utils/Keyword.h>
-#include <rok4/utils/TileMatrixLimits.h>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+using boost::property_tree::ptree;
+using boost::property_tree::write_xml;
+using boost::property_tree::xml_writer_settings;
 
 #include <iomanip>
 #include <string>
 #include <vector>
 
+#include <rok4/utils/BoundingBox.h>
+#include <rok4/utils/Keyword.h>
+#include <rok4/utils/TileMatrixLimits.h>
+#include <rok4/thirdparty/json11.hpp>
+
+#include "DataStreams.h"
+
 class Utils {
    public:
-
-
-
     /**
      * \~french
      * \brief Donne le nombre de chiffres après la virgule
@@ -136,7 +144,7 @@ class Utils {
 
             size_t pos_kv = item.find(kv_separator);
             if (pos_kv != std::string::npos) {
-                res.insert ( std::pair<std::string, std::string> ( item.substr(0, pos_kv), item.substr(pos_kv + kv_separator.length(), std::string::npos) ) );
+                res.insert(std::pair<std::string, std::string>(item.substr(0, pos_kv), item.substr(pos_kv + kv_separator.length(), std::string::npos)));
             }
 
             if (pos_item == std::string::npos) {
@@ -147,6 +155,91 @@ class Utils {
         return res;
     }
 
+    static std::string map_to_string(std::map<std::string, std::string> m, std::string item_separator, std::string kv_separator) {
+        std::vector<std::string> tmp;
+
+        for (auto const& i : m) {
+            tmp.push_back(i.first + kv_separator + i.second);
+        }
+
+        return boost::algorithm::join(tmp, "&");
+    }
+
+    static MessageDataStream* format_get_feature_info(std::vector<std::string> data, std::string format) {
+        if (format.compare("text/html") == 0) {
+            ptree tree;
+
+            ptree& root = tree.add("html", "");
+            root.add("body.p.b", "FeatureInfo :");
+            ptree& list = root.add("ul", "");
+            for (std::string v : data) {
+                list.add("li", v);
+            }
+
+            std::stringstream ss;
+            write_xml(ss, tree);
+            return new MessageDataStream(ss.str(), "text/html", 200);
+        } else if (format.compare("text/xml") == 0 || format.compare("application/xml") == 0) {
+            ptree tree;
+
+            ptree& root = tree.add("FeatureInfo", "");
+            for (std::string v : data) {
+                root.add("value", v);
+            }
+
+            std::stringstream ss;
+            write_xml(ss, tree);
+            return new MessageDataStream(ss.str(), format, 200);
+        } else if (format.compare("application/json") == 0) {
+            json11::Json res = json11::Json::object{
+                {"featureInfo", data}};
+            return new MessageDataStream(res.dump(), "application/json", 200);
+        } else {
+            return new MessageDataStream(boost::algorithm::join(data, " "), "text/plain", 200);
+        }
+    }
+
+    /**
+     * \~french
+     * \brief Décodage de l'URL correspondant à la requête
+     * \param[in,out] src URL
+     * \~english
+     * \brief URL decoding
+     * \param[in,out] src URL
+     */
+    static void url_decode(char* src) {
+        unsigned char high, low;
+        char* dst = src;
+
+        while ((*src) != '\0') {
+            if (*src == '+') {
+                *dst = ' ';
+            } else if (*src == '%') {
+                *dst = '%';
+
+                high = Utils::hexadecimal_to_int(*(src + 1));
+                if (high != 0xFF) {
+                    low = Utils::hexadecimal_to_int(*(src + 2));
+                    if (low != 0xFF) {
+                        high = (high << 4) | low;
+
+                        /* map control-characters out */
+                        if (high < 32 || high == 127) high = '_';
+
+                        *dst = high;
+                        src += 2;
+                    }
+                }
+            } else {
+                *dst = *src;
+            }
+
+            dst++;
+            src++;
+        }
+
+        *dst = '\0';
+    }
 };
 
 #endif  // UTILSERV_H

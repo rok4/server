@@ -101,7 +101,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     provider_node.add("ows:ProviderName", services->provider_site);
     provider_node.add("ows:ProviderSite.<xmlattr>.xlink:href", services->provider_site);
 
-    services->contact->add_node(provider_node);
+    services->contact->add_node_wmts(provider_node);
 
     ptree& op_getcapabilities = root.add("ows:OperationsMetadata.ows:Operation", "");
     op_getcapabilities.add("<xmlattr>.name", "GetCapabilities");
@@ -289,5 +289,4 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     std::stringstream ss;
     write_xml(ss, tree);
     return new MessageDataStream ( ss.str(), "application/xml", 200 );
-
 }

@@ -129,19 +129,4 @@ DataStream* CommonService::process_request(Request* req, Rok4Server* serv) {
 DataStream* CommonService::get_services ( Request* req, Rok4Server* serv ) {
 
     throw CommonException::get_error_message("Coming soon !", 501);
-    // std::ostringstream res;
-    // res << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
-    // res << "<Services>";
-    // if (serv->) {
-    //     res << "<TileMapService title=\"" << serv->get_services_configuration()->title << "\" version=\"1.0.0\" href=\"" << serv->get_services_configuration()->tmsPublicUrl << "/1.0.0/\" />";
-    // }
-    // if (serv->supportWms()) {
-    //     res << "<WebMapService title=\"" << serv->get_services_configuration()->title << "\" version=\"1.3.0\" href=\"" << serv->get_services_configuration()->wmsPublicUrl << "?SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities\" />";
-    // }
-    // if (serv->supportWmts()) {
-    //     res << "<WebMapTileService title=\"" << serv->get_services_configuration()->title << "\" version=\"1.0.0\" href=\"" << serv->get_services_configuration()->wmtsPublicUrl << "?SERVICE=WMTS&amp;VERSION=1.0.0&amp;REQUEST=GetCapabilities\" />";
-    // }
-    // res << "</Services>";
-
-    // return new MessageDataStream ( res.str(), "application/xml", 200 );
 }

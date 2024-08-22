@@ -45,6 +45,8 @@
 
 #include <chrono>
 
+#include <rok4/thirdparty/json11.hpp>
+
 #include "services/health/Service.h"
 #include "services/health/Threads.h"
 #include "services/health/Exception.h"
@@ -52,105 +54,66 @@
 #include "Rok4Server.h"
 
 DataStream* HealthService::get_health ( Request* req, Rok4Server* serv ) {
-    std::ostringstream res;
-    
-    res << "{\n";
-    if (serv->get_server_configuration()->is_enabled()) {
-        res << "  \"status\": \"OK\",\n";
-    } else {
-        res << "  \"status\": \"DISABLED\",\n";
-    }
-    res << "  \"version\": \"" << VERSION << "\",\n";
-    res << "  \"pid\": " << serv->get_pid() << ",\n";
-    res << "  \"time\": " << serv->get_time() << "\n";
-    res << "}\n";
 
-    return new MessageDataStream(res.str(), "application/json", 200);
+    json11::Json res = json11::Json::object {
+        { "version", VERSION },
+        { "pid", serv->get_pid() },
+        { "time", (int) serv->get_time() },
+        { "status", serv->get_server_configuration()->is_enabled() ? "OK" : "DISABLED" }
+    };
+
+    return new MessageDataStream ( res.dump(), "application/json", 200 );
 }
 
 DataStream* HealthService::get_infos ( Request* req, Rok4Server* serv ) {
-    std::ostringstream res;
 
-    res << "{\n";
-
-    // Informations :
-    //      layers : []
-    //      tms : []
-    //      styles : []
-
-    // layers
-    auto layers = serv->get_server_configuration()->get_layers();
-    std::map<std::string, Layer *>::iterator itl = layers.begin();
-    res << "    \"layers\": [\n";
-    while(itl != layers.end()) {
-        res << "      \"" << itl->first << "\"";
-        if (++itl != layers.end()) {
-            res << ",";
-        }
-        res << "\n";
+    std::vector<std::string> layers;
+    for(auto const& l: serv->get_server_configuration()->get_layers()) {
+        layers.push_back(l.first);
     }
-    res << "    ],\n";
 
-    // tms
-    auto tms = TmsBook::get_book();
-    std::map<std::string, TileMatrixSet *>::iterator itt = tms.begin();
-    res << "    \"tms\": [\n";
-    while(itt != tms.end()) {
-        res << "      \"" << itt->first << "\"";
-        if (++itt != tms.end()) {
-            res << ",";
-        }
-        res << "\n";
+    std::vector<std::string> tms;
+    for(auto const& t: TmsBook::get_book()) {
+        tms.push_back(t.first);
     }
-    res << "    ],\n";
 
-    // styles
-    auto styles = StyleBook::get_book();
-    std::map<std::string, Style *>::iterator its = styles.begin();
-    res << "    \"styles\": [\n";
-    while(its != styles.end()) {
-        res << "      \"" << its->first << "\"";
-        if (++its != styles.end()) {
-            res << ",";
-        }
-        res << "\n";
+    std::vector<std::string> styles;
+    for(auto const& s: StyleBook::get_book()) {
+        styles.push_back(s.first);
     }
-    res << "    ]\n";
 
-    res << "}\n";
+    json11::Json res = json11::Json::object {
+        { "layers", layers },
+        { "tms", tms },
+        { "styles", styles }
+    };
 
-    return new MessageDataStream(res.str(), "application/json", 200);
+    return new MessageDataStream ( res.dump(), "application/json", 200 );
 }
 
 DataStream* HealthService::get_threads ( Request* req, Rok4Server* serv ) {
-    std::ostringstream res;
 
-    res << "{\n";
-    res << "  \"number\": " << serv->get_threads().size() << ",\n";
-    res << "  \"threads\": [\n";
-    res << Threads::print();
-    res << "  ]\n";
-    res << "}\n";
+    json11::Json res = json11::Json::object {
+        { "number", (int) serv->get_threads().size() },
+        { "threads", Threads::to_json() }
+    };
 
-    return new MessageDataStream(res.str(), "application/json", 200);
+    return new MessageDataStream ( res.dump(), "application/json", 200 );
 }
 
 DataStream* HealthService::get_dependencies ( Request* req, Rok4Server* serv ) {
-    std::ostringstream res;
-
-    res << "{\n";
-    res << "    \"storage\": {\n";
 
     int file_count, s3_count, ceph_count, swift_count;
     StoragePool::get_storages_count(file_count, s3_count, ceph_count, swift_count);
-    
-    res << "      \"file\": " << file_count << ",\n";
-    res << "      \"s3\": " << s3_count << ",\n";
-    res << "      \"swift\": " << swift_count << ",\n";
-    res << "      \"ceph\": " << ceph_count << "\n";
 
-    res << "    }\n";
-    res << "}\n";
+    json11::Json res = json11::Json::object {
+        { "storage", json11::Json::object {
+            { "file", file_count },
+            { "s3", s3_count},
+            { "swift", ceph_count },
+            { "ceph", swift_count }
+        } }
+    };
 
-    return new MessageDataStream(res.str(), "application/json", 200);
+    return new MessageDataStream ( res.dump(), "application/json", 200 );
 }

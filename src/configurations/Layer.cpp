@@ -79,11 +79,8 @@ bool Layer::parse(json11::Json& doc) {
     gfi_enabled = false;
     gfi_type = "";
     gfi_url = "";
-    gfi_service = "";
-    gfi_version = "";
     gfi_query_layers = "";
     gfi_layers = "";
-    gfi_force_epsg = true;
 
     // Chargement
 
@@ -284,10 +281,6 @@ bool Layer::parse(json11::Json& doc) {
 
                     if(doc["get_feature_info"]["url"].is_string()) {
                         gfi_url = doc["get_feature_info"]["url"].string_value();
-                        std::string a = gfi_url.substr(gfi_url.length()-1, 1);
-                        if ( a.compare("?") != 0 ) {
-                            gfi_url = gfi_url + "?";
-                        }
                     }
                     if(doc["get_feature_info"]["layers"].is_string()) {
                         gfi_layers = doc["get_feature_info"]["layers"].string_value();
@@ -295,17 +288,8 @@ bool Layer::parse(json11::Json& doc) {
                     if(doc["get_feature_info"]["query_layers"].is_string()) {
                         gfi_query_layers = doc["get_feature_info"]["query_layers"].string_value();
                     }
-                    if(doc["get_feature_info"]["version"].is_string()) {
-                        gfi_version = doc["get_feature_info"]["version"].string_value();
-                    }
-                    if(doc["get_feature_info"]["service"].is_string()) {
-                        gfi_service = doc["get_feature_info"]["service"].string_value();
-                    }
-                    if(doc["get_feature_info"]["force_epsg"].is_bool()) {
-                        gfi_force_epsg = doc["get_feature_info"]["force_epsg"].bool_value();
-                    }
                     if(doc["get_feature_info"]["extra_query_params"].is_string()) {
-                        gfi_extra_params = doc["get_feature_info"]["extra_query_params"].string_value();
+                        gfi_extra_params = Utils::string_to_map(doc["get_feature_info"]["extra_query_params"].string_value(), "&", "=");
                     }
 
                 } 
@@ -401,7 +385,7 @@ bool Layer::parse(json11::Json& doc) {
                     continue;
                 }
 
-                wms_crs.push_back ( crs );
+                wms_crss.push_back ( crs );
             }
         }
 
@@ -640,8 +624,8 @@ std::string Layer::get_id() {
 
 Layer::~Layer() {
 
-    for (unsigned int l = 0 ; l < wms_crs.size() ; l++) {
-        delete wms_crs.at(l);
+    for (unsigned int l = 0 ; l < wms_crss.size() ; l++) {
+        delete wms_crss.at(l);
     }
     if (attribution != NULL) delete attribution;
     if (pyramid != NULL) delete pyramid;
@@ -695,17 +679,17 @@ Style* Layer::get_style_by_identifier(std::string identifier) {
 }
 
 std::string Layer::get_title() { return title; }
-bool Layer::isInWMSCRSList(CRS* c) {
-    for ( unsigned int k = 0; k < wms_crs.size(); k++ ) {
-        if ( c->cmp_request_code ( wms_crs.at (k)->get_request_code() ) ) {
+bool Layer::is_wms_crs(CRS* c) {
+    for ( unsigned int k = 0; k < wms_crss.size(); k++ ) {
+        if ( c->cmp_request_code ( wms_crss.at (k)->get_request_code() ) ) {
             return true;
         }
     }
     return false;
 }
-bool Layer::isInWMSCRSList(std::string c) {
-    for ( unsigned int k = 0; k < wms_crs.size(); k++ ) {
-        if ( wms_crs.at (k)->cmp_request_code ( c ) ) {
+bool Layer::is_wms_crs(std::string c) {
+    for ( unsigned int k = 0; k < wms_crss.size(); k++ ) {
+        if ( wms_crss.at (k)->cmp_request_code ( c ) ) {
             return true;
         }
     }
@@ -719,10 +703,7 @@ std::vector<Metadata> Layer::get_metadata() { return metadata; }
 bool Layer::is_gfi_enabled() { return gfi_enabled; }
 std::string Layer::get_gfi_type() { return gfi_type; }
 std::string Layer::get_gfi_url() { return gfi_url; }
-std::string Layer::get_gfi_extra_params() { return gfi_extra_params; }
+std::map<std::string, std::string> Layer::get_gfi_extra_params() { return gfi_extra_params; }
 std::string Layer::get_gfi_layers() { return gfi_layers; }
 std::string Layer::get_gfi_query_layers() { return gfi_query_layers; }
-std::string Layer::get_gfi_service() { return gfi_service; }
-std::string Layer::get_gfi_version() { return gfi_version; }
 Interpolation::KernelType Layer::get_resampling() { return resampling; }
-bool Layer::get_gfi_force_epsg() { return gfi_force_epsg; }

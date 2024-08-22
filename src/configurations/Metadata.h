@@ -97,10 +97,6 @@ public:
         type = doc["type"].string_value();
     };
 
-    std::string get_tms_xml() {
-        return "<Metadata type=\"" + type + "\" mime-type=\"" + format + "\" href=\"" + href + "\" />\n";
-    }
-
     /**
      * \~french
      * Crée un Metadata à partir d'un autre
@@ -173,6 +169,20 @@ public:
      * \brief Default destructor
      */
     virtual ~Metadata() {};
+
+
+    /**
+     * \~french \brief Ajoute un noeud TMS correpondant à la métadonnée
+     * \param[in] parent Noeud auquel ajouter celui de la métadonnée
+     * \~english \brief Add a TMS node corresponding to metadata
+     * \param[in] parent Node to whom add the metadata node
+     */
+    void add_node_tms(ptree& parent) {
+        ptree& node = parent.add("Metadata", "");
+        node.add("<xmlattr>.type", type);
+        node.add("<xmlattr>.mime-type", "text/xml");
+        node.add("<xmlattr>.href", href);
+    }
 };
 
 #endif // METADATA_H

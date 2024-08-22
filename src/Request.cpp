@@ -43,119 +43,149 @@
  * \brief Implement the Request Class analysing HTTP requests
  */
 
-#include <cstdlib>
-#include <climits>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <boost/log/trivial.hpp>
-
 #include "Request.h"
-#include "Utils.h"
 
+#include <algorithm>
+#include <boost/algorithm/string.hpp>
+#include <boost/log/trivial.hpp>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <vector>
+
+#include <rok4/utils/Cache.h>
+#include <rok4/utils/LibcurlStruct.h>
+
+#include "Utils.h"
 #include "config.h"
 
-void Request::url_decode ( char *src ) {
-    unsigned char high, low;
-    char* dst = src;
-
-    while ( ( *src ) != '\0' ) {
-        if ( *src == '+' ) {
-            *dst = ' ';
-        } else if ( *src == '%' ) {
-            *dst = '%';
-
-            high = Utils::hexadecimal_to_int ( * ( src + 1 ) );
-            if ( high != 0xFF ) {
-                low = Utils::hexadecimal_to_int ( * ( src + 2 ) );
-                if ( low != 0xFF ) {
-                    high = ( high << 4 ) | low;
-
-                    /* map control-characters out */
-                    if ( high < 32 || high == 127 ) high = '_';
-
-                    *dst = high;
-                    src += 2;
-                }
-            }
-        } else {
-            *dst = *src;
-        }
-
-        dst++;
-        src++;
-    }
-
-    *dst = '\0';
-}
-
-Request::Request ( FCGX_Request* fcgx ) : fcgx_request(fcgx) {
-    
+Request::Request(FCGX_Request *fcgx) : fcgx_request(fcgx) {
     // Méthode
-    method = std::string(FCGX_GetParam ( "REQUEST_METHOD",fcgx->envp ));
+    method = std::string(FCGX_GetParam("REQUEST_METHOD", fcgx->envp));
 
     // Body
     if (method == "POST" || method == "PUT") {
-        char* contentBuffer = ( char* ) malloc ( sizeof ( char ) *200 );
-        while ( FCGX_GetLine ( contentBuffer, 200, fcgx->in ) ) {
-            body.append ( contentBuffer );
+        char *contentBuffer = (char *)malloc(sizeof(char) * 200);
+        while (FCGX_GetLine(contentBuffer, 200, fcgx->in)) {
+            body.append(contentBuffer);
         }
-        free ( contentBuffer );
+        free(contentBuffer);
         contentBuffer = NULL;
         body.append("\n");
-        BOOST_LOG_TRIVIAL(debug) <<  "Request Content :" << std::endl << body ;
+        BOOST_LOG_TRIVIAL(debug) << "Request Content :" << std::endl
+                                 << body;
     }
 
     // Chemin
-    path = std::string(FCGX_GetParam ( "SCRIPT_NAME",fcgx->envp ));
+    path = std::string(FCGX_GetParam("SCRIPT_NAME", fcgx->envp));
     // Suppression du slash final
-    if (path.compare ( path.size()-1,1,"/" ) == 0) {
+    if (path.compare(path.size() - 1, 1, "/") == 0) {
         path.pop_back();
     }
 
-    BOOST_LOG_TRIVIAL(debug) <<  "Request: " << method << " " << path ;
+    BOOST_LOG_TRIVIAL(debug) << "Request: " << method << " " << path;
 
     // Query parameters
-    char* query = FCGX_GetParam ( "QUERY_STRING",fcgx->envp );
-    BOOST_LOG_TRIVIAL(debug) <<  "Query parameters: " << query ;
-    url_decode ( query );
+    char *query = FCGX_GetParam("QUERY_STRING", fcgx->envp);
+    BOOST_LOG_TRIVIAL(debug) << "Query parameters: " << query;
+    Utils::url_decode(query);
 
     std::map<std::string, std::string> params = Utils::string_to_map(std::string(query), "&", "=");
 
     // On stocke les paramètres de requête avec la clé en minuscule
     std::map<std::string, std::string>::iterator it;
-    for ( it = params.begin(); it != params.end(); it++ ) {
+    for (it = params.begin(); it != params.end(); it++) {
         std::string key = it->first;
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-        query_params.insert ( std::pair<std::string, std::string> ( key, it->second ) );
+        query_params.insert(std::pair<std::string, std::string>(key, it->second));
     }
 }
 
+Request::Request(std::string m, std::string u, std::map<std::string, std::string> qp) : fcgx_request(NULL), method(m), query_params(qp), url(u) {}
 
 Request::~Request() {}
 
-bool Request::has_query_param ( std::string paramName ) {
-    std::map<std::string, std::string>::iterator it = query_params.find ( paramName );
-    if ( it == query_params.end() ) {
+bool Request::has_query_param(std::string paramName) {
+    std::map<std::string, std::string>::iterator it = query_params.find(paramName);
+    if (it == query_params.end()) {
         return false;
     }
     return true;
 }
 
-std::string Request::get_query_param ( std::string paramName ) {
-    std::map<std::string, std::string>::iterator it = query_params.find ( paramName );
-    if ( it == query_params.end() ) {
+std::string Request::get_query_param(std::string paramName) {
+    std::map<std::string, std::string>::iterator it = query_params.find(paramName);
+    if (it == query_params.end()) {
         return "";
     }
     return it->second;
 }
-    
+
 void Request::print() {
     BOOST_LOG_TRIVIAL(info) << "path = " << path;
     BOOST_LOG_TRIVIAL(info) << "method = " << method;
 }
-    
+
 bool Request::is_inspire() {
     std::string inspire = get_query_param("inspire");
     return inspire == "true" || inspire == "1";
+}
+
+RawDataStream* Request::send() {
+
+    if (fcgx_request != NULL) {
+        BOOST_LOG_TRIVIAL(error) << "Input request cannot be sent";
+        return NULL;
+    }
+
+    BOOST_LOG_TRIVIAL(info) << "Send request " << method << " " << url;
+
+    CURLcode res;
+    DataStruct chunk;
+    chunk.nbPassage = 0;
+    chunk.data = (char *)malloc(1);
+    chunk.size = 0;
+
+    CURL *curl = CurlPool::get_curl_env();
+
+    std::string full_url = url + "?" + Utils::map_to_string(query_params, "&", "=");
+    curl_easy_setopt(curl, CURLOPT_URL, full_url.c_str());
+    if (get_ssl_no_verify()) {
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    }
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+    curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 30);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
+    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "identity");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "ROK4 server");
+
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, data_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+    res = curl_easy_perform(curl);
+
+    if (CURLE_OK != res) {
+        BOOST_LOG_TRIVIAL(error) <<  method << " " << url << " failed" ;
+        BOOST_LOG_TRIVIAL(error) << curl_easy_strerror(res);
+        return NULL;
+    }
+
+    long http_code = 0;
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
+    if (http_code < 200 || http_code > 299) {
+        BOOST_LOG_TRIVIAL(error) <<  method << " " << url << " failed" ;
+        BOOST_LOG_TRIVIAL(error) << "Response HTTP code : " << http_code;
+        return NULL;
+    }
+
+    char* content_type = 0;
+    curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
+
+    RawDataStream* stream = new RawDataStream((uint8_t*) chunk.data, chunk.size, std::string(content_type), "");
+
+    return stream;
 }

@@ -50,7 +50,7 @@
 
 #include "services/health/Threads.h"
 
-std::map<long unsigned int, InfoThread> Threads::m_threads;
+std::map<long unsigned int, InfoThread> Threads::threads;
 
 void Threads::add() {
     pthread_t i = pthread_self();
@@ -59,7 +59,7 @@ void Threads::add() {
 
 void Threads::add(long unsigned int i) {
     BOOST_LOG_TRIVIAL(debug) << "add" << "(call thread " << i << ")";
-    m_threads.insert(std::make_pair<long unsigned int, InfoThread>(std::move(i), InfoThread(i)));
+    threads.insert(std::make_pair<long unsigned int, InfoThread>(std::move(i), InfoThread(i)));
 }
 
 void Threads::status(eThreadStatus value) {
@@ -70,102 +70,82 @@ void Threads::status(eThreadStatus value) {
 void Threads::status(long unsigned int i, eThreadStatus value) {
     BOOST_LOG_TRIVIAL(debug) << "status : " << Threads::to_string(value) << "(call thread " << i << ")";
     std::map<long unsigned int, InfoThread>::iterator it;
-    it = m_threads.find(i);
-    if (it == m_threads.end()) {
+    it = threads.find(i);
+    if (it == threads.end()) {
         BOOST_LOG_TRIVIAL(debug) << "thread " << i << " not found !?";
         return;
     }
-    it->second.setStatus(Threads::to_string(value));
-    BOOST_LOG_TRIVIAL(debug) << "status update : " << it->second.getStatus();
+    it->second.set_status(Threads::to_string(value));
+    BOOST_LOG_TRIVIAL(debug) << "status update : " << it->second.get_status();
 
     if (value == eThreadStatus::PENDING) {
         auto start = std::chrono::system_clock::now();
         std::time_t time = std::chrono::system_clock::to_time_t(start);
-        it->second.setTime(time);
-        it->second.setDuration(0);
+        it->second.set_time(time);
+        it->second.set_duration(0);
     }
 
     if (value == eThreadStatus::RUNNING) {
         auto start = std::chrono::system_clock::now();
         std::time_t time = std::chrono::system_clock::to_time_t(start);
-        it->second.setTime(time);
-        BOOST_LOG_TRIVIAL(debug) << "time update : " << it->second.getTime();
+        it->second.set_time(time);
+        BOOST_LOG_TRIVIAL(debug) << "time update : " << it->second.get_time();
     }
 
     if (value == eThreadStatus::AVAILABLE) {
         auto end = std::chrono::system_clock::now();
-        std::time_t time = it->second.getTime();
+        std::time_t time = it->second.get_time();
         auto start = std::chrono::system_clock::from_time_t(time);
         std::chrono::duration<double> elapsed_seconds = end - start;
         double duration = elapsed_seconds.count();
-        it->second.setDuration(duration);
-        BOOST_LOG_TRIVIAL(debug) << "duration update : " << it->second.getDuration();
-        it->second.setCount();
+        it->second.set_duration(duration);
+        BOOST_LOG_TRIVIAL(debug) << "duration update : " << it->second.get_duration();
+        it->second.set_count();
         BOOST_LOG_TRIVIAL(debug) << "count update : " << it->second.get_count();
     }
 
 }
 
-std::string Threads::print() {
-    std::ostringstream res;
-    std::map<long unsigned int, InfoThread>::iterator it;
-    it = m_threads.begin();
-    while(it != m_threads.end()) {
-        res << "  {\n";
-        res << "    \"pid\":" << it->second.getPID() << ",\n";
-        res << "    \"status\":" << "\"" << it->second.getStatus() << "\",\n";
-        res << "    \"count\":" << it->second.get_count() << ",\n";
-        res << "    \"time\":" << it->second.getTime() << ",\n";
-        res << "    \"duration\":" << it->second.getDuration() << "\n";
-        res << "  }";
-        if (++it != m_threads.end()) {
-            res << ",";
-        }
-        res << "\n";
-    }
-    return res.str();
-}
-
 InfoThread::InfoThread(long unsigned int& i) {
-    m_pid = i;
-    m_status = Threads::to_string(eThreadStatus::PENDING);
-    m_count = 0;
-    m_duration = 0;
-    m_time = 0;
+    pid = i;
+    status = Threads::to_string(eThreadStatus::PENDING);
+    count = 0;
+    duration = 0;
+    time = 0;
 }
 
 InfoThread::InfoThread(long unsigned int& i, std::string st) {
-    m_pid = i;
-    m_status = st;
-    m_count = 0;
-    m_duration = 0;
-    m_time = 0;
+    pid = i;
+    status = st;
+    count = 0;
+    duration = 0;
+    time = 0;
 }
 
-long unsigned int InfoThread::getPID() {
-    return m_pid;
+long unsigned int InfoThread::get_pid() {
+    return pid;
 }
 
-std::string InfoThread::getStatus() {
-    return m_status;
+std::string InfoThread::get_status() {
+    return status;
 }
 
-void InfoThread::setStatus(std::string s) {
-    m_status = s;
+void InfoThread::set_status(std::string s) {
+    status = s;
 }
 
 int InfoThread::get_count() {
-    return m_count;
+    return count;
 }
 
-void InfoThread::setCount() {
-    m_count++;
+void InfoThread::set_count() {
+    count++;
 }
 
-void InfoThread::setTime(std::time_t t) {
-    m_time = t;
+void InfoThread::set_time(std::time_t t) {
+    time = t;
 }
 
-void InfoThread::setDuration(long double d) {
-    m_duration = d;
+void InfoThread::set_duration(long double d) {
+    duration = d;
 }

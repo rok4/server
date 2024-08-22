@@ -158,7 +158,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
             throw WmtsException::get_error_message("No data found", "Not Found", 404);
         }
 
-        if (format == "image/png" && style->get_palette() && ! style->get_palette()->is_empty()) {
+        if (layer->get_pyramid()->get_channels() == 1 && format == "image/png" && style->get_palette() && ! style->get_palette()->is_empty()) {
             return new DataStreamFromDataSource(new PaletteDataSource(d, style->get_palette()));
         } else {
             return new DataStreamFromDataSource(d);
@@ -185,14 +185,6 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
 
         image->set_bbox(bbox);
         image->set_crs(crs);
-
-        // La classe PaletteImage appliquera la palette que si elle peut (donnée 1 canal et palette non vide)
-        Image* styled_image = new PaletteImage(image, style->get_palette());
-
-        if (styled_image == 0) {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot apply palette to the tile in a non native TMS";
-            throw WmtsException::get_error_message("No data found", "Not Found", 404);
-        }
 
         std::map<std::string, std::string> format_options = Utils::string_to_map(req->get_query_param("format_options"), ";", ":");
 

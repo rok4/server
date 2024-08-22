@@ -131,49 +131,22 @@ public:
     };
 
     /**
-     * \~french \brief Export XML pour le GetCapabilities TMS
-     * \param[in] elName Nom de l'élément XML
-     * \~english \brief XML export for TMS GetCapabilities
-     * \param[in] elName XML element name
+     * \~french \brief Ajoute un noeud TMS correpondant à l'attribution
+     * \param[in] parent Noeud auquel ajouter celui de l'attribution
+     * \~english \brief Add a TMS node corresponding to attribution
+     * \param[in] parent Node to whom add the attribution node
      */
-    std::string get_tms_xml() {
-        std::string res = "<Attribution><Title>" + title + "</Title>";
+    void add_node_tms(ptree& parent) {
+        ptree& node = parent.add("Attribution", "");
+        node.add("Title", title);
+
         if (logo != NULL) {
-            res += "<Logo width=\"" + std::to_string(width) + "\" height=\"" + std::to_string(height) + "\" href=\"" + logo->get_href() + "\" mime-type=\"" + logo->get_format() + "\" />\n";
+            node.add("Logo.<xmlattr>.width", width);
+            node.add("Logo.<xmlattr>.height", height);
+            node.add("Logo.<xmlattr>.href", href);
+            node.add("Logo.<xmlattr>.mime-type", format);
         }
-        res += "</Attribution>";
-        return res;
     }
-
-    /**
-     * \~french \brief Export XML pour le GetCapabilities WMS
-     * \~english \brief XML export for WMS GetCapabilities
-     */
-    // TiXmlElement* get_wms_xml() {
-    //     TiXmlElement* el = new TiXmlElement ( "Attribution" );
-    //     el->LinkEndChild ( Utils::build_text_node ( "Title", title ) );
-
-    //     TiXmlElement* orEl = new TiXmlElement ( "OnlineResource" );
-    //     orEl->SetAttribute ( "xlink:type","simple" );
-    //     orEl->SetAttribute ( "xlink:href", href );
-    //     el->LinkEndChild ( orEl );
-
-    //     if (logo != NULL) {
-    //         TiXmlElement* logoEl = new TiXmlElement ( "LogoURL" );
-    //         logoEl->SetAttribute ( "width", width );
-    //         logoEl->SetAttribute ( "height", height );
-    //         logoEl->LinkEndChild ( Utils::build_text_node ( "Format", logo->get_format() ) );
-
-    //         TiXmlElement* logoOrEl = new TiXmlElement ( "OnlineResource" );
-    //         logoOrEl->SetAttribute ( "xlink:type","simple" );
-    //         logoOrEl->SetAttribute ( "xlink:href", logo->get_href() );
-    //         logoEl->LinkEndChild ( logoOrEl );
-
-    //         el->LinkEndChild ( logoEl );
-    //     }
-        
-    //     return el;
-    // }
 
     /**
      * \~french

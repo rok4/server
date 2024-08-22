@@ -49,6 +49,8 @@
 #include <map>
 #include <chrono>
 
+#include <rok4/thirdparty/json11.hpp>
+
 #include "Request.h"
 
 enum eThreadStatus {
@@ -72,31 +74,31 @@ class InfoThread {
          * @brief PID or thread ID
          * 
          */
-        long unsigned int m_pid;
+        long unsigned int pid;
 
         /**
          * @brief Thread status : PENDING | RUNNING | AVAIBLE
          * 
          */
-        std::string m_status;
+        std::string status;
 
         /**
          * @brief Number of times the thread changes status
          * 
          */
-        int m_count;
+        int count;
 
         /**
          * @brief Time to the last execution
          * 
          */
-        std::time_t m_time;
+        std::time_t time;
 
         /**
          * @brief Duration to the last execution
          * 
          */
-        long double m_duration;
+        long double duration;
 
     public:
         /**
@@ -106,6 +108,16 @@ class InfoThread {
         InfoThread(){};
         InfoThread(long unsigned int&);
         InfoThread(long unsigned int&, std::string);
+
+        json11::Json to_json() const {
+            return json11::Json::object {
+                { "pid", (int) pid },
+                { "status", status },
+                { "count", count },
+                { "time", (int) time },
+                { "duration", (double) duration }
+            };
+        }
 
         /**
          * @brief Destroy the Stat object
@@ -118,20 +130,20 @@ class InfoThread {
          * 
          * @return std::string
          */
-        long unsigned int getPID();
+        long unsigned int get_pid();
 
         /**
          * @brief Get the Status object
          * 
          * @return std::string 
          */
-        std::string getStatus();
+        std::string get_status();
 
         /**
          * @brief Set the Status object
          * 
          */
-        void setStatus(std::string);
+        void set_status(std::string);
 
         /**
          * @brief Get the Count object
@@ -144,21 +156,21 @@ class InfoThread {
          * @brief Set the Count object
          * 
          */
-        void setCount();
+        void set_count();
 
         /**
          * @brief Set the Time object
          * 
          */
-        void setTime(std::time_t);
+        void set_time(std::time_t);
 
         /**
          * @brief Get the Time object
          * 
          * @return long int
          */
-        std::time_t getTime() {
-            return m_time;
+        std::time_t get_time() {
+            return time;
         }
 
         /**
@@ -166,8 +178,8 @@ class InfoThread {
          * 
          * @return long double 
          */
-        long double getDuration() {
-            return m_duration;
+        long double get_duration() {
+            return duration;
         }
 
         /**
@@ -175,7 +187,7 @@ class InfoThread {
          * 
          * @param double 
          */
-        void setDuration(long double);
+        void set_duration(long double);
 
 };
 
@@ -185,7 +197,7 @@ class Threads {
          * @brief Thread list information
          * 
          */
-        static std::map<long unsigned int, InfoThread> m_threads;
+        static std::map<long unsigned int, InfoThread> threads;
 
         /**
          * @brief Construct a new Stats object
@@ -233,7 +245,15 @@ class Threads {
          * 
          * @return std::string 
          */
-        static std::string print();
+        static json11::Json to_json() {
+
+            std::vector<InfoThread> res;
+            for(auto const& t: threads) {
+                res.push_back(t.second);
+            }
+
+            return json11::Json(res);
+        };
 
         static std::string to_string (eThreadStatus st) {
             return std::string ( threadstatus_name[st] );

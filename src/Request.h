@@ -43,7 +43,9 @@
 #include <regex>
 #include "fcgiapp.h"
 
-struct Route;
+#include <rok4/datastream/DataStream.h>
+
+// struct Route;
 
 /**
  * \file Request.h
@@ -73,17 +75,6 @@ struct Route;
 class Request {
     friend class CppUnitRequest;
 
-private:
-    /**
-     * \~french
-     * \brief Décodage de l'URL correspondant à la requête
-     * \param[in,out] src URL
-     * \~english
-     * \brief URL decoding
-     * \param[in,out] src URLs
-     */
-    void url_decode ( char *src );
-
 public:
 
     FCGX_Request* fcgx_request;
@@ -111,6 +102,12 @@ public:
      * \return parameter value or "" if not availlable
      */
     std::string get_query_param ( std::string paramName );
+
+    /**
+     * \~french \brief Protocole, hôte, port et chemin
+     * \~english \brief Protocol, host, port and path
+     */
+    std::string url;
 
     /**
      * \~french \brief Méthode de la requête (GET, POST, PUT, DELETE)
@@ -152,16 +149,38 @@ public:
      * \~english \brief Is a INSPIRE request ?
      */
     bool is_inspire();
+
+    /**
+     * \~french \brief Joue la requête
+     * \details La requête ne doit pas être une requête reçue
+     * \~english \brief Send the request
+     * \details Request cannot be an input one
+     */
+    RawDataStream* send();
     
     /**
      * \~french
-     * \brief Constructeur d'une requête
+     * \brief Constructeur d'une requête reçue
      * \param fcgx Requête fcgi
      * \~english
-     * \brief Request Constructor
+     * \brief Input request Constructor
      * \param fcgx Fcgi request
      */
     Request ( FCGX_Request* fcgx);
+    
+    /**
+     * \~french
+     * \brief Constructeur d'une requête à jouer
+     * \param m Méthode
+     * \param u URL
+     * \param qp Paramètres de requête
+     * \~english
+     * \brief Request to process constructor
+     * \param m Method
+     * \param u URL
+     * \param qp Query parameters
+     */
+    Request (std::string m, std::string u, std::map<std::string, std::string> qp);
 
     /**
      * \~french

@@ -181,7 +181,7 @@ private:
      * \~french \brief Liste des systèmes de coordonnées authorisées pour le WMS
      * \~english \brief Authorised coordinates systems list for WMS
      */
-    std::vector<CRS*> wms_crs;
+    std::vector<CRS*> wms_crss;
     /**
      * \~french \brief Liste des TMS d'interrogation autorisés en WMTS
      * \~english \brief TMS list for WMTS requests
@@ -209,16 +209,6 @@ private:
      */
     std::string gfi_url;
     /**
-     * \~french \brief Type de service (WMS ou WMTS)
-     * \~english \brief Type of service (WMS or WMTS)
-     */
-    std::string gfi_service;
-    /**
-     * \~french \brief Version du service
-     * \~english \brief Version of service
-     */
-    std::string gfi_version;
-    /**
      * \~french \brief Paramètre query_layers à fournir au service
      * \~english \brief Parameter query_layers for the service
      */
@@ -232,12 +222,7 @@ private:
      * \~french \brief Paramètres de requête additionnels à fournir au service
      * \~english \brief Additionnal query parameters for the service
      */
-    std::string gfi_extra_params;
-    /**
-     * \~french \brief Modification des EPSG autorisé (pour Geoserver)
-     * \~english \brief Modification of EPSG is authorized (for Geoserver)
-     */
-    bool gfi_force_epsg;
+    std::map<std::string, std::string> gfi_extra_params;
 
     void calculate_bboxes();
     void calculate_native_tilematrix_limits();
@@ -411,7 +396,7 @@ public:
      * \brief Test if CRS is in the CRS list
      * \return Present or not
      */
-    bool isInWMSCRSList(CRS* c) ;
+    bool is_wms_crs(CRS* c) ;
 
     /**
      * \~french
@@ -421,7 +406,7 @@ public:
      * \brief Test if CRS is in the CRS list
      * \return Present or not
      */
-    bool isInWMSCRSList(std::string c) ;
+    bool is_wms_crs(std::string c) ;
 
     /**
      * \~french
@@ -530,40 +515,13 @@ public:
     std::string get_gfi_query_layers() ;
     /**
      * \~french
-     * \brief Retourne le type du service de GFI
-     * \return type du service de GFI
-     * \~english
-     * \brief Return type of service used for GFI
-     * \return type of service used for GFI
-     */
-    std::string get_gfi_service() ;
-    /**
-     * \~french
-     * \brief Retourne la version du service de GFI
-     * \return version du service de GFI
-     * \~english
-     * \brief Return version of service used for GFI
-     * \return version of service used for GFI
-     */
-    std::string get_gfi_version() ;
-    /**
-     * \~french
      * \brief Retourne les paramètres de requête additionnels de la requête de GFI
      * \return paramètres additionnels
      * \~english
      * \brief Return the extra query parameters of GFI request
      * \return extra parameters
      */
-    std::string get_gfi_extra_params() ;
-    /**
-     * \~french
-     * \brief
-     * \return
-     * \~english
-     * \brief
-     * \return
-     */
-    bool get_gfi_force_epsg() ;
+    std::map<std::string, std::string> get_gfi_extra_params() ;
     /**
      * \~french
      * \brief Destructeur par défaut
