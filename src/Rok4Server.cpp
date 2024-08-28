@@ -124,7 +124,7 @@ Rok4Server::Rok4Server(ServerConfiguration* svr, ServicesConfiguration* svc) {
     server_configuration = svr;
     
     if (svr->cache_validity > 0) {
-        IndexCache::setValidity(svr->cache_validity * 60);
+        IndexCache::set_validity(svr->cache_validity * 60);
     }
     if (svr->cache_size > 0) {
         IndexCache::setCacheSize(svr->cache_size);

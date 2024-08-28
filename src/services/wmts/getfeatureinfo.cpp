@@ -129,7 +129,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmtsException::get_error_message("InfoFormat unknown", "InvalidParameterValue", 400);
     }
 
-    if ( std::find(info_formats.begin(), info_formats.end(), info_format) == info_formats.end() )
+    if ( ! is_available_infoformat(info_format) )
         throw WmtsException::get_error_message("InfoFormat " + info_format + " unknown", "InvalidParameterValue", 400);
 
     // i
@@ -163,8 +163,8 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
     Level* level = layer->get_pyramid()->get_level(tm->get_id());
 
     std::string gfi_type = layer->get_gfi_type();
-    if (gfi_type.compare("PYRAMID") == 0) {
-        BOOST_LOG_TRIVIAL(debug) << "GFI sur pyramide";
+    if (gfi_type.compare("PYRAMID") == 0 && tms->get_id() == layer->get_pyramid()->get_tms()->get_id() ) {
+        BOOST_LOG_TRIVIAL(debug) << "GFI sur pyramide dans le TMS natif";
 
         Image* image = level->get_tile(column, row, 0, 0, 0, 0, true);
         if (image == NULL) {
@@ -214,7 +214,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         return Utils::format_get_feature_info(gfi_data, info_format);
 
     } else if (gfi_type.compare("EXTERNALWMS") == 0) {
-        BOOST_LOG_TRIVIAL(debug) << "GFI sur WMS externe";
+        BOOST_LOG_TRIVIAL(debug) << "GFI sur WMS externe, en TMS natif ou non";
 
         BoundingBox<double> bbox = tm->tile_indices_to_bbox(column, row);
         int height = tm->get_tile_height();
@@ -229,12 +229,12 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         query_params.emplace("QUERY_LAYERS", layer->get_gfi_query_layers());
         query_params.emplace("INFO_FORMAT", info_format);
         query_params.emplace("FEATURE_COUNT", "1");
-        query_params.emplace("CRS", layer->get_pyramid()->get_tms()->get_crs()->get_request_code());
+        query_params.emplace("CRS", tms->get_crs()->get_request_code());
         query_params.emplace("WIDTH", std::to_string(width));
         query_params.emplace("HEIGHT", std::to_string(height));
         query_params.emplace("I", std::to_string(i));
         query_params.emplace("J", std::to_string(j));
-        query_params.emplace("BBOX", bbox.to_string());
+        query_params.emplace("BBOX", bbox.to_string(tms->get_crs()->is_lat_lon()));
 
         std::map<std::string, std::string> extra_query_params = layer->get_gfi_extra_params();
         query_params.insert(extra_query_params.begin(), extra_query_params.end());

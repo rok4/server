@@ -48,5 +48,5 @@
 std::string WmsException::xml_template = "<ServiceExceptionReport><ServiceException code=\"%s\">%s</ServiceException></ServiceExceptionReport>";
 
 MessageDataStream* WmsException::get_error_message(std::string reason, std::string code, int status) {
-    return new MessageDataStream(str(boost::format(xml_template) % code % reason), "application/xml", status);
+    return new MessageDataStream(str(boost::format(xml_template) % code % reason), "text/xml", status);
 }

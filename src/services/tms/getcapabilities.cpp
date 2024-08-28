@@ -102,7 +102,7 @@ DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::stringstream ss;
     write_xml(ss, tree);
-    return new MessageDataStream ( ss.str(), "application/xml", 200 );
+    return new MessageDataStream ( ss.str(), "text/xml", 200 );
 }
 
 DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
@@ -134,15 +134,17 @@ DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
         root.add("KeywordList", layer->get_keywords()->at(i).get_content() );
     }
 
-    for ( unsigned int i = 0; i < layer->get_metadata().size(); i++ ) {
-        layer->get_metadata().at(i).add_node_tms(root);
+    for ( unsigned int i = 0; i < layer->get_metadata()->size(); i++ ) {
+        layer->get_metadata()->at(i).add_node_tms(root);
     }
 
     if (layer->get_attribution() != NULL) {
         layer->get_attribution()->add_node_tms(root);
     }
 
-    root.add("SRS", layer->get_pyramid()->get_tms()->get_crs()->get_request_code() );
+    CRS* crs = layer->get_pyramid()->get_tms()->get_crs();
+    root.add("SRS", crs->get_request_code() );
+    layer->get_native_bbox().add_node(root, false, crs->is_lat_lon());
 
     root.add("BoundingBox.<xmlattr>.minx", layer->get_native_bbox().xmin );
     root.add("BoundingBox.<xmlattr>.maxx", layer->get_native_bbox().xmax );
@@ -184,7 +186,7 @@ DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
 
     std::stringstream ss;
     write_xml(ss, tree);
-    return new MessageDataStream ( ss.str(), "application/xml", 200 );
+    return new MessageDataStream ( ss.str(), "text/xml", 200 );
 }
 
 DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
@@ -349,5 +351,5 @@ DataStream* TmsService::get_gdal ( Request* req, Rok4Server* serv ) {
 
     std::stringstream ss;
     write_xml(ss, tree);
-    return new MessageDataStream ( ss.str(), "application/xml", 200 );
+    return new MessageDataStream ( ss.str(), "text/xml", 200 );
 }

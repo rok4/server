@@ -66,6 +66,7 @@ using boost::property_tree::ptree;
 #include "configurations/Attribution.h"
 
 #include "services/wmts/Service.h"
+#include "services/wms/Service.h"
 
 struct WmtsTmsInfos {
     TileMatrixSet* tms;
@@ -228,7 +229,7 @@ private:
     void calculate_native_tilematrix_limits();
     void calculate_tilematrix_limits();
 
-    bool parse(json11::Json& doc);
+    bool parse(json11::Json& doc, ServicesConfiguration* services);
 
 public:
     /**
@@ -241,7 +242,7 @@ public:
     * \brief Constructor
     * \param[in] path Path to layer descriptor
     */
-    Layer(std::string path );
+    Layer(std::string path, ServicesConfiguration* services );
     /**
     * \~french
     * Crée un Layer à partir d'un contenu JSON
@@ -254,7 +255,7 @@ public:
     * \param[in] layer_name Layer identifier
     * \param[in] content JSON content
     */
-    Layer(std::string layer_name, std::string content );
+    Layer(std::string layer_name, std::string content, ServicesConfiguration* services );
 
     /**
      * \~french
@@ -370,6 +371,16 @@ public:
 
     /**
      * \~french
+     * \brief Retourne la liste des CRS disponibles en WMS
+     * \return liste des CRS de la couche
+     * \~english
+     * \brief Return the available CRS list for WMS
+     * \return CRS list
+     */
+    std::vector<CRS*>* get_wms_crss() ;
+
+    /**
+     * \~french
      * \brief Retourne le style associé à la couche (identifiant public)
      * \return le style si associé, NULL sinon
      * \~english
@@ -467,7 +478,7 @@ public:
      * \brief Return the associated metadata list
      * \return metadata list
      */
-    std::vector<Metadata> get_metadata() ;
+    std::vector<Metadata>* get_metadata() ;
     /**
      * \~french
      * \brief GFI est-il autorisé

@@ -88,7 +88,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     if ( keywords.size() != 0 ) {
         ptree& keywords_node = identification_node.add("ows:Keywords", "");
         for ( unsigned int i=0; i < keywords.size(); i++ ) {
-            keywords.at(i).add_node(keywords_node);
+            keywords.at(i).add_node(keywords_node, "ows:Keyword");
         }
     }
 
@@ -129,8 +129,8 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
             inspire_extension.add("inspire_common:MetadataUrl.inspire_common:MediaType", metadata->get_type());
         }
         
-        inspire_extension.add("inspire_common:SupportedLanguages.inspire_common:DefaultLanguage.inspire_common:Language", "fre");
-        inspire_extension.add("inspire_common:ResponseLanguage.inspire_common:Language", "fre");
+        inspire_extension.add("inspire_common:SupportedLanguages.inspire_common:DefaultLanguage.inspire_common:Language", "fra");
+        inspire_extension.add("inspire_common:ResponseLanguage.inspire_common:Language", "fra");
     }
 
     ptree& contents_node = root.add("Contents", "");
@@ -146,7 +146,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
             if ( layer->keywords.size() != 0 ) {
                 ptree& keywords_node = layer_node.add("ows:Keywords", "");
                 for ( unsigned int i = 0; i < layer->keywords.size(); i++ ) {
-                    keywords.at(i).add_node(keywords_node);
+                    keywords.at(i).add_node(keywords_node, "ows:Keyword");
                 }
             }
 
@@ -167,24 +167,22 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
                 
                 Style* style = layer->styles.at(i);
                 for (int j = 0 ; j < style->get_titles().size(); ++j ) {
-                    BOOST_LOG_TRIVIAL(debug) <<  "Title : " << style->get_titles() [j].c_str()  ;
                     style_node.add("ows:Title", style->get_titles()[j]);
                 }
                 for (int j = 0 ; j < style->get_abstracts().size(); ++j ) {
-                    BOOST_LOG_TRIVIAL(debug) <<  "Abstract : " << style->get_abstracts() [j].c_str()  ;
                     style_node.add("ows:Abstract", style->get_abstracts()[j]);
                 }
 
                 if ( style->get_keywords()->size() != 0 ) {
                     ptree& style_keywords_node = style_node.add("ows:Keywords", "");
                     for ( unsigned int j = 0; j < style->get_keywords()->size(); j++ ) {
-                        style->get_keywords()->at ( j ).add_node(style_keywords_node);
+                        style->get_keywords()->at ( j ).add_node(style_keywords_node, "ows:Keyword");
                     }
                 }
 
                 style_node.add("ows:Identifier", style->get_identifier());
-                for ( int j = 0 ; j < style->get_legends().size(); j++ ) {
-                    style->get_legends() [j].add_node(style_node);
+                for ( int j = 0 ; j < style->get_legends()->size(); j++ ) {
+                    style->get_legends()->at(j).add_node_wmts(style_node);
                 }
             }
 
@@ -244,7 +242,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
         if ( tms->get_keywords()->size() != 0 ) {
             ptree& tms_keywords_node = tms_node.add("ows:Keywords", "");
             for ( unsigned int j = 0; j < tms->get_keywords()->size(); j++ ) {
-                tms->get_keywords()->at ( j ).add_node(tms_keywords_node);
+                tms->get_keywords()->at ( j ).add_node(tms_keywords_node, "ows:Keyword");
             }
         }
 
@@ -270,7 +268,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
             tm_node.add( "ows:Identifier",tm->get_id() );
             tm_node.add( "ScaleDenominator",Utils::double_to_string ( ( long double ) ( tm->get_res() * tms->get_crs()->get_meters_per_unit() ) /0.00028 ) );
-            if (tms->get_crs()->get_authority() == "EPSG" && tms->get_crs()->is_lon_lat()) {
+            if (tms->get_crs()->get_authority() == "EPSG" && tms->get_crs()->is_geographic()) {
                 tm_node.add ( "TopLeftCorner", Utils::double_to_string ( tm->get_y0() ) + " " + Utils::double_to_string ( tm->get_x0() ) );
             } else {
                 tm_node.add ( "TopLeftCorner", Utils::double_to_string ( tm->get_x0() ) + " " + Utils::double_to_string ( tm->get_y0() ) );
@@ -288,5 +286,5 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::stringstream ss;
     write_xml(ss, tree);
-    return new MessageDataStream ( ss.str(), "application/xml", 200 );
+    return new MessageDataStream ( ss.str(), "text/xml", 200 );
 }

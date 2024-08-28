@@ -62,7 +62,7 @@ class WmsService : public Service {
 private:
     DataStream* get_capabilities ( Request* req, Rok4Server* serv );
     DataStream* get_feature_info ( Request* req, Rok4Server* serv );
-    DataSource* get_map ( Request* req, Rok4Server* serv );
+    DataStream* get_map ( Request* req, Rok4Server* serv );
 
     std::string name;
     Metadata* metadata;
@@ -100,9 +100,52 @@ public:
      */
     ~WmsService() {
         if (metadata) delete metadata;
-        for (CRS* c : crss) {
-            delete c;
-        }
+    };
+
+    /**
+     * \~french
+     * \brief Teste la présence du CRS dans la liste
+     * \return Présent ou non
+     * \~english
+     * \brief Test if CRS is in the CRS list
+     * \return Present or not
+     */
+    bool is_available_crs(CRS* c) ;
+
+    /**
+     * \~french
+     * \brief Teste la présence du CRS dans la liste
+     * \return Présent ou non
+     * \~english
+     * \brief Test if CRS is in the CRS list
+     * \return Present or not
+     */
+    bool is_available_crs(std::string c) ;
+
+    /**
+     * \~french
+     * \brief Teste la validité du format
+     * \~english
+     * \brief Test if format is valid
+     */
+    bool is_available_format(std::string f) ;
+
+    /**
+     * \~french
+     * \brief Teste la validité du info format
+     * \~english
+     * \brief Test if info format is valid
+     */
+    bool is_available_infoformat(std::string f) ;
+
+    /**
+     * \~french
+     * \brief La reprojection est-elle activée
+     * \~english
+     * \brief Is reprojection enabled
+     */
+    bool reprojection_enabled() {
+        return reprojection;
     };
 
 };

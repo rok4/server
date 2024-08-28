@@ -190,6 +190,31 @@ public:
     }
 
     /**
+     * \~french \brief Ajoute un noeud WMS correpondant au contact
+     * \param[in] parent Noeud auquel ajouter celui du contact
+     * \~english \brief Add a WMS node corresponding to contact
+     * \param[in] parent Node to whom add the contact node
+     */
+    void add_node_wms(ptree& parent, std::string organization) {
+        ptree& node = parent.add("ContactInformation", "");
+        node.add("ContactPersonPrimary.ContactPerson", individual_name);
+        node.add("ContactPersonPrimary.ContactOrganization", organization);
+        node.add("ContactPosition", individual_position);
+
+        node.add("ContactAddress.AddressType", address_type);
+        node.add("ContactAddress.Address", delivery_point);
+        node.add("ContactAddress.City", city);
+        node.add("ContactAddress.StateOrProvince", administrative_area);
+        node.add("ContactAddress.PostCode", post_code);
+        node.add("ContactAddress.Country", country);
+
+        node.add("ContactVoiceTelephone", voice);
+        node.add("ContactFacsimileTelephone", facsimile);
+        node.add("ContactElectronicMailAddress", email);
+
+    }
+
+    /**
      * \~french \brief Ajoute un noeud TMS correpondant au contact
      * \param[in] parent Noeud auquel ajouter celui du contact
      * \~english \brief Add a TMS node corresponding to contact

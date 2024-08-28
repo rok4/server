@@ -74,8 +74,11 @@
 class ServicesConfiguration : public Configuration
 {
     friend class Rok4Server;
+    
     friend class WmtsService;
     friend class TmsService;
+    friend class WmsService;
+    friend class TilesService;
     
     public:
         ServicesConfiguration(std::string path);

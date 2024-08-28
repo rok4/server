@@ -69,12 +69,6 @@
         "common": {
             "type": "object",
             "properties": {
-                "info_formats": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "styling": {
                     "type": "boolean"
                 },

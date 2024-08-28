@@ -200,7 +200,7 @@ Rok4Server* load_configuration() {
         delete[] data; 
         std::string layer_desc;    
         while (std::getline(list_content, layer_desc)) {
-            Layer* layer = new Layer(layer_desc );
+            Layer* layer = new Layer(layer_desc, services_configuration);
             if ( layer->is_ok() ) {
                 server_configuration->add_layer ( layer );
             } else {
@@ -400,6 +400,7 @@ int main ( int argc, char** argv ) {
     ProjPool::clean_projs();
     StoragePool::clean_storages();
     IndexCache::clean_indexes();
+    CrsBook::clean_crss();
 
     //CRYPTO clean - one time for the whole program
     EVP_cleanup();

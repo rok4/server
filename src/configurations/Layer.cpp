@@ -64,7 +64,7 @@ bool is_style_handled(Style* style) {
     return true;
 }
 
-bool Layer::parse(json11::Json& doc) {
+bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
 
     /********************** Default values */
 
@@ -338,7 +338,7 @@ bool Layer::parse(json11::Json& doc) {
         // Configuration des reprojections possibles
 
         // TMS additionnels pour le WMTS
-        if (doc["wmts"].is_object() && doc["wmts"]["tms"].is_array()) {
+        if (services->get_wmts_service()->reprojection_enabled() && doc["wmts"].is_object() && doc["wmts"]["tms"].is_array()) {
             for (json11::Json t : doc["wmts"]["tms"].array_items()) {
                 if (! t.is_string()) {
                     error_message =  "wmts.tms have to be a string array"  ;
@@ -362,7 +362,7 @@ bool Layer::parse(json11::Json& doc) {
         }
 
         // Projections additionnelles pour le WMS
-        if (doc["wms"].is_object() && doc["wms"]["crs"].is_array()) {
+        if (services->get_wms_service()->reprojection_enabled() && doc["wms"].is_object() && doc["wms"]["crs"].is_array()) {
             for (json11::Json c : doc["wms"]["crs"].array_items()) {
                 if (! c.is_string()) {
                     error_message =  "wms.crs have to be a string array"  ;
@@ -370,18 +370,21 @@ bool Layer::parse(json11::Json& doc) {
                 }
                 std::string str_crs = c.string_value();
                 // On verifie que la CRS figure dans la liste des CRS de proj (sinon, le serveur n est pas capable de la gerer)
-                CRS* crs = new CRS ( str_crs );
+                CRS* crs = CrsBook::get_crs( str_crs );
                 
                 if ( ! crs->is_define() ) {
                     BOOST_LOG_TRIVIAL(warning) << "CRS " << str_crs << " is not handled by PROJ";
-                    delete crs;
+                    continue;
+                }
+
+                if (services->get_wms_service()->is_available_crs(str_crs)) {
+                    // Cette projection est déjà disponible globalement au niveau du service
                     continue;
                 }
 
                 // Test if the current layer bounding box is compatible with the current CRS
                 if ( ! geographic_bbox.intersect_crs_area(crs) ) {
                     BOOST_LOG_TRIVIAL(warning) << "CRS " << str_crs << " is not compatible with the layer extent";
-                    delete crs;
                     continue;
                 }
 
@@ -520,7 +523,7 @@ void Layer::calculate_tilematrix_limits() {
     wmts_tilematrixsets = newList;
 }
 
-Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string path, ServicesConfiguration* services) : Configuration(path), pyramid(NULL), attribution(NULL) {
 
     /********************** Id */
 
@@ -565,7 +568,7 @@ Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution
 
     /********************** Parse */
 
-    if (! parse(doc)) {
+    if (! parse(doc, services)) {
         return;
     }
 
@@ -582,7 +585,7 @@ Layer::Layer(std::string path) : Configuration(path), pyramid(NULL), attribution
 }
 
 
-Layer::Layer(std::string layerName, std::string content ) : Configuration(), id(layerName), pyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string layerName, std::string content, ServicesConfiguration* services ) : Configuration(), id(layerName), pyramid(NULL), attribution(NULL) {
 
     /********************** Id */
 
@@ -602,7 +605,7 @@ Layer::Layer(std::string layerName, std::string content ) : Configuration(), id(
 
     /********************** Parse */
 
-    if (! parse(doc)) {
+    if (! parse(doc, services)) {
         return;
     }
 
@@ -624,9 +627,6 @@ std::string Layer::get_id() {
 
 Layer::~Layer() {
 
-    for (unsigned int l = 0 ; l < wms_crss.size() ; l++) {
-        delete wms_crss.at(l);
-    }
     if (attribution != NULL) delete attribution;
     if (pyramid != NULL) delete pyramid;
 }
@@ -649,6 +649,7 @@ Style* Layer::get_default_style() {
 std::vector<Style*> Layer::get_styles() { return styles; }
 
 std::vector<WmtsTmsInfos> Layer::get_wmts_tilematrixsets() { return wmts_tilematrixsets; }
+std::vector<CRS*>* Layer::get_wms_crss() { return &wms_crss; }
 TileMatrixSet* Layer::get_tilematrixset(std::string wmts_id) {
     for ( unsigned int k = 0; k < wmts_tilematrixsets.size(); k++ ) {
         if ( wmts_id == wmts_tilematrixsets.at(k).wmts_id || wmts_id == wmts_tilematrixsets.at(k).tms->get_id() ) {
@@ -699,7 +700,7 @@ bool Layer::is_wms_crs(std::string c) {
 Attribution* Layer::get_attribution() { return attribution; }
 BoundingBox<double> Layer::get_geographical_bbox() { return geographic_bbox; }
 BoundingBox<double> Layer::get_native_bbox() { return native_bbox; }
-std::vector<Metadata> Layer::get_metadata() { return metadata; }
+std::vector<Metadata>* Layer::get_metadata() { return &metadata; }
 bool Layer::is_gfi_enabled() { return gfi_enabled; }
 std::string Layer::get_gfi_type() { return gfi_type; }
 std::string Layer::get_gfi_url() { return gfi_url; }

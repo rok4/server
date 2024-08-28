@@ -53,5 +53,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
 
     // IGNGPF-3549 : si I ou J invalide -> InvalidPoint
 
+    // requête sur couche non queryable -> LayerNotQueryable
+
     throw WmsException::get_error_message("Coming soon !", "NotImplemented", 501);
 }

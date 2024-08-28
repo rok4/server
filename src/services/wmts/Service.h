@@ -88,6 +88,24 @@ public:
         if (metadata) delete metadata;
     };
 
+    /**
+     * \~french
+     * \brief La reprojection est-elle activée
+     * \~english
+     * \brief Is reprojection enabled
+     */
+    bool reprojection_enabled() {
+        return reprojection;
+    };
+
+    /**
+     * \~french
+     * \brief Teste la validité du info format
+     * \~english
+     * \brief Test if info format is valid
+     */
+    bool is_available_infoformat(std::string f) ;
+
 };
 
 #endif /* WMTSSERVICE_H_ */

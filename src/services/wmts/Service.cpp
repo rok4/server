@@ -131,19 +131,10 @@ WmtsService::WmtsService (json11::Json& doc) : Service(doc), metadata(NULL) {
         reprojection = false;
     }
 
-    if (doc["info_formats"].is_array()) {
-        for (json11::Json info : doc["info_formats"].array_items()) {
-            if (info.is_string()) {
-                info_formats.push_back ( info.string_value() );
-            } else {
-                error_message = "WMTS service: info_formats have to be a string array";
-                return;
-            }
-        }
-    } else if (! doc["info_formats"].is_null()) {
-        error_message = "WMTS service: info_formats have to be a string array";
-        return;
-    }
+    info_formats.push_back("text/plain");
+    info_formats.push_back("text/xml");
+    info_formats.push_back("text/html");
+    info_formats.push_back("application/json");
 }
 
 DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
@@ -182,3 +173,7 @@ DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
     }
 
 };
+
+bool WmtsService::is_available_infoformat(std::string f) {
+    return (std::find(info_formats.begin(), info_formats.end(), f) != info_formats.end());
+}

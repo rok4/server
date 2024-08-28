@@ -149,6 +149,27 @@ public:
     }
 
     /**
+     * \~french \brief Ajoute un noeud WMS correpondant à l'attribution
+     * \param[in] parent Noeud auquel ajouter celui de l'attribution
+     * \~english \brief Add a WMS node corresponding to attribution
+     * \param[in] parent Node to whom add the attribution node
+     */
+    void add_node_wms(ptree& parent) {
+        ptree& node = parent.add("Attribution", "");
+        node.add("Title", title);
+        node.add("OnlineResource.<xmlattr>.xlink:href", href);
+        node.add("OnlineResource.<xmlattr>.xlink:type", "simple");
+
+        if (logo != NULL) {
+            node.add("LogoURL.<xmlattr>.width", width);
+            node.add("LogoURL.<xmlattr>.height", height);
+            node.add("LogoURL.OnlineResource.<xmlattr>.xlink:href", href);
+            node.add("LogoURL.OnlineResource.<xmlattr>.xlink:type", "simple");
+            node.add("LogoURL.Format", format);
+        }
+    }
+
+    /**
      * \~french
      * \brief Destructeur par défaut
      * \~english

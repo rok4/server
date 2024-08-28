@@ -62,13 +62,6 @@
         ],
         "layer_root_title": "Couches WMS",
         "layer_root_abstract": "Données servies en WMS",
-        "info_formats": [
-            "text/plain",
-            "text/html",
-            "text/xml",
-            "application/xml",
-            "application/json"
-        ],
         "styling": true,
         "reprojection": true,
         "inspire": false
@@ -82,13 +75,6 @@
             "WMTS"
         ],
         "root_path": "/wmts",
-        "info_formats": [
-            "text/plain",
-            "text/html",
-            "text/xml",
-            "application/xml",
-            "application/json"
-        ],
         "styling": true,
         "reprojection": true
     },

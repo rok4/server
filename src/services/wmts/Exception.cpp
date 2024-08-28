@@ -48,5 +48,5 @@
 std::string WmtsException::xml_template = "<ExceptionReport xmlns=\"http://www.opengis.net/ows/1.1\"><Exception exceptionCode=\"%s\" >%s</Exception></ExceptionReport>";
 
 MessageDataStream* WmtsException::get_error_message(std::string reason, std::string code, int status) {
-    return new MessageDataStream(str(boost::format(xml_template) % code % reason), "application/xml", status);
+    return new MessageDataStream(str(boost::format(xml_template) % code % reason), "text/xml", status);
 }

@@ -170,7 +170,7 @@ class Utils {
             ptree tree;
 
             ptree& root = tree.add("html", "");
-            root.add("body.p.b", "FeatureInfo :");
+            root.add("body.p.b", "Pixel value :");
             ptree& list = root.add("ul", "");
             for (std::string v : data) {
                 list.add("li", v);
@@ -179,25 +179,36 @@ class Utils {
             std::stringstream ss;
             write_xml(ss, tree);
             return new MessageDataStream(ss.str(), "text/html", 200);
-        } else if (format.compare("text/xml") == 0 || format.compare("application/xml") == 0) {
+        } else if (format.compare("text/xml") == 0) {
             ptree tree;
 
-            ptree& root = tree.add("FeatureInfo", "");
+            ptree& root = tree.add("Pixel", "");
             for (std::string v : data) {
-                root.add("value", v);
+                root.add("Band", v);
             }
 
             std::stringstream ss;
             write_xml(ss, tree);
-            return new MessageDataStream(ss.str(), format, 200);
+            return new MessageDataStream(ss.str(), "text/xml", 200);
         } else if (format.compare("application/json") == 0) {
             json11::Json res = json11::Json::object{
-                {"featureInfo", data}};
+                {"type", "FeatureCollection"},
+                {"features", json11::Json::array { 
+                    json11::Json::object {
+                        {"type", "Feature"},
+                        {"properties", json11::Json::object {
+                            {"pixel", data},
+                        } },
+                    }
+                } },
+            };
             return new MessageDataStream(res.dump(), "application/json", 200);
         } else {
-            return new MessageDataStream(boost::algorithm::join(data, " "), "text/plain", 200);
+            return new MessageDataStream(boost::algorithm::join(data, ","), "text/plain", 200);
         }
     }
+
+
 
     /**
      * \~french

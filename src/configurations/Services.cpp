@@ -37,6 +37,8 @@
 
 #include <fstream>
 
+#include <rok4/utils/Cache.h>
+
 #include "configurations/Services.h"
 
 bool ServicesConfiguration::parse(json11::Json& doc) {
@@ -244,11 +246,10 @@ bool ServicesConfiguration::load_crs_equivalences(std::string file) {
         std::vector<CRS*> eqs;
 
         // On met en premier le CRS correspondant à la clé
-        CRS* c = new CRS ( index_crs );
+        CRS* c = CrsBook::get_crs( index_crs );
         index_crs = c->get_request_code();
         if ( ! c->is_define() ) {
             BOOST_LOG_TRIVIAL(warning) << "The Equivalent CRS [" << c << "] is not present in PROJ"  ;
-            delete c;
             continue;
         } else {
             eqs.push_back(c);
@@ -257,10 +258,9 @@ bool ServicesConfiguration::load_crs_equivalences(std::string file) {
         if (it.second.is_array()) {
             for (json11::Json eq_crs : it.second.array_items()) {
                 if (eq_crs.is_string()) {
-                    c = new CRS ( eq_crs.string_value() );
+                    c = CrsBook::get_crs( eq_crs.string_value() );
                     if ( ! c->is_define() ) {
-                        BOOST_LOG_TRIVIAL(warning) << "The Equivalent CRS [" << c << "] is not present in PROJ"  ;
-                        delete c;
+                        BOOST_LOG_TRIVIAL(warning) << "The Equivalent CRS [" << c << "] is not present in PROJ";
                     } else {
                         eqs.push_back(c);
                     }

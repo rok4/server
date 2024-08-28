@@ -48,5 +48,5 @@
 std::string CommonException::xml_template = "<?xml version=\"1.0\" ?><Error><Message>%s</Message></Error>";
 
 MessageDataStream* CommonException::get_error_message(std::string reason, int status) {
-    return new MessageDataStream(str(boost::format(xml_template) % reason), "application/xml", status);
+    return new MessageDataStream(str(boost::format(xml_template) % reason), "text/xml", status);
 }

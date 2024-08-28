@@ -174,9 +174,8 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
 
         bool crs_equals = serv->get_services_configuration()->are_crs_equals(layer->get_pyramid()->get_tms()->get_crs()->get_proj_code(), crs->get_proj_code());
 
-        int error;
         // On se donne maxium 3 tuiles sur 3 dans la pyramide source pour calculer cette tuile
-        Image* image = layer->get_pyramid()->getbbox(3, 3, bbox, width, height, crs, crs_equals, layer->get_resampling(), 0, error);
+        Image* image = layer->get_pyramid()->getbbox(3, 3, bbox, width, height, crs, crs_equals, layer->get_resampling(), 0);
 
         if (image == NULL) {
             BOOST_LOG_TRIVIAL(warning) << "Cannot process the tile in a non native TMS";
@@ -229,6 +228,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
                 case Rok4Format::TIFF_PKB_FLOAT32:
                     return new TiffPackBitsEncoder<float>(image, is_geotiff);
                 default:
+                    delete image;
                     throw WmtsException::get_error_message("No data found", "Not Found", 404);
             }
         }
@@ -250,6 +250,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
             // On ne traite le format asc que sur les image à un seul channel
             if (image->get_channels() != 1) {
                 BOOST_LOG_TRIVIAL(error) << "Le format " << format << " ne concerne que les images à 1 canal";
+                delete image;
                 throw WmtsException::get_error_message("No data found", "Not Found", 404);
             } else {
                 return new AscEncoder(image);

@@ -46,6 +46,7 @@
 #include <iostream>
 
 #include <rok4/utils/CRS.h>
+#include <rok4/utils/Cache.h>
 
 #include "services/wms/Exception.h"
 #include "services/wms/Service.h"
@@ -156,7 +157,6 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
                 } else {
                     formats.push_back ( format );
                 }
-                formats.push_back ( f.string_value() );
             } else {
                 error_message = "WMS service: formats have to be a string array";
                 return;
@@ -167,19 +167,10 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
         return;
     }
 
-    if (doc["info_formats"].is_array()) {
-        for (json11::Json info : doc["info_formats"].array_items()) {
-            if (info.is_string()) {
-                info_formats.push_back ( info.string_value() );
-            } else {
-                error_message = "WMS service: info_formats have to be a string array";
-                return;
-            }
-        }
-    } else if (! doc["info_formats"].is_null()) {
-        error_message = "WMS service: info_formats have to be a string array";
-        return;
-    }
+    info_formats.push_back("text/plain");
+    info_formats.push_back("text/xml");
+    info_formats.push_back("text/html");
+    info_formats.push_back("application/json");
 
     if (doc["root_layer"].is_object()) {
         if (doc["root_layer"]["title"].is_string()) {
@@ -265,12 +256,12 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
     }
 
     bool crs84_present = false;
-    if (doc["crs"].is_array()) {
+    if (reprojection && doc["crs"].is_array()) {
         for (json11::Json c : doc["crs"].array_items()) {
             if (c.is_string()) {
                 std::string crs_string = c.string_value();
 
-                CRS* crs = new CRS( crs_string );
+                CRS* crs = CrsBook::get_crs( crs_string );
                 if ( ! crs->is_define() ) {
                     BOOST_LOG_TRIVIAL(warning) << "The (WMS) CRS [" << crs_string <<"] is not present in PROJ"  ;
                     continue;
@@ -295,8 +286,7 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
                         }
                         if (! already_in) {
                             BOOST_LOG_TRIVIAL(info) <<  "Adding equivalent global CRS [" << eqs.at(e)->get_request_code() <<"] of [" << crs->get_request_code() << "]"  ;
-                            // On clone bien le CRS, pour ne pas avoir un conflit lors du nettoyage
-                            crss.push_back(new CRS(eqs.at(e)));
+                            crss.push_back(eqs.at(e));
                             if (eqs.at(e)->get_request_code() == "CRS:84") {
                                 crs84_present = true;
                             }
@@ -315,7 +305,7 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
 
     if (! crs84_present) {
         BOOST_LOG_TRIVIAL(info) <<  "CRS:84 not found -> adding global CRS CRS:84"   ;
-        CRS* crs = new CRS( "CRS:84" );
+        CRS* crs = CrsBook::get_crs( "CRS:84" );
 
         if ( ! crs->is_define() ) {
             error_message = "WMS service: The CRS [CRS:84] is not present in PROJ"  ;
@@ -336,8 +326,7 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
                 }
                 if (! already_in) {
                     BOOST_LOG_TRIVIAL(info) <<  "Adding equivalent global CRS [" << eqs.at(e)->get_request_code() <<"] of [CRS:84]"  ;
-                    // On clone bien le CRS, pour ne pas avoir un conflit lors du nettoyage
-                    crss.push_back(new CRS(eqs.at(e)));
+                    crss.push_back(eqs.at(e));
                 }
             }
         }
@@ -359,7 +348,7 @@ DataStream* WmsService::process_request(Request* req, Rok4Server* serv) {
 
     // On ne gère que la version 1.0.0
     std::string param_version = req->get_query_param("version");
-    if (param_version != "1.0.0" && param_version != "") {
+    if (param_version != "1.3.0" && param_version != "") {
         throw WmsException::get_error_message("VERSION query parameter have to be 1.3.0 or empty", "InvalidParameterValue", 400);
     }
 
@@ -375,9 +364,29 @@ DataStream* WmsService::process_request(Request* req, Rok4Server* serv) {
         return get_feature_info(req, serv);
     } else if (param_request == "getmap") {
         BOOST_LOG_TRIVIAL(debug) << "GETMAP request";
-        return new DataStreamFromDataSource(get_map(req, serv));
+        return get_map(req, serv);
     } else {
         throw WmsException::get_error_message("REQUEST query parameter unknown", "OperationNotSupported", 400);
     }
 
 };
+
+bool WmsService::is_available_crs(CRS* c) {
+    return is_available_crs(c->get_request_code());
+}
+bool WmsService::is_available_crs(std::string c) {
+    for ( unsigned int k = 0; k < crss.size(); k++ ) {
+        if ( crss.at (k)->cmp_request_code ( c ) ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool WmsService::is_available_format(std::string f) {
+    return (std::find(formats.begin(), formats.end(), f) != info_formats.end());
+}
+
+bool WmsService::is_available_infoformat(std::string f) {
+    return (std::find(info_formats.begin(), info_formats.end(), f) != info_formats.end());
+}
