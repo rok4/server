@@ -43,6 +43,7 @@
  * \brief Implement the Layer Class handling data layer.
  */
 
+#include <boost/format.hpp>
 #include <boost/log/trivial.hpp>
 #include <libgen.h>
 #include <fstream>
@@ -72,7 +73,9 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     abstract = "";
 
     wms = true;
+    wms_inspire = true;
     wmts = true;
+    wmts_inspire = true;
     tms = true;
     tiles = true;
 
@@ -110,6 +113,9 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     } else if (! doc["keywords"].is_null()) {
         error_message = "keywords have to be a string array";
         return false;
+    } else {
+        wms_inspire = false;
+        wmts_inspire = false;
     }
 
     if (doc["metadata"].is_array()) {
@@ -124,6 +130,8 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     } else if (! doc["metadata"].is_null()) {
         error_message = "metadata have to be an object array";
         return false;
+    } else {
+        wmts_inspire = false;
     }
 
     if (doc["attribution"].is_object()) {
@@ -138,8 +146,8 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     /******************* PYRAMIDES *********************/
 
     std::vector<Pyramid*> pyramids;
-    std::vector<std::string> topLevels;
-    std::vector<std::string> bottomLevels;
+    std::vector<std::string> top_levels;
+    std::vector<std::string> bottom_levels;
 
     if (doc["pyramids"].is_array()) {
         for (json11::Json pyr : doc["pyramids"].array_items()) {
@@ -154,14 +162,14 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
                 }
 
                 if (pyr["top_level"].is_string()) {
-                    topLevels.push_back(pyr["top_level"].string_value());
+                    top_levels.push_back(pyr["top_level"].string_value());
                 } else {
                     error_message =  "pyramids element have to own a 'top_level' string attribute";
                     return false;
                 }
 
                 if (pyr["bottom_level"].is_string()) {
-                    bottomLevels.push_back(pyr["bottom_level"].string_value());
+                    bottom_levels.push_back(pyr["bottom_level"].string_value());
                 } else {
                     error_message =  "pyramids element have to own a 'bottom_level' string attribute";
                     return false;
@@ -197,7 +205,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "pyramide composée de " << pyramids.size() << " pyramide(s)";
 
     for (int i = 0; i < pyramids.size(); i++) {
-        if (! pyramid->add_levels(pyramids.at(i), bottomLevels.at(i), topLevels.at(i))) {
+        if (! pyramid->add_levels(pyramids.at(i), bottom_levels.at(i), top_levels.at(i))) {
             BOOST_LOG_TRIVIAL(error) << "Cannot compose pyramid to broadcast with input pyramid " << i;
             delete pyramid;
             pyramid = NULL;
@@ -216,12 +224,17 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
         return false;
     }
 
+    // On a forcément le TMS natif de la donnée pour le WMTS
     WmtsTmsInfos infos;
     infos.tms = pyramid->get_tms();
     infos.top_level = pyramid->get_highest_level()->get_id();
     infos.bottom_level = pyramid->get_lowest_level()->get_id();
     infos.wmts_id = infos.tms->get_id() + "_" + infos.top_level + "_" + infos.bottom_level;
     wmts_tilematrixsets.push_back(infos);
+
+
+    // On a forcément le CRS natif de la donnée pour le WMS
+    wms_crss.push_back ( pyramid->get_tms()->get_crs() );
 
     /********************** Gestion de l'étendue des données */
 
@@ -335,6 +348,12 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
             return false;
         }
 
+        // Pour être inspire, le style par défaut (le premier) doit avoir le bon identifiant
+        if (styles[0]->get_identifier() != "inspire_common:DEFAULT") {
+            wms_inspire = false;
+            wmts_inspire = false;
+        }
+
         // Configuration des reprojections possibles
 
         // TMS additionnels pour le WMTS
@@ -409,9 +428,9 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
 void Layer::calculate_bboxes() {
 
     // On calcule la bbox à partir des tuiles limites du niveau le mieux résolu de la pyramide
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->get_ordered_levels(true);
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(true);
 
-    Level * level = orderedLevels.begin()->second;
+    Level * level = ordered_levels.begin()->second;
     native_bbox = BoundingBox<double>(level->get_bbox_from_tile_limits());
     native_bbox.crs = pyramid->get_tms()->get_crs()->get_request_code();
 
@@ -421,27 +440,27 @@ void Layer::calculate_bboxes() {
 
 void Layer::calculate_native_tilematrix_limits() {
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->get_ordered_levels(true);
-    for (std::pair<std::string, Level*> element : orderedLevels) {
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(true);
+    for (std::pair<std::string, Level*> element : ordered_levels) {
         element.second->set_tile_limits_from_bbox(native_bbox);
     }
 }
 
 void Layer::calculate_tilematrix_limits() {
 
-    std::vector<WmtsTmsInfos> newList;
+    std::vector<WmtsTmsInfos> new_list;
 
     // Le premier TMS est celui natif : les tuiles limites sont déjà calculée et stockées dans les niveaux
 
     WmtsTmsInfos infos = wmts_tilematrixsets.at(0);
     infos.limits = std::vector<TileMatrixLimits>();
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->get_ordered_levels(false);
-    for (std::pair<std::string, Level*> element : orderedLevels) {
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(false);
+    for (std::pair<std::string, Level*> element : ordered_levels) {
         infos.limits.push_back(element.second->get_tile_limits());
     }
 
-    newList.push_back(infos);
+    new_list.push_back(infos);
 
     // On calcule les tuiles limites pour tous les TMS supplémentaires, que l'on filtre
     for (unsigned i = 1 ; i < wmts_tilematrixsets.size(); i++) {
@@ -455,7 +474,6 @@ void Layer::calculate_tilematrix_limits() {
         BoundingBox<double> tmp = geographic_bbox;
         tmp.print();
         tmp = tmp.crop_to_crs_area(tms->get_crs());
-        BOOST_LOG_TRIVIAL(warning) <<  tms->get_crs()->get_request_code();
         if ( tmp.has_null_area()  ) {
             BOOST_LOG_TRIVIAL(warning) <<  "La couche n'est pas dans l'aire de définition du CRS du TMS supplémentaire " << tms->get_id() ;
             continue;
@@ -467,8 +485,8 @@ void Layer::calculate_tilematrix_limits() {
 
         // Recherche du niveau du haut du TMS supplémentaire
         TileMatrix* tmTop = NULL;
-        std::set<std::pair<std::string, Level*>, ComparatorLevel> orderedLevels = pyramid->get_ordered_levels(false);
-        for (std::pair<std::string, Level*> element : orderedLevels) {
+        std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(false);
+        for (std::pair<std::string, Level*> element : ordered_levels) {
             tmTop = tms->get_corresponding_tm(element.second->get_tm(), pyramid->get_tms()) ;
             if (tmTop != NULL) {
                 // On a trouvé un niveau du haut du TMS supplémentaire satisfaisant pour la pyramide
@@ -482,8 +500,8 @@ void Layer::calculate_tilematrix_limits() {
 
         // Recherche du niveau du bas du TMS supplémentaire
         TileMatrix* tmBottom = NULL;
-        orderedLevels = pyramid->get_ordered_levels(true);
-        for (std::pair<std::string, Level*> element : orderedLevels) {
+        ordered_levels = pyramid->get_ordered_levels(true);
+        for (std::pair<std::string, Level*> element : ordered_levels) {
             tmBottom = tms->get_corresponding_tm(element.second->get_tm(), pyramid->get_tms()) ;
             if (tmBottom != NULL) {
                 // On a trouvé un niveau du bas du TMS supplémentaire satisfaisant pour la pyramide
@@ -516,11 +534,11 @@ void Layer::calculate_tilematrix_limits() {
         infos.top_level = tmTop->get_id();
         infos.wmts_id = infos.tms->get_id() + "_" + infos.top_level + "_" + infos.bottom_level;
 
-        newList.push_back(infos);
+        new_list.push_back(infos);
     }
 
     // La nouvelle liste ne contient pas les TMS pour lesquels nous n'avons pas pu calculer les niveaux et les limites
-    wmts_tilematrixsets = newList;
+    wmts_tilematrixsets = new_list;
 }
 
 Layer::Layer(std::string path, ServicesConfiguration* services) : Configuration(path), pyramid(NULL), attribution(NULL) {
@@ -634,8 +652,10 @@ Layer::~Layer() {
 
 std::string Layer::get_abstract() { return abstract; }
 bool Layer::is_wms_enabled() { return wms; }
+bool Layer::is_wms_inspire() { return wms_inspire; }
 bool Layer::is_tms_enabled() { return tms; }
 bool Layer::is_wmts_enabled() { return wmts; }
+bool Layer::is_wmts_inspire() { return wmts_inspire; }
 bool Layer::is_tiles_enabled() { return tiles; }
 std::vector<Keyword>* Layer::get_keywords() { return &keywords; }
 Pyramid* Layer::get_pyramid() { return pyramid; }
@@ -646,10 +666,10 @@ Style* Layer::get_default_style() {
         return NULL;
     }
 }
-std::vector<Style*> Layer::get_styles() { return styles; }
+std::vector<Style*>* Layer::get_styles() { return &styles; }
 
-std::vector<WmtsTmsInfos> Layer::get_wmts_tilematrixsets() { return wmts_tilematrixsets; }
-std::vector<CRS*>* Layer::get_wms_crss() { return &wms_crss; }
+std::vector<WmtsTmsInfos>* Layer::get_available_tilematrixsets_wmts() { return &wmts_tilematrixsets; }
+std::vector<CRS*>* Layer::get_available_crs_wms() { return &wms_crss; }
 TileMatrixSet* Layer::get_tilematrixset(std::string wmts_id) {
     for ( unsigned int k = 0; k < wmts_tilematrixsets.size(); k++ ) {
         if ( wmts_id == wmts_tilematrixsets.at(k).wmts_id || wmts_id == wmts_tilematrixsets.at(k).tms->get_id() ) {
@@ -680,7 +700,7 @@ Style* Layer::get_style_by_identifier(std::string identifier) {
 }
 
 std::string Layer::get_title() { return title; }
-bool Layer::is_wms_crs(CRS* c) {
+bool Layer::is_available_crs_wms(CRS* c) {
     for ( unsigned int k = 0; k < wms_crss.size(); k++ ) {
         if ( c->cmp_request_code ( wms_crss.at (k)->get_request_code() ) ) {
             return true;
@@ -688,7 +708,7 @@ bool Layer::is_wms_crs(CRS* c) {
     }
     return false;
 }
-bool Layer::is_wms_crs(std::string c) {
+bool Layer::is_available_crs_wms(std::string c) {
     for ( unsigned int k = 0; k < wms_crss.size(); k++ ) {
         if ( wms_crss.at (k)->cmp_request_code ( c ) ) {
             return true;
@@ -708,3 +728,356 @@ std::map<std::string, std::string> Layer::get_gfi_extra_params() { return gfi_ex
 std::string Layer::get_gfi_layers() { return gfi_layers; }
 std::string Layer::get_gfi_query_layers() { return gfi_query_layers; }
 Interpolation::KernelType Layer::get_resampling() { return resampling; }
+
+void Layer::add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire, std::map< std::string, WmtsTmsInfos>* used_tms_list) {
+
+    if (! wmts) {
+        return;
+    }
+
+    if (only_inspire && ! wmts_inspire) {
+        return;
+    }
+
+    ptree& node = parent.add("Layer", "");
+    node.add("ows:Title", title);
+    node.add("ows:Abstract", abstract);
+
+    if ( keywords.size() != 0 ) {
+        ptree& keywords_node = node.add("ows:Keywords", "");
+        for ( Keyword k : keywords) {
+            k.add_node(keywords_node, "ows:Keyword");
+        }
+    }
+
+    std::ostringstream os;
+    os << geographic_bbox.xmin << " " << geographic_bbox.ymin;
+    node.add("ows:WGS84BoundingBox.ows:LowerCorner", os.str());
+    os.str ( "" );
+    os << geographic_bbox.xmax << " " << geographic_bbox.ymax;
+    node.add("ows:WGS84BoundingBox.ows:UpperCorner", os.str());
+    
+    node.add("ows:Identifier", id);
+    
+    for ( Metadata m : metadata) {
+        m.add_node_wmts(node);
+    }
+
+    for ( Style* s : styles) {
+        s->add_node_wmts(node);
+    }
+
+    node.add("Format", Rok4Format::to_mime_type ( pyramid->get_format() ));
+
+    if (gfi_enabled){
+        for ( unsigned int j = 0; j < service->get_available_infoformats()->size(); j++ ) {
+            node.add("InfoFormat", service->get_available_infoformats()->at ( j ));
+        }
+    }
+
+    // On ajoute les TMS disponibles avec les tuiles limites
+    // Si la reprojection WMTS n'est pas activée, nous n'avons les limites que pour le TMS natif
+    for (WmtsTmsInfos wti : wmts_tilematrixsets) {
+        ptree& tms_node = node.add("TileMatrixSetLink", "");
+        tms_node.add("TileMatrixSet", wti.wmts_id);
+
+        ptree& tms_limits_node = tms_node.add("TileMatrixSetLimits", "");
+        
+        // Niveaux
+        for ( unsigned int j = 0; j < wti.limits.size(); j++ ) { 
+            wti.limits.at(j).add_node(tms_limits_node);
+        }
+
+        used_tms_list->insert ( std::pair<std::string, WmtsTmsInfos> ( wti.wmts_id , wti) );
+    }
+
+    // On veut ajouter le TMS natif des données dans sa version originale
+    WmtsTmsInfos origin_infos;
+    origin_infos.tms = pyramid->get_tms();
+    origin_infos.top_level = "";
+    origin_infos.bottom_level = "";
+    origin_infos.wmts_id = origin_infos.tms->get_id();
+    used_tms_list->insert ( std::pair<std::string, WmtsTmsInfos> ( origin_infos.wmts_id, origin_infos) );
+}
+
+void Layer::add_node_wms(ptree& parent, WmsService* service, bool only_inspire) {
+
+    if (! wms) {
+        return;
+    }
+
+    if (only_inspire && ! wms_inspire) {
+        return;
+    }
+
+    ptree& node = parent.add("Layer", "");
+    if (gfi_enabled) {
+        node.add("<xmlattr>.queryable", "1");
+    }
+
+    node.add("Name", id);
+    node.add("Title", title);
+    node.add("Abstract", abstract);
+
+    if ( keywords.size() != 0 ) {
+        ptree& keywords_node = node.add("KeywordList", "");
+        for ( Keyword k : keywords) {
+            k.add_node(keywords_node, "Keyword");
+        }
+    }
+
+    for ( CRS* c : wms_crss) {
+        node.add("CRS", c->get_request_code());
+    }
+
+    geographic_bbox.add_node(node, true, true);
+
+    // BoundingBox
+    if ( only_inspire ) {
+        for ( CRS* c : wms_crss) {
+            BoundingBox<double> bbox ( 0,0,0,0 );
+            if ( geographic_bbox.is_in_crs_area(c)) {
+                bbox = geographic_bbox;
+            } else {
+                bbox = geographic_bbox.crop_to_crs_area(c);
+            }
+
+            bbox.reproject(CRS::get_epsg4326(), c);
+            bbox.add_node(node, false, c->is_lat_lon() );
+        }
+        for ( unsigned int i = 0; i < service->get_available_crs()->size(); i++ ) {
+            CRS* crs = service->get_available_crs()->at(i);
+            BoundingBox<double> bbox ( 0,0,0,0 );
+            if ( geographic_bbox.is_in_crs_area(crs)) {
+                bbox = geographic_bbox;
+            } else {
+                bbox = geographic_bbox.crop_to_crs_area(crs);
+            }
+
+            bbox.reproject(CRS::get_epsg4326(), crs);
+            bbox.add_node(node, false, crs->is_lat_lon() );
+        }
+    } else {
+        BoundingBox<double> bbox = native_bbox;
+        native_bbox.add_node(node, false, pyramid->get_tms()->get_crs()->is_lat_lon() );
+    }
+
+    if (attribution != NULL) {
+        attribution->add_node_wms(node);
+    }
+    
+    for ( Metadata m : metadata) {
+        m.add_node_wms(node);
+    }
+
+    for ( Style* s : styles) {
+        s->add_node_wms(node);
+    }
+
+    node.add("MinScaleDenominator", pyramid->get_lowest_level()->get_res() * 1000 / 0.28);
+    node.add("MaxScaleDenominator", pyramid->get_highest_level()->get_res() * 1000 / 0.28);
+}
+
+
+void Layer::add_node_tms(ptree& parent, TmsService* service) {
+
+    if (! tms) {
+        return;
+    }
+
+    std::string ln = std::regex_replace(title, std::regex("\""), "&quot;");
+
+    ptree& node = parent.add("TileMap", "");
+    node.add("<xmlattr>.title", ln);
+    node.add("<xmlattr>.srs", pyramid->get_tms()->get_crs()->get_request_code());
+    node.add("<xmlattr>.profile", "none");
+    node.add("<xmlattr>.extension", Rok4Format::to_extension ( pyramid->get_format() ));
+    node.add("<xmlattr>.href", service->get_endpoint_uri() + "/1.0.0/" + id);
+}
+
+std::string Layer::get_description_tilejson(TmsService* service) {
+
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(true);
+
+    int order = 0;
+    std::string minzoom, maxzoom;
+
+    std::vector<std::string> tables_names;
+    std::map<std::string, Table*> tables_infos;
+    std::map<std::string, int> mins;
+    std::map<std::string, int> maxs;
+
+    for (std::pair<std::string, Level*> element : ordered_levels) {
+        Level * level = element.second;
+
+        if (order == 0) {
+            // Le premier niveau lu est le plus détaillé, on va l'utiliser pour définir plusieurs choses
+            maxzoom = level->get_id();
+        }
+        // Zooms min et max
+        minzoom = level->get_id();
+
+        std::vector<Table>* level_tables = level->get_tables();
+        for (int i = 0; i < level_tables->size(); i++) {
+            std::string t = level_tables->at(i).get_name();
+            std::map<std::string, int>::iterator it = mins.find ( t );
+            if ( it == mins.end() ) {
+                tables_names.push_back(t);
+                tables_infos.emplace ( t, &(level_tables->at(i)) );
+                maxs.emplace ( t, std::stoi(level->get_id()) );
+                mins.emplace ( t, std::stoi(level->get_id()) );
+            } else {
+                it->second = std::stoi(minzoom);
+            }
+
+        }
+
+        order++;
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "name", id },
+        { "description", abstract },
+        { "minzoom", std::stoi(minzoom) },
+        { "maxzoom", std::stoi(maxzoom) },
+        { "crs", pyramid->get_tms()->get_crs()->get_request_code() },
+        { "center", json11::Json::array { 
+            ((geographic_bbox.xmax + geographic_bbox.xmin) / 2.), 
+            ((geographic_bbox.ymax + geographic_bbox.ymin) / 2.)
+        } },
+        { "bounds", json11::Json::array { 
+            geographic_bbox.xmin,
+            geographic_bbox.ymin,
+            geographic_bbox.xmax,
+            geographic_bbox.ymax 
+        } },
+        { "format", Rok4Format::to_extension ( ( pyramid->get_format() ) ) },
+        { "tiles", json11::Json::array { service->get_endpoint_uri() + "/1.0.0/" + id + "/{z}/{x}/{y}." + Rok4Format::to_extension ( ( pyramid->get_format() ) ) } },
+    };
+
+
+    if (! Rok4Format::is_raster(pyramid->get_format())) {
+        std::vector<json11::Json> items;
+        for (int i = 0; i < tables_names.size(); i++) {
+            items.push_back(tables_infos.at(tables_names.at(i))->to_json(maxs.at(tables_names.at(i)),mins.at(tables_names.at(i))));
+        }
+        res["vector_layers"] = items;
+    }
+
+    return json11::Json{ res }.dump();
+}
+
+/*
+<GDAL_WMS>
+    <Service name="TMS">
+        <ServerUrl>https://rok4.ign.fr/tms/1.0.0/LAYER/${z}/${x}/${y}.png</ServerUrl>
+    </Service>
+    <DataWindow>
+        <UpperLeftX>-20037508.34</UpperLeftX>
+        <UpperLeftY>20037508.34</UpperLeftY>
+        <LowerRightX>20037508.34</LowerRightX>
+        <LowerRightY>-20037508.34</LowerRightY>
+        <TileLevel>18</TileLevel>
+        <TileCountX>1</TileCountX>
+        <TileCountY>1</TileCountY>
+        <YOrigin>top</YOrigin>
+    </DataWindow>
+    <Projection>EPSG:3857</Projection>
+    <BlockSizeX>256</BlockSizeX>
+    <BlockSizeY>256</BlockSizeY>
+    <BandsCount>4</BandsCount>
+    <ZeroBlockHttpCodes>204,404</ZeroBlockHttpCodes>
+</GDAL_WMS>
+*/
+std::string Layer::get_description_gdal(TmsService* service) {
+    
+    Level* best = pyramid->get_lowest_level();
+
+    ptree tree;
+
+    ptree& root = tree.add("GDAL_WMS", "");
+    root.add("Service.<xmlattr>.name", "TMS");
+    root.add("Service.ServerUrl", service->get_endpoint_uri() + "/1.0.0/" + id + "/${z}/${x}/${y}." + Rok4Format::to_extension ( ( pyramid->get_format() ) ));
+
+    root.add("DataWindow.UpperLeftX", best->get_tm()->get_x0());
+    root.add("DataWindow.UpperLeftY", best->get_tm()->get_y0());
+    root.add("DataWindow.LowerRightX", best->get_tm()->get_x0() + best->get_tm()->get_matrix_width() * best->get_tm()->get_tile_width() * best->get_tm()->get_res());
+    root.add("DataWindow.LowerRightY", best->get_tm()->get_y0() - best->get_tm()->get_matrix_height() * best->get_tm()->get_tile_height() * best->get_tm()->get_res());
+    root.add("DataWindow.TileLevel", best->get_tm()->get_id());
+    root.add("DataWindow.TileCountX", 1);
+    root.add("DataWindow.TileCountY", 1);
+    root.add("DataWindow.YOrigin", "top");
+
+    root.add("Projection", pyramid->get_tms()->get_crs()->get_proj_code());
+    root.add("BlockSizeX", best->get_tm()->get_tile_width());
+    root.add("BlockSizeY", best->get_tm()->get_tile_height());
+    root.add("ZeroBlockHttpCodes", "204,404");
+    root.add("BandsCount", pyramid->get_channels());
+
+    std::stringstream ss;
+    write_xml(ss, tree);
+    return ss.str();
+}
+
+std::string Layer::get_description_tms(TmsService* service) {
+    
+    ptree tree;
+
+    ptree& root = tree.add("TileMap", "");
+    root.add("<xmlattr>.version", "1.0.0");
+    root.add("<xmlattr>.tilemapservice", service->get_endpoint_uri() + "/1.0.0" );
+    root.add("Title", title );
+
+    for ( Keyword k : keywords) {
+        root.add("KeywordList", k.get_content() );
+    }
+
+    for ( Metadata m : metadata) {
+        m.add_node_tms(root);
+    }
+
+    if (attribution != NULL) {
+        attribution->add_node_tms(root);
+    }
+
+    CRS* crs = pyramid->get_tms()->get_crs();
+    root.add("SRS", crs->get_request_code() );
+    native_bbox.add_node(root, false, crs->is_lat_lon());
+
+    TileMatrix* tm = pyramid->get_tms()->getTmList()->begin()->second;
+
+    root.add("Origin.<xmlattr>.x", tm->get_x0() );
+    root.add("Origin.<xmlattr>.y", tm->get_y0() );
+
+    root.add("TileFormat.<xmlattr>.width", tm->get_tile_width() );
+    root.add("TileFormat.<xmlattr>.height", tm->get_tile_height() );
+    root.add("TileFormat.<xmlattr>.mime-type", Rok4Format::to_mime_type ( pyramid->get_format() ) );
+    root.add("TileFormat.<xmlattr>.extension", Rok4Format::to_extension ( pyramid->get_format() ) );
+
+    ptree& tilesets_node = root.add("TileMap", "");
+    tilesets_node.add("<xmlattr>.profile", "none");
+
+    int order = 0;
+
+    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(false);
+
+    for (std::pair<std::string, Level*> element : ordered_levels) {
+        Level * level = element.second;
+        tm = level->get_tm();
+        ptree& tileset_node = tilesets_node.add("TileSet", "");
+
+        tileset_node.add("<xmlattr>.href", str(boost::format("%s/1.0.0/%s/%s") % service->get_endpoint_uri() % id % tm->get_id()) );
+        tileset_node.add("<xmlattr>.minrow", level->get_min_tile_row());
+        tileset_node.add("<xmlattr>.maxrow", level->get_max_tile_row());
+        tileset_node.add("<xmlattr>.mincol", level->get_min_tile_col());
+        tileset_node.add("<xmlattr>.maxcol", level->get_max_tile_col());
+        tileset_node.add("<xmlattr>.units-per-pixel", tm->get_res());
+        tileset_node.add("<xmlattr>.order", order);
+
+        order++;
+    }
+
+    std::stringstream ss;
+    write_xml(ss, tree);
+    return ss.str();
+}

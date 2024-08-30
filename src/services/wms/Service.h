@@ -132,6 +132,14 @@ public:
 
     /**
      * \~french
+     * \brief Liste des CRS globaux du service
+     * \~english
+     * \brief Global service CRS list
+     */
+    std::vector<CRS*>* get_available_crs() ;
+
+    /**
+     * \~french
      * \brief Teste la validité du info format
      * \~english
      * \brief Test if info format is valid

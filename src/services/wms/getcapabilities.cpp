@@ -142,8 +142,8 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
             inspire_extension.add("inspire_common:MetadataUrl.inspire_common:MediaType", metadata->get_type());
         }
         
-        inspire_extension.add("inspire_common:SupportedLanguages.inspire_common:DefaultLanguage.inspire_common:Language", "fra");
-        inspire_extension.add("inspire_common:ResponseLanguage.inspire_common:Language", "fra");
+        inspire_extension.add("inspire_common:SupportedLanguages.inspire_common:DefaultLanguage.inspire_common:Language", "fre");
+        inspire_extension.add("inspire_common:ResponseLanguage.inspire_common:Language", "fre");
     }
 
     ptree& contents_node = capability_node.add("Layer", "");
@@ -162,93 +162,7 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
-        if (layers_iterator->second->is_wms_enabled()) {
-            Layer* layer = layers_iterator->second;
-
-            ptree& layer_node = contents_node.add("Layer", "");
-            if (layer->is_gfi_enabled()) {
-                layer_node.add("<xmlattr>.queryable", "1");
-            }
-
-            layer_node.add("Name", layer->get_id());
-            layer_node.add("Title", layer->get_title());
-            layer_node.add("Abstract", layer->get_abstract());
-
-            if ( layer->get_keywords()->size() != 0 ) {
-                ptree& keywords_node = layer_node.add("KeywordList", "");
-                for ( unsigned int i = 0; i < layer->get_keywords()->size(); i++ ) {
-                    keywords.at(i).add_node(keywords_node, "Keyword");
-                }
-            }
-
-            for ( unsigned int i = 0; i < layer->get_wms_crss()->size(); i++ ) {
-                layer_node.add("CRS", layer->get_wms_crss()->at(i)->get_request_code());
-            }
-
-            layer->get_geographical_bbox().add_node(layer_node, true, true);
-
-
-            // BoundingBox
-            if ( req->is_inspire() ) {
-                for ( unsigned int i = 0; i < layer->get_wms_crss()->size(); i++ ) {
-                    CRS* crs = layer->get_wms_crss()->at(i);
-                    BoundingBox<double> bbox ( 0,0,0,0 );
-                    if ( layer->get_geographical_bbox().is_in_crs_area(crs)) {
-                        bbox = layer->get_geographical_bbox();
-                    } else {
-                        bbox = layer->get_geographical_bbox().crop_to_crs_area(crs);
-                    }
-
-                    bbox.reproject(CRS::get_epsg4326(), crs);
-                    bbox.add_node(layer_node, false, crs->is_lat_lon() );
-                }
-                for ( unsigned int i = 0; i < crss.size(); i++ ) {
-                    CRS* crs = crss.at(i);
-                    BoundingBox<double> bbox ( 0,0,0,0 );
-                    if ( layer->get_geographical_bbox().is_in_crs_area(crs)) {
-                        bbox = layer->get_geographical_bbox();
-                    } else {
-                        bbox = layer->get_geographical_bbox().crop_to_crs_area(crs);
-                    }
-
-                    bbox.reproject(CRS::get_epsg4326(), crs);
-                    bbox.add_node(layer_node, false, crs->is_lat_lon() );
-                }
-            } else {
-                BoundingBox<double> bbox = layer->get_native_bbox();
-                CRS* crs = layer->get_pyramid()->get_tms()->get_crs();
-                bbox.add_node(layer_node, false, crs->is_lat_lon() );
-            }
-
-            if (layer->get_attribution() != NULL) {
-                layer->get_attribution()->add_node_wms(layer_node);
-            }
-            
-            for ( unsigned int i = 0; i < layer->get_metadata()->size(); ++i ) {
-                layer->get_metadata()->at(i).add_node_wms(layer_node);
-            }
-
-            for ( unsigned int i = 0; i < layer->get_styles().size(); i++ ) {
-                ptree& style_node = layer_node.add("Style", "");
-                Style* style = layer->get_styles().at(i);
-
-                style_node.add("Name", style->get_identifier());
-
-                for (int j = 0 ; j < style->get_titles().size(); ++j ) {
-                    style_node.add("Title", style->get_titles()[j]);
-                }
-                for (int j = 0 ; j < style->get_abstracts().size(); ++j ) {
-                    style_node.add("Abstract", style->get_abstracts()[j]);
-                }
-
-                for (int j = 0 ; j < style->get_legends()->size(); ++j ) {
-                    style->get_legends()->at(j).add_node_wms(style_node);
-                }
-            }
-
-            layer_node.add("MinScaleDenominator", layer->get_pyramid()->get_lowest_level()->get_res() * 1000 / 0.28);
-            layer_node.add("MaxScaleDenominator", layer->get_pyramid()->get_highest_level()->get_res() * 1000 / 0.28);
-        }
+        layers_iterator->second->add_node_wms(contents_node, this, req->is_inspire());
     }
 
     std::stringstream ss;

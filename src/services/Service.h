@@ -96,7 +96,7 @@ public:
 
     virtual DataStream* process_request(Request* req, Rok4Server* serv) = 0;
 
-    std::string get_root_path() {return root_path;};
+    std::string get_endpoint_uri() {return endpoint_uri;};
     bool is_enabled() {return enabled;};
     bool match_request(Request* req);
 };

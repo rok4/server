@@ -197,6 +197,20 @@ public:
         node.add("OnlineResource.<xmlattr>.xlink:href", href);
         node.add("OnlineResource.<xmlattr>.xlink:type", "simple");
     }
+
+    /**
+     * \~french \brief Ajoute un noeud WMTS correpondant à la métadonnée
+     * \param[in] parent Noeud auquel ajouter celui de la métadonnée
+     * \~english \brief Add a WMTS node corresponding to metadata
+     * \param[in] parent Node to whom add the metadata node
+     */
+    void add_node_wmts(ptree& parent) {
+        ptree& node = parent.add("MetadataURL", "");
+        node.add("<xmlattr>.type", type);
+        node.add("Format", format);
+        node.add("OnlineResource.<xmlattr>.xlink:href", href);
+        node.add("OnlineResource.<xmlattr>.xlink:type", "simple");
+    }
 };
 
 #endif // METADATA_H

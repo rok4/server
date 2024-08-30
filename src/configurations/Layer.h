@@ -67,6 +67,7 @@ using boost::property_tree::ptree;
 
 #include "services/wmts/Service.h"
 #include "services/wms/Service.h"
+#include "services/tms/Service.h"
 
 struct WmtsTmsInfos {
     TileMatrixSet* tms;
@@ -99,8 +100,6 @@ struct WmtsTmsInfos {
  */
 class Layer : public Configuration {
 
-friend class WmtsService;
-
 private:
     /**
      * \~french \brief Identifiant de la couche
@@ -124,10 +123,20 @@ private:
      */
     bool wms;
     /**
+     * \~french \brief Conformité Inspire en WMS
+     * \~english \brief WMS Inspire compliant
+     */
+    bool wms_inspire;
+    /**
      * \~french \brief Autorisation du WMTS pour ce layer
      * \~english \brief Authorized WMTS for this layer
      */
     bool wmts;
+    /**
+     * \~french \brief Conformité Inspire en WMTS
+     * \~english \brief WMTS Inspire compliant
+     */
+    bool wmts_inspire;
     /**
      * \~french \brief Autorisation du TMS pour ce layer
      * \~english \brief Authorized TMS for this layer
@@ -279,19 +288,22 @@ public:
     /**
      * \~french
      * \brief Retourne le droit d'utiliser un service WMS
-     * \return WMSAuthorized
      * \~english
      * \brief Return the right to use WMS
-     * \return WMSAuthorized
      */
     bool is_wms_enabled() ;
     /**
      * \~french
+     * \brief Retourne la conformité Inspire WMS
+     * \~english
+     * \brief Return WMS Inspire compliance
+     */
+    bool is_wms_inspire() ;
+    /**
+     * \~french
      * \brief Retourne le droit d'utiliser un service TMS
-     * \return TMSAuthorized
      * \~english
      * \brief Return the right to use TMS
-     * \return TMSAuthorized
      */
     bool is_tms_enabled() ;
     /**
@@ -306,12 +318,17 @@ public:
     /**
      * \~french
      * \brief Retourne le droit d'utiliser un service WMTS
-     * \return WMTSAuthorized
      * \~english
      * \brief Return the right to use WMTS
-     * \return WMTSAuthorized
      */
     bool is_wmts_enabled() ;
+    /**
+     * \~french
+     * \brief Retourne la conformité Inspire WMTS
+     * \~english
+     * \brief Return WMTS Inspire compliance
+     */
+    bool is_wmts_inspire() ;
     /**
      * \~french
      * \brief Retourne la liste des mots-clés
@@ -358,7 +375,7 @@ public:
      * \brief Return the associated styles list
      * \return styles list
      */
-    std::vector<Style*> get_styles() ;
+    std::vector<Style*>* get_styles() ;
     /**
      * \~french
      * \brief Retourne la liste des TMS disponibles
@@ -367,7 +384,7 @@ public:
      * \brief Return the available TMS list
      * \return TMS infos list
      */
-    std::vector<WmtsTmsInfos> get_wmts_tilematrixsets() ;
+    std::vector<WmtsTmsInfos>* get_available_tilematrixsets_wmts() ;
 
     /**
      * \~french
@@ -377,7 +394,7 @@ public:
      * \brief Return the available CRS list for WMS
      * \return CRS list
      */
-    std::vector<CRS*>* get_wms_crss() ;
+    std::vector<CRS*>* get_available_crs_wms() ;
 
     /**
      * \~french
@@ -407,7 +424,7 @@ public:
      * \brief Test if CRS is in the CRS list
      * \return Present or not
      */
-    bool is_wms_crs(CRS* c) ;
+    bool is_available_crs_wms(CRS* c) ;
 
     /**
      * \~french
@@ -417,7 +434,7 @@ public:
      * \brief Test if CRS is in the CRS list
      * \return Present or not
      */
-    bool is_wms_crs(std::string c) ;
+    bool is_available_crs_wms(std::string c) ;
 
     /**
      * \~french
@@ -533,6 +550,68 @@ public:
      * \return extra parameters
      */
     std::map<std::string, std::string> get_gfi_extra_params() ;
+
+    /**
+     * \~french \brief Ajoute un noeud WMS correpondant à la couche
+     * \param[in] parent Noeud auquel ajouter celui de la couche
+     * \param[in] service Service WMS appelant
+     * \param[in] only_inspire Seulement si la couche est inspire
+     * \~english \brief Add a WMS node corresponding to layer
+     * \param[in] parent Node to whom add the layer node
+     * \param[in] service Calling WMS service
+     * \param[in] only_inspire Only if layer is inspire compliant
+     */
+    void add_node_wms(ptree& parent, WmsService* service, bool only_inspire);
+
+    /**
+     * \~french \brief Ajoute un noeud TMS correpondant à la couche
+     * \param[in] parent Noeud auquel ajouter celui de la couche
+     * \param[in] service Service TMS appelant
+     * \~english \brief Add a TMS node corresponding to layer
+     * \param[in] parent Node to whom add the layer node
+     * \param[in] service Calling TMS service
+     */
+    void add_node_tms(ptree& parent, TmsService* service);
+
+    /**
+     * \~french \brief Ajoute un noeud WMTS correpondant à la couche
+     * \param[in] parent Noeud auquel ajouter celui de la couche
+     * \param[in] service Service WMTS appelant
+     * \param[in] only_inspire Seulement si la couche est inspire
+     * \param[in] used_tms_list TMS utilisés dans le service pour ajouter celui de la couche
+     * \~english \brief Add a WMTS node corresponding to layer
+     * \param[in] parent Node to whom add the layer node
+     * \param[in] service Calling WMTS service
+     * \param[in] only_inspire Only if layer is inspire compliant
+     * \param[in] used_tms_list Used TMS, to add the layer ones
+     */
+    void add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire, std::map< std::string, WmtsTmsInfos>* used_tms_list);
+
+
+    /**
+     * \~french \brief Récupère la description TileJSON de la couche au format JSON
+     * \details En accord avec https://github.com/mapbox/tilejson-spec
+     * \~english \brief Get layer TileJSON description as JSON
+     * \details According to https://github.com/mapbox/tilejson-spec
+     */
+    std::string get_description_tilejson(TmsService* service);
+
+    /**
+     * \~french \brief Récupère la description GDAL de la couche au format XML
+     * \details En accord avec https://gdal.org/en/latest/drivers/raster/wms.html
+     * \~english \brief Get layer GDAL description as XML
+     * \details According to https://gdal.org/en/latest/drivers/raster/wms.html
+     */
+    std::string get_description_gdal(TmsService* service);
+
+    /**
+     * \~french \brief Récupère la description TMS de la couche au format XML
+     * \details En accord avec https://gdal.org/en/latest/drivers/raster/wms.html
+     * \~english \brief Get layer TMS description as XML
+     * \details According to https://gdal.org/en/latest/drivers/raster/wms.html
+     */
+    std::string get_description_tms(TmsService* service);
+
     /**
      * \~french
      * \brief Destructeur par défaut

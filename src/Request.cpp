@@ -121,9 +121,8 @@ std::string Request::get_query_param(std::string paramName) {
     return it->second;
 }
 
-void Request::print() {
-    BOOST_LOG_TRIVIAL(info) << "path = " << path;
-    BOOST_LOG_TRIVIAL(info) << "method = " << method;
+std::string Request::to_string() {
+    return method + " " + path + "?" + Utils::map_to_string(query_params, "&", "=");
 }
 
 bool Request::is_inspire() {
@@ -138,7 +137,7 @@ RawDataStream* Request::send() {
         return NULL;
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Send request " << method << " " << url;
+    BOOST_LOG_TRIVIAL(info) << "Send request " << method << " " << url << "?" << Utils::map_to_string(query_params, "&", "=");
 
     CURLcode res;
     DataStruct chunk;

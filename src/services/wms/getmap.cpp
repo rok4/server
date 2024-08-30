@@ -65,13 +65,11 @@
 
 DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
-    // IGNGPF-3546 : si bbox en dehors de l'aire de définition du CRS, on doit répondre de l'image vide (et pas une erreur)
-
     // Les couches
     std::vector<Layer*> layers;
 
     std::string str_layers = req->get_query_param("layers");
-    if (str_layers == "") throw WmsException::get_error_message("LAYERS query parameter unknown", "MissingParameterValue", 400);
+    if (str_layers == "") throw WmsException::get_error_message("LAYERS query parameter missing", "MissingParameterValue", 400);
 
     std::vector<std::string> vector_layers;
     boost::split(vector_layers, str_layers, boost::is_any_of(","));
@@ -137,7 +135,7 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
     if (! is_available_crs(str_crs) ) {
         for ( unsigned int i = 0; i < layers.size() ; i++ ) {
             bool crs_equals = serv->get_services_configuration()->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
-            if (! crs_equals && layers.at ( i )->is_wms_crs(str_crs) )
+            if (! crs_equals && ! layers.at ( i )->is_available_crs_wms(str_crs) )
                 throw WmsException::get_error_message("CRS is not available for the layer " + layers.at ( i )->get_id(), "InvalidParameterValue", 400);
         }
     }
@@ -259,7 +257,7 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
     for (int i = 0; i < layers.size(); i++) {
         bool crs_equals = serv->get_services_configuration()->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
 
-        if (! crs_equals && ! serv->get_services_configuration()->get_wms_service()->reprojection_enabled()) {
+        if (! crs_equals && ! reprojection) {
             throw WmsException::get_error_message("Reprojection is not available", "InvalidParameterValue", 400);
         }
 
@@ -272,16 +270,19 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             sample_format = style->get_sample_format(layers.at(i)->get_pyramid()->get_sample_format());
         }
 
-        bands = std::max(bands, style->get_channels(layers.at(i)->get_pyramid()->get_channels()));
 
         Image* image = layers.at(i)->get_pyramid()->getbbox(max_tile_x, max_tile_y, bbox, width, height, crs, crs_equals, layers.at(i)->get_resampling(), dpi);
 
         if (image == NULL) {
-            throw WmsException::get_error_message("BBOX not valid", "InvalidParameterValue", 400);
+            throw WmsException::get_error_message("BBOX too big", "InvalidParameterValue", 400);
         }
 
         image = new PaletteImage(image, style->get_palette());
+
         images.push_back(image);
+
+        // Le nombre final de canaux est celui maxiumum parmis les couches, c'est à dire celui de la donnée en prenant en compte le style
+        bands = std::max(bands, style->get_channels(layers.at(i)->get_pyramid()->get_channels()));
     }
 
     // On construit la réponse finale, en superposant les couches

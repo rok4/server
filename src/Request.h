@@ -139,10 +139,10 @@ public:
     std::string body;
 
     /**
-     * \~french \brief Affichage (debug)
-     * \~english \brief Display (debug)
+     * \~french \brief Export textuel
+     * \~english \brief Text export
      */
-    void print();
+    std::string to_string();
 
     /**
      * \~french \brief Est une requête INSPIRE ?

@@ -129,98 +129,16 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
             inspire_extension.add("inspire_common:MetadataUrl.inspire_common:MediaType", metadata->get_type());
         }
         
-        inspire_extension.add("inspire_common:SupportedLanguages.inspire_common:DefaultLanguage.inspire_common:Language", "fra");
-        inspire_extension.add("inspire_common:ResponseLanguage.inspire_common:Language", "fra");
+        inspire_extension.add("inspire_common:SupportedLanguages.inspire_common:DefaultLanguage.inspire_common:Language", "fre");
+        inspire_extension.add("inspire_common:ResponseLanguage.inspire_common:Language", "fre");
     }
 
     ptree& contents_node = root.add("Contents", "");
 
     std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
-        if (layers_iterator->second->is_wmts_enabled()) {
-            Layer* layer = layers_iterator->second;
-            ptree& layer_node = contents_node.add("Layer", "");
-            layer_node.add("ows:Title", layer->title);
-            layer_node.add("ows:Abstract", layer->abstract);
-
-            if ( layer->keywords.size() != 0 ) {
-                ptree& keywords_node = layer_node.add("ows:Keywords", "");
-                for ( unsigned int i = 0; i < layer->keywords.size(); i++ ) {
-                    keywords.at(i).add_node(keywords_node, "ows:Keyword");
-                }
-            }
-
-            std::ostringstream os;
-            os << layer->geographic_bbox.xmin << " " << layer->geographic_bbox.ymin;
-            layer_node.add("ows:WGS84BoundingBox.ows:LowerCorner", os.str());
-            os.str ( "" );
-            os << layer->geographic_bbox.xmax << " " << layer->geographic_bbox.ymax;
-            layer_node.add("ows:WGS84BoundingBox.ows:UpperCorner", os.str());
-            
-            layer_node.add("ows:Identifier", layer->id);
-
-            for ( unsigned int i = 0; i < layer->styles.size(); i++ ) {
-                ptree& style_node = layer_node.add("Style", "");
-                if ( i == 0 ) {
-                    style_node.add("<xmlattr>.isDefault", "true");
-                }
-                
-                Style* style = layer->styles.at(i);
-                for (int j = 0 ; j < style->get_titles().size(); ++j ) {
-                    style_node.add("ows:Title", style->get_titles()[j]);
-                }
-                for (int j = 0 ; j < style->get_abstracts().size(); ++j ) {
-                    style_node.add("ows:Abstract", style->get_abstracts()[j]);
-                }
-
-                if ( style->get_keywords()->size() != 0 ) {
-                    ptree& style_keywords_node = style_node.add("ows:Keywords", "");
-                    for ( unsigned int j = 0; j < style->get_keywords()->size(); j++ ) {
-                        style->get_keywords()->at ( j ).add_node(style_keywords_node, "ows:Keyword");
-                    }
-                }
-
-                style_node.add("ows:Identifier", style->get_identifier());
-                for ( int j = 0 ; j < style->get_legends()->size(); j++ ) {
-                    style->get_legends()->at(j).add_node_wmts(style_node);
-                }
-            }
-
-            layer_node.add("Format", Rok4Format::to_mime_type ( layer->pyramid->get_format() ));
-
-            if (layer->gfi_enabled){
-                for ( unsigned int j = 0; j < info_formats.size(); j++ ) {
-                    layer_node.add("InfoFormat", info_formats.at ( j ));
-                }
-            }
-
-            if (reprojection) {
-                // On ajoute les TMS disponibles avec les tuiles limites
-                for ( unsigned int i = 0; i < layer->get_wmts_tilematrixsets().size(); i++ ) {
-                    ptree& tms_node = layer_node.add("TileMatrixSetLink", "");
-                    tms_node.add("TileMatrixSet", layer->get_wmts_tilematrixsets().at(i).wmts_id);
-
-                    ptree& tms_limits_node = tms_node.add("TileMatrixSetLimits", "");
-                    
-                    // Niveaux
-                    for ( unsigned int j = 0; j < layer->get_wmts_tilematrixsets().at(i).limits.size(); j++ ) { 
-                        layer->get_wmts_tilematrixsets().at(i).limits.at(j).add_node(tms_limits_node);
-                    }
-
-                    used_tms_list.insert ( std::pair<std::string, WmtsTmsInfos> ( layer->get_wmts_tilematrixsets().at(i).wmts_id , layer->get_wmts_tilematrixsets().at(i)) );
-                }
-            }
-
-            // On veut ajouter le TMS natif des données dans sa version originale
-            WmtsTmsInfos origin_infos;
-            origin_infos.tms = layer->get_pyramid()->get_tms();
-            origin_infos.top_level = "";
-            origin_infos.bottom_level = "";
-            origin_infos.wmts_id = origin_infos.tms->get_id();
-            used_tms_list.insert ( std::pair<std::string, WmtsTmsInfos> ( origin_infos.wmts_id, origin_infos) );
-        }
+        layers_iterator->second->add_node_wmts(contents_node, this, req->is_inspire(), &used_tms_list);
     }
-
 
     std::map<std::string, WmtsTmsInfos>::iterator tms_iterator ( used_tms_list.begin() ), tms_end ( used_tms_list.end() );
     for ( ; tms_iterator!=tms_end; ++tms_iterator ) {

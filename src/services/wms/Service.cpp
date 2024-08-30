@@ -299,7 +299,7 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
             }
         }
     } else if (! doc["crs"].is_null()) {
-        error_message = "WMS service: crs have to be a string array";
+        error_message = "WMS service: crs have to be a string array with enabled reprojection";
         return;
     }
 
@@ -389,4 +389,8 @@ bool WmsService::is_available_format(std::string f) {
 
 bool WmsService::is_available_infoformat(std::string f) {
     return (std::find(info_formats.begin(), info_formats.end(), f) != info_formats.end());
+}
+
+std::vector<CRS*>* WmsService::get_available_crs() {
+    return &crss;
 }

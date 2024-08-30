@@ -254,6 +254,8 @@ void Router::process_request(Request* req, Rok4Server* serv) {
 
     try {
 
+        BOOST_LOG_TRIVIAL(info) << "Request: " << req->to_string();
+
         if (services->get_health_service()->match_request(req)) {
             sendresponse(services->get_health_service()->process_request(req, serv), req);
         }
@@ -281,8 +283,7 @@ void Router::process_request(Request* req, Rok4Server* serv) {
     }
     catch (MessageDataStream* m) {
         // On attrape un message d'erreur
-        BOOST_LOG_TRIVIAL(debug) << "Request failure";
-        BOOST_LOG_TRIVIAL(debug) << req->method << " " << req->path;
+        BOOST_LOG_TRIVIAL(info) << "Request failure";
         sendresponse(m, req);
     }
     catch (...) {

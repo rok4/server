@@ -106,6 +106,14 @@ public:
      */
     bool is_available_infoformat(std::string f) ;
 
+    /**
+     * \~french
+     * \brief Liste des formats d'information du service
+     * \~english
+     * \brief Service informations formats
+     */
+    std::vector<std::string>* get_available_infoformats() ;
+
 };
 
 #endif /* WMTSSERVICE_H_ */

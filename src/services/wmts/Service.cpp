@@ -177,3 +177,7 @@ DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
 bool WmtsService::is_available_infoformat(std::string f) {
     return (std::find(info_formats.begin(), info_formats.end(), f) != info_formats.end());
 }
+
+std::vector<std::string>* WmtsService::get_available_infoformats() {
+    return &info_formats;
+}

@@ -111,11 +111,11 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
     TileMatrixLimits* tml = layer->get_tilematrix_limits(tms, tm);
     if (tml == NULL) {
         // On est hors niveau -> erreur
-        throw WmtsException::get_error_message("No data found", "Not Found", 404);
+        throw WmtsException::get_error_message("No data found", "TileOutOfRange", 404);
     }
     if (!tml->contain_tile(column, row)) {
         // On est hors tuiles -> erreur
-        throw WmtsException::get_error_message("No data found", "Not Found", 404);
+        throw WmtsException::get_error_message("No data found", "TileOutOfRange", 404);
     }
     
     // infoformat
@@ -139,12 +139,12 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
 
     char c;
     if (sscanf(str_i.c_str(), "%d%c", &i, &c) != 1) {
-        throw WmtsException::get_error_message("I query parameter have to be a positive integer", "MissingParameterValue", 400);
+        throw WmtsException::get_error_message("I query parameter have to be a positive integer", "InvalidParameterValue", 400);
     }
     if ( i < 0 )
-        throw WmtsException::get_error_message("I query parameter have to be a positive integer", "MissingParameterValue", 400);
+        throw WmtsException::get_error_message("I query parameter have to be a positive integer", "PointIJOutOfRange", 400);
     if ( i > tm->get_tile_width()-1 )
-        throw WmtsException::get_error_message("I query parameter have to be smaller than the tile width", "MissingParameterValue", 400);
+        throw WmtsException::get_error_message("I query parameter have to be smaller than the tile width", "PointIJOutOfRange", 400);
 
 
     // j
@@ -153,12 +153,12 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
 
     int j;
     if (sscanf(str_j.c_str(), "%d%c", &j, &c) != 1) {
-        throw WmtsException::get_error_message("J query parameter have to be a positive integer", "MissingParameterValue", 400);
+        throw WmtsException::get_error_message("J query parameter have to be a positive integer", "InvalidParameterValue", 400);
     }
     if ( j < 0 )
-        throw WmtsException::get_error_message("J query parameter have to be a positive integer", "MissingParameterValue", 400);
-    if ( j > tm->get_tile_width()-1 )
-        throw WmtsException::get_error_message("J query parameter have to be smaller than the tile height", "MissingParameterValue", 400);
+        throw WmtsException::get_error_message("J query parameter have to be a positive integer", "PointIJOutOfRange", 400);
+    if ( j > tm->get_tile_height()-1 )
+        throw WmtsException::get_error_message("J query parameter have to be smaller than the tile height", "PointIJOutOfRange", 400);
 
     Level* level = layer->get_pyramid()->get_level(tm->get_id());
 
@@ -206,7 +206,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
                 break;
             }
             default:
-                throw WmtsException::get_error_message("No data found", "Not Found", 404);
+                throw WmtsException::get_error_message("No readable data found", "Not Found", 404);
         }
 
         delete image;
@@ -245,11 +245,11 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         delete gfi_request;
 
         if (response == NULL) {
-            throw WmtsException::get_error_message("No data found", "Not Found", 404);
+            throw WmtsException::get_error_message("No readable data found", "Not Found", 404);
         }
 
         return response;
     }
 
-    throw WmtsException::get_error_message("Get Feature Info badly configured", "Bad configuration", 503);
+    throw WmtsException::get_error_message("Get Feature Info badly configured", "NoApplicableCode", 503);
 }
