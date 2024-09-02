@@ -65,6 +65,7 @@ DataStream* AdminService::add_layer ( Request* req, Rok4Server* serv ) {
     }
 
     serv->get_server_configuration()->add_layer ( layer );
+    serv->get_services_configuration()->clean_cache();
 
     return new EmptyResponseDataStream ();
 }
@@ -86,6 +87,7 @@ DataStream* AdminService::update_layer ( Request* req, Rok4Server* serv ) {
 
     serv->get_server_configuration()->delete_layer ( layer->get_id() );
     serv->get_server_configuration()->add_layer ( new_layer );
+    serv->get_services_configuration()->clean_cache();
 
     return new EmptyResponseDataStream ();
 
@@ -100,7 +102,7 @@ DataStream* AdminService::delete_layer ( Request* req, Rok4Server* serv ) {
     if ( layer == NULL ) throw AdminException::get_error_message("Layer " + str_layer + " does not exists.", "Not found", 404);
 
     serv->get_server_configuration()->delete_layer ( layer->get_id() );
+    serv->get_services_configuration()->clean_cache();
 
     return new EmptyResponseDataStream ();
-
 }

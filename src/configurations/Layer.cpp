@@ -59,7 +59,6 @@
 
 bool is_style_handled(Style* style) {
     if (style->get_identifier() == "") return false;
-    if (style->get_titles().size() == 0) return false;
     if (style->get_aspect() != 0 || style->get_estompage() != 0 || style->get_pente() != 0) return false;
 
     return true;

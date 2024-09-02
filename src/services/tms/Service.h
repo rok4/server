@@ -47,7 +47,6 @@ class TmsService;
 
 #ifndef TMSSERVICE_H_
 #define TMSSERVICE_H_
-
 #include "services/Service.h"
 #include "configurations/Metadata.h"
 
@@ -67,8 +66,22 @@ private:
 
     Metadata* metadata;
 
+    std::string cache_getcapabilities;
+
 public:
     DataStream* process_request(Request* req, Rok4Server* serv);
+
+    /**
+     * \~french
+     * \brief Supprime les réponses cachées
+     * \~english
+     * \brief Remove cached responses
+     */
+    void clean_cache() {
+        cache_mtx.lock();
+        cache_getcapabilities.clear();
+        cache_mtx.unlock();
+    };
 
     /**
      * \~french

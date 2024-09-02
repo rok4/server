@@ -47,6 +47,7 @@
 #define SERVICE_H_
 
 #include <regex>
+#include <mutex>
 
 #include <utils/Configuration.h>
 #include <utils/Keyword.h>
@@ -84,6 +85,14 @@ protected:
      * \param[in] req Request to test
      */
     bool match_route(std::string path, std::vector<std::string> methods, Request* req);
+
+    /**
+     * \~french \brief Exclusion mutuelle
+     * \details Pour éviter les modifications concurrentes du cache
+     * \~english \brief Mutual exclusion
+     * \details To avoid concurrent cache updates
+     */
+    std::mutex cache_mtx;
 
 public:
     /**

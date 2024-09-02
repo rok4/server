@@ -58,6 +58,10 @@ using boost::property_tree::xml_writer_settings;
 
 DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
+    if (! cache_getcapabilities.empty()) {
+        return new MessageDataStream ( cache_getcapabilities, "text/xml", 200 );
+    }
+
     ServicesConfiguration* services = serv->get_services_configuration();
 
     // On va mémoriser les TMS utilisés, avec les niveaux du haut et du bas
@@ -204,5 +208,8 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::stringstream ss;
     write_xml(ss, tree);
+    cache_mtx.lock();
+    cache_getcapabilities = ss.str();
+    cache_mtx.unlock();
     return new MessageDataStream ( ss.str(), "text/xml", 200 );
 }

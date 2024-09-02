@@ -58,11 +58,9 @@ using boost::property_tree::xml_writer_settings;
 
 DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
-    // IGNGPF-3548 : revoir les formats de GFI pour ne pas proposer ce que geoserver ne veut pas (pas application/xml mais text/xml)
-    // Voir la même chose pour les formats d'image : est ce qu'on ne devrait pas les définir pour chaque couche
-
-    // IGNGPF-3556 : ajouter aux URL des opérations ?SERVICE=WMS& : fait
-
+    if (! cache_getcapabilities.empty()) {
+        return new MessageDataStream ( cache_getcapabilities, "text/xml", 200 );
+    }
 
     ServicesConfiguration* services = serv->get_services_configuration();
 
@@ -167,6 +165,9 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::stringstream ss;
     write_xml(ss, tree);
+    cache_mtx.lock();
+    cache_getcapabilities = ss.str();
+    cache_mtx.unlock();
     return new MessageDataStream ( ss.str(), "text/xml", 200 );
 
 }

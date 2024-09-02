@@ -70,23 +70,23 @@ AdminService::AdminService (json11::Json& doc) : Service(doc) {
 DataStream* AdminService::process_request(Request* req, Rok4Server* serv) {
     BOOST_LOG_TRIVIAL(debug) << "ADMIN service";
 
-    if ( match_route( "/admin/layers/([^/]+)", {"POST"}, req ) ) {
+    if ( match_route( "/layers/([^/]+)", {"POST"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "ADDLAYER request";
         return add_layer(req, serv);
     }
-    else if ( match_route( "/admin/layers/([^/]+)", {"PUT"}, req ) ) {
+    else if ( match_route( "/layers/([^/]+)", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "UPDATELAYER request";
         return update_layer(req, serv);
     }
-    else if ( match_route( "/admin/layers/([^/]+)", {"DELETE"}, req ) ) {
+    else if ( match_route( "/layers/([^/]+)", {"DELETE"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "DELETELAYER request";
         return delete_layer(req, serv);
     }
-    else if ( match_route( "/depends", {"PUT"}, req ) ) {
+    else if ( match_route( "/on", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "TURNON request";
         return turn_on(req, serv);
     }
-    else if ( match_route( "/depends", {"PUT"}, req ) ) {
+    else if ( match_route( "/off", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "TURNOFF request";
         return turn_off(req, serv);
     } else {

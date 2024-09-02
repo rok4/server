@@ -330,3 +330,9 @@ ServicesConfiguration::~ServicesConfiguration(){
             delete it->second.at(i);
         }
 }
+
+void ServicesConfiguration::clean_cache() {
+    wms_service->clean_cache();
+    wmts_service->clean_cache();
+    tms_service->clean_cache();
+};

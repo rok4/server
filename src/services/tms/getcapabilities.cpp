@@ -64,6 +64,10 @@ DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Invalid version (only 1.0.0 available)", 400);
     }
 
+    if (! cache_getcapabilities.empty()) {
+        return new MessageDataStream ( cache_getcapabilities, "text/xml", 200 );
+    }
+
     ptree tree;
 
     ptree& root = tree.add("TileMapService", "");
@@ -91,6 +95,9 @@ DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::stringstream ss;
     write_xml(ss, tree);
+    cache_mtx.lock();
+    cache_getcapabilities = ss.str();
+    cache_mtx.unlock();
     return new MessageDataStream ( ss.str(), "text/xml", 200 );
 }
 

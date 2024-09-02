@@ -104,6 +104,14 @@ class ServicesConfiguration : public Configuration
         };
         bool are_crs_equals( std::string crs1, std::string crs2 );
 
+        /**
+         * \~french
+         * \brief Supprime les réponses cachées
+         * \~english
+         * \brief Remove cached responses
+         */
+        void clean_cache();
+        
     protected:
 
         // ----------------------- Global 
