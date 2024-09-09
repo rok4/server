@@ -43,8 +43,7 @@
  * \brief Define classe TilesException
  */
 
-#ifndef TILESEXCEPTION_H_
-#define TILESEXCEPTION_H_
+#pragma once
 
 #include <string>
 #include "boost/format.hpp"
@@ -56,19 +55,18 @@
  * \~french
  * \brief Gestion des erreurs du service OGC API Tiles
  * \details Cette classe est prévue pour être utilisée sans instance. Les erreurs ont le formalisme suivant :
- * \code{.xml}
- * <?xml version="1.0" ?>
- * <TilesError>
- *    <Message>An error occured</Message>
- * </TileError>
+ * \code{.json}
+ * {
+ *    "type": "Request issue"
+ *    "title": "An error occured"
+ * }
  * \endcode
  */
 class TilesException {
 private:
-    static std::string xml_template;
+    static std::string json_template;
 
 public:
-    static MessageDataStream* get_error_message(std::string reason, int status);
+    static MessageDataStream* get_error_message(std::string type, std::string title, int status);
 };
 
-#endif /* TILESEXCEPTION_H_ */

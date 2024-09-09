@@ -109,6 +109,13 @@ Les répertoires dans lesquels sont les tile matrix sets et les styles peuvent �
 * Les paramètres possibles du fichier de configuration `server.json` sont décrits [ici](./config/server.schema.json)
 * Les paramètres possibles du fichier de configuration `services.json` sont décrits [ici](./config/services.schema.json)
 
+Vous pouvez valider votre fichier avec l'outil [check-jsonschema](https://pypi.org/project/check-jsonschema/) :
+
+```bash
+check-jsonschema /path/to/your/server.json --schemafile ./config/server.schema.json
+check-jsonschema /path/to/your/services.json --schemafile ./config/services.schema.json
+```
+
 ### Lancer le serveur
 
 #### En ligne de commande

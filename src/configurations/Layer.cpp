@@ -56,6 +56,7 @@
 #include <rok4/style/Style.h>
 
 #include "configurations/Layer.h"
+#include "Inspire.h"
 
 bool is_style_handled(Style* style) {
     if (style->get_identifier() == "") return false;
@@ -72,9 +73,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     abstract = "";
 
     wms = true;
-    wms_inspire = true;
     wmts = true;
-    wmts_inspire = true;
     tms = true;
     tiles = true;
 
@@ -112,9 +111,6 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     } else if (! doc["keywords"].is_null()) {
         error_message = "keywords have to be a string array";
         return false;
-    } else {
-        wms_inspire = false;
-        wmts_inspire = false;
     }
 
     if (doc["metadata"].is_array()) {
@@ -129,8 +125,6 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     } else if (! doc["metadata"].is_null()) {
         error_message = "metadata have to be an object array";
         return false;
-    } else {
-        wmts_inspire = false;
     }
 
     if (doc["attribution"].is_object()) {
@@ -224,12 +218,12 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     }
 
     // On a forcément le TMS natif de la donnée pour le WMTS
-    WmtsTmsInfos infos;
-    infos.tms = pyramid->get_tms();
-    infos.top_level = pyramid->get_highest_level()->get_id();
-    infos.bottom_level = pyramid->get_lowest_level()->get_id();
-    infos.wmts_id = infos.tms->get_id() + "_" + infos.top_level + "_" + infos.bottom_level;
-    wmts_tilematrixsets.push_back(infos);
+    WmtsTmsInfos infos_tms_natif;
+    infos_tms_natif.tms = pyramid->get_tms();
+    infos_tms_natif.top_level = pyramid->get_highest_level()->get_id();
+    infos_tms_natif.bottom_level = pyramid->get_lowest_level()->get_id();
+    infos_tms_natif.wmts_id = infos_tms_natif.tms->get_id() + "_" + infos_tms_natif.top_level + "_" + infos_tms_natif.bottom_level;
+    wmts_tilematrixsets.push_back(infos_tms_natif);
 
 
     // On a forcément le CRS natif de la donnée pour le WMS
@@ -270,7 +264,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     if (doc["tms"].is_object() && doc["tms"]["enabled"].is_bool()) {
         tms = doc["tms"]["enabled"].bool_value();
     }
-    if (doc["tiles"].is_object() && doc["tms"]["enabled"].is_bool()) {
+    if (doc["tiles"].is_object() && doc["tiles"]["enabled"].is_bool()) {
         tiles = doc["tiles"]["enabled"].bool_value();
     }
 
@@ -347,12 +341,6 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
             return false;
         }
 
-        // Pour être inspire, le style par défaut (le premier) doit avoir le bon identifiant
-        if (styles[0]->get_identifier() != "inspire_common:DEFAULT") {
-            wms_inspire = false;
-            wmts_inspire = false;
-        }
-
         // Configuration des reprojections possibles
 
         // TMS additionnels pour le WMTS
@@ -373,6 +361,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
                     continue;
                 }
 
+                WmtsTmsInfos infos;
                 infos.tms = tms;
                 // On calculera plus tard (dans calculate_tilematrix_limits) les informations de niveaux de haut et bas (et donc l'ID WMTS de ce TMS)
                 wmts_tilematrixsets.push_back(infos);
@@ -420,6 +409,21 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
             resampling = Interpolation::from_string ( DEFAULT_RESAMPLING );
         }
     }
+
+    wms_inspire = Inspire::is_inspire_wms(this);
+    wmts_inspire = Inspire::is_inspire_wmts(this);
+
+    calculate_tilematrix_limits();
+
+    if (! Rok4Format::is_raster(pyramid->get_format())) {
+        // Une pyramide vecteur n'est diffusée qu'en TMS et API TILES et le GFI n'est pas possible
+        wms = false;
+        wms_inspire = false;
+        wmts = false;
+        wmts_inspire = false;
+        gfi_enabled = false;
+    }
+
 
     return true;
 }
@@ -514,10 +518,8 @@ void Layer::calculate_tilematrix_limits() {
 
         // Pour chaque niveau entre le haut et le base, on va calculer les tuiles limites
 
-        std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->get_ordered_tm(false);
         bool begin = false;
-        for (std::pair<std::string, TileMatrix*> element : orderedTM) {
-            TileMatrix* tm = element.second;
+        for (TileMatrix* tm : tms->get_ordered_tm(false)) {
 
             if (! begin && tm->get_id() != tmTop->get_id()) {
                 continue;
@@ -589,20 +591,11 @@ Layer::Layer(std::string path, ServicesConfiguration* services) : Configuration(
         return;
     }
 
-    if (Rok4Format::is_raster(pyramid->get_format())) {
-        calculate_tilematrix_limits();
-    } else {
-        // Une pyramide vecteur n'est diffusée qu'en TMS et le GFI n'est pas possible
-        wms = false;
-        wmts = false;
-        gfi_enabled = false;
-    }
-
     return;
 }
 
 
-Layer::Layer(std::string layerName, std::string content, ServicesConfiguration* services ) : Configuration(), id(layerName), pyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string layer_name, std::string content, ServicesConfiguration* services ) : Configuration(), id(layer_name), pyramid(NULL), attribution(NULL) {
 
     /********************** Id */
 
@@ -624,15 +617,6 @@ Layer::Layer(std::string layerName, std::string content, ServicesConfiguration* 
 
     if (! parse(doc, services)) {
         return;
-    }
-
-    if (Rok4Format::is_raster(pyramid->get_format())) {
-        calculate_tilematrix_limits();
-    } else {
-        // Une pyramide vecteur n'est diffusée qu'en WMTS et TMS et le GFI n'est pas possible
-        wms = false;
-        wmts = false;
-        gfi_enabled = false;
     }
     
     return;
@@ -763,7 +747,18 @@ void Layer::add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire
     }
 
     for ( Style* s : styles) {
-        s->add_node_wmts(node);
+        /*
+        Pour qu'un style soit applicable en WMTS, il faut que :
+           - quel style soit l'identité
+        Ou :
+           - que le style soit une palette (c'est forcément le cas, on n'accepte pas les styles plus complexes à la diffusion)
+           - que la donnée soit sur un canal
+           - que la donnée soit en PNG
+        Cela permet de n'avoir à modifier que l'en tête de la tuile PNG pour que le style "soit appliqué"
+        */
+        if (s->is_identity() || (pyramid->get_channels() == 1 && pyramid->get_sample_compression() == Compression::PNG)) {
+            s->add_node_wmts(node);
+        }
     }
 
     node.add("Format", Rok4Format::to_mime_type ( pyramid->get_format() ));
@@ -892,6 +887,46 @@ void Layer::add_node_tms(ptree& parent, TmsService* service) {
     node.add("<xmlattr>.profile", "none");
     node.add("<xmlattr>.extension", Rok4Format::to_extension ( pyramid->get_format() ));
     node.add("<xmlattr>.href", service->get_endpoint_uri() + "/1.0.0/" + id);
+}
+
+json11::Json Layer::to_json_tiles(TilesService* service) {
+
+    if (! tiles) {
+        return json11::Json::NUL;
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "id", id },
+        { "title", title },
+        { "description", abstract },
+        { "extent", geographic_bbox.to_json_tiles() }
+    };
+
+    std::vector<json11::Json> links;
+
+    links.push_back(json11::Json::object {
+        { "href", service->get_endpoint_uri() + "/collections/" + id + "?f=application/json"},
+        { "rel", "self"},
+        { "type", "application/json"},
+        { "title", "this document"}
+    });
+    
+    for ( Metadata m : metadata) {
+        links.push_back(m.to_json_tiles("Dataset metadata", "describedby"));
+    }
+
+    res["links"] = links;
+
+    res["crs"] = json11::Json::array {
+        pyramid->get_tms()->get_crs()->get_url()
+    };
+
+    res["dataType"] = Rok4Format::is_raster(pyramid->get_format()) ? "map" : "vector";
+
+    res["minCellSize"] = pyramid->get_lowest_level()->get_res();
+    res["maxCellSize"] = pyramid->get_highest_level()->get_res();
+
+    return res;
 }
 
 std::string Layer::get_description_tilejson(TmsService* service) {
@@ -1043,7 +1078,7 @@ std::string Layer::get_description_tms(TmsService* service) {
     root.add("SRS", crs->get_request_code() );
     native_bbox.add_node(root, false, crs->is_lat_lon());
 
-    TileMatrix* tm = pyramid->get_tms()->getTmList()->begin()->second;
+    TileMatrix* tm = pyramid->get_lowest_level()->get_tm();
 
     root.add("Origin.<xmlattr>.x", tm->get_x0() );
     root.add("Origin.<xmlattr>.y", tm->get_y0() );

@@ -43,8 +43,7 @@
  * \brief Define classes InfoThread and Threads
  */
 
-#ifndef THREADS_H_
-#define THREADS_H_
+#pragma once
 
 #include <map>
 #include <chrono>
@@ -260,4 +259,3 @@ class Threads {
         }
 };
 
-#endif /* THREADS_H_ */

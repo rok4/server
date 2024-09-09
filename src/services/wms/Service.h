@@ -45,8 +45,7 @@
 
 class WmsService;
 
-#ifndef WMSSERVICE_H_
-#define WMSSERVICE_H_
+#pragma once
 
 #include "services/Service.h"
 #include "configurations/Metadata.h"
@@ -81,7 +80,10 @@ private:
 
     std::vector<CRS*> crss;
 
+    bool default_inspire;
+
     std::string cache_getcapabilities;
+    std::string cache_getcapabilities_inspire;
 
 public:
     DataStream* process_request(Request* req, Rok4Server* serv);
@@ -95,6 +97,7 @@ public:
     void clean_cache() {
         cache_mtx.lock();
         cache_getcapabilities.clear();
+        cache_getcapabilities_inspire.clear();
         cache_mtx.unlock();
     };
 
@@ -172,4 +175,4 @@ public:
 
 };
 
-#endif /* WMSSERVICE_H_ */
+

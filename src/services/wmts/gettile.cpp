@@ -43,6 +43,9 @@
  * \brief Implements classe WmtsService
  */
 
+#include <iostream>
+
+
 #include <rok4/datasource/PaletteDataSource.h>
 #include <rok4/datastream/AscEncoder.h>
 #include <rok4/datastream/BilEncoder.h>
@@ -54,8 +57,6 @@
 #include <rok4/datastream/TiffDeflateEncoder.h>
 #include <rok4/datastream/TiffRawEncoder.h>
 #include <rok4/image/PaletteImage.h>
-
-#include <iostream>
 
 #include "Rok4Server.h"
 #include "services/wmts/Exception.h"
@@ -142,12 +143,20 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     std::string str_style = req->get_query_param("style");
     if (str_style == "") throw WmtsException::get_error_message("STYLE query parameter missing", "MissingParameterValue", 400);
 
+    if (contain_chars(str_style, "<>")) {
+        // On a détecté un caractère interdit, on ne met pas le format fourni dans la réponse pour éviter une injection
+        BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMTS style: " << str_style;
+        throw WmtsException::get_error_message("Style unknown", "InvalidParameterValue", 400);
+    }
+
     Style* style = NULL;
     if (Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
         style = layer->get_style_by_identifier(str_style);
 
         if (style == NULL) throw WmtsException::get_error_message("Style " + str_style + " unknown", "InvalidParameterValue", 400);
     }
+
+    // Traitement de la requête
 
     if (tms->get_id() == layer->get_pyramid()->get_tms()->get_id()) {
         // TMS d'interrogation natif
@@ -219,14 +228,26 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
                         return new TiffPackBitsEncoder<uint8_t>(image, is_geotiff);
                     }
 
+                    break;
+
                 case Rok4Format::TIFF_RAW_FLOAT32:
-                    return new TiffRawEncoder<float>(image, is_geotiff);
                 case Rok4Format::TIFF_LZW_FLOAT32:
-                    return new TiffLZWEncoder<float>(image, is_geotiff);
                 case Rok4Format::TIFF_ZIP_FLOAT32:
-                    return new TiffDeflateEncoder<float>(image, is_geotiff);
                 case Rok4Format::TIFF_PKB_FLOAT32:
-                    return new TiffPackBitsEncoder<float>(image, is_geotiff);
+                    if (opt.compare("lzw") == 0) { 
+                        return new TiffLZWEncoder<float>(image, is_geotiff);
+                    }
+                    if (opt.compare("deflate") == 0) {
+                        return new TiffDeflateEncoder<float>(image, is_geotiff);
+                    }
+                    if (opt.compare("raw") == 0 || opt == "") {
+                        return new TiffRawEncoder<float>(image, is_geotiff);
+                    }
+                    if (opt.compare("packbits") == 0) {
+                        return new TiffPackBitsEncoder<float>(image, is_geotiff);
+                    }
+
+                    break;
                 default:
                     delete image;
                     throw WmtsException::get_error_message("No data found", "Not Found", 404);

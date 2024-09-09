@@ -370,7 +370,9 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
                 image->get_line(data, j);
                 for (int b = 0; b < bands; b++) {
                     std::stringstream ss;
-                    ss << (float)data[bands * i + b];
+                    ss.setf(std::ios::fixed, std::ios::floatfield);
+                    ss.precision(2);
+                    ss << data[bands * i + b];
                     gfi_data.push_back(ss.str());
                 }
                 delete[] data;

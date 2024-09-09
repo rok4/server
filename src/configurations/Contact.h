@@ -44,8 +44,7 @@
  */
 
 
-#ifndef CONTACT_H_
-#define CONTACT_H_
+#pragma once
 
 #include <boost/property_tree/ptree.hpp>
 using boost::property_tree::ptree;
@@ -92,7 +91,7 @@ public:
     */
     Contact(json11::Json& doc) {
         if (doc.is_null()) {
-            error_message = "No contact section";
+            // On aura tous les champs vides
             return;
         } else if (! doc.is_object()) {
             error_message = "Contact configuration: contact have to be an object";
@@ -241,4 +240,4 @@ public:
 
 };
 
-#endif /* CONTACT_H_ */
+

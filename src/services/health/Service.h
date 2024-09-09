@@ -45,8 +45,7 @@
 
 class HealthService;
 
-#ifndef HEALTHSERVICE_H_
-#define HEALTHSERVICE_H_
+#pragma once
 
 #include "services/Service.h"
 
@@ -77,4 +76,3 @@ public:
 
 };
 
-#endif /* HEALTHSERVICE_H_ */

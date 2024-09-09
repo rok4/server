@@ -45,8 +45,7 @@
 
 class TmsService;
 
-#ifndef TMSSERVICE_H_
-#define TMSSERVICE_H_
+#pragma once
 #include "services/Service.h"
 #include "configurations/Metadata.h"
 
@@ -62,7 +61,7 @@ private:
     DataStream* get_tiles ( Request* req, Rok4Server* serv );
     DataStream* get_metadata ( Request* req, Rok4Server* serv );
     DataStream* get_gdal ( Request* req, Rok4Server* serv );
-    DataSource* get_tile ( Request* req, Rok4Server* serv );
+    DataStream* get_tile ( Request* req, Rok4Server* serv );
 
     Metadata* metadata;
 
@@ -103,4 +102,4 @@ public:
 
 };
 
-#endif /* TMSSERVICE_H_ */
+

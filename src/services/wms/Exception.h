@@ -43,8 +43,7 @@
  * \brief Define classe WmsException
  */
 
-#ifndef WMSEXCEPTION_H_
-#define WMSEXCEPTION_H_
+#pragma once
 
 #include <string>
 #include "boost/format.hpp"
@@ -72,5 +71,5 @@ public:
     static MessageDataStream* get_error_message(std::string reason, std::string code, int status);
 };
 
-#endif /* WMSEXCEPTION_H_ */
+
 

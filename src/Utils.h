@@ -35,8 +35,7 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-#ifndef UTILSERV_H
-#define UTILSERV_H
+#pragma once
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -57,8 +56,7 @@ using boost::property_tree::xml_writer_settings;
 
 #include "DataStreams.h"
 
-class Utils {
-   public:
+namespace Utils {
     /**
      * \~french
      * \brief Donne le nombre de chiffres après la virgule
@@ -253,4 +251,4 @@ class Utils {
     }
 };
 
-#endif  // UTILSERV_H
+

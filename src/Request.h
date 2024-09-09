@@ -35,8 +35,7 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-#ifndef REQUEST_H_
-#define REQUEST_H_
+#pragma once
 
 #include <map>
 #include <vector>
@@ -146,9 +145,11 @@ public:
 
     /**
      * \~french \brief Est une requête INSPIRE ?
+     * \param[in] inspire_default Comportement par défaut du service appelé
      * \~english \brief Is a INSPIRE request ?
+     * \param[in] inspire_default Default behaviour of requested service
      */
-    bool is_inspire();
+    bool is_inspire(bool inspire_default = false);
 
     /**
      * \~french \brief Joue la requête
@@ -191,4 +192,4 @@ public:
     virtual ~Request();
 };
 
-#endif /* REQUEST_H_ */
+

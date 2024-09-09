@@ -142,7 +142,7 @@ DataStream* TmsService::process_request(Request* req, Rok4Server* serv) {
     }
     else if ( match_route( "/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)\\.(.*)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILE request";
-        return new DataStreamFromDataSource(get_tile(req, serv));
+        return get_tile(req, serv);
     } else {
         throw TmsException::get_error_message("Unknown tms request path", 400);
     }

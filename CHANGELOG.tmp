@@ -8,3 +8,4 @@
 * Utilisation des librairies boost (property tree) pour écrire du XML et json11 pour écrire du JSON
 * Suppression de la classe WebService, l'envoi de requête est assuré par la classe Request
 * Changement du format des réponses au getFeatureInfo interne (JSON -> FeatureCollection, XML -> Pixel.Band)
+* WMTS : on ne met dans le getcapabilities que les styles que l'on pourra effectivement appliquer lors d'un GetTile

@@ -43,8 +43,7 @@
  * \brief Define classe TmsException
  */
 
-#ifndef TMSEXCEPTION_H_
-#define TMSEXCEPTION_H_
+#pragma once
 
 #include <string>
 #include "boost/format.hpp"
@@ -71,4 +70,3 @@ public:
     static MessageDataStream* get_error_message(std::string reason, int status);
 };
 
-#endif /* TMSEXCEPTION_H_ */

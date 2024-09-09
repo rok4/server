@@ -35,31 +35,52 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-#include <unistd.h>
-#include <stdint.h>
-#include <cstring>
-#include <cstdlib>
-#include <algorithm>
+/**
+ * \file Inspire.h
+ ** \~french
+ * \brief Définition du namespace Inspire, gérant les contraintes Inspire
+ ** \~english
+ * \brief Define and the namespace Inspire, handling inspire constraints
+ */
 
 #pragma once
 
-// Variable issues du cmake
-#cmakedefine VERSION "@VERSION@"
+#include <string>
+#include <vector>
 
-#include <cassert>
-// Pour déactiver tous les assert, décommenter la ligne suivante
-// #define NDEBUG
+#include "configurations/Layer.h"
 
-#include <iostream>
-#include <boost/log/trivial.hpp>
+/**
+ * \author Institut national de l'information géographique et forestière
+ * \~french \brief Gestion des contraintes Inspire
+ * \~english \brief Manage Inspire constraints
+ */
+namespace Inspire {
 
-#define DEFAULT_SERVER_CONF_PATH   "../config/server.json"
+/**
+ * \~french \brief Le nom de couche est-il un nom harmonisé inspire
+ * \param[in] ln Nom de couche à tester
+ * \~english \brief Is layer name a harmonized inspire one
+ * \param[in] ln Layer name to test
+ */
+bool is_inspire_layer_name ( std::string ln );
 
-#define DEFAULT_LOG_OUTPUT "rolling_file"
-#define DEFAULT_LOG_FILE_PREFIX "/var/tmp/rok4"
-#define DEFAULT_LOG_FILE_PERIOD 3600
-#define DEFAULT_LOG_LEVEL  boost::log::trivial::error
-#define DEFAULT_NB_THREAD  1
-#define DEFAULT_RESAMPLING "lanczos_2"
+/**
+ * \~french \brief La couche est-elle conforme Inspire WMTS
+ * \param[in] ln Couche à tester
+ * \~english \brief Is layer WMTS Inspire compliant
+ * \param[in] ln Layer to test
+ */
+bool is_inspire_wmts ( Layer* layer );
+
+/**
+ * \~french \brief La couche est-elle conforme Inspire WMS
+ * \param[in] ln Couche à tester
+ * \~english \brief Is layer WMS Inspire compliant
+ * \param[in] ln Layer to test
+ */
+bool is_inspire_wms ( Layer* layer );
+
+};
 
 

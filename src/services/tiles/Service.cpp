@@ -124,18 +124,26 @@ TilesService::TilesService (json11::Json& doc) : Service(doc), metadata(NULL) {
 DataStream* TilesService::process_request(Request* req, Rok4Server* serv) {
     BOOST_LOG_TRIVIAL(debug) << "TILES service";
 
-    if ( match_route( "/tiles/collections", {"GET"}, req ) ) {
+    if ( match_route( "/collections", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
         return get_capabilities(req, serv);
+    }
+    else if ( match_route( "/collections/([^/]+)", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETTILES request";
+        return get_tiles(req, serv);
     }
     else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)/info", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETFEATUREINFO request";
         return get_feature_info(req, serv);
     }
+    else if ( match_route( "/collections/([^/]+)/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETTILE vector request";
+        return get_tile(req, serv, false);
+    }
     else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETTILE request";
-        return new DataStreamFromDataSource(get_tile(req, serv));
+        BOOST_LOG_TRIVIAL(debug) << "GETTILE map request";
+        return get_tile(req, serv, true);
     } else {
-        throw TilesException::get_error_message("Unknown tms request path", 400);
+        throw TilesException::get_error_message("ResourceNotFound", "Unknown tiles request path", 404);
     }
 };

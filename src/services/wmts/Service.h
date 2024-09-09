@@ -45,8 +45,7 @@
 
 class WmtsService;
 
-#ifndef WMTSSERVICE_H_
-#define WMTSSERVICE_H_
+#pragma once
 
 #include "services/Service.h"
 #include "configurations/Metadata.h"
@@ -67,7 +66,10 @@ private:
     bool reprojection;
     std::vector<std::string> info_formats;
 
+    bool default_inspire;
+
     std::string cache_getcapabilities;
+    std::string cache_getcapabilities_inspire;
 
 public:
     DataStream* process_request(Request* req, Rok4Server* serv);
@@ -81,6 +83,7 @@ public:
     void clean_cache() {
         cache_mtx.lock();
         cache_getcapabilities.clear();
+        cache_getcapabilities_inspire.clear();
         cache_mtx.unlock();
     };
 
@@ -130,4 +133,4 @@ public:
 
 };
 
-#endif /* WMTSSERVICE_H_ */
+

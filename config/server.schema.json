@@ -2,31 +2,33 @@
     "$schema": "http://json-schema.org/schema#",
     "title": "ROK4 Server configuration",
     "type": "object",
+    "additionalProperties": false,
     "properties": {
         "threads": {
             "type": "integer",
-            "description": "Nombre de thread de traitement des requêtes"
+            "description": "Threads count to treat requests"
         },
         "port": {
             "type": "string",
-            "description": "Port d'écoute du serveur"
+            "description": "Port listened"
         },
         "backlog": {
             "type": "integer",
-            "description": "Taille de la file d'attente du socket"
+            "description": "Socket's backlog size"
         },
         "enabled": {
             "type": "boolean",
-            "description": "Active-t-on les API de consultation automatiquement à la fin du chargement ?",
+            "description": "Broadcast activation when all configuration is loaded",
             "default": true
         },
         "logger": {
             "type": "object",
-            "description": "Paramètres du logger",
+            "description": "Logger configuration",
+            "additionalProperties": false,
             "properties": {
                 "output": {
                     "type": "string",
-                    "description": "Type de sortie",
+                    "description": "Output type",
                     "enum": [
                         "standard_output",
                         "static_file",
@@ -35,7 +37,7 @@
                 },
                 "level": {
                     "type": "string",
-                    "description": "Niveau de log",
+                    "description": "Log level",
                     "enum": [
                         "fatal",
                         "error",
@@ -46,11 +48,11 @@
                 },
                 "file_prefix": {
                     "type": "string",
-                    "description": "Chemin ou préfixe du fichier de logs"
+                    "description": "Prefix for log files"
                 },
                 "file_period": {
                     "type": "integer",
-                    "description": "Temps en seconde avant de changer de fichier de logs"
+                    "description": "Time limit for a log file (in seconds)"
                 }
 
             }
@@ -58,44 +60,44 @@
         },
         "cache": {
             "type": "object",
-            "description": "Paramètres du cache des index des dalles",
+            "description": "Slab indices cache configuration",
+            "additionalProperties": false,
             "properties": {
                 "size": {
                     "type": "integer",
                     "minimum": 1,
-                    "description": "Nombre d'éléments maximal dans le cache"
+                    "description": "Max items count"
                 },
                 "validity": {
                     "type": "integer",
                     "minimum": 1,
-                    "description": "Temps de validité d'une élément du cache en minutes"
+                    "description": "Time to live for an item (in minutes)"
                 }
             }
         },
         "configurations": {
             "type": "object",
-            "description": "Fichiers secondaires de configuration",
+            "description": "Content configuration",
+            "additionalProperties": false,
             "required": ["services", "styles", "tile_matrix_sets"],
             "properties": {
                 "services": {
                     "type": "string",
-                    "description": "Chemin vers le fichier de configurations des services"
+                    "description": "File path to services JSON configuration file"
                 },
                 "layers": {
                     "type": "string",
-                    "description": "Chemin vers le fichier ou objet contenant la liste des descripteurs de couches à considérer"
+                    "description": "Path (file or object) to layers' descriptor list"
                 },
                 "styles": {
                     "type": "string",
-                    "description": "Chemin vers la racine de configurations des styles (répertoire fichier ou préfixe objet)"
+                    "description": "Path (file or object) to styles' directory"
                 },
                 "tile_matrix_sets": {
                     "type": "string",
-                    "description": "Chemin vers la racine de définition des tile matrix sets (répertoire fichier ou préfixe objet)"
+                    "description": "Path (file or object) to TMS' directory"
                 }
             }
-
-        }
-        
+        }        
     }
 }

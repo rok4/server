@@ -125,9 +125,16 @@ std::string Request::to_string() {
     return method + " " + path + "?" + Utils::map_to_string(query_params, "&", "=");
 }
 
-bool Request::is_inspire() {
-    std::string inspire = get_query_param("inspire");
-    return inspire == "true" || inspire == "1";
+bool Request::is_inspire(bool inspire_default) {
+
+    if (inspire_default) {
+        std::string inspire = get_query_param("inspire");
+        return ! (inspire == "false" || inspire == "0");
+    } else {
+        std::string inspire = get_query_param("inspire");
+        return inspire == "true" || inspire == "1";
+    }
+
 }
 
 RawDataStream* Request::send() {

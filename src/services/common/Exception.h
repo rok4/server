@@ -43,8 +43,7 @@
  * \brief Define classe CommonException
  */
 
-#ifndef COMMONEXCEPTION_H_
-#define COMMONEXCEPTION_H_
+#pragma once
 
 #include <string>
 #include "boost/format.hpp"
@@ -71,4 +70,3 @@ public:
     static MessageDataStream* get_error_message(std::string reason, int status);
 };
 
-#endif /* COMMONEXCEPTION_H_ */

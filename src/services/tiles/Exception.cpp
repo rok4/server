@@ -45,8 +45,8 @@
 
 #include "services/tiles/Exception.h"
 
-std::string TilesException::xml_template = "<?xml version=\"1.0\" ?><TileError><Message>%s</Message></TileError>";
+std::string TilesException::json_template = "{ \"type\": \"%s\", \"title\": \"%s\", \"status\": %s }";
 
-MessageDataStream* TilesException::get_error_message(std::string reason, int status) {
-    return new MessageDataStream(str(boost::format(xml_template) % reason), "text/xml", status);
+MessageDataStream* TilesException::get_error_message(std::string type, std::string title, int status) {
+    return new MessageDataStream(str(boost::format(json_template) % type % title % status), "application/json", status);
 }

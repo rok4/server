@@ -45,8 +45,7 @@
 
 class TilesService;
 
-#ifndef TILESSERVICE_H_
-#define TILESSERVICE_H_
+#pragma once
 
 #include "services/Service.h"
 #include "configurations/Metadata.h"
@@ -59,11 +58,19 @@ class TilesService;
 class TilesService : public Service {  
 
 private:
+
+    /**
+     * \todo Gérer la pagination
+     * \todo Filtrer selon la bbox
+     */
     DataStream* get_capabilities ( Request* req, Rok4Server* serv );
+    DataStream* get_tiles ( Request* req, Rok4Server* serv );
     DataStream* get_feature_info ( Request* req, Rok4Server* serv );
-    DataSource* get_tile ( Request* req, Rok4Server* serv );
+    DataStream* get_tile ( Request* req, Rok4Server* serv, bool is_map_request );
 
     Metadata* metadata;
+
+    std::string cache_getcapabilities;
 
 public:
     DataStream* process_request(Request* req, Rok4Server* serv);
@@ -78,6 +85,18 @@ public:
 
     /**
      * \~french
+     * \brief Supprime les réponses cachées
+     * \~english
+     * \brief Remove cached responses
+     */
+    void clean_cache() {
+        cache_mtx.lock();
+        cache_getcapabilities.clear();
+        cache_mtx.unlock();
+    };
+
+    /**
+     * \~french
      * \brief Destructeur
      * \~english
      * \brief Destructor
@@ -88,4 +107,4 @@ public:
 
 };
 
-#endif /* TILESSERVICE_H_ */
+

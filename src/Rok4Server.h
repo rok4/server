@@ -46,8 +46,7 @@
 class ServicesConfiguration;
 class Server;
 
-#ifndef _ROK4SERVER_
-#define _ROK4SERVER_
+#pragma once
 
 #include "fcgiapp.h"
 #include <csignal>
@@ -263,5 +262,5 @@ public:
 
 };
 
-#endif
+
 

@@ -45,8 +45,7 @@
 
 class Layer;
 
-#ifndef LAYER_H_
-#define LAYER_H_
+#pragma once
 
 #include <vector>
 #include <string>
@@ -68,6 +67,7 @@ using boost::property_tree::ptree;
 #include "services/wmts/Service.h"
 #include "services/wms/Service.h"
 #include "services/tms/Service.h"
+#include "services/tiles/Service.h"
 
 struct WmtsTmsInfos {
     TileMatrixSet* tms;
@@ -587,6 +587,13 @@ public:
      */
     void add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire, std::map< std::string, WmtsTmsInfos>* used_tms_list);
 
+    /**
+     * \~french \brief Récupère la description OGC API Tiles de la couche au format JSON
+     * \param[in] service Service OGC API Tiles appelant
+     * \~english \brief Get layer OGC API Tiles description as JSON
+     * \param[in] service Calling OGC API Tiles service
+     */
+    json11::Json to_json_tiles(TilesService* service);
 
     /**
      * \~french \brief Récupère la description TileJSON de la couche au format JSON
@@ -622,4 +629,4 @@ public:
 
 };
 
-#endif /* LAYER_H_ */
+

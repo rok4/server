@@ -43,8 +43,7 @@
  * \brief Define classe Service
  */
 
-#ifndef SERVICE_H_
-#define SERVICE_H_
+#pragma once
 
 #include <regex>
 #include <mutex>
@@ -110,6 +109,6 @@ public:
     bool match_request(Request* req);
 };
 
-#endif /* SERVICE_H_ */
+
 
 

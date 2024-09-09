@@ -45,8 +45,7 @@
 
 class Rok4Server;
 
-#ifndef ROUTER_H_
-#define ROUTER_H_
+#pragma once
 
 #include "fcgiapp.h"
 #include <functional>
@@ -77,4 +76,3 @@ public:
 
 };
 
-#endif /* ROUTER_H_ */

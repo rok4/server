@@ -58,7 +58,10 @@ using boost::property_tree::xml_writer_settings;
 
 DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
-    if (! cache_getcapabilities.empty()) {
+    if ( req->is_inspire(default_inspire) && ! cache_getcapabilities_inspire.empty()) {
+        return new MessageDataStream ( cache_getcapabilities_inspire, "text/xml", 200 );
+    }
+    else if (! req->is_inspire(default_inspire) && ! cache_getcapabilities.empty()) {
         return new MessageDataStream ( cache_getcapabilities, "text/xml", 200 );
     }
 
@@ -78,7 +81,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     root.add("<xmlattr>.xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance" );
     root.add("<xmlattr>.xmlns:gml","http://www.opengis.net/gml" );
     
-    if ( req->is_inspire() ) {
+    if ( req->is_inspire(default_inspire) ) {
         root.add("<xmlattr>.xmlns:inspire_common","http://inspire.ec.europa.eu/schemas/common/1.0" );
         root.add("<xmlattr>.xmlns:inspire_vs","http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0" );
         root.add("<xmlattr>.xsi:schemaLocation","http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0 http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0/inspire_vs_ows_11.xsd" );
@@ -107,25 +110,30 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     services->contact->add_node_wmts(provider_node);
 
+    std::string additionnal_params = "?SERVICE=WMTS&";
+    if (req->is_inspire(default_inspire)) {
+        additionnal_params = "?INSPIRE=1&SERVICE=WMTS&";
+    }
+
     ptree& op_getcapabilities = root.add("ows:OperationsMetadata.ows:Operation", "");
     op_getcapabilities.add("<xmlattr>.name", "GetCapabilities");
-    op_getcapabilities.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMTS&");
+    op_getcapabilities.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + additionnal_params);
     op_getcapabilities.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.<xmlattr>.name", "GetEncoding");
     op_getcapabilities.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.ows:AllowedValues.ows:Value", "KVP");
 
     ptree& op_gettile = root.add("ows:OperationsMetadata.ows:Operation", "");
     op_gettile.add("<xmlattr>.name", "GetTile");
-    op_gettile.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMTS&");
+    op_gettile.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + additionnal_params);
     op_gettile.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.<xmlattr>.name", "GetEncoding");
     op_gettile.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.ows:AllowedValues.ows:Value", "KVP");
 
     ptree& op_getfeatureinfo = root.add("ows:OperationsMetadata.ows:Operation", "");
     op_getfeatureinfo.add("<xmlattr>.name", "GetFeatureInfo");
-    op_getfeatureinfo.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMTS&");
+    op_getfeatureinfo.add("ows:DCP.ows:HTTP.ows:Get.<xmlattr>.xlink:href", endpoint_uri + additionnal_params);
     op_getfeatureinfo.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.<xmlattr>.name", "GetEncoding");
     op_getfeatureinfo.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.ows:AllowedValues.ows:Value", "KVP");
 
-    if (req->is_inspire()) {
+    if (req->is_inspire(default_inspire)) {
         ptree& inspire_extension = root.add("inspire_vs:ExtendedCapabilities", "");
 
         if (metadata) {
@@ -141,7 +149,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
-        layers_iterator->second->add_node_wmts(contents_node, this, req->is_inspire(), &used_tms_list);
+        layers_iterator->second->add_node_wmts(contents_node, this, req->is_inspire(default_inspire), &used_tms_list);
     }
 
     std::map<std::string, WmtsTmsInfos>::iterator tms_iterator ( used_tms_list.begin() ), tms_end ( used_tms_list.end() );
@@ -171,14 +179,12 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
         tms_node.add ( "ows:SupportedCRS",tms->get_crs()->get_request_code() );
         
         // TileMatrix
-        std::set<std::pair<std::string, TileMatrix*>, ComparatorTileMatrix> orderedTM = tms->get_ordered_tm(false);
         bool keep = false;
         if (tms_iterator->second.top_level == "") {
             // On est sur un TMS d'origine, on l'exporte en entier
             keep = true;
         }
-        for (std::pair<std::string, TileMatrix*> element : orderedTM) {
-            TileMatrix* tm = element.second;
+        for (TileMatrix* tm : tms->get_ordered_tm(false)) {
 
             if (! keep && tm->get_id() != tms_iterator->second.top_level) {
                 continue;
@@ -209,7 +215,11 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     std::stringstream ss;
     write_xml(ss, tree);
     cache_mtx.lock();
-    cache_getcapabilities = ss.str();
+    if (req->is_inspire(default_inspire)) {
+        cache_getcapabilities_inspire = ss.str();
+    } else {
+        cache_getcapabilities = ss.str();
+    }
     cache_mtx.unlock();
     return new MessageDataStream ( ss.str(), "text/xml", 200 );
 }

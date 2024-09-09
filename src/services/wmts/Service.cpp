@@ -131,6 +131,15 @@ WmtsService::WmtsService (json11::Json& doc) : Service(doc), metadata(NULL) {
         reprojection = false;
     }
 
+    if (doc["inspire"].is_bool()) {
+        default_inspire = doc["inspire"].bool_value();
+    } else if (! doc["inspire"].is_null()) {
+        error_message = "WMTS service: inspire have to be a boolean";
+        return;
+    } else {
+        default_inspire = false;
+    }
+
     info_formats.push_back("text/plain");
     info_formats.push_back("text/xml");
     info_formats.push_back("text/html");

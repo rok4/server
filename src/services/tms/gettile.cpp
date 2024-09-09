@@ -51,7 +51,7 @@
 #include "services/tms/Service.h"
 #include "Rok4Server.h"
 
-DataSource* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
+DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
 
     // La version
     if ( req->path_params.at(0) != "1.0.0" )
@@ -137,8 +137,8 @@ DataSource* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
     }
 
     if (format == "image/png" && style->get_palette() && ! style->get_palette()->is_empty()) {
-        return new PaletteDataSource(d, style->get_palette());
+        return new DataStreamFromDataSource(new PaletteDataSource(d, style->get_palette()));
     } else {
-        return d;
+        return new DataStreamFromDataSource(d);
     }
 }

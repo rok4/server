@@ -51,5 +51,5 @@
 
 DataStream* TilesService::get_feature_info ( Request* req, Rok4Server* serv ) {
 
-    throw TilesException::get_error_message("Coming soon !", 501);
+    throw TilesException::get_error_message("NotImplemented", "Coming soon !", 501);
 }

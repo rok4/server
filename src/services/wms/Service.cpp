@@ -141,6 +141,15 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
         reprojection = false;
     }
 
+    if (doc["inspire"].is_bool()) {
+        default_inspire = doc["inspire"].bool_value();
+    } else if (! doc["inspire"].is_null()) {
+        error_message = "WMS service: inspire have to be a boolean";
+        return;
+    } else {
+        default_inspire = false;
+    }
+
     if (doc["formats"].is_array()) {
         for (json11::Json f : doc["formats"].array_items()) {
             if (f.is_string()) {
@@ -165,6 +174,12 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
     } else if (! doc["formats"].is_null()) {
         error_message = "WMS service: formats have to be a string array";
         return;
+    } else {
+        formats.push_back("image/jpeg");
+        formats.push_back("image/png");
+        formats.push_back("image/tiff");
+        formats.push_back("image/geotiff");
+        formats.push_back("image/x-bil;bits=32");
     }
 
     info_formats.push_back("text/plain");

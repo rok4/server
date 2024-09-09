@@ -45,8 +45,7 @@
 
 class CommonService;
 
-#ifndef COMMONSERVICE_H_
-#define COMMONSERVICE_H_
+#pragma once
 
 #include "services/Service.h"
 
@@ -73,4 +72,3 @@ public:
 
 };
 
-#endif /* COMMONSERVICE_H_ */

@@ -43,8 +43,7 @@
  * \brief Define classes EmptyResponseDataStream and MessageDataStream
  */
 
-#ifndef _MESSAGE_
-#define _MESSAGE_
+#pragma once
 
 #include <string.h>
 #include <vector>
@@ -151,4 +150,4 @@ public:
     }
 };
 
-#endif
+

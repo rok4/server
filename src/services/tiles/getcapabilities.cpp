@@ -51,5 +51,70 @@
 
 DataStream* TilesService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
-    throw TilesException::get_error_message("Coming soon !", 501);
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    if ( ! cache_getcapabilities.empty()) {
+        return new MessageDataStream ( cache_getcapabilities, "application/json", 200 );
+    }
+
+    std::vector<json11::Json> links;
+    links.push_back(json11::Json::object {
+        { "href", endpoint_uri + "/collections?f=application/json"},
+        { "rel", "self"},
+        { "type", "application/json"},
+        { "title", "this document"}
+    });
+
+    if (metadata) {
+        links.push_back(metadata->to_json_tiles("Service metadata", "describedby"));
+    }
+
+    std::vector<json11::Json> collections;
+
+    std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
+    for ( ; layers_iterator != layers_end; ++layers_iterator ) {
+        if (layers_iterator->second->is_tiles_enabled()) {
+            collections.push_back(layers_iterator->second->to_json_tiles(this));
+        }
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "links", links },
+        { "numberMatched", (int) collections.size() },
+        { "numberReturned", (int) collections.size() }
+    };
+
+    res["collections"] = collections;
+
+    cache_mtx.lock();
+    cache_getcapabilities = json11::Json{ res }.dump();
+    cache_mtx.unlock();
+    return new MessageDataStream ( cache_getcapabilities, "application/json", 200 );
+}
+
+
+
+DataStream* TilesService::get_tiles ( Request* req, Rok4Server* serv ) {
+
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    // La couche
+    std::string str_layer = req->path_params.at(0);
+    if ( contain_chars(str_layer, "\"")) {
+        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES layer: " << str_layer ;
+        throw TilesException::get_error_message("ResourceNotFound", "Layer unknown", 404);
+    }
+
+    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    if ( layer == NULL || ! layer->is_tiles_enabled() ) {
+        throw TilesException::get_error_message("ResourceNotFound", "Layer "+str_layer+" unknown", 404);
+    }
+
+    return new MessageDataStream ( json11::Json{ layer->to_json_tiles(this) }.dump(), "application/json", 200 );
 }

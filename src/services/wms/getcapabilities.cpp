@@ -58,7 +58,10 @@ using boost::property_tree::xml_writer_settings;
 
 DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
-    if (! cache_getcapabilities.empty()) {
+    if ( req->is_inspire(default_inspire) && ! cache_getcapabilities_inspire.empty()) {
+        return new MessageDataStream ( cache_getcapabilities_inspire, "text/xml", 200 );
+    }
+    else if (! req->is_inspire(default_inspire) && ! cache_getcapabilities.empty()) {
         return new MessageDataStream ( cache_getcapabilities, "text/xml", 200 );
     }
 
@@ -76,7 +79,7 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     root.add("<xmlattr>.xmlns:xlink","http://www.w3.org/1999/xlink" );
     root.add("<xmlattr>.xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance" );
     
-    if ( req->is_inspire() ) {
+    if ( req->is_inspire(default_inspire) ) {
         root.add("<xmlattr>.xmlns:inspire_common","http://inspire.ec.europa.eu/schemas/common/1.0" );
         root.add("<xmlattr>.xmlns:inspire_vs","http://inspire.ec.europa.eu/schemas/inspire_vs_ows11/1.0" );
         root.add("<xmlattr>.xsi:schemaLocation","http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd http://inspire.ec.europa.eu/schemas/inspire_vs/1.0 http://inspire.ec.europa.eu/schemas/inspire_vs/1.0/inspire_vs.xsd http://inspire.ec.europa.eu/schemas/common/1.0 http://inspire.ec.europa.eu/schemas/common/1.0/common.xsd" );
@@ -108,9 +111,14 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     ptree& capability_node = root.add("Capability", "");
 
+    std::string additionnal_params = "?SERVICE=WMS&";
+    if (req->is_inspire(default_inspire)) {
+        additionnal_params = "?INSPIRE=1&SERVICE=WMS&";
+    }
+
     ptree& op_getcapabilities = capability_node.add("Request.GetCapabilities", "");
     op_getcapabilities.add("Format", "text/xml");
-    op_getcapabilities.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMS&");
+    op_getcapabilities.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:href", endpoint_uri + additionnal_params);
     op_getcapabilities.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xmlns:xlink", "http://www.w3.org/1999/xlink");
     op_getcapabilities.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:type", "simple");
 
@@ -118,7 +126,7 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     for ( unsigned int i = 0; i < formats.size(); i++ ) {
         op_getmap.add("Format", formats.at(i));
     }
-    op_getmap.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMS&");
+    op_getmap.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:href", endpoint_uri + additionnal_params);
     op_getmap.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xmlns:xlink", "http://www.w3.org/1999/xlink");
     op_getmap.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:type", "simple");
 
@@ -126,13 +134,13 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     for ( unsigned int i = 0; i < info_formats.size(); i++ ) {
         op_getfeatureinfo.add("Format", info_formats.at(i));
     }
-    op_getfeatureinfo.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:href", endpoint_uri + "?SERVICE=WMS&");
+    op_getfeatureinfo.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:href", endpoint_uri + additionnal_params);
     op_getfeatureinfo.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xmlns:xlink", "http://www.w3.org/1999/xlink");
     op_getfeatureinfo.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:type", "simple");
 
     capability_node.add("Exception.Format", "XML");
 
-    if (req->is_inspire()) {
+    if (req->is_inspire(default_inspire)) {
         ptree& inspire_extension = capability_node.add("inspire_vs:ExtendedCapabilities", "");
 
         if (metadata) {
@@ -160,13 +168,17 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
-        layers_iterator->second->add_node_wms(contents_node, this, req->is_inspire());
+        layers_iterator->second->add_node_wms(contents_node, this, req->is_inspire(default_inspire));
     }
 
     std::stringstream ss;
     write_xml(ss, tree);
     cache_mtx.lock();
-    cache_getcapabilities = ss.str();
+    if (req->is_inspire(default_inspire)) {
+        cache_getcapabilities_inspire = ss.str();
+    } else {
+        cache_getcapabilities = ss.str();
+    }
     cache_mtx.unlock();
     return new MessageDataStream ( ss.str(), "text/xml", 200 );
 

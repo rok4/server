@@ -45,8 +45,7 @@
 
 class AdminService;
 
-#ifndef ADMINSERVICE_H_
-#define ADMINSERVICE_H_
+#pragma once
 
 #include "services/Service.h"
 
@@ -78,4 +77,3 @@ public:
 
 };
 
-#endif /* ADMINSERVICE_H_ */

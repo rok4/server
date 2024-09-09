@@ -45,8 +45,7 @@
 
 class ServerConfiguration;
 
-#ifndef SERVERXML_H
-#define SERVERXML_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -152,5 +151,5 @@ class ServerConfiguration : public Configuration
 
 };
 
-#endif // SERVERXML_H
+
 

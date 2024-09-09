@@ -45,8 +45,7 @@
 
 class Metadata;
 
-#ifndef METADATA_H
-#define METADATA_H
+#pragma once
 
 #include <rok4/utils/ResourceLocator.h>
 
@@ -211,6 +210,15 @@ public:
         node.add("OnlineResource.<xmlattr>.xlink:href", href);
         node.add("OnlineResource.<xmlattr>.xlink:type", "simple");
     }
+
+    json11::Json to_json_tiles(std::string title, std::string rel) const {
+        return json11::Json::object {
+            { "href", href },
+            { "type", type },
+            { "rel", rel },
+            { "title", title }
+        };
+    }
 };
 
-#endif // METADATA_H
+

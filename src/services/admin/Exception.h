@@ -43,8 +43,7 @@
  * \brief Define classe AdminException
  */
 
-#ifndef ADMINEXCEPTION_H_
-#define ADMINEXCEPTION_H_
+#pragma once
 
 #include <string>
 #include "boost/format.hpp"
@@ -71,4 +70,3 @@ public:
     static MessageDataStream* get_error_message(std::string reason, std::string code, int status);
 };
 
-#endif /* ADMINEXCEPTION_H_ */

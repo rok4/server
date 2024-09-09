@@ -43,8 +43,7 @@
  * \brief Define the Attribution Class handling capabilities metadata link elements
  */
 
-#ifndef ATTRIBUTION_H
-#define ATTRIBUTION_H
+#pragma once
 
 #include <rok4/utils/ResourceLocator.h>
 
@@ -180,4 +179,4 @@ public:
     };
 };
 
-#endif // ATTRIBUTION_H
+

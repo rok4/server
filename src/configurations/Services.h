@@ -43,8 +43,7 @@
  * \brief Define classe ServicesConfiguration
  */
 
-#ifndef SERVICESCONF_H
-#define SERVICESCONF_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -146,5 +145,5 @@ class ServicesConfiguration : public Configuration
         std::map<std::string, std::vector<CRS*> > crs_equivalences;
 };
 
-#endif // SERVICESCONF_H
+
 
