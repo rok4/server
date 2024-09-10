@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: Serveur ROK4 WMS / WMTS / TMS
   description: Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (OGC) WMS 1.3.0 et WMTS 1.0.0, ainsi que le TMS (Tile Map Service).
@@ -9,16 +9,31 @@ servers:
 tags:
 - name: OGC API Common
   description: Découverte des services du serveur
+  externalDocs:
+    description: Spécifications OGC
+    url: https://ogcapi.ogc.org/common/
 - name: Santé du serveur
   description: Informations de santé sur les serveur 
 - name: Web Map Tile Service
   description: Diffusion de tuiles raster et vecteur selon le standard OGC WMTS
+  externalDocs:
+    description: Spécifications OGC
+    url: https://www.ogc.org/standard/wmts/
 - name: Web Map Service
   description: Diffusion d'images raster selon le standard OGC WMS
+  externalDocs:
+    description: Spécifications OGC
+    url: https://www.ogc.org/standard/wms/
 - name: Tile Map Service
   description: Diffusion de tuiles raster et vecteur selon la convention TMS
+  externalDocs:
+    description: Spécifications OSGeo
+    url: https://wiki.osgeo.org/wiki/Tile_Map_Service_Specification
 - name: OGC API Tiles
   description: Diffusion de tuiles raster et vecteur selon le standard l'API OGC - Tiles
+  externalDocs:
+    description: Spécifications OGC
+    url: https://ogcapi.ogc.org/tiles/
 - name: Administration
   description: API d'ajout et de suppression de couches disponibles
 
@@ -32,14 +47,13 @@ paths:
       - OGC API Common
       summary: Retourne la liste des services disponibles
       operationId: common_get_services
-      x-query: "{&parameters*}" # changed the prefix to &
       responses:
-        501:
-          description: Coming soon !
+        200:
+          description: Services assurés par le serveur
           content:
-            application/xml:
+            application/json:
               schema:
-                $ref: '#/components/schemas/common_error'
+                $ref: '#/components/schemas/common_get_services'
 
   ######################################### SANTÉ DU SERVEUR
   
@@ -1257,13 +1271,15 @@ components:
   schemas:
 
     common_error:
-      xml:
-        name: 'Error'
       type: object
       additionalProperties: false
       properties:
-        Message:
+        type:
           type: string
+        title:
+          type: string
+        status:
+          type: integer
 
     wms_error:
       xml:
@@ -1337,6 +1353,31 @@ components:
         name: 'WMS_Capabilities'
       type: object
       additionalProperties: false
+
+    common_metadata:
+      type: object
+      properties:
+        href:
+          type: string
+        rel:
+          type: string
+          enum: ["data", "self"]
+        type:
+          type: string
+        title:
+          type: string
+
+    common_get_services:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/common_metadata'
 
     tiles_bbox:
       type: object
@@ -1543,6 +1584,7 @@ components:
             type: string
         styles:
           type: array
+          minItems: 1
           items: 
             type: string
         bbox:
@@ -1606,6 +1648,7 @@ components:
 
         pyramids:
           type: array
+          minItems: 1
           items: 
             type: object
             properties:
@@ -1623,31 +1666,44 @@ components:
 
         resampling:
           type: string
+          enum:
+            - nn
+            - linear
+            - bicubic
+            - lanczos
+            - lanczos_2
+            - lanczos_3
+            - lanczos_4
 
         get_feature_info:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - EXTERNALWMS
-                - PYRAMID
-            url:
-              type: string
-            layers:
-              type: string
-            query_layers:
-              type: string
-            version:
-              type: string
-            service:
-              type: string
-            extra_query_params:
-              type: string
-            force_epsg:
-              type: boolean
-          required:
-            - type
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - PYRAMID
+              required:
+                - type
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - EXTERNALWMS
+                url:
+                  type: string
+                layers:
+                  type: string
+                query_layers:
+                  type: string
+                extra_query_params:
+                  type: string
+              required:
+                - type
+                - url
+                - layers
+                - query_layers
             
         wms:
           type: object

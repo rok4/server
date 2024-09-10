@@ -200,7 +200,6 @@
                             "image/tiff",
                             "image/geotiff",
                             "image/x-bil;bits=32",
-                            "image/gif",
                             "text/asc"
                         ]
                     },

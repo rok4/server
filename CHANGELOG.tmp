@@ -9,3 +9,4 @@
 * Suppression de la classe WebService, l'envoi de requête est assuré par la classe Request
 * Changement du format des réponses au getFeatureInfo interne (JSON -> FeatureCollection, XML -> Pixel.Band)
 * WMTS : on ne met dans le getcapabilities que les styles que l'on pourra effectivement appliquer lors d'un GetTile
+* Les GetFeatureInfo sur un WMS externe se font toujours avec le format image/tiff
