@@ -150,7 +150,9 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         throw WmsException::get_error_message("Format unknown", "InvalidParameterValue", 400);
     }
 
-    if (! is_available_format(format)) throw WmsException::get_error_message("Format " + format + " unknown", "InvalidParameterValue", 400);
+    if (! is_available_format(format)) {
+        throw WmsException::get_error_message("Format " + format + " unknown", "InvalidParameterValue", 400);
+    }
 
     // La bbox
     std::string str_bbox = req->get_query_param("bbox");
@@ -297,6 +299,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         final_image = images.at(0);
     }
 
+    final_image->set_crs(crs);
+
     if (format == "image/png" && sample_format == SampleFormat::UINT8) {
         return new PNGEncoder(final_image, NULL);
     }
@@ -336,9 +340,10 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             if (opt.compare("packbits") == 0) {
                 return new TiffPackBitsEncoder<float>(final_image, is_geotiff);
             }
-        } else {
-            throw WmsException::get_error_message("Used data and expected format are not consistent", "InvalidParameterValue", 400);
         }
+
+        delete final_image;
+        throw WmsException::get_error_message("Used data and expected format are not consistent", "InvalidParameterValue", 400);
     }
     else if (format == "image/jpeg" && sample_format == SampleFormat::UINT8) {
 
@@ -354,11 +359,12 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
     else if (format == "image/x-bil;bits=32" && sample_format == SampleFormat::FLOAT32) {
         return new BilEncoder(final_image);
     }
-    else if (format == "text/asc" && final_image->get_channels() != 1) {
+    else if (format == "text/asc" && sample_format == SampleFormat::FLOAT32 && final_image->get_channels() == 1) {
         return new AscEncoder(final_image);
     } else {
+
         delete final_image;
-        throw WmsException::get_error_message("Used data format (" + SampleFormat::to_string(sample_format) + ") and expected output format (" + format + ") are not consistent", "InvalidParameterValue", 400);
+        throw WmsException::get_error_message("Used data format (" + std::to_string(bands) + " band(s) " + SampleFormat::to_string(sample_format) + ") and expected output format (" + format + ") are not consistent", "InvalidParameterValue", 400);
     }
 
     return NULL;

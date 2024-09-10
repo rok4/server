@@ -357,6 +357,10 @@ DataStream* WmsService::process_request(Request* req, Rok4Server* serv) {
     std::string param_service = req->get_query_param("service");
     std::transform(param_service.begin(), param_service.end(), param_service.begin(), ::tolower);
 
+    if (param_service == "") {
+        throw WmsException::get_error_message("SERVICE query parameter missing", "MissingParameterValue", 400);
+    }
+
     if (param_service != "wms") {
         throw WmsException::get_error_message("SERVICE query parameter have to be WMS", "InvalidParameterValue", 400);
     }
@@ -399,7 +403,7 @@ bool WmsService::is_available_crs(std::string c) {
 }
 
 bool WmsService::is_available_format(std::string f) {
-    return (std::find(formats.begin(), formats.end(), f) != info_formats.end());
+    return (std::find(formats.begin(), formats.end(), f) != formats.end());
 }
 
 bool WmsService::is_available_infoformat(std::string f) {

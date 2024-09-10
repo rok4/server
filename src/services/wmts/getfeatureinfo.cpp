@@ -117,7 +117,24 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         // On est hors tuiles -> erreur
         throw WmtsException::get_error_message("No data found", "TileOutOfRange", 404);
     }
-    
+
+    // Le style
+    std::string str_style = req->get_query_param("style");
+    if (str_style == "") throw WmtsException::get_error_message("STYLE query parameter missing", "MissingParameterValue", 400);
+
+    if (contain_chars(str_style, "<>")) {
+        // On a détecté un caractère interdit, on ne met pas le format fourni dans la réponse pour éviter une injection
+        BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMTS style: " << str_style;
+        throw WmtsException::get_error_message("Style unknown", "InvalidParameterValue", 400);
+    }
+
+    Style* style = NULL;
+    if (Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
+        style = layer->get_style_by_identifier(str_style);
+
+        if (style == NULL) throw WmtsException::get_error_message("Style " + str_style + " unknown", "InvalidParameterValue", 400);
+    }
+
     // infoformat
 
     std::string info_format = req->get_query_param("infoformat");
@@ -229,6 +246,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         query_params.emplace("QUERY_LAYERS", layer->get_gfi_query_layers());
         query_params.emplace("INFO_FORMAT", info_format);
         query_params.emplace("FEATURE_COUNT", "1");
+        query_params.emplace("FORMAT", "image/tiff");
         query_params.emplace("CRS", tms->get_crs()->get_request_code());
         query_params.emplace("WIDTH", std::to_string(width));
         query_params.emplace("HEIGHT", std::to_string(height));

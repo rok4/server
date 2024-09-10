@@ -335,4 +335,6 @@ void ServicesConfiguration::clean_cache() {
     wms_service->clean_cache();
     wmts_service->clean_cache();
     tms_service->clean_cache();
+    common_service->clean_cache();
+    tiles_service->clean_cache();
 };

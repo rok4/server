@@ -88,8 +88,13 @@ DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map
     } else {
         format = req->get_query_param("f");
 
-        if (format != Rok4Format::to_tiles_format(layer->get_pyramid()->get_format())) {
+        if (contain_chars(format, "\"")) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES format: " << format ;
             throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+        }
+
+        if (format != Rok4Format::to_tiles_format(layer->get_pyramid()->get_format())) {
+            throw TilesException::get_error_message("InvalidParameter", "Format " + format + " unknown", 400);
         }
     }
 

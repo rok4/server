@@ -140,6 +140,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     if (format.compare(Rok4Format::to_mime_type((layer->get_pyramid()->get_format()))) != 0)
         throw WmtsException::get_error_message("Format " + format + " unknown", "InvalidParameterValue", 400);
 
+    // Le style
     std::string str_style = req->get_query_param("style");
     if (str_style == "") throw WmtsException::get_error_message("STYLE query parameter missing", "MissingParameterValue", 400);
 

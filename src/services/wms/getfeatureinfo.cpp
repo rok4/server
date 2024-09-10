@@ -396,6 +396,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         query_params.emplace("LAYERS", layer->get_gfi_layers());
         query_params.emplace("QUERY_LAYERS", layer->get_gfi_query_layers());
         query_params.emplace("INFO_FORMAT", info_format);
+        query_params.emplace("FORMAT", "image/tiff");
         query_params.emplace("FEATURE_COUNT", std::to_string(feature_count));
         query_params.emplace("CRS", crs->get_request_code());
         query_params.emplace("WIDTH", std::to_string(width));

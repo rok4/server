@@ -287,12 +287,21 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
 
                     if(doc["get_feature_info"]["url"].is_string()) {
                         gfi_url = doc["get_feature_info"]["url"].string_value();
+                    } else {
+                        error_message = "get_feature_info.url have to be provided and be a string for an EXTERNALWMS get feature info";
+                        return false;
                     }
                     if(doc["get_feature_info"]["layers"].is_string()) {
                         gfi_layers = doc["get_feature_info"]["layers"].string_value();
+                    } else {
+                        error_message = "get_feature_info.layers have to be provided and be a string for an EXTERNALWMS get feature info";
+                        return false;
                     }
                     if(doc["get_feature_info"]["query_layers"].is_string()) {
                         gfi_query_layers = doc["get_feature_info"]["query_layers"].string_value();
+                    } else {
+                        error_message = "get_feature_info.query_layers have to be provided and be a string for an EXTERNALWMS get feature info";
+                        return false;
                     }
                     if(doc["get_feature_info"]["extra_query_params"].is_string()) {
                         gfi_extra_params = Utils::string_to_map(doc["get_feature_info"]["extra_query_params"].string_value(), "&", "=");
@@ -431,9 +440,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
 void Layer::calculate_bboxes() {
 
     // On calcule la bbox à partir des tuiles limites du niveau le mieux résolu de la pyramide
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(true);
-
-    Level * level = ordered_levels.begin()->second;
+    Level * level = pyramid->get_lowest_level();
     native_bbox = BoundingBox<double>(level->get_bbox_from_tile_limits());
     native_bbox.crs = pyramid->get_tms()->get_crs()->get_request_code();
 
@@ -443,9 +450,8 @@ void Layer::calculate_bboxes() {
 
 void Layer::calculate_native_tilematrix_limits() {
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(true);
-    for (std::pair<std::string, Level*> element : ordered_levels) {
-        element.second->set_tile_limits_from_bbox(native_bbox);
+    for (Level* l : pyramid->get_ordered_levels(true)) {
+        l->set_tile_limits_from_bbox(native_bbox);
     }
 }
 
@@ -458,9 +464,8 @@ void Layer::calculate_tilematrix_limits() {
     WmtsTmsInfos infos = wmts_tilematrixsets.at(0);
     infos.limits = std::vector<TileMatrixLimits>();
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(false);
-    for (std::pair<std::string, Level*> element : ordered_levels) {
-        infos.limits.push_back(element.second->get_tile_limits());
+    for (Level* l : pyramid->get_ordered_levels(false)) {
+        infos.limits.push_back(l->get_tile_limits());
     }
 
     new_list.push_back(infos);
@@ -487,31 +492,29 @@ void Layer::calculate_tilematrix_limits() {
         }
 
         // Recherche du niveau du haut du TMS supplémentaire
-        TileMatrix* tmTop = NULL;
-        std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(false);
-        for (std::pair<std::string, Level*> element : ordered_levels) {
-            tmTop = tms->get_corresponding_tm(element.second->get_tm(), pyramid->get_tms()) ;
-            if (tmTop != NULL) {
+        TileMatrix* tm_top = NULL;
+        for (Level* l : pyramid->get_ordered_levels(false)) {
+            tm_top = tms->get_corresponding_tm(l->get_tm(), pyramid->get_tms()) ;
+            if (tm_top != NULL) {
                 // On a trouvé un niveau du haut du TMS supplémentaire satisfaisant pour la pyramide
                 break;
             }
         }
-        if ( tmTop == NULL ) {
+        if ( tm_top == NULL ) {
             BOOST_LOG_TRIVIAL(warning) <<  "Impossible de trouver un niveau du haut satisfaisant dans le TMS supplémentaire " << tms->get_id() ;
             continue;
         }
 
         // Recherche du niveau du bas du TMS supplémentaire
-        TileMatrix* tmBottom = NULL;
-        ordered_levels = pyramid->get_ordered_levels(true);
-        for (std::pair<std::string, Level*> element : ordered_levels) {
-            tmBottom = tms->get_corresponding_tm(element.second->get_tm(), pyramid->get_tms()) ;
-            if (tmBottom != NULL) {
+        TileMatrix* tm_bottom = NULL;
+        for (Level* l : pyramid->get_ordered_levels(true)) {
+            tm_bottom = tms->get_corresponding_tm(l->get_tm(), pyramid->get_tms()) ;
+            if (tm_bottom != NULL) {
                 // On a trouvé un niveau du bas du TMS supplémentaire satisfaisant pour la pyramide
                 break;
             }
         }
-        if ( tmBottom == NULL ) {
+        if ( tm_bottom == NULL ) {
             BOOST_LOG_TRIVIAL(warning) <<  "Impossible de trouver un niveau du bas satisfaisant dans le TMS supplémentaire " << tms->get_id() ;
             continue;
         }
@@ -521,18 +524,18 @@ void Layer::calculate_tilematrix_limits() {
         bool begin = false;
         for (TileMatrix* tm : tms->get_ordered_tm(false)) {
 
-            if (! begin && tm->get_id() != tmTop->get_id()) {
+            if (! begin && tm->get_id() != tm_top->get_id()) {
                 continue;
             }
             begin = true;
             infos.limits.push_back(tm->bbox_to_tile_limits(tmp));
-            if (tm->get_id() == tmBottom->get_id()) {
+            if (tm->get_id() == tm_bottom->get_id()) {
                 break;
             }
         }
 
-        infos.bottom_level = tmBottom->get_id();
-        infos.top_level = tmTop->get_id();
+        infos.bottom_level = tm_bottom->get_id();
+        infos.top_level = tm_top->get_id();
         infos.wmts_id = infos.tms->get_id() + "_" + infos.top_level + "_" + infos.bottom_level;
 
         new_list.push_back(infos);
@@ -931,8 +934,6 @@ json11::Json Layer::to_json_tiles(TilesService* service) {
 
 std::string Layer::get_description_tilejson(TmsService* service) {
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(true);
-
     int order = 0;
     std::string minzoom, maxzoom;
 
@@ -941,8 +942,7 @@ std::string Layer::get_description_tilejson(TmsService* service) {
     std::map<std::string, int> mins;
     std::map<std::string, int> maxs;
 
-    for (std::pair<std::string, Level*> element : ordered_levels) {
-        Level * level = element.second;
+    for (Level* level : pyramid->get_ordered_levels(true)) {
 
         if (order == 0) {
             // Le premier niveau lu est le plus détaillé, on va l'utiliser pour définir plusieurs choses
@@ -1093,10 +1093,7 @@ std::string Layer::get_description_tms(TmsService* service) {
 
     int order = 0;
 
-    std::set<std::pair<std::string, Level*>, ComparatorLevel> ordered_levels = pyramid->get_ordered_levels(false);
-
-    for (std::pair<std::string, Level*> element : ordered_levels) {
-        Level * level = element.second;
+    for (Level* level : pyramid->get_ordered_levels(false)) {
         tm = level->get_tm();
         ptree& tileset_node = tilesets_node.add("TileSet", "");
 

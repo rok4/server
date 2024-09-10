@@ -154,6 +154,10 @@ DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
 
     std::transform(param_service.begin(), param_service.end(), param_service.begin(), ::tolower);
 
+    if (param_service == "") {
+        throw WmtsException::get_error_message("SERVICE query parameter missing", "MissingParameterValue", 400);
+    }
+
     if (param_service != "wmts") {
         throw WmtsException::get_error_message("SERVICE query parameter have to be WMTS", "InvalidParameterValue", 400);
     }
