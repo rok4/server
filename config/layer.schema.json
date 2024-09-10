@@ -3,99 +3,75 @@
     "title": "Layer's descriptor",
     "type": "object",
     "additionalProperties": false,
-    "properties":
-    {
-        "title":
-        {
+    "properties": {
+        "title": {
             "type": "string"
         },
-        "abstract":
-        {
+        "abstract": {
             "type": "string"
         },
-        "keywords":
-        {
+        "keywords": {
             "type": "array",
-            "items":
-            {
+            "items": {
                 "type": "string"
             }
         },
-        "styles":
-        {
+        "styles": {
             "type": "array",
-            "items":
-            {
+            "minItems": 1,
+            "items": {
                 "type": "string"
             }
         },
-        "bbox":
-        {
+        "bbox": {
             "type": "object",
-            "required":
-            [
+            "required": [
                 "east",
                 "west",
                 "north",
                 "south"
             ],
-            "properties":
-            {
-                "east":
-                {
+            "properties": {
+                "east": {
                     "type": "number"
                 },
-                "west":
-                {
+                "west": {
                     "type": "number"
                 },
-                "north":
-                {
+                "north": {
                     "type": "number"
                 },
-                "south":
-                {
+                "south": {
                     "type": "number"
                 }
             }
         },
-        "attribution":
-        {
+        "attribution": {
             "type": "object",
-            "properties":
-            {
-                "title":
-                {
+            "properties": {
+                "title": {
                     "type": "string"
                 },
-                "url":
-                {
+                "url": {
                     "type": "string"
                 },
-                "logo":
-                {
+                "logo": {
                     "type": "object",
-                    "properties":
-                    {
-                        "format":
-                        {
+                    "properties": {
+                        "format": {
                             "type": "string"
                         },
-                        "url":
-                        {
+                        "url": {
                             "type": "string"
                         },
-                        "width":
-                        {
+                        "width": {
                             "type": "integer"
                         },
-                        "height":
-                        {
+                        "height": {
                             "type": "integer"
                         }
                     },
-                    "required":
-                    [
+                    "required": [
                         "format",
                         "url",
                         "width",
@@ -103,179 +79,159 @@
                     ]
                 }
             },
-            "required":
-            [
+            "required": [
                 "title",
                 "url"
             ]
         },
-        "metadata":
-        {
+        "metadata": {
             "type": "array",
-            "items":
-            {
+            "items": {
                 "type": "object",
-                "properties":
-                {
-                    "format":
-                    {
+                "properties": {
+                    "format": {
                         "type": "string"
                     },
-                    "url":
-                    {
+                    "url": {
                         "type": "string"
                     },
-                    "type":
-                    {
+                    "type": {
                         "type": "string"
                     }
                 },
-                "required":
-                [
+                "required": [
                     "format",
                     "url",
                     "type"
                 ]
             }
         },
-        "pyramids":
-        {
+        "pyramids": {
             "type": "array",
-            "items":
-            {
+            "minItems": 1,
+            "items": {
                 "type": "object",
-                "properties":
-                {
-                    "path":
-                    {
+                "properties": {
+                    "path": {
                         "type": "string"
                     },
-                    "bottom_level":
-                    {
+                    "bottom_level": {
                         "type": "string"
                     },
-                    "top_level":
-                    {
+                    "top_level": {
                         "type": "string"
                     }
                 },
-                "required":
-                [
+                "required": [
                     "path",
                     "bottom_level",
                     "top_level"
                 ]
             }
         },
-        "resampling":
-        {
+        "resampling": {
             "type": "string",
             "enum": [
-                "nn", 
-                "linear", 
-                "bicubic", 
+                "nn",
+                "linear",
+                "bicubic",
                 "lanczos",
-                "lanczos_2", 
-                "lanczos_3", 
+                "lanczos_2",
+                "lanczos_3",
                 "lanczos_4"
             ]
         },
-        "get_feature_info":
-        {
+        "get_feature_info": {
             "type": "object",
-            "properties":
-            {
-                "type":
+            "oneOf": [
                 {
-                    "type": "string",
-                    "enum":
-                    [
-                        "EXTERNALWMS",
-                        "PYRAMID"
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "PYRAMID"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "type"
                     ]
                 },
-                "url":
                 {
-                    "type": "string"
-                },
-                "layers":
-                {
-                    "type": "string"
-                },
-                "query_layers":
-                {
-                    "type": "string"
-                },
-                "version":
-                {
-                    "type": "string"
-                },
-                "service":
-                {
-                    "type": "string"
-                },
-                "force_epsg":
-                {
-                    "type": "boolean"
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "EXTERNALWMS"
+                            ]
+                        },
+                        "url": {
+                            "type": "string"
+                        },
+                        "layers": {
+                            "type": "string"
+                        },
+                        "query_layers": {
+                            "type": "string"
+                        },
+                        "extra_query_params": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "type", "url", "layers", "query_layers"
+                    ]
                 }
-            },
-            "required":
-            [
-                "type"
             ]
         },
-        "wms":
-        {
+        "wms": {
             "type": "object",
-            "properties":
-            {
-                "authorized":
-                {
+            "properties": {
+                "enabled": {
                     "type": "boolean"
                 },
-                "crs":
-                {
+                "crs": {
                     "type": "array",
-                    "items":
-                    {
+                    "items": {
                         "type": "string"
                     }
                 }
             }
         },
-        "wmts":
-        {
+        "wmts": {
             "type": "object",
-            "properties":
-            {
-                "authorized":
-                {
+            "properties": {
+                "enabled": {
                     "type": "boolean"
                 },
-                "tms":
-                {
+                "tms": {
                     "type": "array",
-                    "items":
-                    {
+                    "items": {
                         "type": "string"
                     }
                 }
             }
         },
-        "tms":
-        {
+        "tms": {
             "type": "object",
-            "properties":
-            {
-                "authorized":
-                {
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "tiles": {
+            "type": "object",
+            "properties": {
+                "enabled": {
                     "type": "boolean"
                 }
             }
         }
     },
-    "required":
-    [
+    "required": [
         "title",
         "abstract",
         "pyramids"

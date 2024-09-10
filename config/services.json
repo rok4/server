@@ -1,11 +1,6 @@
 {
-    "title": "Service de visualisation WMS/WMTS/TMS",
-    "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux WMS, WMTS ou TMS",
     "provider": "Local",
     "site": "http://localhost",
-    "keywords": [
-        "WMS", "WMTS", "TMS"
-    ],
     "fee": "none",
     "access_constraint": "none",
     "contact": {
@@ -21,24 +16,32 @@
         "country": "",
         "email": ""
     },
+    "crs_equivalences": "/etc/rok4/equals_crs.json",
+    "admin": {
+        "enabled": true
+    },
+    "health": {
+        "enabled": true
+    },
     "common": {
-        "info_formats": [
-            "text/plain",
-            "text/html",
-            "text/xml",
-            "application/xml",
-            "application/json"
-        ],
-        "styling": true,
-        "reprojection": true,
-        "crs_restrictions": "/etc/rok4/restrictedCRSList.txt",
-        "crs_equivalency": "/etc/rok4/listofequalscrs.txt",
-        "inspire": false,
-        "post_mode": false
+        "enabled": true,
+        "endpoint_uri": "http://localhost/rok4/common",
+        "root_path": "/common",
+        "title": "Service COMMON",
+        "abstract": "Ce service permet la découvertes des services assurés par ce serveur",
+        "keywords": [
+            "COMMON"
+        ]
     },
     "wms": {
-        "active": true,
+        "enabled": true,
         "endpoint_uri": "http://localhost/rok4/wms",
+        "root_path": "/wms",
+        "title": "Service de visualisation WMS",
+        "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux WMS",
+        "keywords": [
+            "WMS"
+        ],
         "name": "WMS",
         "max_width": 10000,
         "max_height": 10000,
@@ -58,18 +61,41 @@
             "EPSG:4326"
         ],
         "layer_root_title": "Couches WMS",
-        "layer_root_abstract": "Données servies en WMS"
+        "layer_root_abstract": "Données servies en WMS",
+        "styling": true,
+        "reprojection": true,
+        "inspire": false
     },
     "wmts": {
-        "active": true,
-	    "endpoint_uri": "http://localhost/rok4/wmts"
+        "enabled": true,
+	    "endpoint_uri": "http://localhost/rok4/wmts",
+        "title": "Service de visualisation WMTS",
+        "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux WMTS",
+        "keywords": [
+            "WMTS"
+        ],
+        "root_path": "/wmts",
+        "styling": true,
+        "reprojection": true
     },
     "tms": {
-        "active": true,
-        "endpoint_uri": "http://localhost/rok4/tms"
+        "enabled": true,
+        "endpoint_uri": "http://localhost/rok4/tms",
+        "root_path": "/tms",
+        "title": "Service de visualisation TMS",
+        "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux TMS",
+        "keywords": [
+            "TMS"
+        ]
     },
-    "ogctiles": {
-        "active": true,
-        "endpoint_uri": "http://localhost/rok4/ogcapitiles"
+    "tiles": {
+        "enabled": true,
+        "endpoint_uri": "http://localhost/rok4/tiles",
+        "root_path": "/tiles",
+        "title": "Service de visualisation OGC API Tiles",
+        "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux OGC API Tiles",
+        "keywords": [
+            "OGC API Tiles"
+        ]
     }
 }

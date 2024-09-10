@@ -6,16 +6,6 @@ message("Search dependencies...")
 
 # Extern libraries, shared
 
-if(NOT TARGET tinyxml)
-    find_package(TinyXML)
-    if(TINYXML_FOUND)
-        add_library(tinyxml SHARED IMPORTED)
-        set_property(TARGET tinyxml PROPERTY IMPORTED_LOCATION ${TINYXML_LIBRARY})
-    else(TINYXML_FOUND)
-        message(FATAL_ERROR   "Cannot find extern library tinyxml")
-    endif(TINYXML_FOUND)
-endif(NOT TARGET tinyxml)
-
 if(NOT TARGET fcgi)
     find_package(Fcgi)
     if(FCGI_FOUND)
@@ -86,6 +76,16 @@ if(NOT TARGET rok4)
         message(FATAL_ERROR "Cannot find extern library rok4")
     endif(ROK4_FOUND)
 endif(NOT TARGET rok4)
+
+if(NOT TARGET zlib)
+    find_package(Zlib)
+    if(ZLIB_FOUND)
+        add_library(zlib SHARED IMPORTED)
+        set_property(TARGET zlib PROPERTY IMPORTED_LOCATION ${ZLIB_LIBRARY})
+    else(ZLIB_FOUND)
+        message(FATAL_ERROR "Cannot find extern library zlib")
+    endif(ZLIB_FOUND)
+endif(NOT TARGET zlib)
 
 if(UNITTEST_ENABLED)
   

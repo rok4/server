@@ -35,128 +35,26 @@
  * knowledge of the CeCILL-C license and that you accept its terms.
  */
 
-class Request;
-
-#ifndef REQUEST_H_
-#define REQUEST_H_
+#pragma once
 
 #include <map>
 #include <vector>
-#include <rok4/utils/BoundingBox.h>
-#include <rok4/datasource/DataSource.h>
-#include <rok4/utils/CRS.h>
-#include "Layer.h"
-#include "ServicesConf.h"
+#include <regex>
 #include "fcgiapp.h"
+
+#include <rok4/datastream/DataStream.h>
+
+// struct Route;
 
 /**
  * \file Request.h
  * \~french
  * \brief Définition de la classe Request, analysant les requêtes HTTP
- * \details Définition de la classe Request et des namespaces RequestType et ServiceType
+ * \details Définition de la classe Request
  * \~english
  * \brief Define the Request Class analysing HTTP requests
- * \details Define class Request and namespaces RequestType and ServiceType
+ * \details Define class Request
  */
-
-namespace RequestType {
-    /**
-     * \~french \brief Énumération des types de requête
-     * \~english \brief Available request type
-     */
-    enum eRequestType {
-        REQUEST_UNKNOWN,
-        REQUEST_MISSING,
-        GETSERVICES,
-        GETCAPABILITIES,
-        GETLAYER,
-        GETLAYERMETADATA,
-        GETLAYERGDAL,
-        GETMAP,
-        GETTILE,
-        GETMAPTILE,
-        GETFEATUREINFO,
-        GETVERSION,
-        ADDLAYER,
-        UPDATELAYER,
-        DELETELAYER,
-        BUILDCAPABILITIES,
-        TURNON,
-        TURNOFF,
-        GETHEALTHSTATUS,
-        GETINFOSTATUS,
-        GETTHREADSTATUS,
-        GETDEPENDSTATUS
-    };
-
-
-    /**
-     * \~french \brief Conversion d'un type de requête vers une chaîne de caractères
-     * \param[in] rt type de requête à convertir
-     * \return la chaîne de caractère nommant le type de requête
-     * \~english \brief Convert a request type to a string
-     * \param[in] rt request type to convert
-     * \return string namming the request type
-     */
-    std::string toString ( eRequestType rt );
-
-}
-
-
-namespace ServiceType {
-    /**
-     * \~french \brief Énumération des services
-     * \~english \brief Available services
-     */
-    enum eServiceType {
-        SERVICE_UNKNOWN,
-        SERVICE_MISSING,
-        WMTS,
-        WMS,
-        TMS,
-        OGCTILES,
-        GLOBAL,
-        ADMIN,
-        HEALTHCHECK
-    };
-
-    /**
-     * \~french \brief Conversion d'un type de service vers une chaîne de caractères
-     * \param[in] st type de service à convertir
-     * \return la chaîne de caractère nommant le type de service
-     * \~english \brief Convert a service type to a string
-     * \param[in] st service type to convert
-     * \return string namming the service type
-     */
-    std::string toString ( eServiceType st );
-}
-
-namespace TemplateOGC {
-    /**
-     * \~french \brief Énumération des templates d'URL OGC
-     */
-    enum eTemplateOGC {
-        // raster tile
-        GETTILERASTERSTYLED,
-        GETTILERASTER,
-        GETTILERASTERSTYLEDBYCOLLECTION,
-        GETTILERASTERBYCOLLECTION,
-        // vector tile
-        GETTILEVECTOR,
-        GETTILEVECTORBYCOLLECTION,
-        // capabilities
-        GETCAPABILITIESBYCOLLECTION,
-        GETCAPABILITIESRASTERBYCOLLECTION,
-        GETCAPABILITIESVECTORBYCOLLECTION,
-        // tilematrixset
-        GETTILEMATRIXSET,
-        GETTILEMATRIXSETBYID
-    };
-    /**
-     * \~french \brief Conversion d'un type vers une chaîne de caractères
-     */
-    std::string toString ( eTemplateOGC r );
-}
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -176,38 +74,9 @@ namespace TemplateOGC {
 class Request {
     friend class CppUnitRequest;
 
-private:
-    /**
-     * \~french
-     * \brief Décodage de l'URL correspondant à la requête
-     * \param[in,out] src URL
-     * \~english
-     * \brief URL decoding
-     * \param[in,out] src URLs
-     */
-    void url_decode ( char *src );
-
-    /**
-     * \~french
-     * \brief Identification du service et de la requête
-     * \~english
-     * \brief Service and request type identification
-     */
-    void determineServiceAndRequest();
-
 public:
 
-    /**
-     * \~french
-     * \brief Transforme la chaîne de caractères en minuscule
-     * \param[in,out] str la chaîne
-     * \~english
-     * \brief Translate the string to lower case
-     * \param[in,out] str the string
-     */
-    static void toLowerCase ( char* str ) {
-        if ( str ) for ( int i = 0; str[i]; i++ ) str[i] = tolower ( str[i] );
-    }
+    FCGX_Request* fcgx_request;
 
     /**
      * \~french
@@ -219,7 +88,7 @@ public:
      * \param[in] paramName parameter to test
      * \return true if present
      */
-    bool hasParam ( std::string paramName );
+    bool has_query_param ( std::string paramName );
 
     /**
      * \~french
@@ -231,7 +100,13 @@ public:
      * \param[in] paramName parameter name
      * \return parameter value or "" if not availlable
      */
-    std::string getParam ( std::string paramName );
+    std::string get_query_param ( std::string paramName );
+
+    /**
+     * \~french \brief Protocole, hôte, port et chemin
+     * \~english \brief Protocol, host, port and path
+     */
+    std::string url;
 
     /**
      * \~french \brief Méthode de la requête (GET, POST, PUT, DELETE)
@@ -243,38 +118,18 @@ public:
      * \~english \brief Web Server path of the service
      */
     std::string path;
-    /**
-     * \~french \brief Chemin découpé
-     * \~english \brief Splitted path
-     */
-    std::vector<std::string> pathParts;
-    /**
-     * \~french \brief Nom au sens OGC de la requête effectuée
-     * \~english \brief OGC request name
-     */
-    RequestType::eRequestType request;
-    /**
-     * \~french \brief Type de service (WMS,WMTS,TMS,OGC)
-     * \~english \brief Service type (WMS,WMTS,TMS,OGC)
-     */
-    ServiceType::eServiceType service;
-    /**
-     * \~french \brief Type de templates OGC
-     * \~english \brief Templates OGC
-     */
-    TemplateOGC::eTemplateOGC tmpl;
 
     /**
      * \~french \brief Liste des paramètres de la requête
      * \~english \brief Request parameters list
      */
-    std::map<std::string, std::string> queryParams;
+    std::map<std::string, std::string> query_params;
 
     /**
-     * \~french \brief Liste des paramètres extraits du corps de la requête
-     * \~english \brief Parameters list from request body
+     * \~french \brief Liste des paramètres extraits du chemin de la requête
+     * \~english \brief Parameters list from request path
      */
-    std::map<std::string, std::string> bodyParams;
+    std::vector<std::string> path_params;
 
     /**
      * \~french \brief Corps de la requête
@@ -283,25 +138,50 @@ public:
     std::string body;
 
     /**
-     * \~french \brief Affichage (debug)
-     * \~english \brief Display (debug)
+     * \~french \brief Export textuel
+     * \~english \brief Text export
      */
-    void print() {
-        BOOST_LOG_TRIVIAL(info) << "path = " << path;
-        BOOST_LOG_TRIVIAL(info) << "method = " << method;
-        BOOST_LOG_TRIVIAL(info) << "service = " << ServiceType::toString(service);
-        BOOST_LOG_TRIVIAL(info) << "request = " << RequestType::toString(request);
-    }
+    std::string to_string();
+
+    /**
+     * \~french \brief Est une requête INSPIRE ?
+     * \param[in] inspire_default Comportement par défaut du service appelé
+     * \~english \brief Is a INSPIRE request ?
+     * \param[in] inspire_default Default behaviour of requested service
+     */
+    bool is_inspire(bool inspire_default = false);
+
+    /**
+     * \~french \brief Joue la requête
+     * \details La requête ne doit pas être une requête reçue
+     * \~english \brief Send the request
+     * \details Request cannot be an input one
+     */
+    RawDataStream* send();
     
     /**
      * \~french
-     * \brief Constructeur d'une requête
-     * \param fcgxRequest Requête fcgi
+     * \brief Constructeur d'une requête reçue
+     * \param fcgx Requête fcgi
      * \~english
-     * \brief Request Constructor
-     * \param fcgxRequest Fcgi request
+     * \brief Input request Constructor
+     * \param fcgx Fcgi request
      */
-    Request ( FCGX_Request& fcgxRequest);
+    Request ( FCGX_Request* fcgx);
+    
+    /**
+     * \~french
+     * \brief Constructeur d'une requête à jouer
+     * \param m Méthode
+     * \param u URL
+     * \param qp Paramètres de requête
+     * \~english
+     * \brief Request to process constructor
+     * \param m Method
+     * \param u URL
+     * \param qp Query parameters
+     */
+    Request (std::string m, std::string u, std::map<std::string, std::string> qp);
 
     /**
      * \~french
@@ -312,4 +192,4 @@ public:
     virtual ~Request();
 };
 
-#endif /* REQUEST_H_ */
+

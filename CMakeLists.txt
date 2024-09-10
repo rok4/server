@@ -56,20 +56,23 @@ include(cmake/modules/dependencies.cmake)
 ################### DÉFINITION DES FICHIERS SOURCES ET DES HEADERS
 
 # Dossiers contenant les headers nécessaires
-include_directories(${PROJECT_BINARY_DIR} ${ROK4_INCLUDE_DIR} ${BOOSTLOG_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${FCGI_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${PROJ_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
+include_directories(${PROJECT_BINARY_DIR} ${ROK4_INCLUDE_DIR} ${BOOSTLOG_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${FCGI_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${PROJ_INCLUDE_DIR})
 
 message(STATUS "Building ROK4 Server")
 
 file(GLOB ROK4SERVER_SRCS 
     "${PROJECT_SOURCE_DIR}/src/*.cpp" 
-    "${PROJECT_SOURCE_DIR}/src/healthcheck/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/services/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/services/*/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/configurations/*.cpp"
 )
 
 add_executable(${PROJECT_NAME} ${ROK4SERVER_SRCS})
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "rok4")
 
 # Lien des librairies dépendantes
-target_link_libraries(${PROJECT_NAME} PUBLIC rok4 fcgi tinyxml boostlog boostlogsetup boostthread boostfilesystem boostsystem curl openssl crypto proj)
+target_link_libraries(${PROJECT_NAME} PUBLIC rok4 fcgi zlib boostlog boostlogsetup boostthread boostfilesystem boostsystem curl openssl crypto proj)
 
 ################### TESTS UNITAIRES
 
@@ -155,7 +158,7 @@ if(CPACK_SYSTEM_NAME AND CPACK_SYSTEM_NAME STREQUAL "ubuntu-20.04" OR CPACK_SYST
     # Debian
     set(CPACK_DEBIAN_PACKAGE_SECTION "science")
     set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "librok4-dev, libfcgi-dev ,libtinyxml-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "librok4-dev, libfcgi-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_SOURCE_DIR}/cmake/debian/postinst;" )
     set(CPACK_BINARY_DEB "ON")
 endif()

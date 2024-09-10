@@ -54,7 +54,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt -y install libcurl4-openssl-dev libproj-dev libssl-dev libfcgi-dev \
-            libboost-log-dev libboost-filesystem-dev libboost-system-dev libtinyxml-dev \
+            libboost-log-dev libboost-filesystem-dev libboost-system-dev \
             jq gettext build-essential cmake libcppunit-dev doxygen graphviz
 
           core_cpp_version=$(curl --silent "https://api.github.com/repos/rok4/core-cpp/releases/latest" | jq -r ".tag_name")
