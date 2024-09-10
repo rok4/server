@@ -2,33 +2,35 @@
     "$schema": "http://json-schema.org/schema#",
     "title": "ROK4 Services configuration",
     "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "contact"
+    ],
     "properties": {
-        "title": {
-            "type": "string"
-        },
-        "abstract": {
-            "type": "string"
-        },
         "provider": {
-            "type": "string"
+            "type": "string",
+            "description": "Service provider"
         },
         "site": {
-            "type": "string"
-        },
-        "keywords": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
+            "type": "string",
+            "description": "Provider's website"
         },
         "fee": {
-            "type": "string"
+            "type": "string",
+            "description": "Access costs"
         },
         "access_constraint": {
-            "type": "string"
+            "type": "string",
+            "description": "Access conditions"
+        },
+        "crs_equivalency": {
+            "type": "string",
+            "description": "Path to JSON file with identical CRS (to avoid useless tranformation)"
         },
         "contact": {
             "type": "object",
+            "additionalProperties": false,
+            "description": "Provider's contact informations",
             "properties": {
                 "name": {
                     "type": "string"
@@ -64,137 +66,373 @@
                     "type": "string"
                 }
             }
-
         },
+
+        "health": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Health API configuration",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Health API activation"
+                }
+            }
+        },
+
+        "admin": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Administration API configuration",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Administration API activation"
+                }
+            }
+        },
+
         "common": {
             "type": "object",
+            "additionalProperties": false,
+            "description": "Common service configuration",
             "properties": {
-                "info_formats": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Common API activation"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "Common API title",
+                    "default": "COMMON service"
+                },
+                "abstract": {
+                    "type": "string",
+                    "description": "Common API abstract",
+                    "default": "COMMON service"
+                },
+                "endpoint_uri": {
+                    "type": "string",
+                    "description": "Common API public endpoint",
+                    "default": "http://localhost/common"
+                },
+                "root_path": {
+                    "type": "string",
+                    "description": "Common API internal path",
+                    "default": "/common"
+                },
+                "keywords": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
-                },
-                "styling": {
-                    "type": "boolean"
-                },
-                "reprojection": {
-                    "type": "boolean"
-                },
-                "inspire": {
-                    "type": "boolean"
-                },
-                "post_mode": {
-                    "type": "boolean"
-                },
-                "crs_restrictions": {
-                    "type": "string"
-                },
-                "crs_equivalency": {
-                    "type": "string"
+                    },
+                    "description": "Common API keywords"
                 }
             }
-
         },
+
         "wms": {
             "type": "object",
+            "additionalProperties": false,
+            "description": "WMS API configuration",
             "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "endpoint_uri": {
-                    "type": "string"
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "WMS API activation"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "WMS API name",
+                    "default": "WMS"
                 },
-                "layer_root_title": {
-                    "type": "string"
+                "title": {
+                    "type": "string",
+                    "description": "WMS API title",
+                    "default": "WMS service"
                 },
-                "layer_root_abstract": {
-                    "type": "string"
+                "abstract": {
+                    "type": "string",
+                    "description": "WMS API abstract",
+                    "default": "WMS service"
                 },
-                "max_width": {
-                    "type": "integer"
+                "endpoint_uri": {
+                    "type": "string",
+                    "description": "WMS API public endpoint",
+                    "default": "http://localhost/wms"
                 },
-                "max_height": {
-                    "type": "integer"
+                "root_path": {
+                    "type": "string",
+                    "description": "WMS API internal path",
+                    "default": "/wms"
                 },
-                "layer_limit": {
-                    "type": "integer"
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "WMS API keywords"
                 },
-                "max_tile_x": {
-                    "type": "integer"
+                "metadata": {
+                    "$ref": "#/$defs/metadata",
+                    "description": "WMS service's metadata"
                 },
-                "max_tile_y": {
-                    "type": "integer"
+                "reprojection": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "WMS reprojection activation"
+                },
+                "inspire": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Inspire mode as WMS default response mode activation"
                 },
                 "formats": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "image/jpeg",
+                            "image/png",
+                            "image/tiff",
+                            "image/geotiff",
+                            "image/x-bil;bits=32",
+                            "text/asc"
+                        ]
+                    },
+                    "description": "WMS handled raster formats",
+                    "default": [
+                        "image/jpeg",
+                        "image/png",
+                        "image/tiff",
+                        "image/geotiff",
+                        "image/x-bil;bits=32"
+                    ]
+                },
+                "root_layer": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "WMS root layer description",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "default": "WMS layers"
+                        },
+                        "abstract": {
+                            "type": "string",
+                            "default": "WMS layers"
+                        }
+                    }
+                },
+                "limits": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "layers_count": {
+                            "type": "integer",
+                            "description": "Maximum layers count in a WMS GetMap",
+                            "minimum": 1,
+                            "default": 1
+                        },
+                        "width": {
+                            "type": "integer",
+                            "description": "Maximum width in a WMS GetMap",
+                            "minimum": 1,
+                            "default": 5000
+                        },
+                        "height": {
+                            "type": "integer",
+                            "description": "Maximum height in a WMS GetMap",
+                            "minimum": 1,
+                            "default": 5000
+                        },
+                        "tile_x": {
+                            "type": "integer",
+                            "description": "Maximum source tiles count widthwise to build the response of a WMS GetMap",
+                            "minimum": 1,
+                            "default": 32
+                        },
+                        "tile_y": {
+                            "type": "integer",
+                            "description": "Maximum source tiles count heightwise to build the response of a WMS GetMap",
+                            "minimum": 1,
+                            "default": 32
+                        }
                     }
                 },
                 "crs": {
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
-                },
-                "metadata": { "$ref": "#/$defs/metadata" }
+                    },
+                    "description": "WMS global handled CRS"
+                }
             }
-
         },
+
         "wmts": {
             "type": "object",
+            "additionalProperties": false,
+            "description": "WMTS API configuration",
             "properties": {
-                "active": {
-                    "type": "boolean"
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "WMTS API activation"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "WMTS API title",
+                    "default": "WMTS service"
+                },
+                "abstract": {
+                    "type": "string",
+                    "description": "WMTS API abstract",
+                    "default": "WMTS service"
                 },
                 "endpoint_uri": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "WMTS API public endpoint",
+                    "default": "http://localhost/wmts"
                 },
-                "metadata": { "$ref": "#/$defs/metadata" }
+                "root_path": {
+                    "type": "string",
+                    "description": "WMTS API internal path",
+                    "default": "/wmts"
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "WMTS API keywords"
+                },
+                "metadata": {
+                    "$ref": "#/$defs/metadata",
+                    "description": "WMTS service's metadata"
+                },
+                "reprojection": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "WMTS reprojection activation"
+                },
+                "inspire": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Inspire mode as WMTS default response mode activation"
+                }
             }
         },
+
         "tms": {
             "type": "object",
+            "additionalProperties": false,
+            "description": "TMS API configuration",
             "properties": {
-                "active": {
-                    "type": "boolean"
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "TMS API activation"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "TMS API title",
+                    "default": "TMS service"
+                },
+                "abstract": {
+                    "type": "string",
+                    "description": "TMS API abstract",
+                    "default": "TMS service"
                 },
                 "endpoint_uri": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "TMS API public endpoint",
+                    "default": "http://localhost/tms"
                 },
-                "metadata": { "$ref": "#/$defs/metadata" }
+                "root_path": {
+                    "type": "string",
+                    "description": "TMS API internal path",
+                    "default": "/tms"
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "TMS API keywords"
+                },
+                "metadata": {
+                    "$ref": "#/$defs/metadata",
+                    "description": "TMS service's metadata"
+                }
             }
         },
-        "ogctiles": {
+
+        "tiles": {
             "type": "object",
+            "additionalProperties": false,
+            "description": "OGC API Tiles configuration",
             "properties": {
-                "active": {
-                    "type": "boolean"
+                "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "OGC API Tiles activation"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "OGC API Tiles title",
+                    "default": "TMS service"
+                },
+                "abstract": {
+                    "type": "string",
+                    "description": "OGC API Tiles abstract",
+                    "default": "TMS service"
                 },
                 "endpoint_uri": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "OGC API Tiles public endpoint",
+                    "default": "http://localhost/tiles"
                 },
-                "metadata": { "$ref": "#/$defs/metadata" }
+                "root_path": {
+                    "type": "string",
+                    "description": "OGC API Tiles internal path",
+                    "default": "/tiles"
+                },
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "OGC API Tiles keywords"
+                },
+                "metadata": {
+                    "$ref": "#/$defs/metadata",
+                    "description": "OGC API Tiles service's metadata"
+                }
             }
         }
     },
+
     "$defs": {
         "metadata": {
             "type": "object",
-            "required": [ "url", "type", "format"],
+            "additionalProperties": false,
+            "required": ["format", "type", "url"],
             "properties": {
-                "url": {
-                    "type": "string"
+                "format": {
+                    "type": "string",
+                    "default": "WMS service"
                 },
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "WMS service"
                 },
-                "format": {
-                    "type": "string"
+                "url": {
+                    "type": "string",
+                    "default": "WMS service"
                 }
             }
         }

@@ -1,3 +1,26 @@
+## 6.0.0
+
+### [Added]
+
+* Tous les services sont désactivable, routes de santé incluses
+* La racine de consultation des services de diffusion est configurable
+* Titre, résumé et mots clés sont définis par service de diffusion
+
+### [Changed]
+
+* Passage complet en snake case
+* Plus de style par défaut au chargement d'une couche, il faut forcément en fournir un. Pas de détection du style Inspire : ce sera toujours le premier qui sera utilisé par défaut à l'interrogation de la couche
+* La route globale des services devient une route du service COMMON (futur OGC API Common)
+* OGC API Tiles : dans le fichier de configuration des services, la section devient 'tiles'
+* Utilisation des librairies boost (property tree) pour écrire du XML et json11 pour écrire du JSON
+* Changement du format des réponses au getFeatureInfo interne (JSON -> FeatureCollection, XML -> Pixel.Band)
+* WMTS : on ne met dans le getcapabilities que les styles que l'on pourra effectivement appliquer lors d'un GetTile
+* Les GetFeatureInfo sur un WMS externe se font toujours avec le format image/tiff
+
+### [Removed]
+
+* Suppression de la classe WebService, l'envoi de requête est assuré par la classe Request
+
 ## 5.5.2
 
 ### [Fixed]
@@ -65,7 +88,7 @@
 * La fonction de copie d'une instance MetadataURL recopie bien le format et le href
 * Lors de l'écriture de nombres flottants dans les réponses à un appel GetFeatureInfo, on précise les décimales
 * Utils API Tiles 
-    * correction l'extraction de la collection et du style lors d'appels à la route `/ogcapitiles/collections/{}/styles/{}/map/tiles/{}/{}/{}/{}(/info)?` 
+    * correction l'extraction de la collection et du style lors d'appels à la route `/tiles/collections/{}/styles/{}/map/tiles/{}/{}/{}/{}(/info)?` 
     * le style par défaut de la couche est bien utilisée lors d'appels sans précision de style
 
 ### [Added]
@@ -85,28 +108,28 @@ Implémentation partielle de l'API OGC Tiles - Part 1 [v1.0.0 final release](htt
 ### [Added]
 
 * Liste de nouvelles routes pour obtenir le **GetCapabilities**: 
-    * /ogcapitiles/collections
+    * /tiles/collections
      avec les paramètres facultatifs : 
        * bbox
        * limit
-    * /ogcapitiles/collections/{layer}/map/tiles
-    * /ogcapitiles/collections/{layer}/tiles
-    * /ogcapitiles/tilematrixsets
-    * /ogcapitiles/tilematrixsets/{tms}
+    * /tiles/collections/{layer}/map/tiles
+    * /tiles/collections/{layer}/tiles
+    * /tiles/tilematrixsets
+    * /tiles/tilematrixsets/{tms}
 
 * Liste des nouvelles routes pour obtenir le **GetTile** :
 
    * Raster
-       * /ogcapitiles/map/tiles/{tms}/{level}/{row}/{col}
+       * /tiles/map/tiles/{tms}/{level}/{row}/{col}
           avec le paramètre obligatoire : collections={layer}
-       * /ogcapitiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
+       * /tiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
          avec le paramètre obligatoire : collections={layer}
-       * /ogcapitiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
-       * /ogcapitiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}
+       * /tiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
+       * /tiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}
 
    * Vecteur
-        * /ogcapitiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}
-        * /ogcapitiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}
+        * /tiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}
+        * /tiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}
 
 ### [Changed]
 
