@@ -23,7 +23,7 @@
             "type": "string",
             "description": "Access conditions"
         },
-        "crs_equivalency": {
+        "crs_equivalences": {
             "type": "string",
             "description": "Path to JSON file with identical CRS (to avoid useless tranformation)"
         },

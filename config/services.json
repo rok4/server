@@ -42,12 +42,14 @@
         "keywords": [
             "WMS"
         ],
+        "limits": {
+            "width": 10000,
+            "height": 10000,
+            "tile_x": 256,
+            "tile_y": 256,
+            "layers_count": 2
+        },
         "name": "WMS",
-        "max_width": 10000,
-        "max_height": 10000,
-        "layer_limit": 1,
-        "max_tile_x": 256,
-        "max_tile_y": 256,
         "formats": [
             "image/jpeg",
             "image/png",
@@ -60,22 +62,22 @@
             "EPSG:3857",
             "EPSG:4326"
         ],
-        "layer_root_title": "Couches WMS",
-        "layer_root_abstract": "Données servies en WMS",
-        "styling": true,
+        "root_layer": {
+            "title": "Couches WMS",
+            "abstract": "Données servies en WMS"
+        },
         "reprojection": true,
         "inspire": false
     },
     "wmts": {
         "enabled": true,
-	    "endpoint_uri": "http://localhost/rok4/wmts",
+        "endpoint_uri": "http://localhost/rok4/wmts",
         "title": "Service de visualisation WMTS",
         "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux WMTS",
         "keywords": [
             "WMTS"
         ],
         "root_path": "/wmts",
-        "styling": true,
         "reprojection": true
     },
     "tms": {
