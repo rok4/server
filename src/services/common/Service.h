@@ -57,10 +57,25 @@ class CommonService;
 class CommonService : public Service {  
 
 private:
-    DataStream* get_services (Request* req, Rok4Server* serv);
+    DataStream* get_landing_page (Request* req, Rok4Server* serv);
+
+    std::string cache_getlandingpage;
 
 public:
     DataStream* process_request(Request* req, Rok4Server* serv);
+
+    /**
+     * \~french
+     * \brief Supprime les réponses cachées
+     * \~english
+     * \brief Remove cached responses
+     */
+    void clean_cache() {
+        cache_mtx.lock();
+        cache_getlandingpage.clear();
+        cache_mtx.unlock();
+    };
+
 
     /**
      * \~french

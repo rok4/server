@@ -64,9 +64,9 @@
  */
 class CommonException {
 private:
-    static std::string xml_template;
+    static std::string json_template;
 
 public:
-    static MessageDataStream* get_error_message(std::string reason, int status);
+    static MessageDataStream* get_error_message(std::string type, std::string title, int status);
 };
 

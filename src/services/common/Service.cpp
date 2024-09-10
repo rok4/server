@@ -118,15 +118,9 @@ DataStream* CommonService::process_request(Request* req, Rok4Server* serv) {
     BOOST_LOG_TRIVIAL(debug) << "COMMON service";
 
     if ( match_route( "", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETSERVICES request";
-        return get_services(req, serv);
+        BOOST_LOG_TRIVIAL(debug) << "GETLANDINGPAGE request";
+        return get_landing_page(req, serv);
     } else {
-        throw CommonException::get_error_message("Unknown common request path", 400);
+        throw CommonException::get_error_message("ResourceNotFound", "Unknown common request path", 404);
     }
 };
-
-
-DataStream* CommonService::get_services ( Request* req, Rok4Server* serv ) {
-
-    throw CommonException::get_error_message("Coming soon !", 501);
-}

@@ -10,3 +10,4 @@
 * Changement du format des réponses au getFeatureInfo interne (JSON -> FeatureCollection, XML -> Pixel.Band)
 * WMTS : on ne met dans le getcapabilities que les styles que l'on pourra effectivement appliquer lors d'un GetTile
 * Les GetFeatureInfo sur un WMS externe se font toujours avec le format image/tiff
+* Implémentation de l'API COMMON en accord avec l'API OGC Common

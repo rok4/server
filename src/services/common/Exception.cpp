@@ -45,8 +45,8 @@
 
 #include "services/common/Exception.h"
 
-std::string CommonException::xml_template = "<?xml version=\"1.0\" ?><Error><Message>%s</Message></Error>";
+std::string CommonException::json_template = "{ \"type\": \"%s\", \"title\": \"%s\", \"status\": %s }";
 
-MessageDataStream* CommonException::get_error_message(std::string reason, int status) {
-    return new MessageDataStream(str(boost::format(xml_template) % reason), "text/xml", status);
+MessageDataStream* CommonException::get_error_message(std::string type, std::string title, int status) {
+    return new MessageDataStream(str(boost::format(json_template) % type % title % status), "application/json", status);
 }
