@@ -969,9 +969,16 @@ std::string Layer::get_description_tilejson(TmsService* service) {
         order++;
     }
 
+    std::string description = abstract;
+    // on double les backslash, en évitant de traiter les backslash déjà doublés
+    boost::replace_all(description, "\\\\", "\\");
+    boost::replace_all(description, "\\", "\\\\");
+    // On échappe les doubles quotes
+    boost::replace_all(description, "\"", "\\\"");
+
     json11::Json::object res = json11::Json::object {
         { "name", id },
-        { "description", abstract },
+        { "description", description },
         { "minzoom", std::stoi(minzoom) },
         { "maxzoom", std::stoi(maxzoom) },
         { "crs", pyramid->get_tms()->get_crs()->get_request_code() },

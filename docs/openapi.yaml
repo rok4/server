@@ -1008,6 +1008,13 @@ paths:
           schema:
             type: string
             enum: ["png", "jpg", "tiff"]
+
+        - name: filename
+          required: false
+          in: query
+          description: nom du fichier à enregistrer (mis dans le content-disposition de la réponse, avec le mode attachment)
+          schema:
+            type: string
               
       responses:
         200:
@@ -1081,6 +1088,13 @@ paths:
           schema:
             type: string
             enum: ["mvt"]
+
+        - name: filename
+          required: false
+          in: query
+          description: nom du fichier à enregistrer (mis dans le content-disposition de la réponse, avec le mode attachment)
+          schema:
+            type: string
               
       responses:
         200:

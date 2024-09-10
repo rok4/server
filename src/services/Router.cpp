@@ -109,7 +109,12 @@ std::string get_status_header ( int http_status ) {
  * \param[in] mime mime type
  * \return filename
  */
-std::string get_default_filename ( std::string mime ) {
+std::string get_default_filename ( std::string mime, Request* request ) {
+
+    if (request->has_query_param("filename")) {
+        return request->get_query_param("filename");
+    }
+
     if ( mime.compare ( "image/tiff" ) ==0 )
         return "image.tif";
     else if ( mime.compare ( "image/geotiff" ) ==0 )
@@ -187,10 +192,14 @@ int sendresponse ( DataStream* stream, Request* request ) {
     }
 
     if (stream->get_type() != "") {
-        std::string filename = get_default_filename ( stream->get_type() );
+        std::string filename = get_default_filename ( stream->get_type(), request );
         BOOST_LOG_TRIVIAL(debug) <<  filename ;
 
-        FCGX_PutStr ( "\r\nContent-Disposition: filename=\"",33,request->fcgx_request->out );
+        FCGX_PutStr ( "\r\nContent-Disposition: ", 23, request->fcgx_request->out );
+        if (request->has_query_param("filename")) {
+            FCGX_PutStr ( "attachment; ", 12, request->fcgx_request->out );
+        }
+        FCGX_PutStr ( "filename=\"", 10, request->fcgx_request->out );
         FCGX_PutStr ( filename.data(),filename.size(), request->fcgx_request->out );
         FCGX_PutStr ( "\"",1,request->fcgx_request->out );
     }
