@@ -1,3 +1,15 @@
+## 5.5.2
+
+### [Fixed]
+
+* `TMS` : les backslash sont échappés dans l'abstract pour éviter la casse du metadata.json
+
+## 5.5.1
+
+### [Added]
+
+* Services WMS, WMTS, TMS et Tiles : il est possible de fournir un filename en paramètre de requête et imposer le téléchargement dans un navigateur
+
 ## 5.5.0
 
 ### [Added]

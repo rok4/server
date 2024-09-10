@@ -226,6 +226,13 @@ paths:
               - normal
           explode: false
 
+        - name: FILENAME
+          required: false
+          in: query
+          description: nom du fichier à enregistrer (mis dans le content-disposition de la réponse, avec le mode attachment)
+          schema:
+            type: string
+
         - name: FORMAT_OPTIONS
           required: false
           in: query
@@ -528,6 +535,13 @@ paths:
           schema:
             type: string
 
+        - name: FILENAME
+          required: false
+          in: query
+          description: nom du fichier à enregistrer (mis dans le content-disposition de la réponse, avec le mode attachment)
+          schema:
+            type: string
+
       responses:
         400:
           description: Paramètre manquant ou erroné
@@ -802,6 +816,12 @@ paths:
           schema:
             type: string
 
+        - name: filename
+          required: false
+          in: query
+          description: nom du fichier à enregistrer (mis dans le content-disposition de la réponse, avec le mode attachment)
+          schema:
+            type: string
       responses:
         400:
           description: Paramètre manquant ou erroné
