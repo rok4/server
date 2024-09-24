@@ -77,8 +77,8 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmtsException::get_error_message("Tile matrix set unknown", "InvalidParameterValue", 400);
     }
 
-    TileMatrixSet* tms = layer->get_tilematrixset(str_tms);
-    if (tms == NULL) {
+    TileMatrixSetInfos* tmsi = layer->get_tilematrixset(str_tms);
+    if (tmsi == NULL) {
         throw WmtsException::get_error_message("Tile matrix set " + str_tms + " unknown", "InvalidParameterValue", 400);
     }
 
@@ -91,7 +91,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmtsException::get_error_message("Tile matrix unknown", "InvalidParameterValue", 400);
     }
 
-    TileMatrix* tm = tms->get_tm(str_tm);
+    TileMatrix* tm = tmsi->tms->get_tm(str_tm);
     if (tm == NULL) throw WmtsException::get_error_message("Tile matrix " + str_tm + " unknown", "InvalidParameterValue", 400);
 
     // La colonne
@@ -108,7 +108,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
     if (sscanf(str_row.c_str(), "%d", &row) != 1)
         throw WmtsException::get_error_message("Invalid row value", "InvalidParameterValue", 400);
 
-    TileMatrixLimits* tml = layer->get_tilematrix_limits(tms, tm);
+    TileMatrixLimits* tml = layer->get_tilematrix_limits(tmsi->tms, tm);
     if (tml == NULL) {
         // On est hors niveau -> erreur
         throw WmtsException::get_error_message("No data found", "TileOutOfRange", 404);
@@ -180,7 +180,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
     Level* level = layer->get_pyramid()->get_level(tm->get_id());
 
     std::string gfi_type = layer->get_gfi_type();
-    if (gfi_type.compare("PYRAMID") == 0 && tms->get_id() == layer->get_pyramid()->get_tms()->get_id() ) {
+    if (gfi_type.compare("PYRAMID") == 0 && tmsi->tms->get_id() == layer->get_pyramid()->get_tms()->get_id() ) {
         BOOST_LOG_TRIVIAL(debug) << "GFI sur pyramide dans le TMS natif";
 
         Image* image = level->get_tile(column, row, 0, 0, 0, 0, true);
@@ -247,12 +247,12 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         query_params.emplace("INFO_FORMAT", info_format);
         query_params.emplace("FEATURE_COUNT", "1");
         query_params.emplace("FORMAT", "image/tiff");
-        query_params.emplace("CRS", tms->get_crs()->get_request_code());
+        query_params.emplace("CRS", tmsi->tms->get_crs()->get_request_code());
         query_params.emplace("WIDTH", std::to_string(width));
         query_params.emplace("HEIGHT", std::to_string(height));
         query_params.emplace("I", std::to_string(i));
         query_params.emplace("J", std::to_string(j));
-        query_params.emplace("BBOX", bbox.to_string(tms->get_crs()->is_lat_lon()));
+        query_params.emplace("BBOX", bbox.to_string(tmsi->tms->get_crs()->is_lat_lon()));
 
         std::map<std::string, std::string> extra_query_params = layer->get_gfi_extra_params();
         query_params.insert(extra_query_params.begin(), extra_query_params.end());

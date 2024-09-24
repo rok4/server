@@ -119,6 +119,15 @@ TilesService::TilesService (json11::Json& doc) : Service(doc), metadata(NULL) {
             return ;
         }
     }
+
+    if (doc["reprojection"].is_bool()) {
+        reprojection = doc["reprojection"].bool_value();
+    } else if (! doc["reprojection"].is_null()) {
+        error_message = "WMTS service: reprojection have to be a boolean";
+        return;
+    } else {
+        reprojection = false;
+    }
 }
 
 DataStream* TilesService::process_request(Request* req, Rok4Server* serv) {
@@ -128,21 +137,51 @@ DataStream* TilesService::process_request(Request* req, Rok4Server* serv) {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
         return get_capabilities(req, serv);
     }
+    else if ( match_route( "/tileMatrixSets", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETTILEMATRIXSETS request";
+        return get_tilematrixsets(req, serv);
+    }
+    else if ( match_route( "/tileMatrixSets/([^/]+)", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETTILEMATRIXSET request";
+        return get_tilematrixset(req, serv);
+    }
     else if ( match_route( "/collections/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILES request";
         return get_tiles(req, serv);
     }
-    else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)/info", {"GET"}, req ) ) {
-        BOOST_LOG_TRIVIAL(debug) << "GETFEATUREINFO request";
-        return get_feature_info(req, serv);
+    // Données vecteur
+    else if ( match_route( "/collections/([^/]+)/tiles", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETTILESETS vector request";
+        return get_tilesets(req, serv, false);
+    }
+    else if ( match_route( "/collections/([^/]+)/tiles/([^/]+)", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETTILESET vector request";
+        return get_tileset(req, serv, false);
     }
     else if ( match_route( "/collections/([^/]+)/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILE vector request";
         return get_tile(req, serv, false);
     }
+    // Données raster
+    else if ( match_route( "/collections/([^/]+)/styles", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETSTYLES map request";
+        return get_styles(req, serv);
+    }
+    else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETTILESETS map request";
+        return get_tilesets(req, serv, true);
+    }
+    else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETTILESET map request";
+        return get_tileset(req, serv, true);
+    }
     else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILE map request";
         return get_tile(req, serv, true);
+    }
+    else if ( match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)/info", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETFEATUREINFO request";
+        return get_feature_info(req, serv);
     } else {
         throw TilesException::get_error_message("ResourceNotFound", "Unknown tiles request path", 404);
     }

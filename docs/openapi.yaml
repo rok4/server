@@ -858,7 +858,7 @@ paths:
         - name: f
           required: false
           in: query
-          description: format de sortie demandée
+          description: format de sortie demandé
           schema:
             type: string
             enum: ['application/json']              
@@ -926,7 +926,7 @@ paths:
         - name: f
           required: false
           in: query
-          description: format de sortie demandée
+          description: format de sortie demandé
           schema:
             type: string
             enum: ['application/json']              
@@ -946,6 +946,254 @@ paths:
                 $ref: '#/components/schemas/tiles_error'
         404:
           description: Couche inconnue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+
+
+  /tiles/collections/{layer}/tiles:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les TMS disponibles pour une couche vecteur
+      operationId: ogc_get_vector_tilesets
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            enum: ['application/json']              
+
+      responses:
+        200:
+          description: Couche demandée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_tilesets'
+        400:
+          description: Format demandé invalide ou la couche demandée correspond à de la donnée raster
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+        404:
+          description: Couche inconnue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+
+
+  /tiles/collections/{layer}/tiles/{tms}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les niveaux disponibles pour une couche vecteur
+      operationId: ogc_get_vector_tileset
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandé
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            enum: ['application/json']              
+
+      responses:
+        200:
+          description: Couche demandée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_tileset'
+        400:
+          description: Format demandé invalide ou la couche demandée correspond à de la donnée raster
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+        404:
+          description: Couche ou TMS inconnu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+
+
+  /tiles/collections/{layer}/styles:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les styles disponibles pour une couche raster
+      operationId: ogc_get_raster_styles
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            enum: ['application/json']              
+
+      responses:
+        200:
+          description: Couche demandée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_styles'
+        400:
+          description: Format demandé invalide ou la couche demandée correspond à de la donnée vecteur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+        404:
+          description: Couche inconnue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+
+
+  /tiles/collections/{layer}/styles/{style}/map/tiles:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les TMS disponibles pour une couche raster
+      operationId: ogc_get_raster_tilesets
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: style
+          required: true
+          in: path
+          description: style demandé
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            enum: ['application/json']              
+
+      responses:
+        200:
+          description: Couche demandée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_tilesets'
+        400:
+          description: Format demandé invalide ou la couche demandée correspond à de la donnée vecteur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+        404:
+          description: Couche ou style inconnu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+
+
+  /tiles/collections/{layer}/styles/{style}/map/tiles/{tms}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les niveaux disponibles pour une couche raster
+      operationId: ogc_get_raster_tileset
+      parameters:
+
+        - name: layer
+          required: true
+          in: path
+          description: couche demandée
+          schema:
+            type: string
+
+        - name: style
+          required: true
+          in: path
+          description: style demandé
+          schema:
+            type: string
+
+        - name: tms
+          required: true
+          in: path
+          description: TMS demandé
+          schema:
+            type: string
+
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            enum: ['application/json']              
+
+      responses:
+        200:
+          description: Couche demandée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_tileset'
+        400:
+          description: Format demandé invalide ou la couche demandée correspond à de la donnée vecteur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_error'
+        404:
+          description: Couche, style ou TMS inconnu
           content:
             application/json:
               schema:
@@ -1117,66 +1365,66 @@ paths:
               schema:
                 $ref: '#/components/schemas/tiles_error'
 
-  # /tiles/tilematrixsets:
-  #   get:
-  #     tags:
-  #     - OGC API Tiles
-  #     summary: Récupère la liste des tileMatreixSet disponibles
-  #     operationId: ogc_get_tilematrixsets
-  #     parameters:
+  /tiles/tileMatrixSets:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère la liste des tile matrix sets disponibles
+      operationId: ogc_get_tilematrixsets
+      parameters:
 
-  #       - name: f
-  #         required: false
-  #         in: query
-  #         description: format de sortie demandée
-  #         schema:
-  #           type: string
-  #           default:
-  #             application/json
-  #           example:
-  #             application/json
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
 
-  #     responses:
-  #       200:
-  #         description: Liste des tileMatreixSet disponibles
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ogc_tilematrixsets'
+      responses:
+        200:
+          description: Liste des tile matrix sets disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_tilematrixsets'
     
-  # /tiles/tilematrixsets/{tms}:
-  #   get:
-  #     tags:
-  #     - OGC API Tiles
-  #     summary: Récupère les informations sur un tileMatrixSet
-  #     operationId: ogc_get_tilematrixsets_id
-  #     parameters:
+  /tiles/tileMatrixSets/{tms}:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Récupère les informations sur un tile matrix set
+      operationId: ogc_get_tilematrixset
+      parameters:
 
-  #       - name: tms
-  #         required: true
-  #         in: path
-  #         description: tileMatrixSet demandée
-  #         schema:
-  #           type: string
+        - name: tms
+          required: true
+          in: path
+          description: tile matrix set demandé
+          schema:
+            type: string
 
-  #       - name: f
-  #         required: false
-  #         in: query
-  #         description: format de sortie demandée
-  #         schema:
-  #           type: string
-  #           default:
-  #             application/json
-  #           example:
-  #             application/json
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            default:
+              application/json
+            example:
+              application/json
   
-  #     responses:
-  #       200:
-  #         description: ...
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ogc_tilematrixsets_id'
+      responses:
+        200:
+          description: Définition du TMS
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_tilematrixset'
 
   ######################################### ADMIN
 
@@ -1432,14 +1680,14 @@ components:
                 maxItems: 4
                 example: [-5, 40, 5, 50]
 
-    tiles_metadata:
+    tiles_link:
       type: object
       properties:
         href:
           type: string
         rel:
           type: string
-          enum: ["describedby", "self"]
+          enum: ["describedby", "self", "item"]
         type:
           type: string
         title:
@@ -1451,7 +1699,7 @@ components:
         links:
           type: array
           items:
-            $ref: '#/components/schemas/tiles_metadata'
+            $ref: '#/components/schemas/tiles_link'
         collections:
           type: array
           items:
@@ -1479,7 +1727,7 @@ components:
         links:
           type: array
           items:
-            $ref: '#/components/schemas/tiles_metadata'
+            $ref: '#/components/schemas/tiles_link'
         crs:
           type: array
           items:
@@ -1487,10 +1735,159 @@ components:
         dataType:
           type: string
           enum: ["map", "vector"]
+        mapTiles:
+          type: boolean
+        dataTiles:
+          type: boolean
         minCellSize:
           type: number
         maxCellSize:
           type: number
+
+    tiles_styles:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/tiles_link'
+        styles:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              title:
+                type: string
+              links:
+                type: array
+                items:
+                  $ref: '#/components/schemas/tiles_link'
+
+    tiles_tilesets:
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/tiles_link'
+        tilesets:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              dataType:
+                type: string
+                enum: ["map", "vector"]
+              crs:
+                type: string
+              tileMatrixSetURI:
+                type: string
+              links:
+                type: array
+                items:
+                  $ref: '#/components/schemas/tiles_link'
+
+    tiles_tileset:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        crs:
+          type: string
+        tileMatrixSetURI:
+          type: string
+        dataType:
+          type: string
+          enum: ["map", "vector"]
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/tiles_link'
+        tileMatrixSetLimits:
+          type: array
+          items:
+            type: object
+            properties:
+              tileMatrix:
+                type: string
+              minTileRow:
+                type: integer
+              maxTileRow:
+                type: integer
+              minTileCol:
+                type: integer
+              maxTileCol:
+                type: integer
+
+    tiles_tilematrixsets:
+      type: object
+      properties:
+        tilematrixsets:
+          type: object
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            crs:
+              type: string
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/tiles_link'
+
+    tiles_tilematrixset:
+      type: object
+      properties:
+          id:
+            type: string
+          title:
+            type: string
+          description:
+            type: string
+          keywords:
+            type: array
+            items: 
+              type: string
+          crs:
+            type: string
+          tileMatrices:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                cellSize:
+                  type: number
+                cornerOfOrigin:
+                  type: string
+                  enum: ["topLeft"]
+                pointOfOrigin:
+                  type: array
+                  items:
+                    type: number
+                  minItems: 2
+                  maxItems: 2
+                tileWidth:
+                  type: integer
+                tileHeight:
+                  type: integer
+                matrixHeight:
+                  type: integer
+                matrixWidth:
+                  type: integer
+
 
     tiles_error:
       type: object

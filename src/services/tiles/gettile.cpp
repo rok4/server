@@ -63,7 +63,6 @@
 
 DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map_request ) {
 
-
     // La couche
     std::string str_layer = req->path_params.at(0);
     if ( contain_chars(str_layer, "\"")) {
@@ -150,8 +149,8 @@ DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map
         throw TilesException::get_error_message("InvalidParameter", "Tile matrix set unknown", 400);
     }
 
-    TileMatrixSet* tms = layer->get_tilematrixset(str_tms);
-    if (tms == NULL) {
+    TileMatrixSetInfos* tmsi = layer->get_tilematrixset(str_tms);
+    if (tmsi == NULL) {
         throw TilesException::get_error_message("InvalidParameter", "Tile matrix set " + str_tms + " unknown", 400);
     }
 
@@ -161,7 +160,7 @@ DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map
         throw TilesException::get_error_message("InvalidParameter", "Tile matrix unknown", 400);
     }
 
-    TileMatrix* tm = tms->get_tm(str_tm);
+    TileMatrix* tm = tmsi->tms->get_tm(str_tm);
     if (tm == NULL) {
         throw TilesException::get_error_message("InvalidParameter", "Tile matrix " + str_tm + " unknown", 400);
     }
@@ -178,7 +177,7 @@ DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map
         throw TilesException::get_error_message("InvalidParameter", "Invalid row value", 400);
     }
 
-    TileMatrixLimits* tml = layer->get_tilematrix_limits(tms, tm);
+    TileMatrixLimits* tml = layer->get_tilematrix_limits(tmsi->tms, tm);
     if (tml == NULL) {
         // On est hors niveau -> erreur
         throw TilesException::get_error_message("ResourceNotFound", "Level out of limits", 404);
@@ -191,7 +190,7 @@ DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map
 
     // Traitement de la requête
 
-    if (tms->get_id() == layer->get_pyramid()->get_tms()->get_id()) {
+    if (tmsi->tms->get_id() == layer->get_pyramid()->get_tms()->get_id()) {
         // TMS d'interrogation natif
         Level* level = layer->get_pyramid()->get_level(tm->get_id());
 
@@ -205,13 +204,13 @@ DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map
         } else {
             return new DataStreamFromDataSource(d);
         }
-    } else {
+    } else if (reprojection) {
         // TMS d'interrogation à la demande
 
         BoundingBox<double> bbox = tm->tile_indices_to_bbox(column, row);
         int height = tm->get_tile_height();
         int width = tm->get_tile_width();
-        CRS* crs = tms->get_crs();
+        CRS* crs = tmsi->tms->get_crs();
         bbox.crs = crs->get_request_code();
 
         bool crs_equals = serv->get_services_configuration()->are_crs_equals(layer->get_pyramid()->get_tms()->get_crs()->get_proj_code(), crs->get_proj_code());
@@ -265,6 +264,9 @@ DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map
                 return new JPEGEncoder(image, 90);
             }
         }
+    } else {
+        // TMS d'interrogation à la demande mais reprojection non activée
+        throw TilesException::get_error_message("InvalidParameter", "Tile matrix set " + str_tms + " unknown", 400);
     }
 
     BOOST_LOG_TRIVIAL(error) << "On ne devrait pas passer par là";

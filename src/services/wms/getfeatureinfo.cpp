@@ -159,7 +159,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
     if (! is_available_crs(str_crs) ) {
         for ( unsigned int i = 0; i < layers.size() ; i++ ) {
             bool crs_equals = serv->get_services_configuration()->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
-            if (! crs_equals && ! layers.at ( i )->is_available_crs_wms(str_crs) )
+            if (! crs_equals && ! layers.at ( i )->is_available_crs(str_crs) )
                 throw WmsException::get_error_message("CRS is not available for the layer " + layers.at ( i )->get_id(), "InvalidParameterValue", 400);
         }
     }

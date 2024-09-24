@@ -291,7 +291,7 @@ std::vector<CRS*> ServicesConfiguration::get_equals_crs(std::string crs)
 
 bool ServicesConfiguration::are_crs_equals( std::string crs1, std::string crs2 ) {
 
-    if (crs1 == crs2) {
+    if (to_upper_case(crs1) == to_upper_case(crs2)) {
         return true;
     }
 
@@ -322,13 +322,6 @@ ServicesConfiguration::~ServicesConfiguration(){
     delete admin_service;
     delete tiles_service;
     delete contact;
-
-    // Les CRS équivalents
-    std::map<std::string, std::vector<CRS*> >::iterator it;
-    for ( it = crs_equivalences.begin(); it != crs_equivalences.end(); it++ )
-        for (unsigned int i = 0 ; i < it->second.size() ; i++) {
-            delete it->second.at(i);
-        }
 }
 
 void ServicesConfiguration::clean_cache() {
