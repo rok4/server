@@ -133,7 +133,15 @@ TilesService::TilesService (json11::Json& doc) : Service(doc), metadata(NULL) {
 DataStream* TilesService::process_request(Request* req, Rok4Server* serv) {
     BOOST_LOG_TRIVIAL(debug) << "TILES service";
 
-    if ( match_route( "/collections", {"GET"}, req ) ) {
+    if ( match_route( "", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETLANDINGPAGE request";
+        return get_landing_page(req, serv);
+    }
+    else if ( match_route( "/conformance", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GETCONFORMANCE request";
+        return get_conformance(req, serv);
+    }
+    else if ( match_route( "/collections", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
         return get_capabilities(req, serv);
     }

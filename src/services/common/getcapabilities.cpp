@@ -52,7 +52,7 @@
 DataStream* CommonService::get_landing_page ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw CommonException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
@@ -100,7 +100,7 @@ DataStream* CommonService::get_landing_page ( Request* req, Rok4Server* serv ) {
 
     if (services->get_tiles_service()->is_enabled()) {
         links.push_back(json11::Json::object {
-            { "href", services->get_tiles_service()->get_endpoint_uri() + "/collections?f=application/json"},
+            { "href", services->get_tiles_service()->get_endpoint_uri() + "/collections?f=json"},
             { "rel", "data"},
             { "type", "application/json"},
             { "title", "OGC API Tiles capabilities"}

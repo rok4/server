@@ -917,7 +917,7 @@ json11::Json Layer::to_json_tiles(TilesService* service) {
     std::vector<json11::Json> links;
 
     links.push_back(json11::Json::object {
-        { "href", service->get_endpoint_uri() + "/collections/" + id + "?f=application/json"},
+        { "href", service->get_endpoint_uri() + "/collections/" + id + "?f=json"},
         { "rel", "self"},
         { "type", "application/json"},
         { "title", "this document"}
@@ -929,14 +929,14 @@ json11::Json Layer::to_json_tiles(TilesService* service) {
 
     if (Rok4Format::is_raster(pyramid->get_format())) {
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles?f=application/json"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles?f=json"},
             { "rel", "describedby"},
             { "type", "application/json"},
             { "title", "Styles list for " + id}
         });
     } else {
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=application/json"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=json"},
             { "rel", "describedby"},
             { "type", "application/json"},
             { "title", "Tilesets list for " + id}
@@ -977,7 +977,7 @@ json11::Json Layer::to_json_styles(TilesService* service) {
         { "title", title },
         { "links", json11::Json::array {
             json11::Json::object {
-                { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles?f=application/json"},
+                { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles?f=json"},
                 { "rel", "self"},
                 { "type", "application/json"},
                 { "title", "this document"}
@@ -992,7 +992,7 @@ json11::Json Layer::to_json_styles(TilesService* service) {
             { "title", s->get_titles().at(0)},
             { "links", json11::Json::array {
                 json11::Json::object {
-                    { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map/tiles?f=application/json"},
+                    { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map/tiles?f=json"},
                     { "rel", "describedby"},
                     { "type", "application/json"},
                     { "title", "Tilesets list for " + id + " with style " + s->get_identifier()}
@@ -1015,7 +1015,7 @@ json11::Json Layer::to_json_tilesets(TilesService* service, Style* style) {
     if (style == NULL) {
         // Interrogation de donnée vecteur
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=application/json"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=json"},
             { "rel", "self"},
             { "type", "application/json"},
             { "title", "this document"}
@@ -1023,7 +1023,7 @@ json11::Json Layer::to_json_tilesets(TilesService* service, Style* style) {
     } else {
         // Interrogation de donnée raster
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles?f=application/json"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles?f=json"},
             { "rel", "self"},
             { "type", "application/json"},
             { "title", "this document"}
@@ -1040,17 +1040,17 @@ json11::Json Layer::to_json_tilesets(TilesService* service, Style* style) {
 
         if (style == NULL) {
             data_type = "vector";
-            tileset_uri = service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + t->tms->get_id() + "?f=application/json";
+            tileset_uri = service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + t->tms->get_id() + "?f=json";
         } else {
             data_type = "map";
-            tileset_uri = service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles/" + t->tms->get_id() + "?f=application/json";
+            tileset_uri = service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles/" + t->tms->get_id() + "?f=json";
         }
 
         tilesets.push_back(json11::Json::object {
             { "title", title },
             { "dataType", data_type},
             { "crs", t->tms->get_crs()->get_url()},
-            { "tileMatrixSetURI", service->get_endpoint_uri() + "/tileMatrixSets/" + t->tms->get_id() + "?f=application/json"},
+            { "tileMatrixSetURI", service->get_endpoint_uri() + "/tileMatrixSets/" + t->tms->get_id() + "?f=json"},
             { "links", json11::Json::array {
                 json11::Json::object {
                     { "href", tileset_uri},
@@ -1078,7 +1078,7 @@ json11::Json Layer::to_json_tileset(TilesService* service, Style* style, TileMat
         { "title", title},
         { "description", abstract},
         { "crs", tmsi->tms->get_crs()->get_url()},
-        { "tileMatrixSetURI", service->get_endpoint_uri() + "/tileMatrixSets/" + tmsi->tms->get_id() + "?f=application/json"},
+        { "tileMatrixSetURI", service->get_endpoint_uri() + "/tileMatrixSets/" + tmsi->tms->get_id() + "?f=json"},
     };
 
     std::vector<json11::Json> links;
@@ -1087,7 +1087,7 @@ json11::Json Layer::to_json_tileset(TilesService* service, Style* style, TileMat
         // Interrogation de donnée vecteur
         res["dataType"] = "vector";
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + tmsi->tms->get_id() + "?f=application/json"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + tmsi->tms->get_id() + "?f=json"},
             { "rel", "self"},
             { "type", "application/json"},
             { "title", "this document"}
@@ -1104,7 +1104,7 @@ json11::Json Layer::to_json_tileset(TilesService* service, Style* style, TileMat
         // Interrogation de donnée raster
         res["dataType"] = "map";
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles/" + tmsi->tms->get_id() + "?f=application/json"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles/" + tmsi->tms->get_id() + "?f=json"},
             { "rel", "self"},
             { "type", "application/json"},
             { "title", "this document"}

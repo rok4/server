@@ -49,10 +49,76 @@
 #include "services/tiles/Service.h"
 #include "Rok4Server.h"
 
+
+DataStream* TilesService::get_landing_page ( Request* req, Rok4Server* serv ) {
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    std::vector<json11::Json> links;
+
+    links.push_back(json11::Json::object {
+        { "href", endpoint_uri},
+        { "rel", "self"},
+        { "type", "application/json"},
+        { "title", "this document"}
+    });
+
+    links.push_back(json11::Json::object {
+        { "href", endpoint_uri + "/collections?f=json"},
+        { "rel", "data"},
+        { "type", "application/json"},
+        { "title", "Information about the collections"}
+    });
+
+    links.push_back(json11::Json::object {
+        { "href", endpoint_uri + "/conformance?f=json"},
+        { "rel", "data"},
+        { "type", "application/json"},
+        { "title", "OGC API conformance classes implemented by this service"}
+    });
+
+    json11::Json::object res = json11::Json::object {
+        { "title", title },
+        { "description", abstract },
+        { "links", links }
+    };
+
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
+}
+
+DataStream* TilesService::get_conformance ( Request* req, Rok4Server* serv ) {
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "conformsTo", json11::Json::array{
+            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
+            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/json",
+            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/oas30",
+            "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/core",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tileset",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tilesets-list",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/geodata-tilesets",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/dataset-tilesets",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/jpeg",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/png",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/mvt",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tiff"
+        } }
+    };
+
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
+}
+
 DataStream* TilesService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
@@ -62,7 +128,7 @@ DataStream* TilesService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::vector<json11::Json> links;
     links.push_back(json11::Json::object {
-        { "href", endpoint_uri + "/collections?f=application/json"},
+        { "href", endpoint_uri + "/collections?f=json"},
         { "rel", "self"},
         { "type", "application/json"},
         { "title", "this document"}
@@ -98,7 +164,7 @@ DataStream* TilesService::get_capabilities ( Request* req, Rok4Server* serv ) {
 DataStream* TilesService::get_tiles ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
@@ -120,7 +186,7 @@ DataStream* TilesService::get_tiles ( Request* req, Rok4Server* serv ) {
 DataStream* TilesService::get_styles ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
@@ -147,7 +213,7 @@ DataStream* TilesService::get_styles ( Request* req, Rok4Server* serv ) {
 DataStream* TilesService::get_tilesets ( Request* req, Rok4Server* serv, bool is_map_request ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
     
@@ -201,7 +267,7 @@ DataStream* TilesService::get_tilesets ( Request* req, Rok4Server* serv, bool is
 DataStream* TilesService::get_tileset ( Request* req, Rok4Server* serv, bool is_map_request ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 

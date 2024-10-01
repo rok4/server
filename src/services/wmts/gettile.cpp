@@ -278,8 +278,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
                 return new AscEncoder(image);
             }
         }
-    } else {
-        // TMS d'interrogation à la demande mais reprojection non activée
-        throw WmtsException::get_error_message("Tile matrix set " + str_tms + " unknown", "InvalidParameterValue", 400);
     }
+    // TMS d'interrogation à la demande mais reprojection non activée
+    throw WmtsException::get_error_message("Tile matrix set " + str_tms + " unknown", "InvalidParameterValue", 400);
 }

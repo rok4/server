@@ -52,7 +52,7 @@
 DataStream* TilesService::get_tilematrixsets ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
@@ -67,7 +67,7 @@ DataStream* TilesService::get_tilematrixsets ( Request* req, Rok4Server* serv ) 
             { "crs", t.second->get_crs()->get_url()},
             { "links", json11::Json::array {
                 json11::Json::object {
-                    { "href", endpoint_uri + "/tileMatrixSets/" + t.second->get_id() + "?f=application/json"},
+                    { "href", endpoint_uri + "/tileMatrixSets/" + t.second->get_id() + "?f=json"},
                     { "rel", "describedby"},
                     { "type", "application/json"},
                     { "title", t.second->get_id() + " definition as application/json"}
@@ -85,7 +85,7 @@ DataStream* TilesService::get_tilematrixsets ( Request* req, Rok4Server* serv ) 
 DataStream* TilesService::get_tilematrixset ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 

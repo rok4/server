@@ -59,6 +59,8 @@ class TilesService : public Service {
 
 private:
 
+    DataStream* get_conformance ( Request* req, Rok4Server* serv );
+    DataStream* get_landing_page ( Request* req, Rok4Server* serv );
     /**
      * \todo Gérer la pagination
      * \todo Filtrer selon la bbox

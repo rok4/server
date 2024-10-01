@@ -847,6 +847,51 @@ paths:
 
   ######################################### OGC API Tiles
 
+
+  /tiles:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Retourne la page d'accueil du service OGC API Tiles
+      operationId: tiles_get_landing_page
+      parameters:
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            enum: ['json']
+      responses:
+        200:
+          description: Services assurés par le service OGC API Tiles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tiles_get_landing_page'
+
+  /tiles/conformance:
+    get:
+      tags:
+      - OGC API Tiles
+      summary: Retourne la liste des classes de conformité du service OGC API Tiles
+      operationId: tiles_get_conformance
+      parameters:
+        - name: f
+          required: false
+          in: query
+          description: format de sortie demandé
+          schema:
+            type: string
+            enum: ['json']
+      responses:
+        200:
+          description: Services assurés par le serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogc_get_conformance'
+
   /tiles/collections:
     get:
       tags:
@@ -854,14 +899,13 @@ paths:
       summary: Récupère la liste des couches disponibles
       operationId: ogc_get_collections
       parameters:
-
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            enum: ['application/json']              
+            enum: ['json']
 
         # - name: bbox
         #   required: false
@@ -922,14 +966,14 @@ paths:
           description: couche demandée
           schema:
             type: string
-
+            
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            enum: ['application/json']              
+            enum: ['json']
 
       responses:
         200:
@@ -966,14 +1010,14 @@ paths:
           description: couche demandée
           schema:
             type: string
-
+            
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            enum: ['application/json']              
+            enum: ['json']
 
       responses:
         200:
@@ -1017,14 +1061,14 @@ paths:
           description: TMS demandé
           schema:
             type: string
-
+            
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            enum: ['application/json']              
+            enum: ['json']
 
       responses:
         200:
@@ -1061,14 +1105,14 @@ paths:
           description: couche demandée
           schema:
             type: string
-
+            
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            enum: ['application/json']              
+            enum: ['json']
 
       responses:
         200:
@@ -1112,14 +1156,14 @@ paths:
           description: style demandé
           schema:
             type: string
-
+            
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            enum: ['application/json']              
+            enum: ['json']
 
       responses:
         200:
@@ -1170,14 +1214,14 @@ paths:
           description: TMS demandé
           schema:
             type: string
-
+            
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            enum: ['application/json']              
+            enum: ['json']
 
       responses:
         200:
@@ -1372,17 +1416,14 @@ paths:
       summary: Récupère la liste des tile matrix sets disponibles
       operationId: ogc_get_tilematrixsets
       parameters:
-
+            
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            default:
-              application/json
-            example:
-              application/json
+            enum: ['json']
 
       responses:
         200:
@@ -1406,17 +1447,14 @@ paths:
           description: tile matrix set demandé
           schema:
             type: string
-
+            
         - name: f
           required: false
           in: query
           description: format de sortie demandé
           schema:
             type: string
-            default:
-              application/json
-            example:
-              application/json
+            enum: ['json']
   
       responses:
         200:
@@ -1692,6 +1730,28 @@ components:
           type: string
         title:
           type: string
+
+
+    tiles_get_landing_page:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/common_metadata'
+
+    ogc_get_conformance:
+      type: object
+      properties:
+        conformsTo:
+          type: array
+          items:
+            type: string
+            format: uri
 
     tiles_collections:
       type: object
