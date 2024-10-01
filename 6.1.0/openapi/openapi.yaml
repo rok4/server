@@ -2166,12 +2166,12 @@ components:
             - lanczos_3
             - lanczos_4
 
-        crs:
+        extra_crs:
           type: array
           items: 
             type: string
 
-        tms:
+        extra_tilematrixsets:
           type: array
           items: 
             type: string
