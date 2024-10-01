@@ -2166,6 +2166,16 @@ components:
             - lanczos_3
             - lanczos_4
 
+        crs:
+          type: array
+          items: 
+            type: string
+
+        tms:
+          type: array
+          items: 
+            type: string
+
         get_feature_info:
           oneOf:
             - type: object
@@ -2201,20 +2211,12 @@ components:
           properties:
             pyramid:
               type: boolean
-            crs:
-              type: array
-              items: 
-                type: string
             
         wmts:
           type: object
           properties:
             pyramid:
               type: boolean
-            tms:
-              type: array
-              items: 
-                type: string
             
         tms:
           type: object
