@@ -1,4 +1,18 @@
-## 6.0.0
+## 6.1.0
+
+### [Added]
+
+* OGC API Tiles :
+    * ajout des routes de découvertes pour connaître les éventuels styles, TMS et tuiles limites pour les couches
+    * ajout des routes de lecture des TMS
+    * ajout d'une route de découverte de ce service
+    * ajout de la route de conformité aux classes
+
+### [Changed]
+
+* Les CRS et TMS additionnels dans le descripteur de couche sont à la racine pour pouvoir être exploités dans plusieurs services
+
+## 6.0.1
 
 ### [Added]
 
