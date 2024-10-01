@@ -1,19 +1,31 @@
 ci-cd:
-  - .github/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - .github/**
 
 dependencies:
-  - cmake/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - cmake/**
 
 documentation:
-  - docs/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - docs/**
 
 enhancement:
-  - src/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - src/**
 
 quality:
-  - tests/**/*
+- changed-files:
+  - any-glob-to-any-file:
+    - tests/**
 
 tooling:
-  - CMakeLists.txt
-  - config.h.in
-  - '**/CMakeLists.txt'
+- changed-files:
+  - any-glob-to-any-file:
+    - CMakeLists.txt
+    - config.h.in
+    - '**/CMakeLists.txt'

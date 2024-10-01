@@ -69,12 +69,20 @@ using boost::property_tree::ptree;
 #include "services/tms/Service.h"
 #include "services/tiles/Service.h"
 
-struct WmtsTmsInfos {
+struct TileMatrixSetInfos {
     TileMatrixSet* tms;
-    std::string wmts_id;
+    std::string request_id;
     std::string top_level;
     std::string bottom_level;
     std::vector<TileMatrixLimits> limits;
+
+    TileMatrixSetInfos(TileMatrixSet* tms) : tms(tms) { };
+
+    void set_bottom_top(std::string b, std::string t) { 
+        top_level = t;
+        bottom_level = b;
+        request_id = tms->get_id() + "_" + top_level + "_" + bottom_level;
+    };
 };
 
 /**
@@ -185,18 +193,18 @@ private:
      * \~french \brief Liste des styles associés
      * \~english \brief Linked styles list
      */
-    std::vector<Style*> styles;
+    std::vector<Style*> available_styles;
     
     /**
      * \~french \brief Liste des systèmes de coordonnées authorisées pour le WMS
      * \~english \brief Authorised coordinates systems list for WMS
      */
-    std::vector<CRS*> wms_crss;
+    std::vector<CRS*> available_crss;
     /**
      * \~french \brief Liste des TMS d'interrogation autorisés en WMTS
      * \~english \brief TMS list for WMTS requests
      */
-    std::vector<WmtsTmsInfos> wmts_tilematrixsets;
+    std::vector<TileMatrixSetInfos*> available_tilematrixsets;
 
     /**
      * \~french \brief Interpolation utilisée pour reprojeter ou recadrer les tuiles
@@ -376,25 +384,6 @@ public:
      * \return styles list
      */
     std::vector<Style*>* get_styles() ;
-    /**
-     * \~french
-     * \brief Retourne la liste des TMS disponibles
-     * \return liste d'informations sur les TMS
-     * \~english
-     * \brief Return the available TMS list
-     * \return TMS infos list
-     */
-    std::vector<WmtsTmsInfos>* get_available_tilematrixsets_wmts() ;
-
-    /**
-     * \~french
-     * \brief Retourne la liste des CRS disponibles en WMS
-     * \return liste des CRS de la couche
-     * \~english
-     * \brief Return the available CRS list for WMS
-     * \return CRS list
-     */
-    std::vector<CRS*>* get_available_crs_wms() ;
 
     /**
      * \~french
@@ -424,7 +413,7 @@ public:
      * \brief Test if CRS is in the CRS list
      * \return Present or not
      */
-    bool is_available_crs_wms(CRS* c) ;
+    bool is_available_crs(CRS* c) ;
 
     /**
      * \~french
@@ -434,7 +423,7 @@ public:
      * \brief Test if CRS is in the CRS list
      * \return Present or not
      */
-    bool is_available_crs_wms(std::string c) ;
+    bool is_available_crs(std::string c) ;
 
     /**
      * \~french
@@ -445,7 +434,7 @@ public:
      * \brief Get available TMS for the layer with identifiant
      * \return NULL if not available
      */
-    TileMatrixSet* get_tilematrixset(std::string id) ;
+    TileMatrixSetInfos* get_tilematrixset(std::string id) ;
 
     /**
      * \~french
@@ -585,7 +574,7 @@ public:
      * \param[in] only_inspire Only if layer is inspire compliant
      * \param[in] used_tms_list Used TMS, to add the layer ones
      */
-    void add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire, std::map< std::string, WmtsTmsInfos>* used_tms_list);
+    void add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire, std::map< std::string, TileMatrixSetInfos*>* used_tms_list);
 
     /**
      * \~french \brief Récupère la description OGC API Tiles de la couche au format JSON
@@ -594,6 +583,30 @@ public:
      * \param[in] service Calling OGC API Tiles service
      */
     json11::Json to_json_tiles(TilesService* service);
+
+    /**
+     * \~french \brief Récupère la description OGC API Tiles des styles disponibles de la couche au format JSON
+     * \param[in] service Service OGC API Tiles appelant
+     * \~english \brief Get available styles OGC API Tiles description for the layer as JSON
+     * \param[in] service Calling OGC API Tiles service
+     */
+    json11::Json to_json_styles(TilesService* service);
+
+    /**
+     * \~french \brief Récupère la description OGC API Tiles des TMS disponibles de la couche au format JSON
+     * \param[in] service Service OGC API Tiles appelant
+     * \~english \brief Get available TMS OGC API Tiles description for the layer as JSON
+     * \param[in] service Calling OGC API Tiles service
+     */
+    json11::Json to_json_tilesets(TilesService* service, Style* style);
+
+    /**
+     * \~french \brief Récupère la description OGC API Tiles de la couche pour un TMS en particulier au format JSON
+     * \param[in] service Service OGC API Tiles appelant
+     * \~english \brief Get layer OGC API Tiles description for an available TMS as JSON
+     * \param[in] service Calling OGC API Tiles service
+     */
+    json11::Json to_json_tileset(TilesService* service, Style* style, TileMatrixSetInfos* tmsi);
 
     /**
      * \~french \brief Récupère la description TileJSON de la couche au format JSON

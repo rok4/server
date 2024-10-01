@@ -49,10 +49,76 @@
 #include "services/tiles/Service.h"
 #include "Rok4Server.h"
 
+
+DataStream* TilesService::get_landing_page ( Request* req, Rok4Server* serv ) {
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    std::vector<json11::Json> links;
+
+    links.push_back(json11::Json::object {
+        { "href", endpoint_uri},
+        { "rel", "self"},
+        { "type", "application/json"},
+        { "title", "this document"}
+    });
+
+    links.push_back(json11::Json::object {
+        { "href", endpoint_uri + "/collections?f=json"},
+        { "rel", "data"},
+        { "type", "application/json"},
+        { "title", "Information about the collections"}
+    });
+
+    links.push_back(json11::Json::object {
+        { "href", endpoint_uri + "/conformance?f=json"},
+        { "rel", "data"},
+        { "type", "application/json"},
+        { "title", "OGC API conformance classes implemented by this service"}
+    });
+
+    json11::Json::object res = json11::Json::object {
+        { "title", title },
+        { "description", abstract },
+        { "links", links }
+    };
+
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
+}
+
+DataStream* TilesService::get_conformance ( Request* req, Rok4Server* serv ) {
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "conformsTo", json11::Json::array{
+            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
+            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/json",
+            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/oas30",
+            "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/core",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tileset",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tilesets-list",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/geodata-tilesets",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/dataset-tilesets",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/jpeg",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/png",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/mvt",
+            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tiff"
+        } }
+    };
+
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
+}
+
 DataStream* TilesService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
@@ -62,7 +128,7 @@ DataStream* TilesService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     std::vector<json11::Json> links;
     links.push_back(json11::Json::object {
-        { "href", endpoint_uri + "/collections?f=application/json"},
+        { "href", endpoint_uri + "/collections?f=json"},
         { "rel", "self"},
         { "type", "application/json"},
         { "title", "this document"}
@@ -95,12 +161,10 @@ DataStream* TilesService::get_capabilities ( Request* req, Rok4Server* serv ) {
     return new MessageDataStream ( cache_getcapabilities, "application/json", 200 );
 }
 
-
-
 DataStream* TilesService::get_tiles ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
-    if (f != "" && f != "application/json") {
+    if (f != "" && f != "application/json" && f != "json") {
         throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
@@ -117,4 +181,154 @@ DataStream* TilesService::get_tiles ( Request* req, Rok4Server* serv ) {
     }
 
     return new MessageDataStream ( json11::Json{ layer->to_json_tiles(this) }.dump(), "application/json", 200 );
+}
+
+DataStream* TilesService::get_styles ( Request* req, Rok4Server* serv ) {
+
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    // La couche
+    std::string str_layer = req->path_params.at(0);
+    if ( contain_chars(str_layer, "\"")) {
+        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES layer: " << str_layer ;
+        throw TilesException::get_error_message("ResourceNotFound", "Layer unknown", 404);
+    }
+
+    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    if ( layer == NULL || ! layer->is_tiles_enabled() ) {
+        throw TilesException::get_error_message("ResourceNotFound", "Layer "+str_layer+" unknown", 404);
+    }
+
+    if (! Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
+        throw TilesException::get_error_message("InvalidParameter", "Vector dataset have to be requested without style", 400);
+    }
+
+    return new MessageDataStream ( json11::Json{ layer->to_json_styles(this) }.dump(), "application/json", 200 );
+}
+
+
+DataStream* TilesService::get_tilesets ( Request* req, Rok4Server* serv, bool is_map_request ) {
+
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+    
+    // La couche
+    std::string str_layer = req->path_params.at(0);
+    if ( contain_chars(str_layer, "\"")) {
+        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES layer: " << str_layer ;
+        throw TilesException::get_error_message("ResourceNotFound", "Layer unknown", 404);
+    }
+
+    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    if ( layer == NULL || ! layer->is_tiles_enabled() ) {
+        throw TilesException::get_error_message("ResourceNotFound", "Layer "+str_layer+" unknown", 404);
+    }
+
+    bool is_raster_data = Rok4Format::is_raster(layer->get_pyramid()->get_format());
+
+    Style* style = NULL;
+
+    if (is_map_request) {
+        // Map tiles request -> pour les pyramides raster
+        if (! is_raster_data) {
+            throw TilesException::get_error_message("InvalidParameter", "Vector dataset have to be requested without style", 400);
+        }
+
+        std::string str_style = req->path_params.at(1);
+
+        // Traitement du style
+        if ( contain_chars(str_style, "\"")) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES style: " << str_layer ;
+            throw TilesException::get_error_message("InvalidParameter", "Style unknown", 400);
+        }
+
+        style = layer->get_style_by_identifier(str_style);
+
+        if (style == NULL) {
+            throw TilesException::get_error_message("InvalidParameter", "Style " + str_style + " unknown", 400);
+        }
+
+    } else {
+        // Tiles request -> pour les pyramides vecteur
+        if (is_raster_data) {
+            throw TilesException::get_error_message("InvalidParameter", "Raster dataset have to be requested with style", 400);
+        }
+    }
+
+    return new MessageDataStream ( json11::Json{ layer->to_json_tilesets(this, style) }.dump(), "application/json", 200 );
+}
+
+
+DataStream* TilesService::get_tileset ( Request* req, Rok4Server* serv, bool is_map_request ) {
+
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    // La couche
+    std::string str_layer = req->path_params.at(0);
+    if ( contain_chars(str_layer, "\"")) {
+        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES layer: " << str_layer ;
+        throw TilesException::get_error_message("ResourceNotFound", "Layer unknown", 404);
+    }
+
+    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    if ( layer == NULL || ! layer->is_tiles_enabled() ) {
+        throw TilesException::get_error_message("ResourceNotFound", "Layer "+str_layer+" unknown", 404);
+    }
+
+    bool is_raster_data = Rok4Format::is_raster(layer->get_pyramid()->get_format());
+
+    std::string str_tms;
+    Style* style = NULL;
+
+    if (is_map_request) {
+        // Map tiles request -> pour les pyramides raster
+        if (! is_raster_data) {
+            throw TilesException::get_error_message("InvalidParameter", "Vector dataset have to be requested without style", 400);
+        }
+
+        str_tms = req->path_params.at(2);
+
+        std::string str_style = req->path_params.at(1);
+
+        // Traitement du style
+        if ( contain_chars(str_style, "\"")) {
+            BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES style: " << str_layer ;
+            throw TilesException::get_error_message("InvalidParameter", "Style unknown", 400);
+        }
+
+        style = layer->get_style_by_identifier(str_style);
+
+        if (style == NULL) {
+            throw TilesException::get_error_message("InvalidParameter", "Style " + str_style + " unknown", 400);
+        }
+
+    } else {
+        // Tiles request -> pour les pyramides vecteur
+        if (is_raster_data) {
+            throw TilesException::get_error_message("InvalidParameter", "Raster dataset have to be requested with style", 400);
+        }
+
+        str_tms = req->path_params.at(1);
+    }
+
+    // Le tile matrix set
+    if (contain_chars(str_tms, "\"")) {
+        BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in TILES tile matrix set: " << str_tms;
+        throw TilesException::get_error_message("InvalidParameter", "Tile matrix set unknown", 400);
+    }
+
+    TileMatrixSetInfos* tmsi = layer->get_tilematrixset(str_tms);
+    if (tmsi == NULL || (! reprojection && tmsi->tms->get_id() != layer->get_pyramid()->get_tms()->get_id())) {
+        throw TilesException::get_error_message("InvalidParameter", "Tile matrix set " + str_tms + " unknown", 400);
+    }
+
+    return new MessageDataStream ( json11::Json{ layer->to_json_tileset(this, style, tmsi) }.dump(), "application/json", 200 );
 }

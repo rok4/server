@@ -394,6 +394,9 @@ bool WmsService::is_available_crs(CRS* c) {
     return is_available_crs(c->get_request_code());
 }
 bool WmsService::is_available_crs(std::string c) {
+    if (! reprojection) {
+        return false;
+    }
     for ( unsigned int k = 0; k < crss.size(); k++ ) {
         if ( crss.at (k)->cmp_request_code ( c ) ) {
             return true;
