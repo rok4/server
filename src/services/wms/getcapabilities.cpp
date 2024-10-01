@@ -67,10 +67,6 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     ServicesConfiguration* services = serv->get_services_configuration();
 
-    // On va mémoriser les TMS utilisés, avec les niveaux du haut et du bas
-    // La clé est un triplet : nom du TMS, niveau du haut, niveau du bas
-    std::map< std::string, WmtsTmsInfos> used_tms_list;
-
     ptree tree;
 
     ptree& root = tree.add("WMS_Capabilities", "");

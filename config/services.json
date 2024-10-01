@@ -98,6 +98,7 @@
         "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux OGC API Tiles",
         "keywords": [
             "OGC API Tiles"
-        ]
+        ],
+        "reprojection": true
     }
 }

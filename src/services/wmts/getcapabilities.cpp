@@ -69,7 +69,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     // On va mémoriser les TMS utilisés, avec les niveaux du haut et du bas
     // La clé est un triplet : nom du TMS, niveau du haut, niveau du bas
-    std::map< std::string, WmtsTmsInfos> used_tms_list;
+    std::map< std::string, TileMatrixSetInfos*> used_tms_list;
 
     ptree tree;
 
@@ -152,14 +152,14 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
         layers_iterator->second->add_node_wmts(contents_node, this, req->is_inspire(default_inspire), &used_tms_list);
     }
 
-    std::map<std::string, WmtsTmsInfos>::iterator tms_iterator ( used_tms_list.begin() ), tms_end ( used_tms_list.end() );
+    std::map<std::string, TileMatrixSetInfos*>::iterator tms_iterator ( used_tms_list.begin() ), tms_end ( used_tms_list.end() );
     for ( ; tms_iterator!=tms_end; ++tms_iterator ) {
 
         ptree& tms_node = contents_node.add("TileMatrixSet", "");
 
         tms_node.add( "ows:Identifier", tms_iterator->first );
 
-        TileMatrixSet* tms = tms_iterator->second.tms;
+        TileMatrixSet* tms = tms_iterator->second->tms;
 
         if ( ! ( tms->get_title().empty() ) ) {
             tms_node.add ( "ows:Title", tms->get_title() );
@@ -180,13 +180,13 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
         
         // TileMatrix
         bool keep = false;
-        if (tms_iterator->second.top_level == "") {
+        if (tms_iterator->second->top_level == "") {
             // On est sur un TMS d'origine, on l'exporte en entier
             keep = true;
         }
         for (TileMatrix* tm : tms->get_ordered_tm(false)) {
 
-            if (! keep && tm->get_id() != tms_iterator->second.top_level) {
+            if (! keep && tm->get_id() != tms_iterator->second->top_level) {
                 continue;
             } else {
                 keep = true;
@@ -206,9 +206,14 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
             tm_node.add( "MatrixWidth",Utils::int_to_string ( tm->get_matrix_width() ) );
             tm_node.add( "MatrixHeight",Utils::int_to_string ( tm->get_matrix_height() ) );
 
-            if (tm->get_id() == tms_iterator->second.bottom_level) {
+            if (tm->get_id() == tms_iterator->second->bottom_level) {
                 break;
             }
+        }
+
+        if (tms_iterator->second->top_level == "") {
+            // On est sur un TMS d'origine, TileMatrixSetInfos créé pour cette occasion, on doit le nettoyer
+            delete tms_iterator->second;
         }
     }
 

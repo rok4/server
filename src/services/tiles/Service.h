@@ -59,16 +59,24 @@ class TilesService : public Service {
 
 private:
 
+    DataStream* get_conformance ( Request* req, Rok4Server* serv );
+    DataStream* get_landing_page ( Request* req, Rok4Server* serv );
     /**
      * \todo Gérer la pagination
      * \todo Filtrer selon la bbox
      */
     DataStream* get_capabilities ( Request* req, Rok4Server* serv );
+    DataStream* get_tilematrixsets ( Request* req, Rok4Server* serv );
+    DataStream* get_tilematrixset ( Request* req, Rok4Server* serv );
     DataStream* get_tiles ( Request* req, Rok4Server* serv );
     DataStream* get_feature_info ( Request* req, Rok4Server* serv );
+    DataStream* get_styles ( Request* req, Rok4Server* serv);
+    DataStream* get_tilesets ( Request* req, Rok4Server* serv, bool is_map_request );
+    DataStream* get_tileset ( Request* req, Rok4Server* serv, bool is_map_request );
     DataStream* get_tile ( Request* req, Rok4Server* serv, bool is_map_request );
 
     Metadata* metadata;
+    bool reprojection;
 
     std::string cache_getcapabilities;
 
@@ -93,6 +101,16 @@ public:
         cache_mtx.lock();
         cache_getcapabilities.clear();
         cache_mtx.unlock();
+    };
+
+    /**
+     * \~french
+     * \brief La reprojection est-elle activée
+     * \~english
+     * \brief Is reprojection enabled
+     */
+    bool reprojection_enabled() {
+        return reprojection;
     };
 
     /**

@@ -411,6 +411,11 @@
                 "metadata": {
                     "$ref": "#/$defs/metadata",
                     "description": "OGC API Tiles service's metadata"
+                },
+                "reprojection": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "OGC API Tiles reprojection activation"
                 }
             }
         }

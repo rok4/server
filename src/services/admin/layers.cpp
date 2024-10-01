@@ -50,12 +50,11 @@
 
 DataStream* AdminService::add_layer ( Request* req, Rok4Server* serv ) {
 
-
     std::string str_layer = req->path_params.at(0);
 
     Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
 
-    if ( layer != NULL ) throw AdminException::get_error_message("Layer " + str_layer +" already exists.", "Configuration conflict", 409);
+    if ( layer != NULL ) throw AdminException::get_error_message("Layer already exists.", "Configuration conflict", 409);
 
     layer = new Layer( str_layer, req->body, serv->get_services_configuration() );
     if ( ! layer->is_ok() ) {
@@ -73,6 +72,10 @@ DataStream* AdminService::add_layer ( Request* req, Rok4Server* serv ) {
 DataStream* AdminService::update_layer ( Request* req, Rok4Server* serv ) {
 
     std::string str_layer = req->path_params.at(0);
+    if ( contain_chars(str_layer, "\"")) {
+        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES layer: " << str_layer ;
+        throw AdminException::get_error_message("Layer does not exists.", "Not found", 404);
+    }
 
     Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
 
@@ -96,6 +99,10 @@ DataStream* AdminService::update_layer ( Request* req, Rok4Server* serv ) {
 DataStream* AdminService::delete_layer ( Request* req, Rok4Server* serv ) {
 
     std::string str_layer = req->path_params.at(0);
+    if ( contain_chars(str_layer, "\"")) {
+        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES layer: " << str_layer ;
+        throw AdminException::get_error_message("Layer does not exists.", "Not found", 404);
+    }
 
     Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
 
