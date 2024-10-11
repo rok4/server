@@ -95,7 +95,7 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     }
 
     service_node.add("OnlineResource.<xmlattr>.xmlns:xlink", "http://www.w3.org/1999/xlink");
-    service_node.add("OnlineResource.<xmlattr>.xlink:href", endpoint_uri);
+    service_node.add("OnlineResource.<xmlattr>.xlink:href", services->provider_site);
 
     services->contact->add_node_wms(service_node, services->service_provider);
 

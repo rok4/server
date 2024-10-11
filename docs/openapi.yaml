@@ -4,7 +4,7 @@ info:
   description: Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (OGC) WMS 1.3.0 et WMTS 1.0.0, ainsi que le TMS (Tile Map Service).
   version: "__version__"
 servers:
-- url: http://localhost/rok4
+- url: https://tuiles.ign.fr/rok4
 
 tags:
 - name: OGC API Common
@@ -2166,12 +2166,12 @@ components:
             - lanczos_3
             - lanczos_4
 
-        crs:
+        extra_crs:
           type: array
           items: 
             type: string
 
-        tms:
+        extra_tilematrixsets:
           type: array
           items: 
             type: string

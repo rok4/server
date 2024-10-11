@@ -1,3 +1,10 @@
+## 6.1.1
+
+### [Fixed]
+
+* `WMS` : correction de l'URL du site du fournisseur du service dans le GetCapabilities
+* `WMTS` : correction du nom du fournisseur du service dans le GetCapabilities
+
 ## 6.1.0
 
 ### [Added]

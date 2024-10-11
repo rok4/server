@@ -105,7 +105,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     identification_node.add("ows:AccessConstraints", services->access_constraint);
 
     ptree& provider_node = root.add("ows:ServiceProvider", "");
-    provider_node.add("ows:ProviderName", services->provider_site);
+    provider_node.add("ows:ProviderName", services->service_provider);
     provider_node.add("ows:ProviderSite.<xmlattr>.xlink:href", services->provider_site);
 
     services->contact->add_node_wmts(provider_node);
