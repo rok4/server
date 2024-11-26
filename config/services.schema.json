@@ -27,6 +27,11 @@
             "type": "string",
             "description": "Path to JSON file with identical CRS (to avoid useless tranformation)"
         },
+        "default_style": {
+            "type": "string",
+            "description": "Default style internal identifier",
+            "default": "normal"
+        },
         "contact": {
             "type": "object",
             "additionalProperties": false,

@@ -1,3 +1,9 @@
+## 6.1.2
+
+### [Added]
+
+* `Layer` : rétablissement d'un style par défaut au chargement de la couche. L'identifiant de ce style par défaut peut être fourni via le champ `default_style` dans le fichier de configuration des services, à la racine (optionnel, `normal` par défaut)
+
 ## 6.1.1
 
 ### [Fixed]
