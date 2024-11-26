@@ -17,6 +17,7 @@
         "email": ""
     },
     "crs_equivalences": "/etc/rok4/equals_crs.json",
+    "default_style": "normal",
     "admin": {
         "enabled": true
     },

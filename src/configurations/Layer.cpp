@@ -348,8 +348,16 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
         }
 
         if ( available_styles.size() == 0 ) {
-            error_message =  "No provided valid style, the layer is not valid"  ;
-            return false;
+            Style* sty = StyleBook::get_style(services->get_default_style_id());
+            if ( sty == NULL ) {
+                error_message =  "No valid style (even the default one), the layer is not valid"  ;
+                return false;
+            }
+            if ( ! is_style_handled(sty) ) {
+                error_message =  "No valid style (even the default one), the layer is not valid"  ;
+                return false;
+            }
+            available_styles.push_back ( sty );
         }
 
         // Configuration des reprojections possibles

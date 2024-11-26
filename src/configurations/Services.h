@@ -103,6 +103,8 @@ class ServicesConfiguration : public Configuration
         };
         bool are_crs_equals( std::string crs1, std::string crs2 );
 
+        std::string get_default_style_id();
+
         /**
          * \~french
          * \brief Supprime les réponses cachées
@@ -121,6 +123,8 @@ class ServicesConfiguration : public Configuration
         std::string access_constraint;
 
         Contact* contact;
+
+        std::string default_style;
 
     private:
 

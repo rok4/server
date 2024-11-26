@@ -49,6 +49,7 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
     fee="";
     access_constraint="";
     provider_site="";
+    default_style="normal";
 
     // ----------------------- Global 
 
@@ -87,6 +88,13 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
         }
     } else if (! doc["crs_equivalences"].is_null()) {
         error_message = "crs_equivalences have to be a string";
+        return false;
+    }
+
+    if (doc["default_style"].is_string()) {
+        default_style = doc["default_style"].string_value();
+    } else if (! doc["default_style"].is_null()) {
+        error_message = "default_style have to be a string";
         return false;
     }
 
@@ -311,6 +319,10 @@ bool ServicesConfiguration::are_crs_equals( std::string crs1, std::string crs2 )
     }
 
     return false;
+}
+
+std::string ServicesConfiguration::get_default_style_id() {
+    return default_style;
 }
 
 ServicesConfiguration::~ServicesConfiguration(){ 

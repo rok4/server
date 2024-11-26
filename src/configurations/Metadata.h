@@ -179,7 +179,7 @@ public:
     void add_node_tms(ptree& parent) {
         ptree& node = parent.add("Metadata", "");
         node.add("<xmlattr>.type", type);
-        node.add("<xmlattr>.mime-type", "text/xml");
+        node.add("<xmlattr>.mime-type", format);
         node.add("<xmlattr>.href", href);
     }
 
