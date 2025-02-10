@@ -217,20 +217,6 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
         return false;
     }
 
-    // On a forcément le TMS natif de la donnée pour le WMTS
-    TileMatrixSetInfos* infos_tms_natif = new TileMatrixSetInfos(pyramid->get_tms());
-
-    infos_tms_natif->set_bottom_top(pyramid->get_lowest_level()->get_id(), pyramid->get_highest_level()->get_id());
-
-    for (Level* l : pyramid->get_ordered_levels(false)) {
-        infos_tms_natif->limits.push_back(l->get_tile_limits());
-    }
-
-    available_tilematrixsets.push_back(infos_tms_natif);
-
-    // On a forcément le CRS natif de la donnée pour le WMS
-    available_crss.push_back ( pyramid->get_tms()->get_crs() );
-
     /********************** Gestion de l'étendue des données */
 
     if (doc["bbox"].is_object()) {
@@ -254,6 +240,20 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
         /* Calcul de la bbox dans la projection des données, à partir des tuiles limites des niveaux de la pyramide */
         calculate_bboxes();
     }
+
+    // On a forcément le TMS natif de la donnée pour le WMTS
+    TileMatrixSetInfos* infos_tms_natif = new TileMatrixSetInfos(pyramid->get_tms());
+
+    infos_tms_natif->set_bottom_top(pyramid->get_lowest_level()->get_id(), pyramid->get_highest_level()->get_id());
+
+    for (Level* l : pyramid->get_ordered_levels(false)) {
+        infos_tms_natif->limits.push_back(l->get_tile_limits());
+    }
+
+    available_tilematrixsets.push_back(infos_tms_natif);
+
+    // On a forcément le CRS natif de la donnée pour le WMS
+    available_crss.push_back ( pyramid->get_tms()->get_crs() );
 
 
     // Services autorisés a priori

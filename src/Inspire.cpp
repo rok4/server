@@ -147,6 +147,11 @@ bool is_inspire_wmts ( Layer* layer ) {
         return false;
     }
 
+    if (Rok4Format::to_mime_type ( layer->get_pyramid()->get_format() ) != "image/png") {
+        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMTS (" << layer->get_id() << ") : données pas en png" ;
+        return false;
+    }
+
     // Pour être inspire, le style par défaut doit avoir le bon identifiant
     if (layer->get_default_style()->get_identifier() != "inspire_common:DEFAULT") {
         BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMTS (" << layer->get_id() << ") : style par défaut != inspire_common:DEFAULT" ;

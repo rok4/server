@@ -1,3 +1,14 @@
+## 6.1.3
+
+### [Fixed]
+
+* `WMTS` : 
+  * correction du calcul des tuiles limites pour le TMS natif lorsque les limites de la couche sont surchargées par une bbox
+  * pour que la couche apparaisse dans les capacités Inspire, le format de la tuile doit être le PNG
+  * dans les capacités inspire, `inspire_vs:ExtendedCapabilities` doit être dans `OperationsMetadata`
+* `WMS`
+  * Ajout des schémas XML dans les réponses en erreur
+
 ## 6.1.2
 
 ### [Added]

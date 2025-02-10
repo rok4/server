@@ -134,7 +134,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     op_getfeatureinfo.add("ows:DCP.ows:HTTP.ows:Get.ows:Constraint.ows:AllowedValues.ows:Value", "KVP");
 
     if (req->is_inspire(default_inspire)) {
-        ptree& inspire_extension = root.add("inspire_vs:ExtendedCapabilities", "");
+        ptree& inspire_extension = root.add("ows:OperationsMetadata.inspire_vs:ExtendedCapabilities", "");
 
         if (metadata) {
             inspire_extension.add("inspire_common:MetadataUrl.inspire_common:URL", metadata->get_href());
