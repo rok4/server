@@ -45,7 +45,7 @@
 
 #include "services/wms/Exception.h"
 
-std::string WmsException::xml_template = "<ServiceExceptionReport><ServiceException code=\"%s\">%s</ServiceException></ServiceExceptionReport>";
+std::string WmsException::xml_template = "<ServiceExceptionReport version=\"1.3.0\" xmlns=\"http://www.opengis.net/ogc\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/ogc http://schemas.opengis.net/wms/1.3.0/exceptions_1_3_0.xsd\"><ServiceException code=\"%s\">%s</ServiceException></ServiceExceptionReport>";
 
 MessageDataStream* WmsException::get_error_message(std::string reason, std::string code, int status) {
     return new MessageDataStream(str(boost::format(xml_template) % code % reason), "text/xml", status);
