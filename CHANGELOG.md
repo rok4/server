@@ -3,27 +3,27 @@
 ### [Fixed]
 
 * `WMS`
-  * Correction de l'attribution dans les capacités : contenu du logo et ordre des balises
-  * Correction du géoréférencement dans les réponses GeoTIFF
+    * Correction de l'attribution dans les capacités : contenu du logo et ordre des balises
+    * Correction du géoréférencement dans les réponses GeoTIFF
 
 * `TMS`
-  * Correction de l'attribution dans les capacités : contenu du logo
-  * Ajout du header `Content-Encoding: defalte` pour les tuiles bil compressées
+    * Correction de l'attribution dans les capacités : contenu du logo
+    * Ajout du header `Content-Encoding: defalte` pour les tuiles bil compressées
 
 * `WMTS`
-  * Correction des balises de métadonnées dans les capacités
-  * Ajout du header `Content-Encoding: defalte` pour les tuiles bil compressées
+    * Correction des balises de métadonnées dans les capacités
+    * Ajout du header `Content-Encoding: defalte` pour les tuiles bil compressées
 
 ## 6.1.3
 
 ### [Fixed]
 
 * `WMTS` : 
-  * correction du calcul des tuiles limites pour le TMS natif lorsque les limites de la couche sont surchargées par une bbox
-  * pour que la couche apparaisse dans les capacités Inspire, le format de la tuile doit être le PNG
-  * dans les capacités inspire, `inspire_vs:ExtendedCapabilities` doit être dans `OperationsMetadata`
+    * correction du calcul des tuiles limites pour le TMS natif lorsque les limites de la couche sont surchargées par une bbox
+    * pour que la couche apparaisse dans les capacités Inspire, le format de la tuile doit être le PNG
+    * dans les capacités inspire, `inspire_vs:ExtendedCapabilities` doit être dans `OperationsMetadata`
 * `WMS`
-  * Ajout des schémas XML dans les réponses en erreur
+    * Ajout des schémas XML dans les réponses en erreur
 
 ## 6.1.2
 
@@ -98,24 +98,24 @@
 ### [Changed]
 
 * WMTS :
-  * On ajoute à la liste des TMS au niveau du getcapabilities les TMS "de base" en entier
+    * On ajoute à la liste des TMS au niveau du getcapabilities les TMS "de base" en entier
 
 ## 5.4.1
 
 ### [Added]
 
 * WMS :
-  * Ajout de la configuration du titre et nom de la couche racine dans le getCapabilities
+    * Ajout de la configuration du titre et nom de la couche racine dans le getCapabilities
 
 ### [Changed]
 
 * WMS :
-  * Déplacement des fonctions d'écriture d'une bbox du getCapabilities dans UtilsXML
-  * Ajout de bbox au niveau de la couche racine dans le getCapabilities
-  * L'attribution d'une couche est mise après les éventuelles métadonnées
+    * Déplacement des fonctions d'écriture d'une bbox du getCapabilities dans UtilsXML
+    * Ajout de bbox au niveau de la couche racine dans le getCapabilities
+    * L'attribution d'une couche est mise après les éventuelles métadonnées
 * WMTS :
-  * On ne liste plus les couches de tuiles vectorielles dans le getCapabilities
-  * On exporte dans le getcapabilities un TMS différent pour chaque couple haut / bas présent dans les couches
+    * On ne liste plus les couches de tuiles vectorielles dans le getCapabilities
+    * On exporte dans le getcapabilities un TMS différent pour chaque couple haut / bas présent dans les couches
 
 ## 5.3.0
 
@@ -162,25 +162,19 @@ Implémentation partielle de l'API OGC Tiles - Part 1 [v1.0.0 final release](htt
 ### [Added]
 
 * Liste de nouvelles routes pour obtenir le **GetCapabilities**: 
-    * /tiles/collections
-     avec les paramètres facultatifs : 
-       * bbox
-       * limit
+    * /tiles/collections avec les paramètres facultatifs : 
+        * bbox
+        * limit
     * /tiles/collections/{layer}/map/tiles
     * /tiles/collections/{layer}/tiles
     * /tiles/tilematrixsets
     * /tiles/tilematrixsets/{tms}
-
 * Liste des nouvelles routes pour obtenir le **GetTile** :
-
-   * Raster
-       * /tiles/map/tiles/{tms}/{level}/{row}/{col}
-          avec le paramètre obligatoire : collections={layer}
-       * /tiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
-         avec le paramètre obligatoire : collections={layer}
-       * /tiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
-       * /tiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}
-
+    * Raster
+        * /tiles/map/tiles/{tms}/{level}/{row}/{col} avec le paramètre obligatoire : collections={layer}
+        * /tiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col} avec le paramètre obligatoire : collections={layer}
+        * /tiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}
+        * /tiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}
    * Vecteur
         * /tiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}
         * /tiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}
@@ -227,10 +221,10 @@ Les configurations des couches, styles et tile matrix sets peuvent être des obj
 ### [Added]
 
 * Implémentation de routes de santé
-  * `/healthcheck` : informations générales, version, date de lancement, statut général
-  * `/healthcheck/info` : informations détaillées, listes de couches, styles et tile matrix sets
-  * `/healthcheck/depends` : informations sur les stockages, nombres de contextes par type
-  * `/healthcheck/threads` : informations sur les threads, statut, requêtes prises en charge, dernier temps de réponse
+    * `/healthcheck` : informations générales, version, date de lancement, statut général
+    * `/healthcheck/info` : informations détaillées, listes de couches, styles et tile matrix sets
+    * `/healthcheck/depends` : informations sur les stockages, nombres de contextes par type
+    * `/healthcheck/threads` : informations sur les threads, statut, requêtes prises en charge, dernier temps de réponse
 
 ### [Fixed]
 
