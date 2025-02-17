@@ -137,13 +137,14 @@ public:
      */
     void add_node_tms(ptree& parent) {
         ptree& node = parent.add("Attribution", "");
+        node.add("<xmlattr>.href", href);
         node.add("Title", title);
 
         if (logo != NULL) {
             node.add("Logo.<xmlattr>.width", width);
             node.add("Logo.<xmlattr>.height", height);
-            node.add("Logo.<xmlattr>.href", href);
-            node.add("Logo.<xmlattr>.mime-type", format);
+            node.add("Logo.<xmlattr>.href", logo->get_href());
+            node.add("Logo.<xmlattr>.mime-type", logo->get_format());
         }
     }
 
@@ -162,9 +163,9 @@ public:
         if (logo != NULL) {
             node.add("LogoURL.<xmlattr>.width", width);
             node.add("LogoURL.<xmlattr>.height", height);
-            node.add("LogoURL.OnlineResource.<xmlattr>.xlink:href", href);
+            node.add("LogoURL.Format", logo->get_format());
+            node.add("LogoURL.OnlineResource.<xmlattr>.xlink:href", logo->get_href());
             node.add("LogoURL.OnlineResource.<xmlattr>.xlink:type", "simple");
-            node.add("LogoURL.Format", format);
         }
     }
 

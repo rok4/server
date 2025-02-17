@@ -204,11 +204,8 @@ public:
      * \param[in] parent Node to whom add the metadata node
      */
     void add_node_wmts(ptree& parent) {
-        ptree& node = parent.add("MetadataURL", "");
-        node.add("<xmlattr>.type", type);
-        node.add("Format", format);
-        node.add("OnlineResource.<xmlattr>.xlink:href", href);
-        node.add("OnlineResource.<xmlattr>.xlink:type", "simple");
+        ptree& node = parent.add("ows:Metadata", "");
+        node.add("<xmlattr>.xlink:href", href);
     }
 
     json11::Json to_json_tiles(std::string title, std::string rel) const {
