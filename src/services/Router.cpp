@@ -174,6 +174,7 @@ void print_fcgi_error ( int error ) {
  */
 int sendresponse ( DataStream* stream, Request* request ) {
 
+
     // Creation de l'en-tete
     std::string statusHeader= get_status_header ( stream->get_http_status() );
     FCGX_PutStr ( statusHeader.data(),statusHeader.size(),request->fcgx_request->out );
@@ -182,7 +183,10 @@ int sendresponse ( DataStream* stream, Request* request ) {
         FCGX_PutStr ( "Content-Type: ",14,request->fcgx_request->out );
         FCGX_PutStr ( stream->get_type().c_str(), strlen ( stream->get_type().c_str() ),request->fcgx_request->out );
     }
-
+    if (stream->get_encoding() != "" ){
+        FCGX_PutStr ( "\r\nContent-Encoding: ",20,request->fcgx_request->out );
+        FCGX_PutStr ( stream->get_encoding().c_str(), strlen ( stream->get_encoding().c_str() ),request->fcgx_request->out );
+    }
     if ( stream->get_length() != 0 ) {
         std::stringstream ss;
         ss << stream->get_length();

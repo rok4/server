@@ -300,6 +300,7 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         final_image = images.at(0);
     }
 
+    final_image->set_bbox(bbox);
     final_image->set_crs(crs);
 
     if (format == "image/png" && sample_format == SampleFormat::UINT8) {

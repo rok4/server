@@ -1,3 +1,19 @@
+## 6.1.4
+
+### [Fixed]
+
+* `WMS`
+  * Correction de l'attribution dans les capacités : contenu du logo et ordre des balises
+  * Correction du géoréférencement dans les réponses GeoTIFF
+
+* `TMS`
+  * Correction de l'attribution dans les capacités : contenu du logo
+  * Ajout du header `Content-Encoding: defalte` pour les tuiles bil compressées
+
+* `WMTS`
+  * Correction des balises de métadonnées dans les capacités
+  * Ajout du header `Content-Encoding: defalte` pour les tuiles bil compressées
+
 ## 6.1.3
 
 ### [Fixed]
