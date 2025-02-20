@@ -153,8 +153,8 @@ bool is_inspire_wmts ( Layer* layer ) {
     }
 
     // Pour être inspire, le style par défaut doit avoir le bon identifiant
-    if (layer->get_default_style()->get_identifier() != "inspire_common:DEFAULT") {
-        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMTS (" << layer->get_id() << ") : style par défaut != inspire_common:DEFAULT" ;
+    if (layer->get_default_style()->get_identifier() != layer->get_id() + ":Default") {
+        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMTS (" << layer->get_id() << ") : style par défaut != " + layer->get_id() + ":Default" ;
         return false;
     }
 
@@ -174,8 +174,8 @@ bool is_inspire_wms ( Layer* layer ) {
     }
 
     // Pour être inspire, le style par défaut doit avoir le bon identifiant
-    if (layer->get_default_style()->get_identifier() != "inspire_common:DEFAULT") {
-        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMS (" << layer->get_id() << ") : style par défaut != inspire_common:DEFAULT" ;
+    if (layer->get_default_style()->get_identifier() != layer->get_id() + ":Default") {
+        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMS (" << layer->get_id() << ") : style par défaut != " + layer->get_id() + ":Default" ;
         return false;
     }
 

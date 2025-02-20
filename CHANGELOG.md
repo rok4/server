@@ -1,3 +1,12 @@
+## 6.1.5
+
+### [Fixed]
+
+* `WMTS`
+    * pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant `<nom de la couche>.Default`
+* `WMS`
+    * pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant `<nom de la couche>.Default`
+
 ## 6.1.4
 
 ### [Fixed]
@@ -8,11 +17,11 @@
 
 * `TMS`
     * Correction de l'attribution dans les capacités : contenu du logo
-    * Ajout du header `Content-Encoding: defalte` pour les tuiles bil compressées
+    * Ajout du header `Content-Encoding: deflate` pour les tuiles bil compressées
 
 * `WMTS`
     * Correction des balises de métadonnées dans les capacités
-    * Ajout du header `Content-Encoding: defalte` pour les tuiles bil compressées
+    * Ajout du header `Content-Encoding: deflate` pour les tuiles bil compressées
 
 ## 6.1.3
 
