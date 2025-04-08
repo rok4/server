@@ -82,12 +82,12 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
         if (contain_chars(vector_layers.at(i), "<>")) {
             BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMS layer: " << vector_layers.at(i);
-            throw WmsException::get_error_message("Layer unknown", "InvalidParameterValue", 400);
+            throw WmsException::get_error_message("Layer unknown", "LayerNotDefined", 400);
         }
 
         Layer* layer = serv->get_server_configuration()->get_layer(vector_layers.at(i));
         if (layer == NULL || ! layer->is_wms_enabled()) {
-            throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "InvalidParameterValue", 400);
+            throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "LayerNotDefined", 400);
         }
        
         layers.push_back ( layer );
@@ -253,6 +253,7 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
     // Le format des canaux sera identifié à partir des données en entrée, en prenant en compte le style
     SampleFormat::eSampleFormat sample_format = SampleFormat::UNKNOWN;
+    int nodata;
 
     // Le nombre de canaux dans l'image finale sera égale au nombre maximum dans les données en entrée (en prenant en compte le style)
     int bands = 0;
@@ -271,8 +272,11 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("All layers (with their style) have to own the same sample format (int or float)", "InvalidParameterValue", 400);
         } else {
             sample_format = style->get_sample_format(layers.at(i)->get_pyramid()->get_sample_format());
-        }
 
+            // Dans le cas d'un geotiff, on renseigne la valeur de nodata
+            // on ne peut mettre qu'une valeur, ce sera celle du premier canal du nodata de la première couche (après style)
+            nodata = *(style->get_output_nodata_value(layers.at(i)->get_pyramid()->get_nodata_value()));
+        }
 
         Image* image = layers.at(i)->get_pyramid()->getbbox(max_tile_x, max_tile_y, bbox, width, height, crs, crs_equals, layers.at(i)->get_resampling(), dpi);
 
@@ -317,37 +321,37 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
         if (sample_format == SampleFormat::UINT8) {
             if (opt.compare("lzw") == 0) { 
-                return new TiffLZWEncoder<uint8_t>(final_image, is_geotiff);
+                return new TiffLZWEncoder<uint8_t>(final_image, is_geotiff, nodata);
             }
             if (opt.compare("deflate") == 0) {
-                return new TiffDeflateEncoder<uint8_t>(final_image, is_geotiff);
+                return new TiffDeflateEncoder<uint8_t>(final_image, is_geotiff, nodata);
             }
             if (opt.compare("raw") == 0 || opt == "") {
-                return new TiffRawEncoder<uint8_t>(final_image, is_geotiff);
+                return new TiffRawEncoder<uint8_t>(final_image, is_geotiff, nodata);
             }
             if (opt.compare("packbits") == 0) {
-                return new TiffPackBitsEncoder<uint8_t>(final_image, is_geotiff);
+                return new TiffPackBitsEncoder<uint8_t>(final_image, is_geotiff, nodata);
             }
         }
         else if (sample_format == SampleFormat::FLOAT32) {
             if (opt.compare("lzw") == 0) { 
-                return new TiffLZWEncoder<float>(final_image, is_geotiff);
+                return new TiffLZWEncoder<float>(final_image, is_geotiff, nodata);
             }
             if (opt.compare("deflate") == 0) {
-                return new TiffDeflateEncoder<float>(final_image, is_geotiff);
+                return new TiffDeflateEncoder<float>(final_image, is_geotiff, nodata);
             }
             if (opt.compare("raw") == 0 || opt == "") {
-                return new TiffRawEncoder<float>(final_image, is_geotiff);
+                return new TiffRawEncoder<float>(final_image, is_geotiff, nodata);
             }
             if (opt.compare("packbits") == 0) {
-                return new TiffPackBitsEncoder<float>(final_image, is_geotiff);
+                return new TiffPackBitsEncoder<float>(final_image, is_geotiff, nodata);
             }
         }
 
         delete final_image;
         throw WmsException::get_error_message("Used data and expected format are not consistent", "InvalidParameterValue", 400);
     }
-    else if (format == "image/jpeg" && sample_format == SampleFormat::UINT8) {
+    else if (format == "image/jpeg" && sample_format == SampleFormat::UINT8 && bands == 3) {
 
         std::map<std::string, std::string>::iterator it = format_options.find("quality");
         int quality = 75;

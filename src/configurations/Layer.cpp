@@ -1289,14 +1289,14 @@ std::string Layer::get_description_tms(TmsService* service) {
     TileMatrix* tm = pyramid->get_lowest_level()->get_tm();
 
     root.add("Origin.<xmlattr>.x", tm->get_x0() );
-    root.add("Origin.<xmlattr>.y", tm->get_y0() );
+    root.add("Origin.<xmlattr>.y", tm->get_y0() - tm->get_matrix_height() * tm->get_tile_height() * tm->get_res() );
 
     root.add("TileFormat.<xmlattr>.width", tm->get_tile_width() );
     root.add("TileFormat.<xmlattr>.height", tm->get_tile_height() );
     root.add("TileFormat.<xmlattr>.mime-type", Rok4Format::to_mime_type ( pyramid->get_format() ) );
     root.add("TileFormat.<xmlattr>.extension", Rok4Format::to_extension ( pyramid->get_format() ) );
 
-    ptree& tilesets_node = root.add("TileMap", "");
+    ptree& tilesets_node = root.add("TileSets", "");
     tilesets_node.add("<xmlattr>.profile", "none");
 
     int order = 0;

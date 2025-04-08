@@ -1,6 +1,6 @@
 # Serveur de diffusion WMS, WMTS et TMS
 
-![ROK4 Logo](https://rok4.github.io/assets/images/rok4.png)
+![ROK4 Logo](https://rok4.github.io/assets/images/rok4-256.png)
 
 Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (OGC) WMS 1.3.0, WMTS 1.0.0 et OGC API Tiles 1.0.0, ainsi que le TMS (Tile Map Service). Il vise deux objectifs principaux :
 
@@ -224,7 +224,7 @@ Lorsqu'une couche est chargée, les descripteurs de pyramide, de TMS et de style
 
 Pour les TMS et les styles, ils sont cherchés dans les répertoires (fichier ou objet) renseignés dans le `server.json`, avec comme nom de fichier objet `<ID du style>.json`. Un annuaire est tenu à jour pour ne charger qu'une seule fois le style ou le TMS.
 
-![Chargement du serveur](./docs/images/rok4server-layer-pyramid.png)
+![Chargement du serveur](./docs/images/rok4-server-loading.png)
 
 ### Personnalisation des points d'accès aux services
 

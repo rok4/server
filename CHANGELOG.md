@@ -2,10 +2,16 @@
 
 ### [Fixed]
 
+* Nettoyage et bascule des styles et TMS lors d'une extinction ou redémarrage du serveur
 * `WMTS`
     * pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant `<nom de la couche>.Default`
 * `WMS`
     * pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant `<nom de la couche>.Default`
+    * on vérifie que la donnée a bien 3 canaux pour répondre une tuile en JPEG
+    * Dans le cas d'une couche inconnu, le code est `LayerNotDefined`
+    * Écriture de la valeur de nodata dans les header geotiff
+* `TMS`
+    * Dans la description des couches, les niveaux (`TileSet`) doivent être définis dans la balise `TileSets` et non `TileMap` et `Origin` est le coin en bas à gauche et non en haut à gauche
 
 ## 6.1.4
 

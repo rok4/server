@@ -232,25 +232,29 @@ DataStream* TilesService::get_tile ( Request* req, Rok4Server* serv, bool is_map
         else if (format == "tiff") {
             bool is_geotiff = true;
 
+            // Dans le cas d'un geotiff, on renseigne la valeur de nodata
+            // on ne peut mettre qu'une valeur, ce sera celle du premier canal
+            int nodata = *(layer->get_pyramid()->get_nodata_value());
+
             // La donnée ne peut être retournée que dans le format de la pyramide source utilisée
 
             switch (layer->get_pyramid()->get_format()) {
                 case Rok4Format::TIFF_RAW_UINT8:
-                    return new TiffRawEncoder<uint8_t>(image, is_geotiff);
+                    return new TiffRawEncoder<uint8_t>(image, is_geotiff, nodata);
                 case Rok4Format::TIFF_LZW_UINT8:
-                    return new TiffLZWEncoder<uint8_t>(image, is_geotiff);
+                    return new TiffLZWEncoder<uint8_t>(image, is_geotiff, nodata);
                 case Rok4Format::TIFF_ZIP_UINT8:
-                    return new TiffDeflateEncoder<uint8_t>(image, is_geotiff);
+                    return new TiffDeflateEncoder<uint8_t>(image, is_geotiff, nodata);
                 case Rok4Format::TIFF_PKB_UINT8:
-                    return new TiffPackBitsEncoder<uint8_t>(image, is_geotiff);
+                    return new TiffPackBitsEncoder<uint8_t>(image, is_geotiff, nodata);
                 case Rok4Format::TIFF_RAW_FLOAT32:
-                    return new TiffRawEncoder<float>(image, is_geotiff);
+                    return new TiffRawEncoder<float>(image, is_geotiff, nodata);
                 case Rok4Format::TIFF_LZW_FLOAT32:
-                    return new TiffLZWEncoder<float>(image, is_geotiff);
+                    return new TiffLZWEncoder<float>(image, is_geotiff, nodata);
                 case Rok4Format::TIFF_ZIP_FLOAT32:
-                    return new TiffDeflateEncoder<float>(image, is_geotiff);
+                    return new TiffDeflateEncoder<float>(image, is_geotiff, nodata);
                 case Rok4Format::TIFF_PKB_FLOAT32:
-                    return new TiffPackBitsEncoder<float>(image, is_geotiff);
+                    return new TiffPackBitsEncoder<float>(image, is_geotiff, nodata);
                 default:
                     delete image;
                     throw TilesException::get_error_message("ResourceNotFound", "Not data found", 404);
