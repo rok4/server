@@ -203,6 +203,10 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
         else if (format == "image/tiff" || format == "image/geotiff") {
             bool is_geotiff = (format == "image/geotiff");
 
+            // Dans le cas d'un geotiff, on renseigne la valeur de nodata
+            // on ne peut mettre qu'une valeur, ce sera celle du premier canal
+            int nodata = *(layer->get_pyramid()->get_nodata_value());
+
             std::map<std::string, std::string>::iterator it = format_options.find("compression");
             std::string opt = "";
             if (it != format_options.end()) {
@@ -217,16 +221,16 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
                 case Rok4Format::TIFF_ZIP_UINT8:
                 case Rok4Format::TIFF_PKB_UINT8:
                     if (opt.compare("lzw") == 0) { 
-                        return new TiffLZWEncoder<uint8_t>(image, is_geotiff);
+                        return new TiffLZWEncoder<uint8_t>(image, is_geotiff, nodata);
                     }
                     if (opt.compare("deflate") == 0) {
-                        return new TiffDeflateEncoder<uint8_t>(image, is_geotiff);
+                        return new TiffDeflateEncoder<uint8_t>(image, is_geotiff, nodata);
                     }
                     if (opt.compare("raw") == 0 || opt == "") {
-                        return new TiffRawEncoder<uint8_t>(image, is_geotiff);
+                        return new TiffRawEncoder<uint8_t>(image, is_geotiff, nodata);
                     }
                     if (opt.compare("packbits") == 0) {
-                        return new TiffPackBitsEncoder<uint8_t>(image, is_geotiff);
+                        return new TiffPackBitsEncoder<uint8_t>(image, is_geotiff, nodata);
                     }
 
                     break;
@@ -236,16 +240,16 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
                 case Rok4Format::TIFF_ZIP_FLOAT32:
                 case Rok4Format::TIFF_PKB_FLOAT32:
                     if (opt.compare("lzw") == 0) { 
-                        return new TiffLZWEncoder<float>(image, is_geotiff);
+                        return new TiffLZWEncoder<float>(image, is_geotiff, nodata);
                     }
                     if (opt.compare("deflate") == 0) {
-                        return new TiffDeflateEncoder<float>(image, is_geotiff);
+                        return new TiffDeflateEncoder<float>(image, is_geotiff, nodata);
                     }
                     if (opt.compare("raw") == 0 || opt == "") {
-                        return new TiffRawEncoder<float>(image, is_geotiff);
+                        return new TiffRawEncoder<float>(image, is_geotiff, nodata);
                     }
                     if (opt.compare("packbits") == 0) {
-                        return new TiffPackBitsEncoder<float>(image, is_geotiff);
+                        return new TiffPackBitsEncoder<float>(image, is_geotiff, nodata);
                     }
 
                     break;

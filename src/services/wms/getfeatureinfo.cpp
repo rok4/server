@@ -69,12 +69,12 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
 
         if (contain_chars(vector_layers.at(i), "<>")) {
             BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMS layer: " << vector_layers.at(i);
-            throw WmsException::get_error_message("Layer unknown", "InvalidParameterValue", 400);
+            throw WmsException::get_error_message("Layer unknown", "LayerNotDefined", 400);
         }
 
         Layer* layer = serv->get_server_configuration()->get_layer(vector_layers.at(i));
         if (layer == NULL || ! layer->is_wms_enabled()) {
-            throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "InvalidParameterValue", 400);
+            throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "LayerNotDefined", 400);
         }
        
         layers.push_back ( layer );

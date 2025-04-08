@@ -240,6 +240,10 @@ void reload_configuration ( int signum ) {
         reload = true;
         std::cout<<  "Rechargement du serveur rok4" << "["<< getpid() <<"]" <<std::endl;
 
+        // On veut que le chargement de configuration construise de nouvelles instances des styles et TMS, qui ont potentiellement changé
+        TmsBook::send_to_trash();
+        StyleBook::send_to_trash();
+
         rok4server_instance_tmp = load_configuration();
         if ( ! rok4server_instance_tmp ){
             std::cout<<  "Erreur lors du rechargement du serveur rok4" << "["<< getpid() <<"]" <<std::endl;
@@ -363,8 +367,6 @@ int main ( int argc, char** argv ) {
                 std::cout<<  "Servers switch " << "["<< pid <<"]" <<std::endl;
                 rok4server_instance = rok4server_instance_tmp;
                 rok4server_instance_tmp = 0;
-                TmsBook::empty_trash();
-                StyleBook::empty_trash();
             }
             rok4server_instance->set_fcgi_socket ( sock );
         }
@@ -379,16 +381,21 @@ int main ( int argc, char** argv ) {
         
         rok4server_instance->run(signal_pending);
 
-        TmsBook::send_to_trash();
-        StyleBook::send_to_trash();
 
         if ( reload ) {
             // Rechargement du serveur
             BOOST_LOG_TRIVIAL(info) << "Configuration reload" ;
             sock = rok4server_instance->get_fcgi_socket();
+            // Lors du rechargement on a mis à la poubelle tous les anciens TMS et styles
+            // On peut maintenant les supprimer
+            TmsBook::empty_trash();
+            StyleBook::empty_trash();
         } else {
             // Extinction du serveur
             BOOST_LOG_TRIVIAL(info) << "Server shutdown" ;
+            // On va vouloir supprimer tous les styles et TMS, on les envoie donc à la poubelle
+            TmsBook::send_to_trash();
+            StyleBook::send_to_trash();
         }
 
         delete rok4server_instance;
