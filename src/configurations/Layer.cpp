@@ -752,6 +752,7 @@ void Layer::add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire
         m.add_node_wmts(node);
     }
 
+    bool is_first = true;
     for ( Style* s : available_styles) {
         /*
         Un style est applicable en WMTS si :
@@ -763,7 +764,8 @@ void Layer::add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire
         Cela permet de n'avoir à modifier que l'en tête de la tuile PNG pour que le style "soit appliqué"
         */
         if (s->is_identity() || (pyramid->get_channels() == 1 && pyramid->get_sample_compression() == Compression::PNG)) {
-            s->add_node_wmts(node);
+            s->add_node_wmts(node, is_first);
+            is_first = false;
         }
     }
 
