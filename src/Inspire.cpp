@@ -126,16 +126,11 @@ const std::vector<std::string> layer_names = {
     "US.SubsidiaryServicesToEducation", "US.ThermalNetwork", "US.UpperSecondaryEducation", "US.UtilityNetwork", "US.WaterNetwork", "GE.VspSurevey"
 };
 
-bool is_inspire_layer_name ( std::string ln ) {
+bool is_normalized_layer_name ( std::string ln ) {
     return std::find(layer_names.begin(), layer_names.end(), ln) != layer_names.end();
 }
 
 bool is_inspire_wmts ( Layer* layer ) {
-
-    if (! is_inspire_layer_name(layer->get_id())) {
-        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMTS (" << layer->get_id() << ") : layer name non harmonisé" ;
-        return false;
-    }
 
     if (layer->get_keywords()->size() == 0) {
         BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMTS (" << layer->get_id() << ") : pas de mots-clés" ;
@@ -152,31 +147,28 @@ bool is_inspire_wmts ( Layer* layer ) {
         return false;
     }
 
-    // Pour être inspire, le style par défaut doit avoir le bon identifiant
-    if (layer->get_default_style()->get_identifier() != layer->get_id() + ":Default") {
-        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMTS (" << layer->get_id() << ") : style par défaut != " + layer->get_id() + ":Default" ;
-        return false;
-    }
-
     return true;
 }
 
 bool is_inspire_wms ( Layer* layer ) {
-
-    if (! is_inspire_layer_name(layer->get_id())) {
-        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMS (" << layer->get_id() << ") : layer name non harmonisé" ;
-        return false;
-    }
 
     if (layer->get_keywords()->size() == 0) {
         BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMS (" << layer->get_id() << ") : pas de mots-clés" ;
         return false;
     }
 
-    // Pour être inspire, le style par défaut doit avoir le bon identifiant
-    if (layer->get_default_style()->get_identifier() != layer->get_id() + ":Default") {
-        BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMS (" << layer->get_id() << ") : style par défaut != " + layer->get_id() + ":Default" ;
-        return false;
+    if (is_normalized_layer_name(layer->get_id())) {
+        // On doit avoir un style dont l'identifiant est <layer>.Default
+        if (layer->get_style_by_identifier(layer->get_id() + ".Default") == NULL) {
+            BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMS (" << layer->get_id() << ") : layer name harmonisé mais pas de style <layer>.Default" ;
+            return false;
+        }
+    } else {
+        // On doit avoir un style avec l'identifiant DEFAULT
+        if (layer->get_style_by_identifier("DEFAULT") == NULL) {
+            BOOST_LOG_TRIVIAL(debug) << "Non conforme INSPIRE WMS (" << layer->get_id() << ") : layer name non harmonisé mais pas de style DEFAULT" ;
+            return false;
+        }
     }
 
     return true;

@@ -1,6 +1,13 @@
 ## 6.1.6
 
-* `WMTS` : dans le getcapabilities, le premier style possède l'attribut isDefault à `true`
+### [Fixed]
+
+* `WMTS` : 
+    * dans le getcapabilities, le premier style possède l'attribut isDefault à `true`
+    * pour la version inspire, peu importe l'identifiant du style et le nom de la couche
+* `WMS` : 
+    * pour le getcapabilities inspire : si le nom est normalisé, son style doit être `<name>.Default`, sinon `DEFAULT`
+    * si une dimension est nulle (et pas juste négative) pour le GetMap ou GetFeatureInfo, on sort en erreur immédiatement
 
 ## 6.1.5
 

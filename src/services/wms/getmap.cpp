@@ -100,8 +100,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
     if (sscanf(str_width.c_str(), "%d", &width) != 1)
         throw WmsException::get_error_message("Invalid WIDTH value", "InvalidParameterValue", 400);
 
-    if ( width < 0 )
-        throw WmsException::get_error_message("WIDTH query parameter have to be a positive integer", "InvalidParameterValue", 400);
+    if ( width <= 0 )
+        throw WmsException::get_error_message("WIDTH query parameter have to be a strictly positive integer", "InvalidParameterValue", 400);
     if ( width > max_width )
         throw WmsException::get_error_message("WIDTH query parameter exceed the limit (" + std::to_string(max_width) + ")", "InvalidParameterValue", 400);
 
@@ -112,8 +112,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
     if (sscanf(str_height.c_str(), "%d", &height) != 1)
         throw WmsException::get_error_message("Invalid HEIGHT value", "InvalidParameterValue", 400);
 
-    if ( height < 0 )
-        throw WmsException::get_error_message("HEIGHT query parameter have to be a positive integer", "InvalidParameterValue", 400);
+    if ( height <= 0 )
+        throw WmsException::get_error_message("HEIGHT query parameter have to be a strictly positive integer", "InvalidParameterValue", 400);
     if ( height > max_height )
         throw WmsException::get_error_message("HEIGHT query parameter exceed the limit (" + std::to_string(max_width) + ")", "InvalidParameterValue", 400);
 
