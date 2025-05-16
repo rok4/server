@@ -1,15 +1,30 @@
+## 6.1.6
+
+### [Fixed]
+
+* `WMTS` : 
+    * dans le getcapabilities, le premier style possède l'attribut isDefault à `true`
+    * pour la version inspire, peu importe l'identifiant du style et le nom de la couche
+* `WMS` : 
+    * pour le getcapabilities inspire : si le nom est normalisé, son style doit être `<name>.Default`, sinon `DEFAULT`
+    * si une dimension est nulle (et pas juste négative) pour le GetMap ou GetFeatureInfo, on sort en erreur immédiatement
+
 ## 6.1.5
+
+### [Added]
+
+* `WMS`
+    * Écriture de la valeur de nodata dans les header geotiff
 
 ### [Fixed]
 
 * Nettoyage et bascule des styles et TMS lors d'une extinction ou redémarrage du serveur
 * `WMTS`
-    * pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant `<nom de la couche>.Default`
+    * Pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant `<nom de la couche>:Default`
 * `WMS`
-    * pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant `<nom de la couche>.Default`
-    * on vérifie que la donnée a bien 3 canaux pour répondre une tuile en JPEG
-    * Dans le cas d'une couche inconnu, le code est `LayerNotDefined`
-    * Écriture de la valeur de nodata dans les header geotiff
+    * Pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant `<nom de la couche>:Default`
+    * On vérifie que la donnée a bien 3 canaux pour répondre une tuile en JPEG
+    * Dans le cas d'une couche inconnue, le code est `LayerNotDefined`
 * `TMS`
     * Dans la description des couches, les niveaux (`TileSet`) doivent être définis dans la balise `TileSets` et non `TileMap` et `Origin` est le coin en bas à gauche et non en haut à gauche
 

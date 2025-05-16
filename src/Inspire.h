@@ -63,7 +63,7 @@ namespace Inspire {
  * \~english \brief Is layer name a harmonized inspire one
  * \param[in] ln Layer name to test
  */
-bool is_inspire_layer_name ( std::string ln );
+bool is_normalized_layer_name ( std::string ln );
 
 /**
  * \~french \brief La couche est-elle conforme Inspire WMTS
