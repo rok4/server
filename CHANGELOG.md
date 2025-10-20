@@ -1,3 +1,15 @@
+## Unreleased
+
+### [Added]
+### [Changed]
+
+* Changement des imports de Cache aux imports spécifiques des classes suite à la séparation du fichier Cache dans core-cpp. 
+
+### [Deprecated]
+### [Removed]
+### [Fixed]
+### [Security]
+
 ## 6.1.6
 
 ### [Fixed]
