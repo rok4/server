@@ -76,7 +76,8 @@
 #include <time.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
-#include <rok4/utils/Cache.h>
+#include <rok4/utils/CurlPool.h>
+#include <rok4/utils/IndexCache.h>
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>

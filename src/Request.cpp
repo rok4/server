@@ -53,7 +53,7 @@
 #include <cstdlib>
 #include <vector>
 
-#include <rok4/utils/Cache.h>
+#include <rok4/utils/CurlPool.h>
 #include <rok4/utils/LibcurlStruct.h>
 
 #include "Utils.h"

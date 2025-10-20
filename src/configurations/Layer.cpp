@@ -51,7 +51,6 @@
 #include <iostream>
 
 #include <rok4/utils/Pyramid.h>
-#include <rok4/utils/Cache.h>
 #include <rok4/utils/Utils.h>
 #include <rok4/style/Style.h>
 
