@@ -159,13 +159,16 @@ RawDataStream* Request::send() {
     if (get_ssl_no_verify()) {
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
     }
+    int timeout = get_timeout();
+    if (timeout != 0) {
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, timeout);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, timeout);
+    }
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
     // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
     curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
-    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 30);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
     curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "identity");
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "ROK4 server");
 
