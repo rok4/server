@@ -165,7 +165,7 @@ DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
     // On ne gère que la version 1.0.0
     std::string param_version = req->get_query_param("version");
     if (param_version != "1.0.0" && param_version != "") {
-        throw WmtsException::get_error_message("VERSION query parameter have to be 1.0.0 or empty", "InvalidParameterValue", 400);
+        throw WmtsException::get_error_message("VERSION query parameter have to be 1.0.0 or empty", "VersionNegotiationFailed", 400);
     }
 
     // On récupère le type de requête précisé en paramètre de requête
