@@ -306,6 +306,9 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             if ( styled_image->get_channels() == 1 && ! ( style->get_palette()->is_empty() ) ) {
                 image = new PaletteImage ( styled_image , style->get_palette() );
             } 
+            else{
+                image=styled_image;
+            }
         }else {
             image=styled_image;
         }
