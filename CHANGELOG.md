@@ -9,6 +9,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ### Changed
 - Refonte du CHANGELOG au format [Keep a Changelog](https://keepachangelog.com/)
+- Changement des imports de Cache aux imports spécifiques des classes suite à la séparation du fichier Cache dans core-cpp. 
 
 ### Deprecated
 ### Removed

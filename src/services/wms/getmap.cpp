@@ -46,7 +46,6 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 
-#include <rok4/utils/Cache.h>
 #include <rok4/image/PaletteImage.h>
 #include <rok4/image/MergeImage.h>
 #include <rok4/datastream/AscEncoder.h>

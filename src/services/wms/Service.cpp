@@ -46,7 +46,6 @@
 #include <iostream>
 
 #include <rok4/utils/CRS.h>
-#include <rok4/utils/Cache.h>
 
 #include "services/wms/Exception.h"
 #include "services/wms/Service.h"
