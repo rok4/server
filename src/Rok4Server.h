@@ -59,6 +59,8 @@ class Server;
 #include "configurations/Services.h"
 #include "configurations/Layer.h"
 
+#include <rok4/utils/IndexCache.h>
+
 #include "Request.h"
 
 #include "config.h"

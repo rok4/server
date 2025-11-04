@@ -37,8 +37,6 @@
 
 #include <fstream>
 
-#include <rok4/utils/Cache.h>
-
 #include "configurations/Services.h"
 
 bool ServicesConfiguration::parse(json11::Json& doc) {
