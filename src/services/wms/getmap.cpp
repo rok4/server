@@ -46,11 +46,7 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 
-#include <rok4/image/PaletteImage.h>
-#include <rok4/image/AspectImage.h>
-#include <rok4/image/PenteImage.h>
-#include <rok4/image/TerrainrgbImage.h>
-#include <rok4/image/EstompageImage.h>
+#include <rok4/image/StyledImage.h>
 #include <rok4/image/MergeImage.h>
 #include <rok4/datastream/AscEncoder.h>
 #include <rok4/datastream/BilEncoder.h>
@@ -287,33 +283,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("BBOX too big", "InvalidParameterValue", 400);
         }
 
-        Image* styled_image = image;
-        
-        if (style->estompage_defined()) {
-            styled_image = new EstompageImage (image, style->get_estompage());
-        }
-        else if (style->pente_defined()) {
-            styled_image = new PenteImage (image, style->get_pente());
-        }
-        else if (style->aspect_defined()) {
-            styled_image = new AspectImage (image, style->get_aspect()) ;           
-        }
-        else if (style->terrainrgb_defined()) {
-            styled_image = new TerrainrgbImage (image, style->get_terrainrgb()) ;           
-        }
-
-        if (style->palette_defined()){
-            if ( styled_image->get_channels() == 1 && ! ( style->get_palette()->is_empty() ) ) {
-                image = new PaletteImage ( styled_image , style->get_palette() );
-            } 
-            else{
-                image=styled_image;
-            }
-        }else {
-            image=styled_image;
-        }
-
-        images.push_back(image);
+        StyledImage* s_image = new StyledImage(image,style);
+        images.push_back(s_image->styled_image);
 
         // Le nombre final de canaux est celui maxiumum parmis les couches, c'est à dire celui de la donnée en prenant en compte le style
         bands = std::max(bands, image->get_channels());
