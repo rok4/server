@@ -284,7 +284,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         }
 
         StyledImage* s_image = new StyledImage(image,style);
-        images.push_back(s_image->styled_image);
+        image = s_image->styled_image;
+        images.push_back(image);
 
         // Le nombre final de canaux est celui maxiumum parmis les couches, c'est à dire celui de la donnée en prenant en compte le style
         bands = std::max(bands, image->get_channels());
@@ -370,6 +371,5 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         delete final_image;
         throw WmsException::get_error_message("Used data format (" + std::to_string(bands) + " band(s) " + SampleFormat::to_string(sample_format) + ") and expected output format (" + format + ") are not consistent", "InvalidParameterValue", 400);
     }
-
     return NULL;
 }
