@@ -283,8 +283,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("BBOX too big", "InvalidParameterValue", 400);
         }
 
-        StyledImage* s_image = new StyledImage(image,style);
-        image = s_image->styled_image;
+        StyledImage* s_image = StyledImage::create(image,style);
+        image = s_image;
         images.push_back(image);
 
         // Le nombre final de canaux est celui maxiumum parmis les couches, c'est à dire celui de la donnée en prenant en compte le style
