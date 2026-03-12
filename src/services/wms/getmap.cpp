@@ -46,7 +46,7 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 
-#include <rok4/image/PaletteImage.h>
+#include <rok4/image/StyledImage.h>
 #include <rok4/image/MergeImage.h>
 #include <rok4/datastream/AscEncoder.h>
 #include <rok4/datastream/BilEncoder.h>
@@ -283,12 +283,12 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("BBOX too big", "InvalidParameterValue", 400);
         }
 
-        image = new PaletteImage(image, style->get_palette());
-
+        StyledImage* s_image = StyledImage::create(image,style);
+        image = s_image;
         images.push_back(image);
 
         // Le nombre final de canaux est celui maxiumum parmis les couches, c'est à dire celui de la donnée en prenant en compte le style
-        bands = std::max(bands, style->get_channels(layers.at(i)->get_pyramid()->get_channels()));
+        bands = std::max(bands, image->get_channels());
     }
 
     // On construit la réponse finale, en superposant les couches
@@ -371,6 +371,5 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         delete final_image;
         throw WmsException::get_error_message("Used data format (" + std::to_string(bands) + " band(s) " + SampleFormat::to_string(sample_format) + ") and expected output format (" + format + ") are not consistent", "InvalidParameterValue", 400);
     }
-
     return NULL;
 }
