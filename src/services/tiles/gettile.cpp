@@ -55,7 +55,6 @@
 #include <rok4/datastream/TiffLZWEncoder.h>
 #include <rok4/datastream/TiffDeflateEncoder.h>
 #include <rok4/datastream/TiffRawEncoder.h>
-#include <rok4/image/PaletteImage.h>
 
 #include "services/tiles/Exception.h"
 #include "services/tiles/Service.h"

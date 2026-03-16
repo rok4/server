@@ -56,7 +56,6 @@
 #include <rok4/datastream/TiffLZWEncoder.h>
 #include <rok4/datastream/TiffDeflateEncoder.h>
 #include <rok4/datastream/TiffRawEncoder.h>
-#include <rok4/image/PaletteImage.h>
 
 #include "Rok4Server.h"
 #include "services/wmts/Exception.h"
