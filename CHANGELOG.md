@@ -4,6 +4,8 @@ Tous les changements sont consignés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce projet respecte le [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+## [6.2.0] - 2026-03-16
 ### Added
 - Possibilité de définir un timeout via la variable d'environnement `ROK4_NETWORK_TIMEOUT` (valeur à fournir en seconde) pour les intéraction avec le un service WMS source (pour le getfeature info)
 
@@ -243,7 +245,8 @@ Cette release contient le serveur de diffusion de données raster ou vecteur sto
 - Suppression du support du WMS 1.1.1
 - Suppression de la gestion de styles complexes (quand le valeur finale d'un pixel dépend des valeurs initiales du voisinage, comme le calcul de pente ou d'ombrage) à la volée
 
-[Unreleased]: https://github.com/rok4/server/compare/v6.1.6...HEAD
+[Unreleased]: https://github.com/rok4/server/compare/v6.2.0...HEAD
+[6.2.0]: https://github.com/rok4/server/compare/v6.1.6...v6.2.0
 [6.1.6]: https://github.com/rok4/server/compare/v6.1.5...v6.1.6
 [6.1.5]: https://github.com/rok4/server/compare/v6.1.4...v6.1.5
 [6.1.4]: https://github.com/rok4/server/compare/v6.1.3...v6.1.4
