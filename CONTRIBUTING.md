@@ -4,32 +4,30 @@ Merci d'envisager de contribuer à ce projet !
 
 ## Pull request
 
-Le titre de la PR est utilisé pour constituer automatiquement les notes de release. Vous pouvez préciser en commentaire de votre PR des détails qui seront ajoutés dans le fichier `CHANGELOG.md` par les mainteneurs du projet.
-
-Le formalisme du changelog est le suivant, en markdown :
+Complétez le fichier `CHANGELOG.md`, dans la partie `[Unreleased]`, en précisant les modifications fonctionnelles apportées. Celles ci seront utilisées pour rédiger le message de release sur GitHub. Le format est basé sur [Keep a Changelog](https://keepachangelog.com/). Les sections sont les suivantes :
 
 ```md
-### [Added]
+### Added
 
 Liste de nouvelles fonctionnalités.
 
-### [Changed]
+### Changed
 
 Liste de fonctionnalités existantes modifiées.
 
-### [Deprecated]
+### Deprecated
 
 Liste de fonctionnalités dépréciées.
 
-### [Removed]
+### Removed
 
 Liste de foncitonnalités retirées.
 
-### [Fixed]
+### Fixed
 
 Liste de corrections fonctionnelles.
 
-### [Security]
+### Security
 
 Liste de corrections de sécurité.
 ```
