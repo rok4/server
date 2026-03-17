@@ -64,10 +64,10 @@ namespace Tile {
  * \brief Give the asked tile
  * \return Data stream
  */
-static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSetInfos* tmsi, TileMatrix* tm, int column, int row, std::string format, Style* style) {
+static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSet* tms, TileMatrix* tm, int column, int row, std::string format, Style* style) {
     // Traitement de la requête
 
-    if (tmsi->tms->get_id() == layer->get_pyramid()->get_tms()->get_id()) {
+    if (tms->get_id() == layer->get_pyramid()->get_tms()->get_id()) {
         // TMS d'interrogation natif
         Level* level = layer->get_pyramid()->get_level(tm->get_id());
 
@@ -76,7 +76,7 @@ static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSetInfos* 
             return NULL;
         }
 
-        if (layer->get_pyramid()->get_channels() == 1 && (format == "image/png" || format == "png") && style->get_palette() && !style->get_palette()->is_empty()) {
+        if (layer->get_pyramid()->get_channels() == 1 && format == "image/png" && style->get_palette() && !style->get_palette()->is_empty()) {
             return new DataStreamFromDataSource(new PaletteDataSource(d, style->get_palette()));
         } else {
             return new DataStreamFromDataSource(d);
@@ -87,7 +87,7 @@ static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSetInfos* 
         BoundingBox<double> bbox = tm->tile_indices_to_bbox(column, row);
         int height = tm->get_tile_height();
         int width = tm->get_tile_width();
-        CRS* crs = tmsi->tms->get_crs();
+        CRS* crs = tms->get_crs();
         bbox.crs = crs->get_request_code();
 
         bool crs_equals = serv->get_services_configuration()->are_crs_equals(layer->get_pyramid()->get_tms()->get_crs()->get_proj_code(), crs->get_proj_code());
@@ -105,8 +105,8 @@ static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSetInfos* 
 
         if (format == "image/png" || format == "png") {
             return new PNGEncoder(image, style->get_palette());
-        } else if (format == "image/tiff" || format == "image/geotiff" || format == "tiff" || format == "geotiff") {
-            bool is_geotiff = (format == "image/geotiff" || format == "geotiff");
+        } else if (format == "image/tiff" || format == "image/geotiff") {
+            bool is_geotiff = (format == "image/geotiff");
 
             // Dans le cas d'un geotiff, on renseigne la valeur de nodata
             // on ne peut mettre qu'une valeur, ce sera celle du premier canal
@@ -135,7 +135,7 @@ static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSetInfos* 
                     delete image;
                     return NULL;
             }
-        } else if (format == "image/jpeg" || format == "jpg") {
+        } else if (format == "image/jpeg") {
             switch (layer->get_pyramid()->get_format()) {
                 case Rok4Format::TIFF_JPG_UINT8:
                     return new JPEGEncoder(image, 75);
@@ -146,7 +146,7 @@ static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSetInfos* 
                     return NULL;
             }
 
-        } else if (format == "image/x-bil;bits=32" || format == "bil") {
+        } else if (format == "image/x-bil;bits=32") {
             return new BilEncoder(image);
         }
     }

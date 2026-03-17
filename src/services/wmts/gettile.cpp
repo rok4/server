@@ -161,7 +161,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     }
 
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(serv, layer, tmsi, tm, column, row, format, style);
+    DataStream* d = Tile::get_tile(serv, layer, tmsi->tms, tm, column, row, format, style);
     if (d == NULL) {
         throw WmtsException::get_error_message("No data found", "Not Found", 404);
     }

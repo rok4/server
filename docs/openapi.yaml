@@ -1040,23 +1040,23 @@ paths:
             type: string
             enum: ['json']
 
-        # - name: bbox
-        #   required: false
-        #   in: query
-        #   description: Seules les collections dont la géométrie intersecte la "bounding box" sont sélectionnées.
-        #   schema:
-        #     type: array
-        #     minItems: 4
-        #     maxItems: 4
-        #     items:
-        #       type: number
-        #       format: double
-        #     example:
-        #       - 450000
-        #       - 560000
-        #       - 455000
-        #       - 565000
-        #   explode: false
+        - name: bbox
+          required: false
+          in: query
+          description: Seules les collections dont la géométrie intersecte la "bounding box" sont sélectionnées. Le format est east,south,west,north (en CRS84)
+          schema:
+            type: array
+            minItems: 4
+            maxItems: 4
+            items:
+              type: number
+              format: double
+            example:
+              - -5
+              - 40
+              - 5
+              - 50
+          explode: false
 
         # - name: limit
         #   required: false
@@ -1452,7 +1452,7 @@ paths:
           description: format demandé
           schema:
             type: string
-            enum: ["png", "jpg", "tiff", "geotiff", "bil"]
+            enum: ["png", "jpg", "tiff", "bil"]
 
         - name: filename
           required: false

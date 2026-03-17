@@ -190,6 +190,7 @@ DataStream* OgcApiService::get_tile ( Request* req, Rok4Server* serv, bool is_ma
         }
     }
 
+    format = Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) );
 
     // Récupération des paramètre selon le type de route (raster ou vecteur)
     
@@ -283,9 +284,8 @@ DataStream* OgcApiService::get_tile ( Request* req, Rok4Server* serv, bool is_ma
         throw OgcApiException::get_error_message("ResourceNotFound", "Tile's indices out of limits", 404);
     }
 
-
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(serv, layer, tmsi, tm, column, row, format, style);
+    DataStream* d = Tile::get_tile(serv, layer, tmsi->tms, tm, column, row, format, style);
     if (d == NULL) {
         throw OgcApiException::get_error_message("ResourceNotFound", "Not data found", 404);
     }

@@ -44,6 +44,7 @@
  */
 
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 
 #include "services/ogcapi/Exception.h"
 #include "services/ogcapi/Service.h"
@@ -52,22 +53,60 @@
 
 DataStream* OgcApiService::get_collections ( Request* req, Rok4Server* serv ) {
 
+    // format
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
         throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
-    if ( ! cache_getcapabilities.empty()) {
+    // bbox
+    std::string str_bbox = req->get_query_param("bbox");
+    bool bbox_provided = false;
+    BoundingBox<double> bbox;
+    if (str_bbox != "") {
+        bbox_provided = true;
+
+        std::vector<std::string> vector_bbox;
+        boost::split(vector_bbox, str_bbox, boost::is_any_of(","));
+        if (vector_bbox.size() != 4) throw OgcApiException::get_error_message("InvalidParameter", "Bbox invalid", 400);
+        
+        double bb[4];
+        for ( int i = 0; i < 4; i++ ) {
+            if ( sscanf ( vector_bbox[i].c_str(),"%lf",&bb[i] ) !=1 )
+                throw OgcApiException::get_error_message("InvalidParameter", "Bbox invalid", 400);
+            //Test NaN values
+            if (bb[i] != bb[i])
+                throw OgcApiException::get_error_message("InvalidParameter", "Bbox invalid", 400);
+        }
+        if ( bb[0] >= bb[2] || bb[1] >= bb[3] )
+            throw OgcApiException::get_error_message("InvalidParameter", "Bbox invalid", 400);
+
+        bbox.xmin=bb[0];
+        bbox.ymin=bb[1];
+        bbox.xmax=bb[2];
+        bbox.ymax=bb[3];
+    }
+
+    if ( ! cache_getcapabilities.empty() && ! bbox_provided) {
         return new MessageDataStream ( cache_getcapabilities, "application/json", 200 );
     }
 
     std::vector<json11::Json> links;
-    links.push_back(json11::Json::object {
-        { "href", endpoint_uri + "/collections?f=json"},
-        { "rel", "self"},
-        { "type", "application/json"},
-        { "title", "this document"}
-    });
+    if (bbox_provided) {
+        links.push_back(json11::Json::object {
+            { "href", endpoint_uri + "/collections?f=json&bbox=" + str_bbox},
+            { "rel", "self"},
+            { "type", "application/json"},
+            { "title", "this document"}
+        });
+    } else {
+        links.push_back(json11::Json::object {
+            { "href", endpoint_uri + "/collections?f=json"},
+            { "rel", "self"},
+            { "type", "application/json"},
+            { "title", "this document"}
+        });
+    }
 
     if (metadata) {
         links.push_back(metadata->to_json_ogcapi("Service metadata", "describedby"));
@@ -77,7 +116,7 @@ DataStream* OgcApiService::get_collections ( Request* req, Rok4Server* serv ) {
 
     std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
-        if (layers_iterator->second->is_ogcapi_enabled()) {
+        if (layers_iterator->second->is_ogcapi_enabled() && (! bbox_provided || layers_iterator->second->get_geographical_bbox().intersects(bbox))) {
             collections.push_back(layers_iterator->second->to_json_ogcapi(this));
         }
     }
@@ -90,10 +129,13 @@ DataStream* OgcApiService::get_collections ( Request* req, Rok4Server* serv ) {
 
     res["collections"] = collections;
 
-    cache_mtx.lock();
-    cache_getcapabilities = json11::Json{ res }.dump();
-    cache_mtx.unlock();
-    return new MessageDataStream ( cache_getcapabilities, "application/json", 200 );
+    if (! bbox_provided) {
+        cache_mtx.lock();
+        cache_getcapabilities = json11::Json{ res }.dump();
+        cache_mtx.unlock();
+        return new MessageDataStream ( cache_getcapabilities, "application/json", 200 );
+    }
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 ); 
 }
 
 
