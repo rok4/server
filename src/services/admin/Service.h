@@ -58,14 +58,16 @@ class AdminService : public Service {
 
 private:
 
-    DataStream* turn_on ( Request* req, Rok4Server* serv );
-    DataStream* turn_off ( Request* req, Rok4Server* serv );
-    DataStream* add_layer ( Request* req, Rok4Server* serv );
-    DataStream* update_layer ( Request* req, Rok4Server* serv );
-    DataStream* delete_layer ( Request* req, Rok4Server* serv );
+    DataStream* turn_on ( Request* req, ServicesConfiguration* services );
+    DataStream* turn_off ( Request* req, ServicesConfiguration* services );
+    DataStream* add_layer ( Request* req, ServicesConfiguration* services );
+    DataStream* update_layer ( Request* req, ServicesConfiguration* services );
+    DataStream* delete_layer ( Request* req, ServicesConfiguration* services );
+    
+    std::string secret;
 
 public:
-    DataStream* process_request(Request* req, Rok4Server* serv);
+    DataStream* process_request(Request* req, ServicesConfiguration* services);
 
     /**
      * \~french

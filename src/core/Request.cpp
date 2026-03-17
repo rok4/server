@@ -43,7 +43,7 @@
  * \brief Implement the Request Class analysing HTTP requests
  */
 
-#include "Request.h"
+#include "core/Request.h"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -56,7 +56,7 @@
 #include <rok4/utils/CurlPool.h>
 #include <rok4/utils/LibcurlStruct.h>
 
-#include "Utils.h"
+#include "core/Utils.h"
 #include "config.h"
 
 Request::Request(FCGX_Request *fcgx) : fcgx_request(fcgx) {
@@ -98,6 +98,12 @@ Request::Request(FCGX_Request *fcgx) : fcgx_request(fcgx) {
         std::string key = it->first;
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
         query_params.insert(std::pair<std::string, std::string>(key, it->second));
+    }
+
+    // On stocke les paramètres de requête avec la clé en minuscule
+    char* tmp = FCGX_GetParam(SECRET_HEADER_NAME, fcgx->envp);
+    if (tmp != 0) {
+        secret = std::string(tmp);
     }
 }
 

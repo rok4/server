@@ -64,15 +64,13 @@
  * \brief ROK4 Server executable
  */
 
-#include "Rok4Server.h"
 #include <proj.h>
 #include <csignal>
 #include <sys/time.h>
 #include <locale>
 #include <limits>
 #include <chrono>
-#include "config.h"
-#include "curl/curl.h"
+#include <curl/curl.h>
 #include <time.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -88,6 +86,10 @@
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
 namespace sinks = boost::log::sinks;
+
+#include "core/Rok4Server.h"
+#include "core/Process.h"
+#include "config.h"
 
 Rok4Server* rok4server_instance;
 Rok4Server* rok4server_instance_tmp;
@@ -203,7 +205,7 @@ Rok4Server* load_configuration() {
         while (std::getline(list_content, layer_desc)) {
             Layer* layer = new Layer(layer_desc, services_configuration);
             if ( layer->is_ok() ) {
-                server_configuration->add_layer ( layer );
+                services_configuration->add_layer ( layer );
             } else {
                 BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layer_desc << ": " << layer->get_error_message();
                 delete layer;
@@ -211,7 +213,7 @@ Rok4Server* load_configuration() {
         }
     }
 
-    BOOST_LOG_TRIVIAL(info) << server_configuration->get_layers_count() << " layer(s) loaded" ;
+    BOOST_LOG_TRIVIAL(info) << services_configuration->get_layers_count() << " layer(s) loaded" ;
 
     // Instanciation du serveur
     return new Rok4Server ( server_configuration, services_configuration );
@@ -374,8 +376,8 @@ int main ( int argc, char** argv ) {
 
         auto start = std::chrono::system_clock::now();
         std::time_t time = std::chrono::system_clock::to_time_t(start);
-        rok4server_instance->set_pid(pid);
-        rok4server_instance->set_time(time);
+        Process::set_pid(pid);
+        Process::set_time(time);
 
         // Remove Event Lock
         defer_signal--;
@@ -404,11 +406,12 @@ int main ( int argc, char** argv ) {
 
     TmsBook::empty_trash();
     StyleBook::empty_trash();
-    CurlPool::clean_curls();
-    ProjPool::clean_projs();
+    CrsBook::clean_crss();
     StoragePool::clean_storages();
     IndexCache::clean_indexes();
-    CrsBook::clean_crss();
+    
+    CurlPool::clean_curls();
+    ProjPool::clean_projs();
 
     //CRYPTO clean - one time for the whole program
     EVP_cleanup();

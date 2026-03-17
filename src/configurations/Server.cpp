@@ -151,16 +151,6 @@ bool ServerConfiguration::parse(json11::Json& doc) {
         backlog = doc["backlog"].int_value();
     }
 
-    // enabled
-    if (doc["enabled"].is_null()) {
-        enabled = true;
-    } else if (! doc["enabled"].is_bool()) {
-        error_message = "enabled have to be a boolean";
-        return false;
-    } else {
-        enabled = doc["enabled"].bool_value();
-    }
-
     // configurations
     json11::Json configurationsSection = doc["configurations"];
     if (configurationsSection.is_null()) {
@@ -237,10 +227,6 @@ ServerConfiguration::ServerConfiguration(std::string path) : Configuration(path)
 
 ServerConfiguration::~ServerConfiguration(){ 
 
-    // Les couches
-    std::map<std::string, Layer*>::iterator itLay;
-    for ( itLay = layers.begin(); itLay != layers.end(); itLay++ )
-        delete itLay->second;
 
 }
 
@@ -252,30 +238,7 @@ std::string ServerConfiguration::get_log_file_prefix() {return log_file_prefix;}
 boost::log::v2_mt_posix::trivial::severity_level ServerConfiguration::get_log_level() {return log_level;}
 
 std::string ServerConfiguration::get_services_configuration_file() {return services_configuration_file;}
-
-std::map<std::string, Layer*>& ServerConfiguration::get_layers() {return layers;}
 std::string ServerConfiguration::get_layers_list() {return layers_list;}
-void ServerConfiguration::add_layer(Layer* l) {
-    layers.insert ( std::pair<std::string, Layer *> ( l->get_id(), l ) );
-}
-int ServerConfiguration::get_layers_count() {
-    return layers.size();
-}
-Layer* ServerConfiguration::get_layer(std::string id) {
-    std::map<std::string, Layer*>::iterator itLay = layers.find ( id );
-    if ( itLay == layers.end() ) {
-        return NULL;
-    }
-    return itLay->second;
-}
-void ServerConfiguration::delete_layer(std::string id) {
-    std::map<std::string, Layer*>::iterator itLay = layers.find ( id );
-    if ( itLay != layers.end() ) {
-        delete itLay->second;
-        layers.erase(itLay);
-    }
-}
 
 int ServerConfiguration::get_threads_count() {return threads_count;}
 std::string ServerConfiguration::get_socket() {return socket;}
-bool ServerConfiguration::is_enabled() {return enabled;}

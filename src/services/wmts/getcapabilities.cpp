@@ -54,9 +54,11 @@ using boost::property_tree::xml_writer_settings;
 
 #include "services/wmts/Exception.h"
 #include "services/wmts/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
-DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
+DataStream* WmtsService::get_capabilities ( Request* req, ServicesConfiguration* services ) {
+
+    bool default_inspire = services->default_inspire;
 
     if ( req->is_inspire(default_inspire) && ! cache_getcapabilities_inspire.empty()) {
         return new MessageDataStream ( cache_getcapabilities_inspire, "text/xml", 200 );
@@ -64,8 +66,6 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     else if (! req->is_inspire(default_inspire) && ! cache_getcapabilities.empty()) {
         return new MessageDataStream ( cache_getcapabilities, "text/xml", 200 );
     }
-
-    ServicesConfiguration* services = serv->get_services_configuration();
 
     // On va mémoriser les TMS utilisés, avec les niveaux du haut et du bas
     // La clé est un triplet : nom du TMS, niveau du haut, niveau du bas
@@ -147,7 +147,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     ptree& contents_node = root.add("Contents", "");
 
-    std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
+    std::map<std::string, Layer*>::iterator layers_iterator ( services->get_layers().begin() ), layers_end ( services->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
         layers_iterator->second->add_node_wmts(contents_node, this, req->is_inspire(default_inspire), &used_tms_list);
     }

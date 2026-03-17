@@ -208,7 +208,7 @@ public:
         node.add("<xmlattr>.xlink:href", href);
     }
 
-    json11::Json to_json_tiles(std::string title, std::string rel) const {
+    json11::Json to_json_ogcapi(std::string title, std::string rel) const {
         return json11::Json::object {
             { "href", href },
             { "type", type },

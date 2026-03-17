@@ -48,9 +48,10 @@
 
 #include "services/wms/Exception.h"
 #include "services/wms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
+#include "core/Map.h"
 
-DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
+DataStream* WmsService::get_feature_info ( Request* req, ServicesConfiguration* services ) {
 
     // Les couches
     std::vector<Layer*> layers;
@@ -61,8 +62,8 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
     std::vector<std::string> vector_layers;
     boost::split(vector_layers, str_layers, boost::is_any_of(","));
 
-    if ( vector_layers.size() > max_layers_count ) {
-        throw WmsException::get_error_message("Number of layers exceed the limit (" + std::to_string(max_layers_count) + ")", "InvalidParameterValue", 400);
+    if ( vector_layers.size() > services->map_max_layers_count ) {
+        throw WmsException::get_error_message("Number of layers exceed the limit (" + std::to_string(services->map_max_layers_count) + ")", "InvalidParameterValue", 400);
     }
 
     for (unsigned int i = 0 ; i < vector_layers.size(); i++ ) {
@@ -72,7 +73,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("Layer unknown", "LayerNotDefined", 400);
         }
 
-        Layer* layer = serv->get_server_configuration()->get_layer(vector_layers.at(i));
+        Layer* layer = services->get_layer(vector_layers.at(i));
         if (layer == NULL || ! layer->is_wms_enabled()) {
             throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "LayerNotDefined", 400);
         }
@@ -100,7 +101,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("Layer unknown", "LayerNotDefined", 400);
         }
 
-        Layer* layer = serv->get_server_configuration()->get_layer(vector_query_layers.at(i));
+        Layer* layer = services->get_layer(vector_query_layers.at(i));
         if (layer == NULL || ! layer->is_wms_enabled()) {
             throw WmsException::get_error_message("Layer " + vector_query_layers.at(i) + " unknown", "LayerNotDefined", 400);
         }
@@ -126,8 +127,8 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
 
     if ( width <= 0 )
         throw WmsException::get_error_message("WIDTH query parameter have to be a strictly positive integer", "InvalidParameterValue", 400);
-    if ( width > max_width )
-        throw WmsException::get_error_message("WIDTH query parameter exceed the limit (" + std::to_string(max_width) + ")", "InvalidParameterValue", 400);
+    if ( width > services->map_max_width )
+        throw WmsException::get_error_message("WIDTH query parameter exceed the limit (" + std::to_string(services->map_max_width) + ")", "InvalidParameterValue", 400);
 
     // La hauteur
     int height;
@@ -138,8 +139,8 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
 
     if ( height <= 0 )
         throw WmsException::get_error_message("HEIGHT query parameter have to be a strictly positive integer", "InvalidParameterValue", 400);
-    if ( height > max_height )
-        throw WmsException::get_error_message("HEIGHT query parameter exceed the limit (" + std::to_string(max_width) + ")", "InvalidParameterValue", 400);
+    if ( height > services->map_max_height )
+        throw WmsException::get_error_message("HEIGHT query parameter exceed the limit (" + std::to_string(services->map_max_height) + ")", "InvalidParameterValue", 400);
 
     // le CRS
     CRS* crs;
@@ -156,9 +157,9 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmsException::get_error_message("CRS " + str_crs + " unknown", "InvalidParameterValue", 400);
     }
 
-    if (! is_available_crs(str_crs) ) {
+    if (! services->is_map_available_crs(str_crs) ) {
         for ( unsigned int i = 0; i < layers.size() ; i++ ) {
-            bool crs_equals = serv->get_services_configuration()->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
+            bool crs_equals = services->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
             if (! crs_equals && ! layers.at ( i )->is_available_crs(str_crs) )
                 throw WmsException::get_error_message("CRS is not available for the layer " + layers.at ( i )->get_id(), "InvalidParameterValue", 400);
         }
@@ -174,7 +175,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmsException::get_error_message("Format unknown", "InvalidParameterValue", 400);
     }
 
-    if (! is_available_format(format)) throw WmsException::get_error_message("Format " + format + " unknown", "InvalidParameterValue", 400);
+    if (! services->is_map_available_format(format)) throw WmsException::get_error_message("Format " + format + " unknown", "InvalidParameterValue", 400);
 
     // La bbox
     std::string str_bbox = req->get_query_param("bbox");
@@ -279,7 +280,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmsException::get_error_message("InfoFormat unknown", "InvalidParameterValue", 400);
     }
 
-    if ( ! is_available_infoformat(info_format) )
+    if ( ! services->is_available_infoformat(info_format) )
         throw WmsException::get_error_message("INFO_FORMAT " + info_format + " unknown", "InvalidParameterValue", 400);
 
     // i
@@ -324,102 +325,16 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
     }
 
     // Traitement de la requête
-
-    Layer* layer = query_layers.at(0);
-
-    std::string gfi_type = layer->get_gfi_type();
-    if (gfi_type.compare("PYRAMID") == 0) {
-
-        // On cherche la valeur du pixel source sous le clique
-        bool crs_equals = serv->get_services_configuration()->are_crs_equals(crs->get_request_code(), layer->get_pyramid()->get_tms()->get_crs()->get_request_code());
-
-        if (! crs_equals && ! reprojection) {
-            throw WmsException::get_error_message("Reprojection is not available", "InvalidParameterValue", 400);
-        }
-
-        Image* image = layer->get_pyramid()->getbbox(max_tile_x, max_tile_y, bbox, width, height, crs, crs_equals, layer->get_resampling(), dpi);
-
-        if (image == NULL) {
-            throw WmsException::get_error_message("BBOX too big", "InvalidParameterValue", 400);
-        }
-
-        std::vector<std::string> gfi_data;
-        int bands = image->get_channels();
-        switch (layer->get_pyramid()->get_format()) {
-            case Rok4Format::TIFF_RAW_UINT8:
-            case Rok4Format::TIFF_JPG_UINT8:
-            case Rok4Format::TIFF_PNG_UINT8:
-            case Rok4Format::TIFF_LZW_UINT8:
-            case Rok4Format::TIFF_ZIP_UINT8:
-            case Rok4Format::TIFF_PKB_UINT8: {
-                uint8_t* data = new uint8_t[image->get_width() * bands * sizeof(uint8_t)];
-                image->get_line(data, j);
-                for (int b = 0; b < bands; b++) {
-                    std::stringstream ss;
-                    ss << (int)data[bands * i + b];
-                    gfi_data.push_back(ss.str());
-                }
-                delete[] data;
-                break;
-            }
-            case Rok4Format::TIFF_RAW_FLOAT32:
-            case Rok4Format::TIFF_LZW_FLOAT32:
-            case Rok4Format::TIFF_ZIP_FLOAT32:
-            case Rok4Format::TIFF_PKB_FLOAT32: {
-                float* data = new float[image->get_width() * bands * sizeof(float)];
-                image->get_line(data, j);
-                for (int b = 0; b < bands; b++) {
-                    std::stringstream ss;
-                    ss.setf(std::ios::fixed, std::ios::floatfield);
-                    ss.precision(2);
-                    ss << data[bands * i + b];
-                    gfi_data.push_back(ss.str());
-                }
-                delete[] data;
-                break;
-            }
-            default:
-                throw WmsException::get_error_message("No readable data found", "Not Found", 404);
-        }
-
-        delete image;
-
-        return Utils::format_get_feature_info(gfi_data, info_format);
-    } else if (gfi_type.compare("EXTERNALWMS") == 0) {
-        BOOST_LOG_TRIVIAL(debug) << "GFI sur WMS externe, en projection native ou non";
-
-        std::map<std::string, std::string> query_params;
-        query_params.emplace("VERSION", "1.3.0");
-        query_params.emplace("SERVICE", "WMS");
-        query_params.emplace("REQUEST", "GetFeatureInfo");
-        query_params.emplace("STYLES", "");
-        query_params.emplace("LAYERS", layer->get_gfi_layers());
-        query_params.emplace("QUERY_LAYERS", layer->get_gfi_query_layers());
-        query_params.emplace("INFO_FORMAT", info_format);
-        query_params.emplace("FORMAT", "image/tiff");
-        query_params.emplace("FEATURE_COUNT", std::to_string(feature_count));
-        query_params.emplace("CRS", crs->get_request_code());
-        query_params.emplace("WIDTH", std::to_string(width));
-        query_params.emplace("HEIGHT", std::to_string(height));
-        query_params.emplace("I", std::to_string(i));
-        query_params.emplace("J", std::to_string(j));
-        query_params.emplace("BBOX", str_bbox);
-
-        std::map<std::string, std::string> extra_query_params = layer->get_gfi_extra_params();
-        query_params.insert(extra_query_params.begin(), extra_query_params.end());
-
-        Request* gfi_request = new Request("GET", layer->get_gfi_url(), query_params);
-
-        RawDataStream* response = gfi_request->send();
-        delete gfi_request;
-
-        if (response == NULL) {
-            throw WmsException::get_error_message("No readable data found", "Not Found", 404);
-        }
-
-        return response;
+    std::string error;
+    DataStream* d = Map::get_feature_info(
+        services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, 
+        layers, query_layers, width, height, crs, bbox, str_bbox, styles, format, format_options, dpi,
+        i, j, feature_count, info_format,
+        &error
+    );
+    if (d == NULL) {
+        throw WmsException::get_error_message(error, "InvalidParameterValue", 400);
     }
-
-    throw WmsException::get_error_message("Get Feature Info badly configured", "Bad configuration", 503);
+    return d;
 
 }

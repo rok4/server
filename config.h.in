@@ -61,5 +61,6 @@
 #define DEFAULT_LOG_LEVEL  boost::log::trivial::error
 #define DEFAULT_NB_THREAD  1
 #define DEFAULT_RESAMPLING "lanczos_2"
+#define SECRET_HEADER_NAME "HTTP_X_ROK4_SECRET"
 
 

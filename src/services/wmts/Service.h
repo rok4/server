@@ -48,7 +48,6 @@ class WmtsService;
 #pragma once
 
 #include "services/Service.h"
-#include "configurations/Metadata.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -58,21 +57,15 @@ class WmtsService;
 class WmtsService : public Service {  
 
 private:
-    DataStream* get_capabilities ( Request* req, Rok4Server* serv );
-    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
-    DataStream* get_tile ( Request* req, Rok4Server* serv );
-
-    Metadata* metadata;
-    bool reprojection;
-    std::vector<std::string> info_formats;
-
-    bool default_inspire;
+    DataStream* get_capabilities ( Request* req, ServicesConfiguration* services );
+    DataStream* get_feature_info ( Request* req, ServicesConfiguration* services );
+    DataStream* get_tile ( Request* req, ServicesConfiguration* services );
 
     std::string cache_getcapabilities;
     std::string cache_getcapabilities_inspire;
 
 public:
-    DataStream* process_request(Request* req, Rok4Server* serv);
+    DataStream* process_request(Request* req, ServicesConfiguration* services );
 
     /**
      * \~french
@@ -101,35 +94,7 @@ public:
      * \~english
      * \brief Destructor
      */
-    ~WmtsService() {
-        if (metadata) delete metadata;
-    };
-
-    /**
-     * \~french
-     * \brief La reprojection est-elle activée
-     * \~english
-     * \brief Is reprojection enabled
-     */
-    bool reprojection_enabled() {
-        return reprojection;
-    };
-
-    /**
-     * \~french
-     * \brief Teste la validité du info format
-     * \~english
-     * \brief Test if info format is valid
-     */
-    bool is_available_infoformat(std::string f) ;
-
-    /**
-     * \~french
-     * \brief Liste des formats d'information du service
-     * \~english
-     * \brief Service informations formats
-     */
-    std::vector<std::string>* get_available_infoformats() ;
+    ~WmtsService() {};
 
 };
 

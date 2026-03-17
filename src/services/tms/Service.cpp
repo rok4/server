@@ -47,9 +47,9 @@
 
 #include "services/tms/Exception.h"
 #include "services/tms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
-TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
+TmsService::TmsService (json11::Json& doc) : Service(doc, "TMS service", "TMS service", "http://localhost/tms", "/tms") {
 
     if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
@@ -61,88 +61,30 @@ TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
         // Le service a déjà été mis comme n'étant pas actif
         return;
     }
-
-    if (doc["title"].is_string()) {
-        title = doc["title"].string_value();
-    } else if (! doc["title"].is_null()) {
-        error_message = "TMS service: title have to be a string";
-        return;
-    } else {
-        title = "TMS service";
-    }
-
-    if (doc["abstract"].is_string()) {
-        abstract = doc["abstract"].string_value();
-    } else if (! doc["abstract"].is_null()) {
-        error_message = "TMS service: abstract have to be a string";
-        return;
-    } else {
-        abstract = "TMS service";
-    }
-
-    if (doc["keywords"].is_array()) {
-        for (json11::Json kw : doc["keywords"].array_items()) {
-            if (kw.is_string()) {
-                keywords.push_back(Keyword ( kw.string_value()));
-            } else {
-                error_message = "TMS service: keywords have to be a string array";
-                return;
-            }
-        }
-    } else if (! doc["keywords"].is_null()) {
-        error_message = "TMS service: keywords have to be a string array";
-        return;
-    }
-
-    if (doc["endpoint_uri"].is_string()) {
-        endpoint_uri = doc["endpoint_uri"].string_value();
-    } else if (! doc["endpoint_uri"].is_null()) {
-        error_message = "TMS service: endpoint_uri have to be a string";
-        return;
-    } else {
-        endpoint_uri = "http://localhost/tms";
-    }
-
-    if (doc["root_path"].is_string()) {
-        root_path = doc["root_path"].string_value();
-    } else if (! doc["root_path"].is_null()) {
-        error_message = "TMS service: root_path have to be a string";
-        return;
-    } else {
-        root_path = "/tms";
-    }
-
-    if (doc["metadata"].is_object()) {
-        metadata = new Metadata ( doc["metadata"] );
-        if (metadata->get_missing_field() != "") {
-            error_message = "TMS service: invalid metadata: have to own a field " + metadata->get_missing_field();
-            return ;
-        }
-    }
 }
 
-DataStream* TmsService::process_request(Request* req, Rok4Server* serv) {
+DataStream* TmsService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "TMS service";
 
     if ( match_route( "/([^/]+)/?", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
-        return get_capabilities(req, serv);
+        return get_capabilities(req, services);
     }
     else if ( match_route( "/([^/]+)/([^/]+)/?", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILES request";
-        return get_tiles(req, serv);
+        return get_tiles(req, services);
     }
     else if ( match_route( "/([^/]+)/([^/]+)/metadata\\.json", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETMETADATA request";
-        return get_metadata(req, serv);
+        return get_metadata(req, services);
     }
     else if ( match_route( "/([^/]+)/([^/]+)/gdal\\.xml", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETGDAL request";
-        return get_gdal(req, serv);
+        return get_gdal(req, services);
     }
     else if ( match_route( "/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)\\.(.*)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILE request";
-        return get_tile(req, serv);
+        return get_tile(req, services);
     } else {
         throw TmsException::get_error_message("Unknown tms request path", 400);
     }

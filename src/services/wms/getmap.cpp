@@ -46,23 +46,12 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 
-#include <rok4/image/StyledImage.h>
-#include <rok4/image/MergeImage.h>
-#include <rok4/datastream/AscEncoder.h>
-#include <rok4/datastream/BilEncoder.h>
-#include <rok4/datastream/JPEGEncoder.h>
-#include <rok4/datastream/PNGEncoder.h>
-#include <rok4/datastream/TiffEncoder.h>
-#include <rok4/datastream/TiffPackBitsEncoder.h>
-#include <rok4/datastream/TiffLZWEncoder.h>
-#include <rok4/datastream/TiffDeflateEncoder.h>
-#include <rok4/datastream/TiffRawEncoder.h>
-
 #include "services/wms/Exception.h"
 #include "services/wms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
+#include "core/Map.h"
 
-DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
+DataStream* WmsService::get_map ( Request* req, ServicesConfiguration* services ) {
 
     // Les couches
     std::vector<Layer*> layers;
@@ -73,8 +62,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
     std::vector<std::string> vector_layers;
     boost::split(vector_layers, str_layers, boost::is_any_of(","));
 
-    if ( vector_layers.size() > max_layers_count ) {
-        throw WmsException::get_error_message("Number of layers exceed the limit (" + std::to_string(max_layers_count) + ")", "InvalidParameterValue", 400);
+    if ( vector_layers.size() > services->map_max_layers_count ) {
+        throw WmsException::get_error_message("Number of layers exceed the limit (" + std::to_string(services->map_max_layers_count) + ")", "InvalidParameterValue", 400);
     }
 
     for (unsigned int i = 0 ; i < vector_layers.size(); i++ ) {
@@ -84,9 +73,12 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("Layer unknown", "LayerNotDefined", 400);
         }
 
-        Layer* layer = serv->get_server_configuration()->get_layer(vector_layers.at(i));
+        Layer* layer = services->get_layer(vector_layers.at(i));
         if (layer == NULL || ! layer->is_wms_enabled()) {
             throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "LayerNotDefined", 400);
+        }
+        if (! layer->is_raster()) {
+            throw WmsException::get_error_message("Vector data " + vector_layers.at(i) + " cannot be requested with WMS GetMap", "InvalidParameterValue", 400);
         }
        
         layers.push_back ( layer );
@@ -101,8 +93,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
     if ( width <= 0 )
         throw WmsException::get_error_message("WIDTH query parameter have to be a strictly positive integer", "InvalidParameterValue", 400);
-    if ( width > max_width )
-        throw WmsException::get_error_message("WIDTH query parameter exceed the limit (" + std::to_string(max_width) + ")", "InvalidParameterValue", 400);
+    if ( width > services->map_max_width )
+        throw WmsException::get_error_message("WIDTH query parameter exceed the limit (" + std::to_string(services->map_max_width) + ")", "InvalidParameterValue", 400);
 
     // La hauteur
     int height;
@@ -113,8 +105,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
     if ( height <= 0 )
         throw WmsException::get_error_message("HEIGHT query parameter have to be a strictly positive integer", "InvalidParameterValue", 400);
-    if ( height > max_height )
-        throw WmsException::get_error_message("HEIGHT query parameter exceed the limit (" + std::to_string(max_width) + ")", "InvalidParameterValue", 400);
+    if ( height > services->map_max_height )
+        throw WmsException::get_error_message("HEIGHT query parameter exceed the limit (" + std::to_string(services->map_max_height) + ")", "InvalidParameterValue", 400);
 
     // le CRS
     CRS* crs;
@@ -131,10 +123,10 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         throw WmsException::get_error_message("CRS " + str_crs + " unknown", "InvalidParameterValue", 400);
     }
 
-    if (! is_available_crs(str_crs) ) {
+    if (! services->is_map_available_crs(str_crs) ) {
         for ( unsigned int i = 0; i < layers.size() ; i++ ) {
-            bool crs_equals = serv->get_services_configuration()->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
-            if (! crs_equals && (! reprojection || ! layers.at ( i )->is_available_crs(str_crs)) ) {
+            bool crs_equals = services->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
+            if (! crs_equals && (! services->map_reprojection || ! layers.at ( i )->is_available_crs(str_crs)) ) {
                 throw WmsException::get_error_message("CRS is not available for the layer " + layers.at ( i )->get_id(), "InvalidParameterValue", 400);
             }
         }
@@ -150,7 +142,7 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         throw WmsException::get_error_message("Format unknown", "InvalidParameterValue", 400);
     }
 
-    if (! is_available_format(format)) {
+    if (! services->is_map_available_format(format)) {
         throw WmsException::get_error_message("Format " + format + " unknown", "InvalidParameterValue", 400);
     }
 
@@ -246,130 +238,17 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("DPI query parameter have to be a positive integer", "InvalidParameterValue", 400);
     }
 
+
     // Traitement de la requête
-
-    std::vector<Image*> images;
-
-    // Le format des canaux sera identifié à partir des données en entrée, en prenant en compte le style
-    SampleFormat::eSampleFormat sample_format = SampleFormat::UNKNOWN;
-    int nodata;
-
-    // Le nombre de canaux dans l'image finale sera égale au nombre maximum dans les données en entrée (en prenant en compte le style)
-    int bands = 0;
-
-    for (int i = 0; i < layers.size(); i++) {
-        bool crs_equals = serv->get_services_configuration()->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
-
-        if (! crs_equals && ! reprojection) {
-            throw WmsException::get_error_message("Reprojection is not available", "InvalidParameterValue", 400);
-        }
-
-        Style* style = styles.at(i);
-
-        // On vérifie que toutes les images ont bien le même format de canal, après application du style
-        if (sample_format != SampleFormat::UNKNOWN && sample_format != style->get_sample_format(layers.at(i)->get_pyramid()->get_sample_format())) {
-            throw WmsException::get_error_message("All layers (with their style) have to own the same sample format (int or float)", "InvalidParameterValue", 400);
-        } else {
-            sample_format = style->get_sample_format(layers.at(i)->get_pyramid()->get_sample_format());
-
-            // Dans le cas d'un geotiff, on renseigne la valeur de nodata
-            // on ne peut mettre qu'une valeur, ce sera celle du premier canal du nodata de la première couche (après style)
-            nodata = *(style->get_output_nodata_value(layers.at(i)->get_pyramid()->get_nodata_value()));
-        }
-
-        Image* image = layers.at(i)->get_pyramid()->getbbox(max_tile_x, max_tile_y, bbox, width, height, crs, crs_equals, layers.at(i)->get_resampling(), dpi);
-
-        if (image == NULL) {
-            throw WmsException::get_error_message("BBOX too big", "InvalidParameterValue", 400);
-        }
-
-        StyledImage* s_image = StyledImage::create(image,style);
-        image = s_image;
-        images.push_back(image);
-
-        // Le nombre final de canaux est celui maxiumum parmis les couches, c'est à dire celui de la donnée en prenant en compte le style
-        bands = std::max(bands, image->get_channels());
+    std::string error;
+    DataStream* d = Map::get_map(
+        services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, 
+        layers, width, height, crs, bbox, styles, format, format_options, dpi,
+        &error
+    );
+    if (d == NULL) {
+        throw WmsException::get_error_message(error, "InvalidParameterValue", 400);
     }
+    return d;
 
-    // On construit la réponse finale, en superposant les couches
-   
-    Image* final_image;
-
-    if (images.size() >= 2) {
-        int background_value[bands];
-        memset(background_value, 0, bands * sizeof(int));
-        final_image = MergeImage::create(images, bands, background_value, NULL, Merge::ALPHATOP);
-    } else {
-        final_image = images.at(0);
-    }
-
-    final_image->set_bbox(bbox);
-    final_image->set_crs(crs);
-
-    if (format == "image/png" && sample_format == SampleFormat::UINT8) {
-        return new PNGEncoder(final_image, NULL);
-    }
-    else if (format == "image/tiff" || format == "image/geotiff") {
-        bool is_geotiff = (format == "image/geotiff");
-
-        std::map<std::string, std::string>::iterator it = format_options.find("compression");
-        std::string opt = "";
-        if (it != format_options.end()) {
-            opt = it->second;
-        }
-
-        if (sample_format == SampleFormat::UINT8) {
-            if (opt.compare("lzw") == 0) { 
-                return new TiffLZWEncoder<uint8_t>(final_image, is_geotiff, nodata);
-            }
-            if (opt.compare("deflate") == 0) {
-                return new TiffDeflateEncoder<uint8_t>(final_image, is_geotiff, nodata);
-            }
-            if (opt.compare("raw") == 0 || opt == "") {
-                return new TiffRawEncoder<uint8_t>(final_image, is_geotiff, nodata);
-            }
-            if (opt.compare("packbits") == 0) {
-                return new TiffPackBitsEncoder<uint8_t>(final_image, is_geotiff, nodata);
-            }
-        }
-        else if (sample_format == SampleFormat::FLOAT32) {
-            if (opt.compare("lzw") == 0) { 
-                return new TiffLZWEncoder<float>(final_image, is_geotiff, nodata);
-            }
-            if (opt.compare("deflate") == 0) {
-                return new TiffDeflateEncoder<float>(final_image, is_geotiff, nodata);
-            }
-            if (opt.compare("raw") == 0 || opt == "") {
-                return new TiffRawEncoder<float>(final_image, is_geotiff, nodata);
-            }
-            if (opt.compare("packbits") == 0) {
-                return new TiffPackBitsEncoder<float>(final_image, is_geotiff, nodata);
-            }
-        }
-
-        delete final_image;
-        throw WmsException::get_error_message("Used data and expected format are not consistent", "InvalidParameterValue", 400);
-    }
-    else if (format == "image/jpeg" && sample_format == SampleFormat::UINT8 && bands == 3) {
-
-        std::map<std::string, std::string>::iterator it = format_options.find("quality");
-        int quality = 75;
-        if (it != format_options.end()) {
-            // si on n'arrive pas à paser en entier l'option, on remet 75
-            if (sscanf(it->second.c_str(), "%d", &quality) != 1) quality = 75;
-        }
-
-        return new JPEGEncoder(final_image, quality);
-    }
-    else if (format == "image/x-bil;bits=32" && sample_format == SampleFormat::FLOAT32) {
-        return new BilEncoder(final_image);
-    }
-    else if (format == "text/asc" && sample_format == SampleFormat::FLOAT32 && final_image->get_channels() == 1) {
-        return new AscEncoder(final_image);
-    } else {
-
-        delete final_image;
-        throw WmsException::get_error_message("Used data format (" + std::to_string(bands) + " band(s) " + SampleFormat::to_string(sample_format) + ") and expected output format (" + format + ") are not consistent", "InvalidParameterValue", 400);
-    }
-    return NULL;
 }

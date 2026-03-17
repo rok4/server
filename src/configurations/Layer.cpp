@@ -55,7 +55,7 @@
 #include <rok4/style/Style.h>
 
 #include "configurations/Layer.h"
-#include "Inspire.h"
+#include "core/Inspire.h"
 
 bool is_style_handled(Style* style) {
     if (style->get_identifier() == "") return false;
@@ -64,7 +64,7 @@ bool is_style_handled(Style* style) {
     return true;
 }
 
-bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
+bool Layer::parse(json11::Json& doc) {
 
     /********************** Default values */
 
@@ -74,7 +74,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     wms = true;
     wmts = true;
     tms = true;
-    tiles = true;
+    ogcapi = true;
 
     gfi_enabled = false;
     gfi_type = "";
@@ -265,11 +265,13 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
     if (doc["tms"].is_object() && doc["tms"]["enabled"].is_bool()) {
         tms = doc["tms"]["enabled"].bool_value();
     }
-    if (doc["tiles"].is_object() && doc["tiles"]["enabled"].is_bool()) {
-        tiles = doc["tiles"]["enabled"].bool_value();
+    if (doc["ogcapi"].is_object() && doc["ogcapi"]["enabled"].is_bool()) {
+        ogcapi = doc["ogcapi"]["enabled"].bool_value();
     }
 
-    if (Rok4Format::is_raster(pyramid->get_format())) {
+    raster = Rok4Format::is_raster(pyramid->get_format());
+
+    if (raster) {
         /******************* CAS RASTER *********************/
 
         // Configuration du GET FEATURE INFO
@@ -347,7 +349,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
         }
 
         if ( available_styles.size() == 0 ) {
-            Style* sty = StyleBook::get_style(services->get_default_style_id());
+            Style* sty = StyleBook::get_style(services->default_style);
             if ( sty == NULL ) {
                 error_message =  "No valid style (even the default one), the layer is not valid"  ;
                 return false;
@@ -361,7 +363,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
 
         // Configuration des reprojections possibles
 
-        // TMS additionnels (pour le WMTS et l'API Tiles)
+        // TMS additionnels (pour le WMTS et l'OGC API Tiles)
         if (doc["extra_tilematrixsets"].is_array()) {
             for (json11::Json t : doc["extra_tilematrixsets"].array_items()) {
                 if (! t.is_string()) {
@@ -401,7 +403,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
                     continue;
                 }
 
-                if (services->get_wms_service()->is_available_crs(str_crs)) {
+                if (services->is_map_available_crs(str_crs)) {
                     // Cette projection est déjà disponible globalement au niveau du service
                     continue;
                 }
@@ -432,8 +434,8 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
 
     calculate_tilematrix_limits();
 
-    if (! Rok4Format::is_raster(pyramid->get_format())) {
-        // Une pyramide vecteur n'est diffusée qu'en TMS et API TILES et le GFI n'est pas possible
+    if (! raster) {
+        // Une pyramide vecteur n'est diffusée qu'en TMS et OGC API TILES et le GFI n'est pas possible
         wms = false;
         wms_inspire = false;
         wmts = false;
@@ -546,7 +548,9 @@ void Layer::calculate_tilematrix_limits() {
     }
 }
 
-Layer::Layer(std::string path, ServicesConfiguration* services) : Configuration(path), pyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string path, ServicesConfiguration* s) : Configuration(path), pyramid(NULL), attribution(NULL) {
+
+    services = s;
 
     /********************** Id */
 
@@ -591,7 +595,7 @@ Layer::Layer(std::string path, ServicesConfiguration* services) : Configuration(
 
     /********************** Parse */
 
-    if (! parse(doc, services)) {
+    if (! parse(doc)) {
         return;
     }
 
@@ -599,7 +603,9 @@ Layer::Layer(std::string path, ServicesConfiguration* services) : Configuration(
 }
 
 
-Layer::Layer(std::string layer_name, std::string content, ServicesConfiguration* services ) : Configuration(), id(layer_name), pyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string layer_name, std::string content, ServicesConfiguration* s ) : Configuration(), id(layer_name), pyramid(NULL), attribution(NULL) {
+
+    services = s;
 
     /********************** Id */
 
@@ -619,7 +625,7 @@ Layer::Layer(std::string layer_name, std::string content, ServicesConfiguration*
 
     /********************** Parse */
 
-    if (! parse(doc, services)) {
+    if (! parse(doc)) {
         return;
     }
     
@@ -646,7 +652,8 @@ bool Layer::is_wms_inspire() { return wms_inspire; }
 bool Layer::is_tms_enabled() { return tms; }
 bool Layer::is_wmts_enabled() { return wmts; }
 bool Layer::is_wmts_inspire() { return wmts_inspire; }
-bool Layer::is_tiles_enabled() { return tiles; }
+bool Layer::is_ogcapi_enabled() { return ogcapi; }
+bool Layer::is_raster() { return raster; }
 std::vector<Keyword>* Layer::get_keywords() { return &keywords; }
 Pyramid* Layer::get_pyramid() { return pyramid; }
 Style* Layer::get_default_style() {
@@ -771,8 +778,8 @@ void Layer::add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire
     node.add("Format", Rok4Format::to_mime_type ( pyramid->get_format() ));
 
     if (gfi_enabled){
-        for ( unsigned int j = 0; j < service->get_available_infoformats()->size(); j++ ) {
-            node.add("InfoFormat", service->get_available_infoformats()->at ( j ));
+        for ( unsigned int j = 0; j < services->get_available_infoformats()->size(); j++ ) {
+            node.add("InfoFormat", services->get_available_infoformats()->at ( j ));
         }
     }
 
@@ -792,7 +799,7 @@ void Layer::add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire
         used_tms_list->emplace ( tmsi->request_id , tmsi );
 
         // Si la reprojection WMTS n'est pas activée, nous n'exposons que le premier TMS, celui natif
-        if (! service->reprojection_enabled()) {
+        if (! services->tile_reprojection) {
             break;
         }
     }
@@ -833,7 +840,7 @@ void Layer::add_node_wms(ptree& parent, WmsService* service, bool only_inspire) 
         node.add("CRS", c->get_request_code());
 
         // Si la reprojection WMS n'est pas activée, nous n'exposons que le premier CRS, celui natif
-        if (! service->reprojection_enabled()) {
+        if (! services->map_reprojection) {
             break;
         }
     }
@@ -854,13 +861,13 @@ void Layer::add_node_wms(ptree& parent, WmsService* service, bool only_inspire) 
             bbox.add_node(node, false, c->is_lat_lon() );
 
             // Si la reprojection WMS n'est pas activée, nous n'exposons que la bbox en projection native
-            if (! service->reprojection_enabled()) {
+            if (! services->map_reprojection) {
                 break;
             }
         }
-        if (! service->reprojection_enabled()) {
-            for ( unsigned int i = 0; i < service->get_available_crs()->size(); i++ ) {
-                CRS* crs = service->get_available_crs()->at(i);
+        if (services->map_reprojection) {
+            for ( unsigned int i = 0; i < services->get_map_available_crs()->size(); i++ ) {
+                CRS* crs = services->get_map_available_crs()->at(i);
                 BoundingBox<double> bbox ( 0,0,0,0 );
                 if ( geographic_bbox.is_in_crs_area(crs)) {
                     bbox = geographic_bbox;
@@ -910,9 +917,9 @@ void Layer::add_node_tms(ptree& parent, TmsService* service) {
     node.add("<xmlattr>.href", service->get_endpoint_uri() + "/1.0.0/" + id);
 }
 
-json11::Json Layer::to_json_tiles(TilesService* service) {
+json11::Json Layer::to_json_ogcapi(OgcApiService* service) {
 
-    if (! tiles) {
+    if (! ogcapi) {
         return json11::Json::NUL;
     }
 
@@ -920,7 +927,7 @@ json11::Json Layer::to_json_tiles(TilesService* service) {
         { "id", id },
         { "title", title },
         { "description", abstract },
-        { "extent", geographic_bbox.to_json_tiles() }
+        { "extent", geographic_bbox.to_json_ogcapi() }
     };
 
     std::vector<json11::Json> links;
@@ -933,40 +940,70 @@ json11::Json Layer::to_json_tiles(TilesService* service) {
     });
     
     for ( Metadata m : metadata) {
-        links.push_back(m.to_json_tiles("Dataset metadata", "describedby"));
+        links.push_back(m.to_json_ogcapi("Dataset metadata", "describedby"));
     }
 
-    if (Rok4Format::is_raster(pyramid->get_format())) {
-        links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles?f=json"},
-            { "rel", "describedby"},
-            { "type", "application/json"},
-            { "title", "Styles list for " + id}
-        });
+    if (raster) {
+        res["dataType"] = "map";
+        res["dataTiles"] = false;
+        if (service->tiles_enabled()) {
+            links.push_back(json11::Json::object {
+                { "href", service->get_endpoint_uri() + "/collections/" + id + "/map/tiles?f=json"},
+                { "rel", "describedby"},
+                { "type", "application/json"},
+                { "title", "Tilesets list for " + id}
+            });
+            res["mapTiles"] = true;
+        } else {
+            res["mapTiles"] = false;
+        }
+        if (service->maps_enabled()) {
+            links.push_back(json11::Json::object {
+                { "href", service->get_endpoint_uri() + "/collections/" + id + "/map?f={format}"},
+                { "rel", "map"},
+                { "type", "application/octet-stream"},
+                { "title", id + " as raster map with default style"},
+                { "templated", true}
+            });
+
+            // Lien vers l'image, pour chaque style disponible
+            for(auto const& s: available_styles) {
+                links.push_back(json11::Json::object {
+                    { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map?f={format}"},
+                    { "rel", "map"},
+                { "type", "application/octet-stream"},
+                    { "title", id + " as raster map with style " + s->get_identifier()},
+                    { "templated", true}
+                });
+            }
+        }
     } else {
-        links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=json"},
-            { "rel", "describedby"},
-            { "type", "application/json"},
-            { "title", "Tilesets list for " + id}
-        });
+        res["dataType"] = "vector";
+        res["mapTiles"] = false;  
+        if (service->tiles_enabled()) {
+            links.push_back(json11::Json::object {
+                { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=json"},
+                { "rel", "describedby"},
+                { "type", "application/json"},
+                { "title", "Tilesets list for " + id}
+            });
+            res["dataTiles"] = true;
+        } else {
+            res["dataTiles"] = false;
+        }
     }
 
     res["links"] = links;
+
+    if (attribution != NULL) {
+        res["attribution"] = attribution->get_title();
+    }
 
     res["crs"] = json11::Json::array {
         pyramid->get_tms()->get_crs()->get_url()
     };
 
-    if (Rok4Format::is_raster(pyramid->get_format())) {
-        res["dataType"] = "map";
-        res["dataTiles"] = false;
-        res["mapTiles"] = true;
-    } else {
-        res["dataType"] = "vector";
-        res["dataTiles"] = true;
-        res["mapTiles"] = false;    
-    }
+    res["storageCrs"] = pyramid->get_tms()->get_crs()->get_url();
 
     res["minCellSize"] = pyramid->get_lowest_level()->get_res();
     res["maxCellSize"] = pyramid->get_highest_level()->get_res();
@@ -974,65 +1011,24 @@ json11::Json Layer::to_json_tiles(TilesService* service) {
     return res;
 }
 
-
-json11::Json Layer::to_json_styles(TilesService* service) {
-
-    if (! tiles) {
-        return json11::Json::NUL;
-    }
-
-    json11::Json::object res = json11::Json::object {
-        { "id", id },
-        { "title", title },
-        { "links", json11::Json::array {
-            json11::Json::object {
-                { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles?f=json"},
-                { "rel", "self"},
-                { "type", "application/json"},
-                { "title", "this document"}
-            }
-        }}
-    };
-
-    std::vector<json11::Json> json_styles;
-    for ( Style* s : available_styles) {
-        json_styles.push_back(json11::Json::object {
-            { "id", s->get_identifier()},
-            { "title", s->get_titles().at(0)},
-            { "links", json11::Json::array {
-                json11::Json::object {
-                    { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map/tiles?f=json"},
-                    { "rel", "describedby"},
-                    { "type", "application/json"},
-                    { "title", "Tilesets list for " + id + " with style " + s->get_identifier()}
-                }
-            }}
-        });
-    }
-
-    res["styles"] = json_styles;
-
-    return res;
-}
-
-json11::Json Layer::to_json_tilesets(TilesService* service, Style* style) {
+json11::Json Layer::to_json_tilesets(OgcApiService* service) {
 
     json11::Json::object res = json11::Json::object {};
 
     std::vector<json11::Json> links;
 
-    if (style == NULL) {
-        // Interrogation de donnée vecteur
+    if (raster) {
+        // Interrogation de donnée raster
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=json"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/map/tiles?f=json"},
             { "rel", "self"},
             { "type", "application/json"},
             { "title", "this document"}
         });
     } else {
-        // Interrogation de donnée raster
+        // Interrogation de donnée vecteur
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles?f=json"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=json"},
             { "rel", "self"},
             { "type", "application/json"},
             { "title", "this document"}
@@ -1047,12 +1043,12 @@ json11::Json Layer::to_json_tilesets(TilesService* service, Style* style) {
         std::string data_type;
         std::string tileset_uri;
 
-        if (style == NULL) {
+        if (raster) {
+            data_type = "map";
+            tileset_uri = service->get_endpoint_uri() + "/collections/" + id + "/map/tiles/" + t->tms->get_id() + "?f=json";
+        } else {
             data_type = "vector";
             tileset_uri = service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + t->tms->get_id() + "?f=json";
-        } else {
-            data_type = "map";
-            tileset_uri = service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles/" + t->tms->get_id() + "?f=json";
         }
 
         tilesets.push_back(json11::Json::object {
@@ -1070,8 +1066,8 @@ json11::Json Layer::to_json_tilesets(TilesService* service, Style* style) {
             }}
         });
 
-        // Si la reprojection API Tiles n'est pas activée, nous n'exposons que le premier TMS, celui natif
-        if (! service->reprojection_enabled()) {
+        // Si la reprojection tuilée n'est pas activée ou que c'est de la donnée vecteur, nous n'exposons que le premier TMS, celui natif
+        if (! services->tile_reprojection || ! raster) {
             break;
         }
     }
@@ -1081,7 +1077,7 @@ json11::Json Layer::to_json_tilesets(TilesService* service, Style* style) {
     return res;
 }
 
-json11::Json Layer::to_json_tileset(TilesService* service, Style* style, TileMatrixSetInfos* tmsi) {
+json11::Json Layer::to_json_tileset(OgcApiService* service, TileMatrixSetInfos* tmsi) {
 
     json11::Json::object res = json11::Json::object {
         { "title", title},
@@ -1092,7 +1088,27 @@ json11::Json Layer::to_json_tileset(TilesService* service, Style* style, TileMat
 
     std::vector<json11::Json> links;
 
-    if (style == NULL) {
+    if (raster) {
+        // Interrogation de donnée raster
+        res["dataType"] = "map";
+        links.push_back(json11::Json::object {
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/map/tiles/" + tmsi->tms->get_id() + "?f=json"},
+            { "rel", "self"},
+            { "type", "application/json"},
+            { "title", "this document"}
+        });
+        // Lien vers la tuile, pour chaque style disponible
+        for(auto const& s: available_styles) {
+            links.push_back(json11::Json::object {
+                { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map/tiles/" + tmsi->tms->get_id() + "/{tileMatrix}/{tileRow}/{tileCol}?f=" + Rok4Format::to_ogcapi_format(pyramid->get_format())},
+                { "rel", "tiles"},
+                { "type", Rok4Format::to_mime_type(pyramid->get_format())},
+                { "title", id + " as raster tile with style " + s->get_identifier()},
+                { "templated", true}
+            });
+        }
+
+    } else {
         // Interrogation de donnée vecteur
         res["dataType"] = "vector";
         links.push_back(json11::Json::object {
@@ -1103,27 +1119,10 @@ json11::Json Layer::to_json_tileset(TilesService* service, Style* style, TileMat
         });
         // Lien vers la tuile
         links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + tmsi->tms->get_id() + "/{tileMatrix}/{tileRow}/{tileCol}?f=" + Rok4Format::to_tiles_format(pyramid->get_format())},
-            { "rel", "item"},
+            { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + tmsi->tms->get_id() + "/{tileMatrix}/{tileRow}/{tileCol}?f=" + Rok4Format::to_ogcapi_format(pyramid->get_format())},
+            { "rel", "tiles"},
             { "type", Rok4Format::to_mime_type(pyramid->get_format())},
-            { "title", id + " tiles as " + Rok4Format::to_mime_type(pyramid->get_format())},
-            { "templated", true}
-        });
-    } else {
-        // Interrogation de donnée raster
-        res["dataType"] = "map";
-        links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles/" + tmsi->tms->get_id() + "?f=json"},
-            { "rel", "self"},
-            { "type", "application/json"},
-            { "title", "this document"}
-        });
-        // Lien vers la tuile
-        links.push_back(json11::Json::object {
-            { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + style->get_identifier() + "/map/tiles/" + tmsi->tms->get_id() + "/{tileMatrix}/{tileRow}/{tileCol}?f=" + Rok4Format::to_tiles_format(pyramid->get_format())},
-            { "rel", "item"},
-            { "type", Rok4Format::to_mime_type(pyramid->get_format())},
-            { "title", id + " tiles as " + Rok4Format::to_mime_type(pyramid->get_format())},
+            { "title", id + " as vector tile"},
             { "templated", true}
         });
     }
@@ -1199,7 +1198,7 @@ std::string Layer::get_description_tilejson(TmsService* service) {
     };
 
 
-    if (! Rok4Format::is_raster(pyramid->get_format())) {
+    if (! raster) {
         std::vector<json11::Json> items;
         for (int i = 0; i < tables_names.size(); i++) {
             items.push_back(tables_infos.at(tables_names.at(i))->to_json(maxs.at(tables_names.at(i)),mins.at(tables_names.at(i))));

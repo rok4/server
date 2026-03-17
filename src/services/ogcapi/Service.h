@@ -38,50 +38,62 @@
 /**
  * \file services/tiles/Service.h
  ** \~french
- * \brief Définition de la classe TilesService
+ * \brief Définition de la classe OgcApiService
  ** \~english
- * \brief Define classe TilesService
+ * \brief Define classe OgcApiService
  */
 
-class TilesService;
+class OgcApiService;
 
 #pragma once
 
 #include "services/Service.h"
-#include "configurations/Metadata.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
  * \~french
- * \brief Gestion du service OGC API Tiles du serveur
+ * \brief Gestion du service OGC API du serveur
  */
-class TilesService : public Service {  
+class OgcApiService : public Service {  
 
 private:
 
-    DataStream* get_conformance ( Request* req, Rok4Server* serv );
-    DataStream* get_landing_page ( Request* req, Rok4Server* serv );
+    static std::vector<std::string> common_conformances;
+    static std::vector<std::string> maps_conformances;
+    static std::vector<std::string> tiles_conformances;
+    static std::map<std::string, std::string> ogcapi_format_to_mime_type;
+
+    DataStream* get_landing_page ( Request* req, ServicesConfiguration* services );
+    DataStream* get_conformance ( Request* req, ServicesConfiguration* services );
+
+    DataStream* get_api_collections ( Request* req, ServicesConfiguration* services );
+    DataStream* get_api_vector_collections ( Request* req, ServicesConfiguration* services );
+    DataStream* get_api_tilematrixsets ( Request* req, ServicesConfiguration* services );
+    DataStream* get_api_styles ( Request* req, ServicesConfiguration* services );
+
+    DataStream* get_tilematrixsets ( Request* req, ServicesConfiguration* services );
+    DataStream* get_tilematrixset ( Request* req, ServicesConfiguration* services );
     /**
      * \todo Gérer la pagination
-     * \todo Filtrer selon la bbox
      */
-    DataStream* get_capabilities ( Request* req, Rok4Server* serv );
-    DataStream* get_tilematrixsets ( Request* req, Rok4Server* serv );
-    DataStream* get_tilematrixset ( Request* req, Rok4Server* serv );
-    DataStream* get_tiles ( Request* req, Rok4Server* serv );
-    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
-    DataStream* get_styles ( Request* req, Rok4Server* serv);
-    DataStream* get_tilesets ( Request* req, Rok4Server* serv, bool is_map_request );
-    DataStream* get_tileset ( Request* req, Rok4Server* serv, bool is_map_request );
-    DataStream* get_tile ( Request* req, Rok4Server* serv, bool is_map_request );
+    DataStream* get_collections ( Request* req, ServicesConfiguration* services );
+    DataStream* get_collection ( Request* req, ServicesConfiguration* services );
+    
+    DataStream* get_tilesets ( Request* req, ServicesConfiguration* services, bool is_map_request );
+    DataStream* get_tileset ( Request* req, ServicesConfiguration* services, bool is_map_request );
+    DataStream* get_tile ( Request* req, ServicesConfiguration* services, bool is_map_request );
 
-    Metadata* metadata;
-    bool reprojection;
+    DataStream* get_map ( Request* req, ServicesConfiguration* services );
+
+    bool tiles;
+    bool maps;
+
+    int default_size;
 
     std::string cache_getcapabilities;
 
 public:
-    DataStream* process_request(Request* req, Rok4Server* serv);
+    DataStream* process_request(Request* req, ServicesConfiguration* services );
 
     /**
      * \~french
@@ -89,7 +101,7 @@ public:
      * \~english
      * \brief Service constructor
      */
-    TilesService (json11::Json& doc);
+    OgcApiService (json11::Json& doc);
 
     /**
      * \~french
@@ -105,12 +117,22 @@ public:
 
     /**
      * \~french
-     * \brief La reprojection est-elle activée
+     * \brief L'API Tiles est-elle activée
      * \~english
-     * \brief Is reprojection enabled
+     * \brief Is API Tiles enabled
      */
-    bool reprojection_enabled() {
-        return reprojection;
+    bool tiles_enabled() {
+        return tiles;
+    };
+
+    /**
+     * \~french
+     * \brief L'API Maps est-elle activée
+     * \~english
+     * \brief Is API Maps enabled
+     */
+    bool maps_enabled() {
+        return maps;
     };
 
     /**
@@ -119,9 +141,7 @@ public:
      * \~english
      * \brief Destructor
      */
-    ~TilesService() {
-        if (metadata) delete metadata;
-    };
+    ~OgcApiService() {};
 
 };
 

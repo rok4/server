@@ -44,7 +44,7 @@
  */
 
 #include "services/Service.h"
-#include "Request.h"
+#include "core/Request.h"
 
 bool Service::match_route(std::string path, std::vector<std::string> methods, Request* req) {
 
@@ -66,7 +66,7 @@ bool Service::match_route(std::string path, std::vector<std::string> methods, Re
     }
 };
 
-Service::Service (json11::Json& doc) {
+Service::Service (json11::Json& doc, std::string default_title, std::string default_abstract, std::string default_endpoint_uri, std::string default_root_path) {
 
     if (doc.is_null()) {
         enabled = false;
@@ -83,6 +83,62 @@ Service::Service (json11::Json& doc) {
         return;
     } else {
         enabled = false;
+    }
+
+    title = default_title;
+    abstract = default_abstract;
+    endpoint_uri = default_endpoint_uri;
+    root_path = default_root_path;
+    metadata = NULL;
+
+    if (doc["title"].is_string()) {
+        title = doc["title"].string_value();
+    } else if (! doc["title"].is_null()) {
+        error_message = "title have to be a string";
+        return;
+    }
+
+    if (doc["abstract"].is_string()) {
+        abstract = doc["abstract"].string_value();
+    } else if (! doc["abstract"].is_null()) {
+        error_message = "abstract have to be a string";
+        return;
+    }
+
+    if (doc["keywords"].is_array()) {
+        for (json11::Json kw : doc["keywords"].array_items()) {
+            if (kw.is_string()) {
+                keywords.push_back(Keyword ( kw.string_value()));
+            } else {
+                error_message = "keywords have to be a string array";
+                return;
+            }
+        }
+    } else if (! doc["keywords"].is_null()) {
+        error_message = "keywords have to be a string array";
+        return;
+    }
+
+    if (doc["endpoint_uri"].is_string()) {
+        endpoint_uri = doc["endpoint_uri"].string_value();
+    } else if (! doc["endpoint_uri"].is_null()) {
+        error_message = "endpoint_uri have to be a string";
+        return;
+    }
+
+    if (doc["root_path"].is_string()) {
+        root_path = doc["root_path"].string_value();
+    } else if (! doc["root_path"].is_null()) {
+        error_message = "root_path have to be a string";
+        return;
+    }
+
+    if (doc["metadata"].is_object()) {
+        metadata = new Metadata ( doc["metadata"] );
+        if (metadata->get_missing_field() != "") {
+            error_message = "invalid metadata: have to own a field " + metadata->get_missing_field();
+            return ;
+        }
     }
 };
 

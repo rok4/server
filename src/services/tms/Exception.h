@@ -46,9 +46,9 @@
 #pragma once
 
 #include <string>
-#include "boost/format.hpp"
+#include <boost/format.hpp>
 
-#include "DataStreams.h"
+#include "core/DataStreams.h"
 
 /**
  * \author Institut national de l'information géographique et forestière

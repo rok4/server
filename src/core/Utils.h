@@ -54,7 +54,7 @@ using boost::property_tree::xml_writer_settings;
 #include <rok4/utils/TileMatrixLimits.h>
 #include <rok4/thirdparty/json11.hpp>
 
-#include "DataStreams.h"
+#include "core/DataStreams.h"
 
 namespace Utils {
     /**

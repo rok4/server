@@ -46,9 +46,9 @@
 #include "services/admin/Service.h"
 #include "services/admin/Exception.h"
 
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
-AdminService::AdminService (json11::Json& doc) : Service(doc) {
+AdminService::AdminService (json11::Json& doc) : Service(doc, "ADMIN service", "ADMIN service", "http://localhost/admin", "/admin") {
 
     if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
@@ -61,34 +61,45 @@ AdminService::AdminService (json11::Json& doc) : Service(doc) {
         return;
     }
 
-    title = "ADMIN service";
-    abstract = "ADMIN service";
+    if (doc["secret"].is_string()) {
+        secret = doc["secret"].string_value();
+    } else if (! doc["secret"].is_null()) {
+        error_message = "ADMIN service: secret have to be a string";
+        return;
+    } else {
+        secret = "";
+    }
+
     keywords.push_back(Keyword ( "administration" ));
-    root_path = "/admin";
 }
 
-DataStream* AdminService::process_request(Request* req, Rok4Server* serv) {
+DataStream* AdminService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "ADMIN service";
+
+    // Contrôle du secret
+    if (secret != "" && req->secret != secret) {
+        throw AdminException::get_error_message("Not authorized request", "Operation forbidden", 403);
+    }
 
     if ( match_route( "/layers/([^/]+)", {"POST"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "ADDLAYER request";
-        return add_layer(req, serv);
+        return add_layer(req, services);
     }
     else if ( match_route( "/layers/([^/]+)", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "UPDATELAYER request";
-        return update_layer(req, serv);
+        return update_layer(req, services);
     }
     else if ( match_route( "/layers/([^/]+)", {"DELETE"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "DELETELAYER request";
-        return delete_layer(req, serv);
+        return delete_layer(req, services);
     }
     else if ( match_route( "/on", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "TURNON request";
-        return turn_on(req, serv);
+        return turn_on(req, services);
     }
     else if ( match_route( "/off", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "TURNOFF request";
-        return turn_off(req, serv);
+        return turn_off(req, services);
     } else {
         throw AdminException::get_error_message("Unknown admin request path", "Operation not supported", 400);
     }
