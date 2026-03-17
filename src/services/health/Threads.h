@@ -50,7 +50,7 @@
 
 #include <rok4/thirdparty/json11.hpp>
 
-#include "Request.h"
+#include "core/Request.h"
 
 enum eThreadStatus {
     UNKNOWN,

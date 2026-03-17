@@ -51,7 +51,7 @@
 #include "services/health/Threads.h"
 #include "services/health/Exception.h"
 
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 DataStream* HealthService::get_health ( Request* req, Rok4Server* serv ) {
 

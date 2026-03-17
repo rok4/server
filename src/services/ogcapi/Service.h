@@ -38,12 +38,12 @@
 /**
  * \file services/tiles/Service.h
  ** \~french
- * \brief Définition de la classe TilesService
+ * \brief Définition de la classe OgcApiService
  ** \~english
- * \brief Define classe TilesService
+ * \brief Define classe OgcApiService
  */
 
-class TilesService;
+class OgcApiService;
 
 #pragma once
 
@@ -55,28 +55,37 @@ class TilesService;
  * \~french
  * \brief Gestion du service OGC API Tiles du serveur
  */
-class TilesService : public Service {  
+class OgcApiService : public Service {  
 
 private:
 
-    DataStream* get_conformance ( Request* req, Rok4Server* serv );
     DataStream* get_landing_page ( Request* req, Rok4Server* serv );
+    DataStream* get_conformance ( Request* req, Rok4Server* serv );
+
+    DataStream* get_api_collections ( Request* req, Rok4Server* serv );
+    DataStream* get_api_vector_collections ( Request* req, Rok4Server* serv );
+    DataStream* get_api_tilematrixsets ( Request* req, Rok4Server* serv );
+    DataStream* get_api_styles ( Request* req, Rok4Server* serv );
+
+    DataStream* get_tilematrixsets ( Request* req, Rok4Server* serv );
+    DataStream* get_tilematrixset ( Request* req, Rok4Server* serv );
     /**
      * \todo Gérer la pagination
      * \todo Filtrer selon la bbox
      */
-    DataStream* get_capabilities ( Request* req, Rok4Server* serv );
-    DataStream* get_tilematrixsets ( Request* req, Rok4Server* serv );
-    DataStream* get_tilematrixset ( Request* req, Rok4Server* serv );
-    DataStream* get_tiles ( Request* req, Rok4Server* serv );
-    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
-    DataStream* get_styles ( Request* req, Rok4Server* serv);
+    DataStream* get_collections ( Request* req, Rok4Server* serv );
+    DataStream* get_collection ( Request* req, Rok4Server* serv );
+    
     DataStream* get_tilesets ( Request* req, Rok4Server* serv, bool is_map_request );
     DataStream* get_tileset ( Request* req, Rok4Server* serv, bool is_map_request );
     DataStream* get_tile ( Request* req, Rok4Server* serv, bool is_map_request );
 
+    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
+
     Metadata* metadata;
     bool reprojection;
+    bool tiles;
+    bool maps;
 
     std::string cache_getcapabilities;
 
@@ -89,7 +98,7 @@ public:
      * \~english
      * \brief Service constructor
      */
-    TilesService (json11::Json& doc);
+    OgcApiService (json11::Json& doc);
 
     /**
      * \~french
@@ -101,6 +110,26 @@ public:
         cache_mtx.lock();
         cache_getcapabilities.clear();
         cache_mtx.unlock();
+    };
+
+    /**
+     * \~french
+     * \brief L'API Tiles est-elle activée
+     * \~english
+     * \brief Is API Tiles enabled
+     */
+    bool tiles_enabled() {
+        return tiles;
+    };
+
+    /**
+     * \~french
+     * \brief L'API Maps est-elle activée
+     * \~english
+     * \brief Is API Maps enabled
+     */
+    bool maps_enabled() {
+        return maps;
     };
 
     /**
@@ -119,7 +148,7 @@ public:
      * \~english
      * \brief Destructor
      */
-    ~TilesService() {
+    ~OgcApiService() {
         if (metadata) delete metadata;
     };
 

@@ -108,19 +108,6 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
 
     // ----------------------- Chargement des services
 
-    json11::Json common_section = doc["common"];
-
-    common_service = new CommonService(common_section);
-    if (! common_service->is_ok()) {
-        error_message = "Services configuration: " + common_service->get_error_message();
-        return false;
-    }
-    if (common_service->is_enabled()) {
-        BOOST_LOG_TRIVIAL(info) <<  "COMMON service enabled";
-    } else {
-        BOOST_LOG_TRIVIAL(info) <<  "COMMON service disabled";
-    }
-
     json11::Json health_section = doc["health"];
 
     health_service = new HealthService(health_section);
@@ -186,17 +173,17 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
         BOOST_LOG_TRIVIAL(info) <<  "ADMIN service disabled";
     }
 
-    json11::Json tiles_section = doc["tiles"];
+    json11::Json ogcapi_section = doc["ogcapi"];
 
-    tiles_service = new TilesService(tiles_section);
-    if (! tiles_service->is_ok()) {
-        error_message = "Services configuration: " + tiles_service->get_error_message();
+    ogcapi_service = new OgcApiService(ogcapi_section);
+    if (! ogcapi_service->is_ok()) {
+        error_message = "Services configuration: " + ogcapi_service->get_error_message();
         return false;
     }
-    if (tiles_service->is_enabled()) {
-        BOOST_LOG_TRIVIAL(info) <<  "TILES service enabled";
+    if (ogcapi_service->is_enabled()) {
+        BOOST_LOG_TRIVIAL(info) <<  "OGC API service enabled";
     } else {
-        BOOST_LOG_TRIVIAL(info) <<  "TILES service disabled";
+        BOOST_LOG_TRIVIAL(info) <<  "OGC API service disabled";
     }
 
     return true;
@@ -324,13 +311,12 @@ std::string ServicesConfiguration::get_default_style_id() {
 }
 
 ServicesConfiguration::~ServicesConfiguration(){ 
-    delete common_service;
     delete tms_service;
     delete health_service;
     delete wmts_service;
     delete wms_service;
     delete admin_service;
-    delete tiles_service;
+    delete ogcapi_service;
     delete contact;
 }
 
@@ -338,6 +324,5 @@ void ServicesConfiguration::clean_cache() {
     wms_service->clean_cache();
     wmts_service->clean_cache();
     tms_service->clean_cache();
-    common_service->clean_cache();
-    tiles_service->clean_cache();
+    ogcapi_service->clean_cache();
 };

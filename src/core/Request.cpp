@@ -43,7 +43,7 @@
  * \brief Implement the Request Class analysing HTTP requests
  */
 
-#include "Request.h"
+#include "core/Request.h"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -56,7 +56,7 @@
 #include <rok4/utils/CurlPool.h>
 #include <rok4/utils/LibcurlStruct.h>
 
-#include "Utils.h"
+#include "core/Utils.h"
 #include "config.h"
 
 Request::Request(FCGX_Request *fcgx) : fcgx_request(fcgx) {

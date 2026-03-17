@@ -65,7 +65,7 @@
 #include <curl/curl.h>
 #include <fcgiapp.h>
 
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 #include "config.h"
 
 #include "services/Router.h"

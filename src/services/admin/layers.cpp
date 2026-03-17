@@ -46,7 +46,7 @@
 #include "services/admin/Service.h"
 #include "services/admin/Exception.h"
 
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 DataStream* AdminService::add_layer ( Request* req, Rok4Server* serv ) {
 
@@ -73,7 +73,7 @@ DataStream* AdminService::update_layer ( Request* req, Rok4Server* serv ) {
 
     std::string str_layer = req->path_params.at(0);
     if ( contain_chars(str_layer, "\"")) {
-        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES layer: " << str_layer ;
+        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in layer: " << str_layer ;
         throw AdminException::get_error_message("Layer does not exists.", "Not found", 404);
     }
 
@@ -100,7 +100,7 @@ DataStream* AdminService::delete_layer ( Request* req, Rok4Server* serv ) {
 
     std::string str_layer = req->path_params.at(0);
     if ( contain_chars(str_layer, "\"")) {
-        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES layer: " << str_layer ;
+        BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in layer: " << str_layer ;
         throw AdminException::get_error_message("Layer does not exists.", "Not found", 404);
     }
 

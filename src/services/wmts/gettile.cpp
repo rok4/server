@@ -57,9 +57,10 @@
 #include <rok4/datastream/TiffDeflateEncoder.h>
 #include <rok4/datastream/TiffRawEncoder.h>
 
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 #include "services/wmts/Exception.h"
 #include "services/wmts/Service.h"
+#include "core/Tile.h"
 
 DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     // La couche
@@ -87,6 +88,9 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
 
     TileMatrixSetInfos* tmsi = layer->get_tilematrixset(str_tms);
     if (tmsi == NULL) {
+        throw WmtsException::get_error_message("Tile matrix set " + str_tms + " unknown", "InvalidParameterValue", 400);
+    }
+    if (tmsi->tms->get_id() != layer->get_pyramid()->get_tms()->get_id() && ! reprojection) {
         throw WmtsException::get_error_message("Tile matrix set " + str_tms + " unknown", "InvalidParameterValue", 400);
     }
 
@@ -150,138 +154,16 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     }
 
     Style* style = NULL;
-    if (Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
+    if (layer->is_raster()) {
         style = layer->get_style_by_identifier(str_style);
 
         if (style == NULL) throw WmtsException::get_error_message("Style " + str_style + " unknown", "InvalidParameterValue", 400);
     }
 
     // Traitement de la requête
-
-    if (tmsi->tms->get_id() == layer->get_pyramid()->get_tms()->get_id()) {
-        // TMS d'interrogation natif
-        Level* level = layer->get_pyramid()->get_level(tm->get_id());
-
-        DataSource* d = level->get_tile(column, row);
-        if (d == NULL) {
-            throw WmtsException::get_error_message("No data found", "Not Found", 404);
-        }
-
-        if (layer->get_pyramid()->get_channels() == 1 && format == "image/png" && style->get_palette() && ! style->get_palette()->is_empty()) {
-            return new DataStreamFromDataSource(new PaletteDataSource(d, style->get_palette()));
-        } else {
-            return new DataStreamFromDataSource(d);
-        }
-    } else if (reprojection) {
-        // TMS d'interrogation à la demande
-
-        BoundingBox<double> bbox = tm->tile_indices_to_bbox(column, row);
-        int height = tm->get_tile_height();
-        int width = tm->get_tile_width();
-        CRS* crs = tmsi->tms->get_crs();
-        bbox.crs = crs->get_request_code();
-
-        bool crs_equals = serv->get_services_configuration()->are_crs_equals(layer->get_pyramid()->get_tms()->get_crs()->get_proj_code(), crs->get_proj_code());
-
-        // On se donne maxium 3 tuiles sur 3 dans la pyramide source pour calculer cette tuile
-        Image* image = layer->get_pyramid()->getbbox(3, 3, bbox, width, height, crs, crs_equals, layer->get_resampling(), 0);
-
-        if (image == NULL) {
-            BOOST_LOG_TRIVIAL(warning) << "Cannot process the tile in a non native TMS";
-            throw WmtsException::get_error_message("No data found", "Not Found", 404);
-        }
-
-        image->set_bbox(bbox);
-        image->set_crs(crs);
-
-        std::map<std::string, std::string> format_options = Utils::string_to_map(req->get_query_param("format_options"), ";", ":");
-
-        if (format == "image/png") {
-            return new PNGEncoder(image, style->get_palette());
-        }
-        else if (format == "image/tiff" || format == "image/geotiff") {
-            bool is_geotiff = (format == "image/geotiff");
-
-            // Dans le cas d'un geotiff, on renseigne la valeur de nodata
-            // on ne peut mettre qu'une valeur, ce sera celle du premier canal
-            int nodata = *(layer->get_pyramid()->get_nodata_value());
-
-            std::map<std::string, std::string>::iterator it = format_options.find("compression");
-            std::string opt = "";
-            if (it != format_options.end()) {
-                opt = it->second;
-            }
-
-            // La donnée ne peut être retournée que dans le format de la pyramide source utilisée
-
-            switch (layer->get_pyramid()->get_format()) {
-                case Rok4Format::TIFF_RAW_UINT8:
-                case Rok4Format::TIFF_LZW_UINT8:
-                case Rok4Format::TIFF_ZIP_UINT8:
-                case Rok4Format::TIFF_PKB_UINT8:
-                    if (opt.compare("lzw") == 0) { 
-                        return new TiffLZWEncoder<uint8_t>(image, is_geotiff, nodata);
-                    }
-                    if (opt.compare("deflate") == 0) {
-                        return new TiffDeflateEncoder<uint8_t>(image, is_geotiff, nodata);
-                    }
-                    if (opt.compare("raw") == 0 || opt == "") {
-                        return new TiffRawEncoder<uint8_t>(image, is_geotiff, nodata);
-                    }
-                    if (opt.compare("packbits") == 0) {
-                        return new TiffPackBitsEncoder<uint8_t>(image, is_geotiff, nodata);
-                    }
-
-                    break;
-
-                case Rok4Format::TIFF_RAW_FLOAT32:
-                case Rok4Format::TIFF_LZW_FLOAT32:
-                case Rok4Format::TIFF_ZIP_FLOAT32:
-                case Rok4Format::TIFF_PKB_FLOAT32:
-                    if (opt.compare("lzw") == 0) { 
-                        return new TiffLZWEncoder<float>(image, is_geotiff, nodata);
-                    }
-                    if (opt.compare("deflate") == 0) {
-                        return new TiffDeflateEncoder<float>(image, is_geotiff, nodata);
-                    }
-                    if (opt.compare("raw") == 0 || opt == "") {
-                        return new TiffRawEncoder<float>(image, is_geotiff, nodata);
-                    }
-                    if (opt.compare("packbits") == 0) {
-                        return new TiffPackBitsEncoder<float>(image, is_geotiff, nodata);
-                    }
-
-                    break;
-                default:
-                    delete image;
-                    throw WmtsException::get_error_message("No data found", "Not Found", 404);
-            }
-        }
-        else if (format == "image/jpeg") {
-
-            std::map<std::string, std::string>::iterator it = format_options.find("quality");
-            int quality = 75;
-            if (it != format_options.end()) {
-                // si on n'arrive pas à paser en entier l'option, on remet 75
-                if (sscanf(it->second.c_str(), "%d", &quality) != 1) quality = 75;
-            }
-
-            return new JPEGEncoder(image, quality);
-        }
-        else if (format == "image/x-bil;bits=32") {
-            return new BilEncoder(image);
-        }
-        else if (format == "text/asc") {
-            // On ne traite le format asc que sur les image à un seul channel
-            if (image->get_channels() != 1) {
-                BOOST_LOG_TRIVIAL(error) << "Le format " << format << " ne concerne que les images à 1 canal";
-                delete image;
-                throw WmtsException::get_error_message("No data found", "Not Found", 404);
-            } else {
-                return new AscEncoder(image);
-            }
-        }
+    DataStream* d = Tile::get_tile(serv, layer, tmsi, tm, column, row, format, style);
+    if (d == NULL) {
+        throw WmtsException::get_error_message("No data found", "Not Found", 404);
     }
-    // TMS d'interrogation à la demande mais reprojection non activée
-    throw WmtsException::get_error_message("Tile matrix set " + str_tms + " unknown", "InvalidParameterValue", 400);
+    return d;
 }

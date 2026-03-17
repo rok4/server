@@ -40,7 +40,7 @@
 #include <map>
 #include <vector>
 #include <regex>
-#include "fcgiapp.h"
+#include <fcgiapp.h>
 
 #include <rok4/datastream/DataStream.h>
 

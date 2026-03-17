@@ -38,22 +38,109 @@
 /**
  * \file services/tiles/getcapabilities.cpp
  ** \~french
- * \brief Implémentation de la classe TilesService
+ * \brief Implémentation de la classe OgcApiService
  ** \~english
- * \brief Implements classe TilesService
+ * \brief Implements classe OgcApiService
  */
 
 #include <iostream>
 
-#include "services/tiles/Exception.h"
-#include "services/tiles/Service.h"
-#include "Rok4Server.h"
+#include "services/ogcapi/Exception.h"
+#include "services/ogcapi/Service.h"
+#include "core/Rok4Server.h"
 
-DataStream* TilesService::get_tilematrixsets ( Request* req, Rok4Server* serv ) {
+
+
+DataStream* OgcApiService::get_api_collections ( Request* req, Rok4Server* serv ) {
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    std::vector<std::string> collections;
+
+    for(auto const& l: serv->get_server_configuration()->get_layers()) {
+        if (l.second->is_ogcapi_enabled()) {
+            collections.push_back(l.first);
+        }
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "type", "enum" },
+        { "enum", collections }
+    };
+
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
+}
+
+DataStream* OgcApiService::get_api_vector_collections ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
-        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+        throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    std::vector<std::string> collections;
+
+    for(auto const& l: serv->get_server_configuration()->get_layers()) {
+        if (l.second->is_ogcapi_enabled() && ! l.second->is_raster()) {
+            collections.push_back(l.first);
+        }
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "type", "enum" },
+        { "enum", collections }
+    };
+
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
+}
+
+DataStream* OgcApiService::get_api_tilematrixsets ( Request* req, Rok4Server* serv ) {
+
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    std::vector<std::string> tms;
+    for(auto const& t: TmsBook::get_book()) {
+        tms.push_back(t.first);
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "type", "enum" },
+        { "enum", tms }
+    };
+
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
+}
+
+DataStream* OgcApiService::get_api_styles ( Request* req, Rok4Server* serv ) {
+
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
+    }
+
+    std::vector<std::string> styles;
+    for(auto const& s: StyleBook::get_book()) {
+        styles.push_back(s.first);
+    }
+
+    json11::Json::object res = json11::Json::object {
+        { "type", "enum" },
+        { "enum", styles }
+    };
+
+    return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
+}
+
+DataStream* OgcApiService::get_tilematrixsets ( Request* req, Rok4Server* serv ) {
+
+    std::string f = req->get_query_param("f");
+    if (f != "" && f != "application/json" && f != "json") {
+        throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
     json11::Json::object res = json11::Json::object {};
@@ -82,23 +169,23 @@ DataStream* TilesService::get_tilematrixsets ( Request* req, Rok4Server* serv ) 
 }
 
 
-DataStream* TilesService::get_tilematrixset ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_tilematrixset ( Request* req, Rok4Server* serv ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
-        throw TilesException::get_error_message("InvalidParameter", "Format unknown", 400);
+        throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
     // Le TMS
     std::string str_tms = req->path_params.at(0);
     if ( contain_chars(str_tms, "\"")) {
         BOOST_LOG_TRIVIAL(warning) <<  "Forbidden char detected in TILES tms: " << str_tms ;
-        throw TilesException::get_error_message("ResourceNotFound", "Tile matrix set unknown", 404);
+        throw OgcApiException::get_error_message("ResourceNotFound", "Tile matrix set unknown", 404);
     }
 
     TileMatrixSet* tms = TmsBook::get_tms(str_tms);
     if ( tms == NULL) {
-        throw TilesException::get_error_message("ResourceNotFound", "Tile matrix set "+str_tms+" unknown", 404);
+        throw OgcApiException::get_error_message("ResourceNotFound", "Tile matrix set "+str_tms+" unknown", 404);
     }
 
     json11::Json::object res = json11::Json::object {

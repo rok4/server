@@ -51,12 +51,11 @@
 #include <stdexcept>
 
 #include "services/Router.h"
-#include "services/common/Service.h"
 #include "services/health/Service.h"
 #include "services/tms/Service.h"
 #include "services/wmts/Service.h"
 #include "services/admin/Service.h"
-#include "services/tiles/Service.h"
+#include "services/ogcapi/Service.h"
 #include "services/wms/Service.h"
 
 std::string get_message_from_http_status ( int http_status ) {
@@ -275,17 +274,14 @@ void Router::process_request(Request* req, Rok4Server* serv) {
         else if (services->get_admin_service()->match_request(req)) {
             sendresponse(services->get_admin_service()->process_request(req, serv), req);
         }
-        else if (enabled && services->get_common_service()->match_request(req)) {
-            sendresponse(services->get_common_service()->process_request(req, serv), req);
-        }
         else if (enabled && services->get_tms_service()->match_request(req)) {
             sendresponse(services->get_tms_service()->process_request(req, serv), req);
         }
         else if (enabled && services->get_wmts_service()->match_request(req)) {
             sendresponse(services->get_wmts_service()->process_request(req, serv), req);
         }
-        else if (enabled && services->get_tiles_service()->match_request(req)) {
-            sendresponse(services->get_tiles_service()->process_request(req, serv), req);
+        else if (enabled && services->get_ogcapi_service()->match_request(req)) {
+            sendresponse(services->get_ogcapi_service()->process_request(req, serv), req);
         }
         else if (enabled && services->get_wms_service()->match_request(req)) {
             sendresponse(services->get_wms_service()->process_request(req, serv), req);

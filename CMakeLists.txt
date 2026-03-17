@@ -62,6 +62,7 @@ message(STATUS "Building ROK4 Server")
 
 file(GLOB ROK4SERVER_SRCS 
     "${PROJECT_SOURCE_DIR}/src/*.cpp" 
+    "${PROJECT_SOURCE_DIR}/src/core/*.cpp" 
     "${PROJECT_SOURCE_DIR}/src/services/*.cpp"
     "${PROJECT_SOURCE_DIR}/src/services/*/*.cpp"
     "${PROJECT_SOURCE_DIR}/src/configurations/*.cpp"

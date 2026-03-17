@@ -47,14 +47,14 @@ class Rok4Server;
 
 #pragma once
 
-#include "fcgiapp.h"
+#include <fcgiapp.h>
 #include <functional>
 
 #include <rok4/datastream/DataStream.h>
 
-#include "Request.h"
-#include "Rok4Server.h"
-#include "DataStreams.h"
+#include "core/Request.h"
+#include "core/Rok4Server.h"
+#include "core/DataStreams.h"
 
 /**
  * \author Institut national de l'information géographique et forestière

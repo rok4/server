@@ -54,7 +54,7 @@ using boost::property_tree::xml_writer_settings;
 
 #include "services/wmts/Exception.h"
 #include "services/wmts/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 

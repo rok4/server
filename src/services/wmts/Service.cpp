@@ -49,7 +49,7 @@
 
 #include "services/wmts/Exception.h"
 #include "services/wmts/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 WmtsService::WmtsService (json11::Json& doc) : Service(doc), metadata(NULL) {
 

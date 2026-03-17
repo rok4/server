@@ -64,15 +64,13 @@
  * \brief ROK4 Server executable
  */
 
-#include "Rok4Server.h"
 #include <proj.h>
 #include <csignal>
 #include <sys/time.h>
 #include <locale>
 #include <limits>
 #include <chrono>
-#include "config.h"
-#include "curl/curl.h"
+#include <curl/curl.h>
 #include <time.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -88,6 +86,9 @@
 namespace logging = boost::log;
 namespace keywords = boost::log::keywords;
 namespace sinks = boost::log::sinks;
+
+#include "core/Rok4Server.h"
+#include "config.h"
 
 Rok4Server* rok4server_instance;
 Rok4Server* rok4server_instance_tmp;

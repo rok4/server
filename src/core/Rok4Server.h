@@ -48,7 +48,7 @@ class Server;
 
 #pragma once
 
-#include "fcgiapp.h"
+#include <fcgiapp.h>
 #include <csignal>
 #include <stdio.h>
 #include <pthread.h>
@@ -61,7 +61,7 @@ class Server;
 
 #include <rok4/utils/IndexCache.h>
 
-#include "Request.h"
+#include "core/Request.h"
 
 #include "config.h"
 

@@ -99,46 +99,6 @@
             }
         },
 
-        "common": {
-            "type": "object",
-            "additionalProperties": false,
-            "description": "Common service configuration",
-            "properties": {
-                "enabled": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Common API activation"
-                },
-                "title": {
-                    "type": "string",
-                    "description": "Common API title",
-                    "default": "COMMON service"
-                },
-                "abstract": {
-                    "type": "string",
-                    "description": "Common API abstract",
-                    "default": "COMMON service"
-                },
-                "endpoint_uri": {
-                    "type": "string",
-                    "description": "Common API public endpoint",
-                    "default": "http://localhost/common"
-                },
-                "root_path": {
-                    "type": "string",
-                    "description": "Common API internal path",
-                    "default": "/common"
-                },
-                "keywords": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "Common API keywords"
-                }
-            }
-        },
-
         "wms": {
             "type": "object",
             "additionalProperties": false,
@@ -376,51 +336,61 @@
             }
         },
 
-        "tiles": {
+        "ogcapi": {
             "type": "object",
             "additionalProperties": false,
-            "description": "OGC API Tiles configuration",
+            "description": "OGC API configuration",
             "properties": {
                 "enabled": {
                     "type": "boolean",
                     "default": false,
-                    "description": "OGC API Tiles activation"
+                    "description": "OGC API activation"
                 },
                 "title": {
                     "type": "string",
-                    "description": "OGC API Tiles title",
+                    "description": "OGC API title",
                     "default": "TMS service"
                 },
                 "abstract": {
                     "type": "string",
-                    "description": "OGC API Tiles abstract",
+                    "description": "OGC API abstract",
                     "default": "TMS service"
                 },
                 "endpoint_uri": {
                     "type": "string",
-                    "description": "OGC API Tiles public endpoint",
-                    "default": "http://localhost/tiles"
+                    "description": "OGC API public endpoint",
+                    "default": "http://localhost/ogcapi"
                 },
                 "root_path": {
                     "type": "string",
-                    "description": "OGC API Tiles internal path",
-                    "default": "/tiles"
+                    "description": "OGC API internal path",
+                    "default": "/ogcapi"
                 },
                 "keywords": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     },
-                    "description": "OGC API Tiles keywords"
+                    "description": "OGC API keywords"
                 },
                 "metadata": {
                     "$ref": "#/$defs/metadata",
-                    "description": "OGC API Tiles service's metadata"
+                    "description": "OGC API service's metadata"
                 },
                 "reprojection": {
                     "type": "boolean",
                     "default": false,
-                    "description": "OGC API Tiles reprojection activation"
+                    "description": "OGC API reprojection activation"
+                },
+                "tiles": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "OGC API Tiles activation"
+                },
+                "maps": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "OGC API Maps activation"
                 }
             }
         }

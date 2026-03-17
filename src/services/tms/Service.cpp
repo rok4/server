@@ -47,7 +47,7 @@
 
 #include "services/tms/Exception.h"
 #include "services/tms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 TmsService::TmsService (json11::Json& doc) : Service(doc), metadata(NULL) {
 

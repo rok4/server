@@ -56,7 +56,7 @@ class ServerConfiguration;
 #include <rok4/style/Style.h>
 
 #include "configurations/Layer.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 #include "config.h"
 

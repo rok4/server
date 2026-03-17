@@ -60,7 +60,7 @@
 
 #include "services/wms/Exception.h"
 #include "services/wms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 

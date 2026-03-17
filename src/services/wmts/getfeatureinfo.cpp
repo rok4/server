@@ -47,7 +47,7 @@
 
 #include "services/wmts/Exception.h"
 #include "services/wmts/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
 
@@ -129,7 +129,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
     }
 
     Style* style = NULL;
-    if (Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
+    if (layer->is_raster()) {
         style = layer->get_style_by_identifier(str_style);
 
         if (style == NULL) throw WmtsException::get_error_message("Style " + str_style + " unknown", "InvalidParameterValue", 400);

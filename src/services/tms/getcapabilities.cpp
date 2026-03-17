@@ -56,7 +56,7 @@ using boost::property_tree::xml_writer_settings;
 
 #include "services/tms/Exception.h"
 #include "services/tms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
@@ -161,7 +161,7 @@ DataStream* TmsService::get_gdal ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Layer " +str_layer+" unknown", 400);
     }
 
-    if (! Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
+    if (! layer->is_raster()) {
         throw TmsException::get_error_message("Layer " +str_layer+" is vector data: cannot describe it with this format", 400);
     }
 

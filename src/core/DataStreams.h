@@ -36,7 +36,7 @@
  */
 
 /**
- * \file DataStreams.h
+ * \file core/DataStreams.h
  * \~french
  * \brief Définition des classes EmptyResponseDataStream et MessageDataStream
  * \~english

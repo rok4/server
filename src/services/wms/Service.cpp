@@ -49,7 +49,7 @@
 
 #include "services/wms/Exception.h"
 #include "services/wms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service(doc), metadata(NULL) {
 

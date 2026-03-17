@@ -24,22 +24,12 @@
     "health": {
         "enabled": true
     },
-    "common": {
-        "enabled": true,
-        "endpoint_uri": "http://localhost/rok4/common",
-        "root_path": "/common",
-        "title": "Service COMMON",
-        "abstract": "Ce service permet la découvertes des services assurés par ce serveur",
-        "keywords": [
-            "COMMON"
-        ]
-    },
     "wms": {
         "enabled": true,
         "endpoint_uri": "http://localhost/rok4/wms",
         "root_path": "/wms",
         "title": "Service de visualisation WMS",
-        "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux WMS",
+        "abstract": "Ce service permet la visulation de couches de données raster au travers d'un flux WMS",
         "keywords": [
             "WMS"
         ],
@@ -74,7 +64,7 @@
         "enabled": true,
         "endpoint_uri": "http://localhost/rok4/wmts",
         "title": "Service de visualisation WMTS",
-        "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux WMTS",
+        "abstract": "Ce service permet la visulation de couches de données raster au travers d'un flux WMTS",
         "keywords": [
             "WMTS"
         ],
@@ -86,20 +76,22 @@
         "endpoint_uri": "http://localhost/rok4/tms",
         "root_path": "/tms",
         "title": "Service de visualisation TMS",
-        "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux TMS",
+        "abstract": "Ce service permet la visulation de couches de données au travers d'un flux TMS",
         "keywords": [
             "TMS"
         ]
     },
-    "tiles": {
+    "ogcapi": {
         "enabled": true,
-        "endpoint_uri": "http://localhost/rok4/tiles",
-        "root_path": "/tiles",
-        "title": "Service de visualisation OGC API Tiles",
-        "abstract": "Ce service permet la visulation de couches de données raster IGN au travers d'un flux OGC API Tiles",
+        "endpoint_uri": "http://localhost/rok4/ogcapi",
+        "root_path": "/ogcapi",
+        "title": "Service de visualisation selon les API OGC",
+        "abstract": "Ce service permet la visulation de couches de données au travers de flux OGC API Tiles",
         "keywords": [
             "OGC API Tiles"
         ],
-        "reprojection": true
+        "reprojection": true,
+        "tiles": true,
+        "maps": false
     }
 }

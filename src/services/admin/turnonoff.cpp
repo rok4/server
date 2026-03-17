@@ -46,7 +46,7 @@
 #include "services/admin/Service.h"
 #include "services/admin/Exception.h"
 
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 DataStream* AdminService::turn_on ( Request* req, Rok4Server* serv ) {
 

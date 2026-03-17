@@ -210,7 +210,7 @@
                 }
             }
         },
-        "tiles": {
+        "ogcapi": {
             "type": "object",
             "properties": {
                 "enabled": {

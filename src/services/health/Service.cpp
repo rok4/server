@@ -49,7 +49,7 @@
 #include "services/health/Threads.h"
 #include "services/health/Exception.h"
 
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 HealthService::HealthService (json11::Json& doc) : Service(doc) {
 

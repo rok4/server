@@ -49,7 +49,7 @@
 
 #include "services/tms/Exception.h"
 #include "services/tms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
 
@@ -111,7 +111,7 @@ DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
 
     // Le style
     Style* style;
-    if (Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
+    if (layer->is_raster()) {
         style = layer->get_default_style();
     }
 

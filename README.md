@@ -2,9 +2,9 @@
 
 ![ROK4 Logo](https://rok4.github.io/assets/images/rok4-256.png)
 
-Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (OGC) WMS 1.3.0, WMTS 1.0.0 et OGC API Tiles 1.0.0, ainsi que le TMS (Tile Map Service). Il vise deux objectifs principaux :
+Le serveur implémente les standards ouverts de l’Open Geospatial Consortium (OGC) WMS 1.3.0, WMTS 1.0.0 et OGC API Tiles et Maps, ainsi que le TMS (Tile Map Service). Il vise deux objectifs principaux :
 
-* L’utilisation d’un cache de données raster unique permettant de servir indifféremment des flux WMS, WMTS, API Tiles et TMS
+* L’utilisation d’un cache de données raster unique permettant de servir indifféremment des flux WMS, WMTS, OGC API Tiles et Maps et TMS
 * Des performances de traitement d’image et de diffusion accrues
 * La diffusion de tuiles vecteur telles qu'elles sont stockées, sans transformation (TMS uniquement)
 * La diffusion en WMTS selon des Tile Matrix Sets différents de celui de la pyramide utilisée.
@@ -176,7 +176,7 @@ On redémarre nginx : `systemctl restart nginx`
     - WMS : http://localhost/rok4/wms?request=GetCapabilities&service=WMS
     - WMTS : http://localhost/rok4/wmts?request=GetCapabilities&service=WMTS
     - TMS : http://localhost/rok4/tms/1.0.0
-    - OGC API Tiles : http://localhost/rok4/tiles/collections
+    - OGC API : http://localhost/rok4/ogcapi/collections
 * Racine de l'API d'administration : http://localhost/rok4/admin/
 * État de santé du serveur : http://localhost/rok4/healthcheck
 
@@ -190,7 +190,7 @@ Lorsque le serveur reçoit une requête, c'est le premier élément du chemin qu
 * `/healthcheck` -> requête d'état de santé ou statut du serveur
 * `/wmts` -> requête WMTS
 * `/wms` -> requête WMS
-* `/tiles` -> requête API Tiles
+* `/ogcapi` -> requête OGC API
 * `/tms` -> requête TMS
 * `/admin` -> requête d'administration
 
@@ -241,8 +241,8 @@ Pour que les URLs présentes dans les réponses des services soient correctes ma
     "tms": {
         "endpoint_uri": "http://localhost/rok4/tms"
     },
-    "tiles": {
-        "endpoint_uri": "http://localhost/rok4/tiles"
+    "ogcapi": {
+        "endpoint_uri": "http://localhost/rok4/ogcapi"
     }
 ```
 
