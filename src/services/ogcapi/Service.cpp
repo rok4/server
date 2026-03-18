@@ -49,7 +49,7 @@
 #include "services/ogcapi/Service.h"
 #include "core/Rok4Server.h"
 
-OgcApiService::OgcApiService (json11::Json& doc) : Service(doc), metadata(NULL) {
+OgcApiService::OgcApiService (json11::Json& doc) : Service(doc, "OGC API service", "OGC API service", "http://localhost/ogcapi", "/ogcapi") {
 
     if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
@@ -60,73 +60,6 @@ OgcApiService::OgcApiService (json11::Json& doc) : Service(doc), metadata(NULL) 
     if (doc.is_null()) {
         // Le service a déjà été mis comme n'étant pas actif
         return;
-    }
-
-    if (doc["title"].is_string()) {
-        title = doc["title"].string_value();
-    } else if (! doc["title"].is_null()) {
-        error_message = "OGC API service: title have to be a string";
-        return;
-    } else {
-        title = "OGC API service";
-    }
-
-    if (doc["abstract"].is_string()) {
-        abstract = doc["abstract"].string_value();
-    } else if (! doc["abstract"].is_null()) {
-        error_message = "OGC API service: abstract have to be a string";
-        return;
-    } else {
-        abstract = "OGC API service";
-    }
-
-    if (doc["keywords"].is_array()) {
-        for (json11::Json kw : doc["keywords"].array_items()) {
-            if (kw.is_string()) {
-                keywords.push_back(Keyword ( kw.string_value()));
-            } else {
-                error_message = "OGC API service: keywords have to be a string array";
-                return;
-            }
-        }
-    } else if (! doc["keywords"].is_null()) {
-        error_message = "OGC API service: keywords have to be a string array";
-        return;
-    }
-
-    if (doc["endpoint_uri"].is_string()) {
-        endpoint_uri = doc["endpoint_uri"].string_value();
-    } else if (! doc["endpoint_uri"].is_null()) {
-        error_message = "OGC API service: endpoint_uri have to be a string";
-        return;
-    } else {
-        endpoint_uri = "http://localhost/ogcapi";
-    }
-
-    if (doc["root_path"].is_string()) {
-        root_path = doc["root_path"].string_value();
-    } else if (! doc["root_path"].is_null()) {
-        error_message = "OGC API service: root_path have to be a string";
-        return;
-    } else {
-        root_path = "/ogcapi";
-    }
-
-    if (doc["metadata"].is_object()) {
-        metadata = new Metadata ( doc["metadata"] );
-        if (metadata->get_missing_field() != "") {
-            error_message = "OGC API service: invalid metadata: have to own a field " + metadata->get_missing_field();
-            return ;
-        }
-    }
-
-    if (doc["reprojection"].is_bool()) {
-        reprojection = doc["reprojection"].bool_value();
-    } else if (! doc["reprojection"].is_null()) {
-        error_message = "OGC API service: reprojection have to be a boolean";
-        return;
-    } else {
-        reprojection = false;
     }
 
     if (doc["tiles"].is_bool()) {

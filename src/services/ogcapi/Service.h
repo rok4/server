@@ -48,12 +48,11 @@ class OgcApiService;
 #pragma once
 
 #include "services/Service.h"
-#include "configurations/Metadata.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
  * \~french
- * \brief Gestion du service OGC API Tiles du serveur
+ * \brief Gestion du service OGC API du serveur
  */
 class OgcApiService : public Service {  
 
@@ -82,8 +81,6 @@ private:
 
     DataStream* get_feature_info ( Request* req, Rok4Server* serv );
 
-    Metadata* metadata;
-    bool reprojection;
     bool tiles;
     bool maps;
 
@@ -134,23 +131,11 @@ public:
 
     /**
      * \~french
-     * \brief La reprojection est-elle activée
-     * \~english
-     * \brief Is reprojection enabled
-     */
-    bool reprojection_enabled() {
-        return reprojection;
-    };
-
-    /**
-     * \~french
      * \brief Destructeur
      * \~english
      * \brief Destructor
      */
-    ~OgcApiService() {
-        if (metadata) delete metadata;
-    };
+    ~OgcApiService() {};
 
 };
 

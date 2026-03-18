@@ -58,14 +58,16 @@ using boost::property_tree::xml_writer_settings;
 
 DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
+    ServicesConfiguration* services = serv->get_services_configuration();
+
+    bool default_inspire = services->default_inspire;
+
     if ( req->is_inspire(default_inspire) && ! cache_getcapabilities_inspire.empty()) {
         return new MessageDataStream ( cache_getcapabilities_inspire, "text/xml", 200 );
     }
     else if (! req->is_inspire(default_inspire) && ! cache_getcapabilities.empty()) {
         return new MessageDataStream ( cache_getcapabilities, "text/xml", 200 );
     }
-
-    ServicesConfiguration* services = serv->get_services_configuration();
 
     ptree tree;
 
@@ -101,9 +103,9 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     service_node.add("Fees", services->fee);
     service_node.add("AccessConstraints", services->access_constraint);
-    service_node.add("LayerLimit", max_layers_count);
-    service_node.add("MaxWidth", max_width);
-    service_node.add("MaxHeight", max_height);
+    service_node.add("LayerLimit", services->map_max_layers_count);
+    service_node.add("MaxWidth", services->map_max_width);
+    service_node.add("MaxHeight", services->map_max_height);
 
     ptree& capability_node = root.add("Capability", "");
 
@@ -119,16 +121,16 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     op_getcapabilities.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:type", "simple");
 
     ptree& op_getmap = capability_node.add("Request.GetMap", "");
-    for ( unsigned int i = 0; i < formats.size(); i++ ) {
-        op_getmap.add("Format", formats.at(i));
+    for ( unsigned int i = 0; i < services->map_formats.size(); i++ ) {
+        op_getmap.add("Format", services->map_formats.at(i));
     }
     op_getmap.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:href", endpoint_uri + additionnal_params);
     op_getmap.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xmlns:xlink", "http://www.w3.org/1999/xlink");
     op_getmap.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:type", "simple");
 
     ptree& op_getfeatureinfo = capability_node.add("Request.GetFeatureInfo", "");
-    for ( unsigned int i = 0; i < info_formats.size(); i++ ) {
-        op_getfeatureinfo.add("Format", info_formats.at(i));
+    for ( unsigned int i = 0; i < services->info_formats.size(); i++ ) {
+        op_getfeatureinfo.add("Format", services->info_formats.at(i));
     }
     op_getfeatureinfo.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xlink:href", endpoint_uri + additionnal_params);
     op_getfeatureinfo.add("DCPType.HTTP.Get.OnlineResource.<xmlattr>.xmlns:xlink", "http://www.w3.org/1999/xlink");
@@ -153,8 +155,8 @@ DataStream* WmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     contents_node.add("Title", root_layer_title);
     contents_node.add("Abstract", root_layer_abstract);
 
-    for ( unsigned int i = 0; i < crss.size(); i++ ) {
-        contents_node.add("CRS", crss.at(i)->get_request_code());
+    for ( unsigned int i = 0; i < services->map_crss.size(); i++ ) {
+        contents_node.add("CRS", services->map_crss.at(i)->get_request_code());
     }
 
     BoundingBox<double> gbbox ( -180.0,-90.0,180.0,90.0 );

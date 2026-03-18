@@ -349,7 +349,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
         }
 
         if ( available_styles.size() == 0 ) {
-            Style* sty = StyleBook::get_style(services->get_default_style_id());
+            Style* sty = StyleBook::get_style(services->default_style);
             if ( sty == NULL ) {
                 error_message =  "No valid style (even the default one), the layer is not valid"  ;
                 return false;
@@ -403,7 +403,7 @@ bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
                     continue;
                 }
 
-                if (services->get_wms_service()->is_available_crs(str_crs)) {
+                if (services->is_map_available_crs(str_crs)) {
                     // Cette projection est déjà disponible globalement au niveau du service
                     continue;
                 }
@@ -548,7 +548,9 @@ void Layer::calculate_tilematrix_limits() {
     }
 }
 
-Layer::Layer(std::string path, ServicesConfiguration* services) : Configuration(path), pyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string path, ServicesConfiguration* s) : Configuration(path), pyramid(NULL), attribution(NULL) {
+
+    services = s;
 
     /********************** Id */
 
@@ -774,8 +776,8 @@ void Layer::add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire
     node.add("Format", Rok4Format::to_mime_type ( pyramid->get_format() ));
 
     if (gfi_enabled){
-        for ( unsigned int j = 0; j < service->get_available_infoformats()->size(); j++ ) {
-            node.add("InfoFormat", service->get_available_infoformats()->at ( j ));
+        for ( unsigned int j = 0; j < services->get_available_infoformats()->size(); j++ ) {
+            node.add("InfoFormat", services->get_available_infoformats()->at ( j ));
         }
     }
 
@@ -795,7 +797,7 @@ void Layer::add_node_wmts(ptree& parent, WmtsService* service, bool only_inspire
         used_tms_list->emplace ( tmsi->request_id , tmsi );
 
         // Si la reprojection WMTS n'est pas activée, nous n'exposons que le premier TMS, celui natif
-        if (! service->reprojection_enabled()) {
+        if (! services->tile_reprojection) {
             break;
         }
     }
@@ -836,7 +838,7 @@ void Layer::add_node_wms(ptree& parent, WmsService* service, bool only_inspire) 
         node.add("CRS", c->get_request_code());
 
         // Si la reprojection WMS n'est pas activée, nous n'exposons que le premier CRS, celui natif
-        if (! service->reprojection_enabled()) {
+        if (! services->map_reprojection) {
             break;
         }
     }
@@ -857,13 +859,13 @@ void Layer::add_node_wms(ptree& parent, WmsService* service, bool only_inspire) 
             bbox.add_node(node, false, c->is_lat_lon() );
 
             // Si la reprojection WMS n'est pas activée, nous n'exposons que la bbox en projection native
-            if (! service->reprojection_enabled()) {
+            if (! services->map_reprojection) {
                 break;
             }
         }
-        if (! service->reprojection_enabled()) {
-            for ( unsigned int i = 0; i < service->get_available_crs()->size(); i++ ) {
-                CRS* crs = service->get_available_crs()->at(i);
+        if (services->map_reprojection) {
+            for ( unsigned int i = 0; i < services->get_map_available_crs()->size(); i++ ) {
+                CRS* crs = services->get_map_available_crs()->at(i);
                 BoundingBox<double> bbox ( 0,0,0,0 );
                 if ( geographic_bbox.is_in_crs_area(crs)) {
                     bbox = geographic_bbox;
@@ -1036,8 +1038,8 @@ json11::Json Layer::to_json_tilesets(OgcApiService* service) {
             }}
         });
 
-        // Si la reprojection OGC API n'est pas activée ou que c'est de la donnée vecteur, nous n'exposons que le premier TMS, celui natif
-        if (! service->reprojection_enabled() || ! raster) {
+        // Si la reprojection tuilée n'est pas activée ou que c'est de la donnée vecteur, nous n'exposons que le premier TMS, celui natif
+        if (! services->tile_reprojection || ! raster) {
             break;
         }
     }

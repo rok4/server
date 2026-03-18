@@ -61,6 +61,7 @@ using boost::property_tree::ptree;
 #include <rok4/utils/Configuration.h>
 
 #include "configurations/Server.h"
+#include "configurations/Services.h"
 #include "configurations/Metadata.h"
 #include "configurations/Attribution.h"
 
@@ -109,6 +110,11 @@ struct TileMatrixSetInfos {
 class Layer : public Configuration {
 
 private:
+    /**
+     * \~french \brief Configuration des services
+     * \~english \brief Services configuration
+     */
+    ServicesConfiguration* services;
     /**
      * \~french \brief Identifiant de la couche
      * \~english \brief Layer identifier

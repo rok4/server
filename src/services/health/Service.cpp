@@ -51,7 +51,7 @@
 
 #include "core/Rok4Server.h"
 
-HealthService::HealthService (json11::Json& doc) : Service(doc) {
+HealthService::HealthService (json11::Json& doc) : Service(doc, "HEALTH service", "HEALTH service", "http://localhost/healthcheck", "/healthcheck") {
 
     if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
@@ -64,11 +64,8 @@ HealthService::HealthService (json11::Json& doc) : Service(doc) {
         return;
     }
 
-    title = "HEALTH service";
-    abstract = "HEALTH service";
     keywords.push_back(Keyword ( "health" ));
     keywords.push_back(Keyword ( "check" ));
-    root_path = "/healthcheck";
 }
 
 DataStream* HealthService::process_request(Request* req, Rok4Server* serv) {

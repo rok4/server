@@ -133,7 +133,7 @@ DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
     std::string format = Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) );
 
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(serv, layer, tms, tm, column, row, format, style);
+    DataStream* d = Tile::get_tile(serv->get_services_configuration(), layer, tms, tm, column, row, format, style);
     if (d == NULL) {
         throw TmsException::get_error_message("No data found", 404);
     }

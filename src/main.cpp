@@ -204,7 +204,7 @@ Rok4Server* load_configuration() {
         while (std::getline(list_content, layer_desc)) {
             Layer* layer = new Layer(layer_desc, services_configuration);
             if ( layer->is_ok() ) {
-                server_configuration->add_layer ( layer );
+                services_configuration->add_layer ( layer );
             } else {
                 BOOST_LOG_TRIVIAL(error) << "Cannot load layer " << layer_desc << ": " << layer->get_error_message();
                 delete layer;
@@ -212,7 +212,7 @@ Rok4Server* load_configuration() {
         }
     }
 
-    BOOST_LOG_TRIVIAL(info) << server_configuration->get_layers_count() << " layer(s) loaded" ;
+    BOOST_LOG_TRIVIAL(info) << services_configuration->get_layers_count() << " layer(s) loaded" ;
 
     // Instanciation du serveur
     return new Rok4Server ( server_configuration, services_configuration );

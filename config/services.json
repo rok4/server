@@ -1,23 +1,51 @@
 {
-    "provider": "Local",
-    "site": "http://localhost",
-    "fee": "none",
-    "access_constraint": "none",
-    "contact": {
-        "name": "SAV",
-        "position": "custodian",
-        "voice": "",
-        "facsimile": "",
-        "address_type": "",
-        "delivery_point": "",
-        "city": "",
-        "administrative_area": "",
-        "post_code": "",
-        "country": "",
-        "email": ""
+    "global": {
+        "provider": "Local",
+        "site": "http://localhost",
+        "fee": "none",
+        "access_constraint": "none",
+        "contact": {
+            "name": "SAV",
+            "position": "custodian",
+            "voice": "",
+            "facsimile": "",
+            "address_type": "",
+            "delivery_point": "",
+            "city": "",
+            "administrative_area": "",
+            "post_code": "",
+            "country": "",
+            "email": ""
+        },
+        "crs_equivalences": "/etc/rok4/equals_crs.json",
+        "default_style": "normal",
+        "map": {
+            "limits": {
+                "width": 10000,
+                "height": 10000,
+                "tile_x": 256,
+                "tile_y": 256,
+                "layers_count": 2
+            },
+            "formats": [
+                "image/jpeg",
+                "image/png",
+                "image/tiff",
+                "image/geotiff",
+                "image/x-bil;bits=32"
+            ],
+            "crs": [
+                "CRS:84",
+                "EPSG:3857",
+                "EPSG:4326"
+            ],
+            "reprojection": true,
+            "inspire": false
+        },
+        "tile": {
+            "reprojection": true
+        }
     },
-    "crs_equivalences": "/etc/rok4/equals_crs.json",
-    "default_style": "normal",
     "admin": {
         "enabled": true
     },
@@ -28,37 +56,16 @@
         "enabled": true,
         "endpoint_uri": "http://localhost/rok4/wms",
         "root_path": "/wms",
-        "title": "Service de visualisation WMS",
-        "abstract": "Ce service permet la visulation de couches de données raster au travers d'un flux WMS",
-        "keywords": [
-            "WMS"
-        ],
-        "limits": {
-            "width": 10000,
-            "height": 10000,
-            "tile_x": 256,
-            "tile_y": 256,
-            "layers_count": 2
-        },
-        "name": "WMS",
-        "formats": [
-            "image/jpeg",
-            "image/png",
-            "image/tiff",
-            "image/geotiff",
-            "image/x-bil;bits=32"
-        ],
-        "crs": [
-            "CRS:84",
-            "EPSG:3857",
-            "EPSG:4326"
-        ],
         "root_layer": {
             "title": "Couches WMS",
             "abstract": "Données servies en WMS"
         },
-        "reprojection": true,
-        "inspire": false
+        "name": "WMS",
+        "title": "Service de visualisation WMS",
+        "abstract": "Ce service permet la visulation de couches de données raster au travers d'un flux WMS",
+        "keywords": [
+            "WMS"
+        ]
     },
     "wmts": {
         "enabled": true,
@@ -68,8 +75,7 @@
         "keywords": [
             "WMTS"
         ],
-        "root_path": "/wmts",
-        "reprojection": true
+        "root_path": "/wmts"
     },
     "tms": {
         "enabled": true,
@@ -90,7 +96,6 @@
         "keywords": [
             "OGC API Tiles"
         ],
-        "reprojection": true,
         "tiles": true,
         "maps": false
     }

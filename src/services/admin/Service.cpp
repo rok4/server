@@ -48,7 +48,7 @@
 
 #include "core/Rok4Server.h"
 
-AdminService::AdminService (json11::Json& doc) : Service(doc) {
+AdminService::AdminService (json11::Json& doc) : Service(doc, "ADMIN service", "ADMIN service", "http://localhost/admin", "/admin") {
 
     if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
@@ -61,10 +61,7 @@ AdminService::AdminService (json11::Json& doc) : Service(doc) {
         return;
     }
 
-    title = "ADMIN service";
-    abstract = "ADMIN service";
     keywords.push_back(Keyword ( "administration" ));
-    root_path = "/admin";
 }
 
 DataStream* AdminService::process_request(Request* req, Rok4Server* serv) {

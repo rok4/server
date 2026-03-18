@@ -72,6 +72,7 @@
 class ServicesConfiguration : public Configuration
 {
     friend class Rok4Server;
+    friend class Layer;
     
     friend class WmtsService;
     friend class TmsService;
@@ -88,6 +89,12 @@ class ServicesConfiguration : public Configuration
         WmsService* get_wms_service() {return wms_service;};
         AdminService* get_admin_service() {return admin_service;};
         OgcApiService* get_ogcapi_service() {return ogcapi_service;};
+
+        std::map<std::string, Layer*>& get_layers() ;
+        void add_layer(Layer* l) ;
+        void delete_layer(std::string id) ;
+        int get_layers_count() ;
+        Layer* get_layer(std::string id) ;
         
         /**
          * \~french
@@ -101,7 +108,58 @@ class ServicesConfiguration : public Configuration
         };
         bool are_crs_equals( std::string crs1, std::string crs2 );
 
-        std::string get_default_style_id();
+        /**
+         * \~french
+         * \brief Teste la validité du info format
+         * \~english
+         * \brief Test if info format is valid
+         */
+        bool is_available_infoformat(std::string f) ;
+
+        /**
+         * \~french
+         * \brief Liste des formats d'information des services
+         * \~english
+         * \brief Services informations formats
+         */
+        std::vector<std::string>* get_available_infoformats() ;
+
+        /**
+         * \~french
+         * \brief Teste la présence du CRS dans la liste
+         * \return Présent ou non
+         * \~english
+         * \brief Test if CRS is in the CRS list
+         * \return Present or not
+         */
+        bool is_map_available_crs(CRS* c) ;
+
+        /**
+         * \~french
+         * \brief Teste la présence du CRS dans la liste
+         * \return Présent ou non
+         * \~english
+         * \brief Test if CRS is in the CRS list
+         * \return Present or not
+         */
+        bool is_map_available_crs(std::string c) ;
+
+        /**
+         * \~french
+         * \brief Teste la validité du format
+         * \~english
+         * \brief Test if format is valid
+         */
+        bool is_map_available_format(std::string f) ;
+
+        /**
+         * \~french
+         * \brief Liste des CRS globaux du service
+         * \~english
+         * \brief Global service CRS list
+         */
+        std::vector<CRS*>* get_map_available_crs() ;
+
 
         /**
          * \~french
@@ -113,6 +171,12 @@ class ServicesConfiguration : public Configuration
         
     protected:
 
+        /**
+         * \~french \brief Liste des couches disponibles
+         * \~english \brief Available layers list
+         */
+        std::map<std::string, Layer*> layers;
+
         // ----------------------- Global 
 
         std::string service_provider;
@@ -123,6 +187,23 @@ class ServicesConfiguration : public Configuration
         Contact* contact;
 
         std::string default_style;
+        bool default_inspire;
+        std::vector<std::string> info_formats;
+
+        // Map
+        bool map_reprojection;
+        std::vector<std::string> map_formats;
+
+        int map_max_layers_count;
+        int map_max_width;
+        int map_max_height;
+        int map_max_tile_x;
+        int map_max_tile_y;
+
+        std::vector<CRS*> map_crss;
+
+        // Tile
+        bool tile_reprojection;
 
     private:
 

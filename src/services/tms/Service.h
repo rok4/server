@@ -47,7 +47,6 @@ class TmsService;
 
 #pragma once
 #include "services/Service.h"
-#include "configurations/Metadata.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -62,8 +61,6 @@ private:
     DataStream* get_metadata ( Request* req, Rok4Server* serv );
     DataStream* get_gdal ( Request* req, Rok4Server* serv );
     DataStream* get_tile ( Request* req, Rok4Server* serv );
-
-    Metadata* metadata;
 
     std::string cache_getcapabilities;
 
@@ -96,9 +93,7 @@ public:
      * \~english
      * \brief Destructor
      */
-    ~TmsService() {
-        if (metadata) delete metadata;
-    };
+    ~TmsService() {};
 
 };
 

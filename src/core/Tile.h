@@ -38,7 +38,6 @@
 #pragma once
 
 #include <rok4/datasource/PaletteDataSource.h>
-#include <rok4/datastream/AscEncoder.h>
 #include <rok4/datastream/BilEncoder.h>
 #include <rok4/datastream/JPEGEncoder.h>
 #include <rok4/datastream/PNGEncoder.h>
@@ -64,7 +63,7 @@ namespace Tile {
  * \brief Give the asked tile
  * \return Data stream
  */
-static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSet* tms, TileMatrix* tm, int column, int row, std::string format, Style* style) {
+static DataStream* get_tile(ServicesConfiguration* services, Layer* layer, TileMatrixSet* tms, TileMatrix* tm, int column, int row, std::string format, Style* style) {
     // Traitement de la requête
 
     if (tms->get_id() == layer->get_pyramid()->get_tms()->get_id()) {
@@ -90,7 +89,7 @@ static DataStream* get_tile(Rok4Server* serv, Layer* layer, TileMatrixSet* tms, 
         CRS* crs = tms->get_crs();
         bbox.crs = crs->get_request_code();
 
-        bool crs_equals = serv->get_services_configuration()->are_crs_equals(layer->get_pyramid()->get_tms()->get_crs()->get_proj_code(), crs->get_proj_code());
+        bool crs_equals = services->are_crs_equals(layer->get_pyramid()->get_tms()->get_crs()->get_proj_code(), crs->get_proj_code());
 
         // On se donne maxium 3 tuiles sur 3 dans la pyramide source pour calculer cette tuile
         Image* image = layer->get_pyramid()->getbbox(3, 3, bbox, width, height, crs, crs_equals, layer->get_resampling(), 0);

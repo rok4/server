@@ -83,14 +83,7 @@ class ServerConfiguration : public Configuration
         boost::log::v2_mt_posix::trivial::severity_level get_log_level() ;
 
         std::string get_services_configuration_file() ;
-
         std::string get_layers_list() ;
-        std::map<std::string, Layer*>& get_layers() ;
-        void add_layer(Layer* l) ;
-        void delete_layer(std::string id) ;
-        int get_layers_count() ;
-        Layer* get_layer(std::string id) ;
-
         
         int get_threads_count() ;
         std::string get_socket() ;
@@ -122,11 +115,6 @@ class ServerConfiguration : public Configuration
          * \~english \brief File or object containing layers' descriptors list
          */
         std::string layers_list;
-        /**
-         * \~french \brief Liste des couches disponibles
-         * \~english \brief Available layers list
-         */
-        std::map<std::string, Layer*> layers;
 
         /**
          * \~french \brief Adresse du socket d'écoute (vide si lancement géré par un tiers)

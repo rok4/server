@@ -146,7 +146,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmtsException::get_error_message("InfoFormat unknown", "InvalidParameterValue", 400);
     }
 
-    if ( ! is_available_infoformat(info_format) )
+    if ( ! serv->get_services_configuration()->is_available_infoformat(info_format) )
         throw WmtsException::get_error_message("InfoFormat " + info_format + " unknown", "InvalidParameterValue", 400);
 
     // i

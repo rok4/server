@@ -90,7 +90,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     if (tmsi == NULL) {
         throw WmtsException::get_error_message("Tile matrix set " + str_tms + " unknown", "InvalidParameterValue", 400);
     }
-    if (tmsi->tms->get_id() != layer->get_pyramid()->get_tms()->get_id() && ! reprojection) {
+    if (tmsi->tms->get_id() != layer->get_pyramid()->get_tms()->get_id() && ! serv->get_services_configuration()->tile_reprojection) {
         throw WmtsException::get_error_message("Tile matrix set " + str_tms + " unknown", "InvalidParameterValue", 400);
     }
 
@@ -161,7 +161,7 @@ DataStream* WmtsService::get_tile(Request* req, Rok4Server* serv) {
     }
 
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(serv, layer, tmsi->tms, tm, column, row, format, style);
+    DataStream* d = Tile::get_tile(serv->get_services_configuration(), layer, tmsi->tms, tm, column, row, format, style);
     if (d == NULL) {
         throw WmtsException::get_error_message("No data found", "Not Found", 404);
     }

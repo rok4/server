@@ -58,14 +58,16 @@ using boost::property_tree::xml_writer_settings;
 
 DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
+    ServicesConfiguration* services = serv->get_services_configuration();
+
+    bool default_inspire = services->default_inspire;
+
     if ( req->is_inspire(default_inspire) && ! cache_getcapabilities_inspire.empty()) {
         return new MessageDataStream ( cache_getcapabilities_inspire, "text/xml", 200 );
     }
     else if (! req->is_inspire(default_inspire) && ! cache_getcapabilities.empty()) {
         return new MessageDataStream ( cache_getcapabilities, "text/xml", 200 );
     }
-
-    ServicesConfiguration* services = serv->get_services_configuration();
 
     // On va mémoriser les TMS utilisés, avec les niveaux du haut et du bas
     // La clé est un triplet : nom du TMS, niveau du haut, niveau du bas
