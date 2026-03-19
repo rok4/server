@@ -64,7 +64,7 @@ bool is_style_handled(Style* style) {
     return true;
 }
 
-bool Layer::parse(json11::Json& doc, ServicesConfiguration* services) {
+bool Layer::parse(json11::Json& doc) {
 
     /********************** Default values */
 
@@ -595,7 +595,7 @@ Layer::Layer(std::string path, ServicesConfiguration* s) : Configuration(path), 
 
     /********************** Parse */
 
-    if (! parse(doc, services)) {
+    if (! parse(doc)) {
         return;
     }
 
@@ -603,7 +603,9 @@ Layer::Layer(std::string path, ServicesConfiguration* s) : Configuration(path), 
 }
 
 
-Layer::Layer(std::string layer_name, std::string content, ServicesConfiguration* services ) : Configuration(), id(layer_name), pyramid(NULL), attribution(NULL) {
+Layer::Layer(std::string layer_name, std::string content, ServicesConfiguration* s ) : Configuration(), id(layer_name), pyramid(NULL), attribution(NULL) {
+
+    services = s;
 
     /********************** Id */
 
@@ -623,7 +625,7 @@ Layer::Layer(std::string layer_name, std::string content, ServicesConfiguration*
 
     /********************** Parse */
 
-    if (! parse(doc, services)) {
+    if (! parse(doc)) {
         return;
     }
     

@@ -258,7 +258,7 @@ private:
     void calculate_native_tilematrix_limits();
     void calculate_tilematrix_limits();
 
-    bool parse(json11::Json& doc, ServicesConfiguration* services);
+    bool parse(json11::Json& doc);
 
 public:
     /**

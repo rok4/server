@@ -48,16 +48,16 @@
 
 #include "core/Rok4Server.h"
 
-DataStream* AdminService::turn_on ( Request* req, Rok4Server* serv ) {
+DataStream* AdminService::turn_on ( Request* req, ServicesConfiguration* services ) {
 
-    serv->turn_on();
+    services->enabled = true;
     return new EmptyResponseDataStream();
 
 }
 
-DataStream* AdminService::turn_off ( Request* req, Rok4Server* serv ) {
+DataStream* AdminService::turn_off ( Request* req, ServicesConfiguration* services ) {
 
-    serv->turn_off();
+    services->enabled = false;
     return new EmptyResponseDataStream();
 
 }

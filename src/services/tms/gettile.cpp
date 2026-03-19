@@ -52,7 +52,7 @@
 #include "core/Rok4Server.h"
 #include "core/Tile.h"
 
-DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
+DataStream* TmsService::get_tile ( Request* req, ServicesConfiguration* services ) {
 
     // La version
     if ( req->path_params.at(0) != "1.0.0" )
@@ -65,7 +65,7 @@ DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Layer unknown", 400);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_tms_enabled() ) {
         throw TmsException::get_error_message("Layer " + str_layer + " unknown", 400);
     }
@@ -133,7 +133,7 @@ DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
     std::string format = Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) );
 
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(serv->get_services_configuration(), layer, tms, tm, column, row, format, style);
+    DataStream* d = Tile::get_tile(services, layer, tms, tm, column, row, format, style);
     if (d == NULL) {
         throw TmsException::get_error_message("No data found", 404);
     }

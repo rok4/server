@@ -50,9 +50,7 @@
 #include "services/wms/Service.h"
 #include "core/Rok4Server.h"
 
-DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
-
-    ServicesConfiguration* services = serv->get_services_configuration();
+DataStream* WmsService::get_feature_info ( Request* req, ServicesConfiguration* services ) {
 
     // Les couches
     std::vector<Layer*> layers;
@@ -74,7 +72,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("Layer unknown", "LayerNotDefined", 400);
         }
 
-        Layer* layer = serv->get_server_configuration()->get_layer(vector_layers.at(i));
+        Layer* layer = services->get_layer(vector_layers.at(i));
         if (layer == NULL || ! layer->is_wms_enabled()) {
             throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "LayerNotDefined", 400);
         }
@@ -102,7 +100,7 @@ DataStream* WmsService::get_feature_info ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("Layer unknown", "LayerNotDefined", 400);
         }
 
-        Layer* layer = serv->get_server_configuration()->get_layer(vector_query_layers.at(i));
+        Layer* layer = services->get_layer(vector_query_layers.at(i));
         if (layer == NULL || ! layer->is_wms_enabled()) {
             throw WmsException::get_error_message("Layer " + vector_query_layers.at(i) + " unknown", "LayerNotDefined", 400);
         }

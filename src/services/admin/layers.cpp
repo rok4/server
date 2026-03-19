@@ -48,28 +48,28 @@
 
 #include "core/Rok4Server.h"
 
-DataStream* AdminService::add_layer ( Request* req, Rok4Server* serv ) {
+DataStream* AdminService::add_layer ( Request* req, ServicesConfiguration* services ) {
 
     std::string str_layer = req->path_params.at(0);
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
 
     if ( layer != NULL ) throw AdminException::get_error_message("Layer already exists.", "Configuration conflict", 409);
 
-    layer = new Layer( str_layer, req->body, serv->get_services_configuration() );
+    layer = new Layer( str_layer, req->body, services );
     if ( ! layer->is_ok() ) {
         std::string msg = layer->get_error_message();
         delete layer;
         throw AdminException::get_error_message(msg, "Configuration issue", 400);
     }
 
-    serv->get_server_configuration()->add_layer ( layer );
-    serv->get_services_configuration()->clean_cache();
+    services->add_layer ( layer );
+    services->clean_cache();
 
     return new EmptyResponseDataStream ();
 }
 
-DataStream* AdminService::update_layer ( Request* req, Rok4Server* serv ) {
+DataStream* AdminService::update_layer ( Request* req, ServicesConfiguration* services ) {
 
     std::string str_layer = req->path_params.at(0);
     if ( contain_chars(str_layer, "\"")) {
@@ -77,26 +77,26 @@ DataStream* AdminService::update_layer ( Request* req, Rok4Server* serv ) {
         throw AdminException::get_error_message("Layer does not exists.", "Not found", 404);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
 
     if ( layer == NULL ) throw AdminException::get_error_message("Layer " + str_layer + " does not exists.", "Not found", 404);
 
-    Layer* new_layer = new Layer( str_layer, req->body, serv->get_services_configuration() );
+    Layer* new_layer = new Layer( str_layer, req->body, services );
     if ( ! new_layer->is_ok() ) {
         std::string msg = new_layer->get_error_message();
         delete new_layer;
         throw AdminException::get_error_message(msg, "Configuration issue", 400);
     }
 
-    serv->get_server_configuration()->delete_layer ( layer->get_id() );
-    serv->get_server_configuration()->add_layer ( new_layer );
-    serv->get_services_configuration()->clean_cache();
+    services->delete_layer ( layer->get_id() );
+    services->add_layer ( new_layer );
+    services->clean_cache();
 
     return new EmptyResponseDataStream ();
 
 }
 
-DataStream* AdminService::delete_layer ( Request* req, Rok4Server* serv ) {
+DataStream* AdminService::delete_layer ( Request* req, ServicesConfiguration* services ) {
 
     std::string str_layer = req->path_params.at(0);
     if ( contain_chars(str_layer, "\"")) {
@@ -104,12 +104,12 @@ DataStream* AdminService::delete_layer ( Request* req, Rok4Server* serv ) {
         throw AdminException::get_error_message("Layer does not exists.", "Not found", 404);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
 
     if ( layer == NULL ) throw AdminException::get_error_message("Layer " + str_layer + " does not exists.", "Not found", 404);
 
-    serv->get_server_configuration()->delete_layer ( layer->get_id() );
-    serv->get_services_configuration()->clean_cache();
+    services->delete_layer ( layer->get_id() );
+    services->clean_cache();
 
     return new EmptyResponseDataStream ();
 }

@@ -51,7 +51,7 @@
 
 
 
-DataStream* OgcApiService::get_api_collections ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_api_collections ( Request* req, ServicesConfiguration* services ) {
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
         throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
@@ -59,7 +59,7 @@ DataStream* OgcApiService::get_api_collections ( Request* req, Rok4Server* serv 
 
     std::vector<std::string> collections;
 
-    for(auto const& l: serv->get_server_configuration()->get_layers()) {
+    for(auto const& l: services->get_layers()) {
         if (l.second->is_ogcapi_enabled()) {
             collections.push_back(l.first);
         }
@@ -73,7 +73,7 @@ DataStream* OgcApiService::get_api_collections ( Request* req, Rok4Server* serv 
     return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
 }
 
-DataStream* OgcApiService::get_api_vector_collections ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_api_vector_collections ( Request* req, ServicesConfiguration* services ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
@@ -82,7 +82,7 @@ DataStream* OgcApiService::get_api_vector_collections ( Request* req, Rok4Server
 
     std::vector<std::string> collections;
 
-    for(auto const& l: serv->get_server_configuration()->get_layers()) {
+    for(auto const& l: services->get_layers()) {
         if (l.second->is_ogcapi_enabled() && ! l.second->is_raster()) {
             collections.push_back(l.first);
         }
@@ -96,7 +96,7 @@ DataStream* OgcApiService::get_api_vector_collections ( Request* req, Rok4Server
     return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
 }
 
-DataStream* OgcApiService::get_api_tilematrixsets ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_api_tilematrixsets ( Request* req, ServicesConfiguration* services ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
@@ -116,7 +116,7 @@ DataStream* OgcApiService::get_api_tilematrixsets ( Request* req, Rok4Server* se
     return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
 }
 
-DataStream* OgcApiService::get_api_styles ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_api_styles ( Request* req, ServicesConfiguration* services ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
@@ -136,7 +136,7 @@ DataStream* OgcApiService::get_api_styles ( Request* req, Rok4Server* serv ) {
     return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
 }
 
-DataStream* OgcApiService::get_tilematrixsets ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_tilematrixsets ( Request* req, ServicesConfiguration* services ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
@@ -169,7 +169,7 @@ DataStream* OgcApiService::get_tilematrixsets ( Request* req, Rok4Server* serv )
 }
 
 
-DataStream* OgcApiService::get_tilematrixset ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_tilematrixset ( Request* req, ServicesConfiguration* services ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {

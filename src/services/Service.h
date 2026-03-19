@@ -54,7 +54,7 @@
 
 #include "configurations/Metadata.h"
 
-class Rok4Server;
+class ServicesConfiguration;
 class Request;
 
 /**
@@ -105,7 +105,7 @@ public:
      */
     Service (json11::Json& doc, std::string default_title, std::string default_abstract, std::string default_endpoint_uri, std::string default_root_path);
 
-    virtual DataStream* process_request(Request* req, Rok4Server* serv) = 0;
+    virtual DataStream* process_request(Request* req, ServicesConfiguration* services) = 0;
 
     std::string get_endpoint_uri() {return endpoint_uri;};
     bool is_enabled() {return enabled;};

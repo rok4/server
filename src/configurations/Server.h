@@ -68,14 +68,10 @@ class ServerConfiguration;
 class ServerConfiguration : public Configuration
 {
     friend class Rok4Server;
-    friend class CommonService;
-    friend class TmsService;
 
     public:
         ServerConfiguration(std::string path);
         ~ServerConfiguration();
-
-        bool is_enabled();
 
         std::string get_log_output() ;
         int get_log_file_period() ;
@@ -126,12 +122,6 @@ class ServerConfiguration : public Configuration
          * \~english \brief Socket listen queue depth
          */
         int backlog;
-
-        /**
-         * \~french \brief Définit si le serveur doit honorer les requêtes de consultation
-         * \~english \brief Define whether broadcast request should be honored
-         */
-        bool enabled;
 
     private:
 

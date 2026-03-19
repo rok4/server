@@ -151,16 +151,6 @@ bool ServerConfiguration::parse(json11::Json& doc) {
         backlog = doc["backlog"].int_value();
     }
 
-    // enabled
-    if (doc["enabled"].is_null()) {
-        enabled = true;
-    } else if (! doc["enabled"].is_bool()) {
-        error_message = "enabled have to be a boolean";
-        return false;
-    } else {
-        enabled = doc["enabled"].bool_value();
-    }
-
     // configurations
     json11::Json configurationsSection = doc["configurations"];
     if (configurationsSection.is_null()) {
@@ -252,4 +242,3 @@ std::string ServerConfiguration::get_layers_list() {return layers_list;}
 
 int ServerConfiguration::get_threads_count() {return threads_count;}
 std::string ServerConfiguration::get_socket() {return socket;}
-bool ServerConfiguration::is_enabled() {return enabled;}

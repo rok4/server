@@ -102,7 +102,7 @@ WmsService::WmsService (json11::Json& doc, ServicesConfiguration* svc) : Service
 }
 
 
-DataStream* WmsService::process_request(Request* req, Rok4Server* serv) {
+DataStream* WmsService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "WMS service";
 
     // On contrôle le service précisé en paramètre de requête
@@ -129,13 +129,13 @@ DataStream* WmsService::process_request(Request* req, Rok4Server* serv) {
     
     if (param_request == "getcapabilities") {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
-        return get_capabilities(req, serv);
+        return get_capabilities(req, services);
     } else if (param_request == "getfeatureinfo") {
         BOOST_LOG_TRIVIAL(debug) << "GETFEATUREINFO request";
-        return get_feature_info(req, serv);
+        return get_feature_info(req, services);
     } else if (param_request == "getmap") {
         BOOST_LOG_TRIVIAL(debug) << "GETMAP request";
-        return get_map(req, serv);
+        return get_map(req, services);
     } else {
         throw WmsException::get_error_message("REQUEST query parameter unknown", "OperationNotSupported", 400);
     }

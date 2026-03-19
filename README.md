@@ -117,6 +117,81 @@ check-jsonschema /path/to/your/server.json --schemafile ./config/server.schema.j
 check-jsonschema /path/to/your/services.json --schemafile ./config/services.schema.json
 ```
 
+#### Convertir la configuration des services v6 -> v7+
+
+La commande `jq` suivante permet d'obtenir la structure de la configuration v7+ à partir de la configuration v6 :
+
+```bash
+jq '
+    . | 
+    {
+        enabled: true,
+        global: {
+            provider: .provider,
+            site: .site,
+            fee: .fee,
+            access_constraint: .access_constraint,
+            contact: .contact,
+            crs_equivalences: .crs_equivalences,
+            default_style: .default_style,
+            inspire: .wms.inspire,
+            map: {
+                limits: .wms.limits,
+                formats: .wms.formats,
+                crs: .wms.crs,
+                reprojection: .wms.reprojection
+            },
+            tile: {
+                reprojection: .wmts.reprojection
+            }
+        },
+        admin: .admin,
+        health: .health,
+        wms: {
+            enabled: .wms.enabled,
+            endpoint_uri: .wms.endpoint_uri,
+            root_path: .wms.root_path,
+            title: .wms.title,
+            abstract: .wms.abstract,
+            keywords: .wms.keywords,
+            metadata: .wms.metadata,
+            name: .wms.name,
+            root_layer: .wms.root_layer
+        },
+        wmts: {
+            enabled: .wmts.enabled,
+            endpoint_uri: .wmts.endpoint_uri,
+            root_path: .wmts.root_path,
+            title: .wmts.title,
+            abstract: .wmts.abstract,
+            keywords: .wmts.keywords,
+            metadata: .wmts.metadata
+        },
+        tms: {
+            enabled: .tms.enabled,
+            endpoint_uri: .tms.endpoint_uri,
+            root_path: .tms.root_path,
+            title: .tms.title,
+            abstract: .tms.abstract,
+            keywords: .tms.keywords,
+            metadata: .tms.metadata
+        },
+        ogcapi: {
+            enabled: .tiles.enabled,
+            endpoint_uri: (.tiles.endpoint_uri | sub("/tiles"; "/ogcapi")),
+            root_path: "/ogcapi",
+            title: (.tiles.title | sub(" Tiles"; "")),
+            abstract: (.tiles.abstract | sub(" Tiles"; "")),
+            keywords: .tiles.keywords,
+            metadata: .tiles.metadata,
+            tiles: true,
+            maps: true
+        }
+    }
+' services.json
+```
+
+
 ### Lancer le serveur
 
 #### En ligne de commande

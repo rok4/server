@@ -48,27 +48,27 @@
 #include <rok4/thirdparty/json11.hpp>
 
 #include "services/health/Service.h"
-#include "services/health/Threads.h"
 #include "services/health/Exception.h"
 
 #include "core/Rok4Server.h"
+#include "core/Process.h"
 
-DataStream* HealthService::get_health ( Request* req, Rok4Server* serv ) {
+DataStream* HealthService::get_health ( Request* req, ServicesConfiguration* services ) {
 
     json11::Json res = json11::Json::object {
         { "version", VERSION },
-        { "pid", serv->get_pid() },
-        { "time", (int) serv->get_time() },
-        { "status", serv->get_server_configuration()->is_enabled() ? "OK" : "DISABLED" }
+        { "pid", (int) Process::get_pid() },
+        { "time", (int) Process::get_time() },
+        { "status", services->enabled ? "OK" : "DISABLED" }
     };
 
     return new MessageDataStream ( res.dump(), "application/json", 200 );
 }
 
-DataStream* HealthService::get_infos ( Request* req, Rok4Server* serv ) {
+DataStream* HealthService::get_infos ( Request* req, ServicesConfiguration* services ) {
 
     std::vector<std::string> layers;
-    for(auto const& l: serv->get_server_configuration()->get_layers()) {
+    for(auto const& l: services->get_layers()) {
         layers.push_back(l.first);
     }
 
@@ -91,17 +91,17 @@ DataStream* HealthService::get_infos ( Request* req, Rok4Server* serv ) {
     return new MessageDataStream ( res.dump(), "application/json", 200 );
 }
 
-DataStream* HealthService::get_threads ( Request* req, Rok4Server* serv ) {
+DataStream* HealthService::get_threads ( Request* req, ServicesConfiguration* services ) {
 
     json11::Json res = json11::Json::object {
-        { "number", (int) serv->get_threads().size() },
-        { "threads", Threads::to_json() }
+        { "number", Process::get_threads_count() },
+        { "threads", Process::to_json() }
     };
 
     return new MessageDataStream ( res.dump(), "application/json", 200 );
 }
 
-DataStream* HealthService::get_dependencies ( Request* req, Rok4Server* serv ) {
+DataStream* HealthService::get_dependencies ( Request* req, ServicesConfiguration* services ) {
 
     int file_count, s3_count, ceph_count, swift_count;
     StoragePool::get_storages_count(file_count, s3_count, ceph_count, swift_count);

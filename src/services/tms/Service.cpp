@@ -63,28 +63,28 @@ TmsService::TmsService (json11::Json& doc) : Service(doc, "TMS service", "TMS se
     }
 }
 
-DataStream* TmsService::process_request(Request* req, Rok4Server* serv) {
+DataStream* TmsService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "TMS service";
 
     if ( match_route( "/([^/]+)/?", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
-        return get_capabilities(req, serv);
+        return get_capabilities(req, services);
     }
     else if ( match_route( "/([^/]+)/([^/]+)/?", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILES request";
-        return get_tiles(req, serv);
+        return get_tiles(req, services);
     }
     else if ( match_route( "/([^/]+)/([^/]+)/metadata\\.json", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETMETADATA request";
-        return get_metadata(req, serv);
+        return get_metadata(req, services);
     }
     else if ( match_route( "/([^/]+)/([^/]+)/gdal\\.xml", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETGDAL request";
-        return get_gdal(req, serv);
+        return get_gdal(req, services);
     }
     else if ( match_route( "/([^/]+)/([^/]+)/([^/]+)/([^/]+)/([^/]+)\\.(.*)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTILE request";
-        return get_tile(req, serv);
+        return get_tile(req, services);
     } else {
         throw TmsException::get_error_message("Unknown tms request path", 400);
     }

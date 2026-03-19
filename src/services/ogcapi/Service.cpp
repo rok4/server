@@ -81,79 +81,79 @@ OgcApiService::OgcApiService (json11::Json& doc) : Service(doc, "OGC API service
     }
 }
 
-DataStream* OgcApiService::process_request(Request* req, Rok4Server* serv) {
+DataStream* OgcApiService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "OGC API service";
 
     if ( match_route( "", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET LANDING PAGE request";
-        return get_landing_page(req, serv);
+        return get_landing_page(req, services);
     }
     else if ( match_route( "/conformance", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET CONFORMANCE request";
-        return get_conformance(req, serv);
+        return get_conformance(req, services);
     }
     // API
     else if ( match_route( "/api/all-collections", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET API COLLECTION request";
-        return get_api_collections(req, serv);
+        return get_api_collections(req, services);
     }
     else if ( match_route( "/api/vectorTiles-collections", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET API VECTOR COLLECTIONS request";
-        return get_api_vector_collections(req, serv);
+        return get_api_vector_collections(req, services);
     }
     else if ( match_route( "/api/tileMatrixSets", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET API TILE MATRIX SETS request";
-        return get_api_tilematrixsets(req, serv);
+        return get_api_tilematrixsets(req, services);
     }
     else if ( match_route( "/api/styles", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET API STYLES request";
-        return get_api_styles(req, serv);
+        return get_api_styles(req, services);
     }
     // TMS
     else if ( match_route( "/tileMatrixSets", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET TILE MATRIX SETS request";
-        return get_tilematrixsets(req, serv);
+        return get_tilematrixsets(req, services);
     }
     else if ( match_route( "/tileMatrixSets/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET TILE MATRIX SET request";
-        return get_tilematrixset(req, serv);
+        return get_tilematrixset(req, services);
     }
     // Collections
     else if ( match_route( "/collections", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET COLLECTIONS request";
-        return get_collections(req, serv);
+        return get_collections(req, services);
     }
     else if ( match_route( "/collections/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET COLLECTION request";
-        return get_collection(req, serv);
+        return get_collection(req, services);
     }
 
     // TILES
     // Données vecteur
     else if ( tiles && match_route( "/collections/([^/]+)/tiles", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET TILESETS vector request";
-        return get_tilesets(req, serv, false);
+        return get_tilesets(req, services, false);
     }
     else if ( tiles && match_route( "/collections/([^/]+)/tiles/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET TILESET vector request";
-        return get_tileset(req, serv, false);
+        return get_tileset(req, services, false);
     }
     else if ( tiles && match_route( "/collections/([^/]+)/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET TILE vector request";
-        return get_tile(req, serv, false);
+        return get_tile(req, services, false);
     }
     // Données raster
     else if ( tiles && match_route( "/collections/([^/]+)/map/tiles", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET TILE SETS map request";
-        return get_tilesets(req, serv, true);
+        return get_tilesets(req, services, true);
     }
     else if ( tiles && match_route( "/collections/([^/]+)/map/tiles/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET TILE SET map request";
-        return get_tileset(req, serv, true);
+        return get_tileset(req, services, true);
     }
     else if ( tiles && match_route( "/collections/([^/]+)/styles/([^/]+)/map/tiles/([^/]+)/([^/]+)/([^/]+)/([^/]+)", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GET TILE map request";
-        return get_tile(req, serv, true);
+        return get_tile(req, services, true);
     }
 
     // MAPS

@@ -66,10 +66,10 @@
 #include <fcgiapp.h>
 
 #include "core/Rok4Server.h"
+#include "core/Process.h"
 #include "config.h"
 
 #include "services/Router.h"
-#include "services/health/Threads.h"
 
 void hangleSIGALARM(int id) {
     if (id == SIGALRM) {
@@ -101,17 +101,17 @@ void* Rok4Server::thread_loop(void* arg) {
         }
 
         BOOST_LOG_TRIVIAL(debug) << "Thread " << pthread_self() << " traite une requete";
-        Threads::status(eThreadStatus::RUNNING);
+        Process::status(eThreadStatus::RUNNING);
 
         Request* request = new Request(&fcgxRequest);
-        Router::process_request(request, server);
+        Router::process_request(request, server->get_services_configuration());
         delete request;
 
         FCGX_Finish_r(&fcgxRequest);
         FCGX_Free(&fcgxRequest, 1);
 
         BOOST_LOG_TRIVIAL(debug) << "Thread " << pthread_self() << " en a fini avec la requete";
-        Threads::status(eThreadStatus::AVAILABLE);
+        Process::status(eThreadStatus::AVAILABLE);
     }
 
     BOOST_LOG_TRIVIAL(debug) << "Extinction du thread";
@@ -151,7 +151,7 @@ void Rok4Server::run(sig_atomic_t signal_pending) {
 
     for (int i = 0; i < threads.size(); i++) {
         pthread_create(&(threads[i]), NULL, Rok4Server::thread_loop, (void*)this);
-	    Threads::add(threads[i]);
+	    Process::add(threads[i]);
     }
 
     if (signal_pending != 0) {
@@ -175,15 +175,9 @@ void Rok4Server::terminate() {
 
 ServicesConfiguration* Rok4Server::get_services_configuration() { return services_configuration; }
 ServerConfiguration* Rok4Server::get_server_configuration() { return server_configuration; }
-void Rok4Server::turn_off() {server_configuration->enabled = false; }
-void Rok4Server::turn_on() {server_configuration->enabled = true; }
 
 std::vector<pthread_t>& Rok4Server::get_threads() {return threads;}
 
 int Rok4Server::get_fcgi_socket() { return sock; }
 void Rok4Server::set_fcgi_socket(int sockFCGI) { sock = sockFCGI; }
-int Rok4Server::get_pid() { return pid; }
-void Rok4Server::set_pid(int processID) { pid = processID; }
-long Rok4Server::get_time() { return time; }
-void Rok4Server::set_time(long processTime) { time = processTime; }
 bool Rok4Server::is_running() { return running; }

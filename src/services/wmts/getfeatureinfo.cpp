@@ -49,7 +49,7 @@
 #include "services/wmts/Service.h"
 #include "core/Rok4Server.h"
 
-DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
+DataStream* WmtsService::get_feature_info ( Request* req, ServicesConfiguration* services ) {
 
     // La couche
     std::string str_layer = req->get_query_param("layer");
@@ -60,7 +60,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmtsException::get_error_message("Layer unknown", "InvalidParameterValue", 400);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if (layer == NULL || ! layer->is_wmts_enabled()) {
         throw WmtsException::get_error_message("Layer " + str_layer + " unknown", "InvalidParameterValue", 400);
     }
@@ -146,7 +146,7 @@ DataStream* WmtsService::get_feature_info ( Request* req, Rok4Server* serv ) {
         throw WmtsException::get_error_message("InfoFormat unknown", "InvalidParameterValue", 400);
     }
 
-    if ( ! serv->get_services_configuration()->is_available_infoformat(info_format) )
+    if ( ! services->is_available_infoformat(info_format) )
         throw WmtsException::get_error_message("InfoFormat " + info_format + " unknown", "InvalidParameterValue", 400);
 
     // i

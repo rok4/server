@@ -74,6 +74,8 @@ class ServicesConfiguration : public Configuration
     friend class Rok4Server;
     friend class Layer;
     
+    friend class AdminService;
+    friend class HealthService;
     friend class WmtsService;
     friend class TmsService;
     friend class WmsService;
@@ -82,6 +84,8 @@ class ServicesConfiguration : public Configuration
     public:
         ServicesConfiguration(std::string path);
         ~ServicesConfiguration();
+
+        bool is_enabled();
 
         HealthService* get_health_service() {return health_service;};
         TmsService* get_tms_service() {return tms_service;};
@@ -176,6 +180,12 @@ class ServicesConfiguration : public Configuration
          * \~english \brief Available layers list
          */
         std::map<std::string, Layer*> layers;
+
+        /**
+         * \~french \brief Activation générale des services
+         * \~english \brief Global activation for services
+         */
+        bool enabled;
 
         // ----------------------- Global 
 

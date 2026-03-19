@@ -43,6 +43,8 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
 
     /********************** Default values */
 
+    enabled = true;
+
     service_provider="";
     fee="";
     access_constraint="";
@@ -69,6 +71,15 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
     map_formats.push_back("image/tiff");
     map_formats.push_back("image/geotiff");
     map_formats.push_back("image/x-bil;bits=32");
+
+
+    // ----------------------- enabled
+    if (doc["enabled"].is_bool()) {
+        enabled = doc["enabled"].bool_value();
+    } else if (! doc["enabled"].is_null()) {
+        error_message = "Services configuration: enabled have to be a boolean";
+        return false;
+    }
 
     // ----------------------- Global 
 
@@ -307,10 +318,9 @@ bool ServicesConfiguration::parse(json11::Json& doc) {
         if (global_section["tile"].is_object()) {
 
             json11::Json tile_section = global_section["tile"];
-
-
+            
             if (tile_section["reprojection"].is_bool()) {
-                tile_reprojection = doc["reprojection"].bool_value();
+                tile_reprojection = tile_section["reprojection"].bool_value();
             } else if (! tile_section["reprojection"].is_null()) {
                 error_message = "Services configuration: global.tile.reprojection have to be a boolean";
                 return false;
@@ -573,6 +583,8 @@ ServicesConfiguration::~ServicesConfiguration(){
     for ( itLay = layers.begin(); itLay != layers.end(); itLay++ )
         delete itLay->second;
 }
+
+bool ServicesConfiguration::is_enabled() {return enabled;}
 
 void ServicesConfiguration::clean_cache() {
     wms_service->clean_cache();

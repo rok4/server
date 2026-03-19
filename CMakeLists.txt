@@ -11,7 +11,7 @@ set(BUILD_SHARED_LIBS OFF)
 ################### PARAMÈTRES
 
 set(BUILD_VERSION "0.0.0" CACHE STRING "Build version")
-set(CPACK_SYSTEM_NAME "ubuntu-20.04" CACHE STRING "Building OS, to deduce package format to generate")
+set(CPACK_SYSTEM_NAME "ubuntu-22.04" CACHE STRING "Building OS, to deduce package format to generate")
 set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Installation location")
 set(DEBUG_BUILD 0 CACHE BOOL "Debug mode compilation")
 set(UNITTEST_ENABLED 1 CACHE BOOL "Unit tests compilation")

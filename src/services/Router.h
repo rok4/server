@@ -72,7 +72,7 @@ public:
      * \~english
      * \brief Service and request type identification
      */
-    static void process_request(Request* req, Rok4Server* serv);
+    static void process_request(Request* req, ServicesConfiguration* services);
 
 };
 

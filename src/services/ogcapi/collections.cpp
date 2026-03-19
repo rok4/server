@@ -51,7 +51,7 @@
 #include "core/Rok4Server.h"
 
 
-DataStream* OgcApiService::get_collections ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_collections ( Request* req, ServicesConfiguration* services ) {
 
     // format
     std::string f = req->get_query_param("f");
@@ -114,7 +114,7 @@ DataStream* OgcApiService::get_collections ( Request* req, Rok4Server* serv ) {
 
     std::vector<json11::Json> collections;
 
-    std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
+    std::map<std::string, Layer*>::iterator layers_iterator ( services->get_layers().begin() ), layers_end ( services->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
         if (layers_iterator->second->is_ogcapi_enabled() && (! bbox_provided || layers_iterator->second->get_geographical_bbox().intersects(bbox))) {
             collections.push_back(layers_iterator->second->to_json_ogcapi(this));
@@ -139,7 +139,7 @@ DataStream* OgcApiService::get_collections ( Request* req, Rok4Server* serv ) {
 }
 
 
-DataStream* OgcApiService::get_collection ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_collection ( Request* req, ServicesConfiguration* services ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
@@ -153,7 +153,7 @@ DataStream* OgcApiService::get_collection ( Request* req, Rok4Server* serv ) {
         throw OgcApiException::get_error_message("ResourceNotFound", "Layer unknown", 404);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_ogcapi_enabled() ) {
         throw OgcApiException::get_error_message("ResourceNotFound", "Layer "+str_layer+" unknown", 404);
     }

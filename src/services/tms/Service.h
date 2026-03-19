@@ -56,16 +56,16 @@ class TmsService;
 class TmsService : public Service {  
 
 private:
-    DataStream* get_capabilities ( Request* req, Rok4Server* serv );
-    DataStream* get_tiles ( Request* req, Rok4Server* serv );
-    DataStream* get_metadata ( Request* req, Rok4Server* serv );
-    DataStream* get_gdal ( Request* req, Rok4Server* serv );
-    DataStream* get_tile ( Request* req, Rok4Server* serv );
+    DataStream* get_capabilities ( Request* req, ServicesConfiguration* services );
+    DataStream* get_tiles ( Request* req, ServicesConfiguration* services );
+    DataStream* get_metadata ( Request* req, ServicesConfiguration* services );
+    DataStream* get_gdal ( Request* req, ServicesConfiguration* services );
+    DataStream* get_tile ( Request* req, ServicesConfiguration* services );
 
     std::string cache_getcapabilities;
 
 public:
-    DataStream* process_request(Request* req, Rok4Server* serv);
+    DataStream* process_request(Request* req, ServicesConfiguration* services );
 
     /**
      * \~french

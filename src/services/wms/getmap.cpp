@@ -51,7 +51,7 @@
 #include "core/Rok4Server.h"
 #include "core/Map.h"
 
-DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
+DataStream* WmsService::get_map ( Request* req, ServicesConfiguration* services ) {
 
     // Les couches
     std::vector<Layer*> layers;
@@ -62,8 +62,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
     std::vector<std::string> vector_layers;
     boost::split(vector_layers, str_layers, boost::is_any_of(","));
 
-    if ( vector_layers.size() > serv->get_services_configuration()->map_max_layers_count ) {
-        throw WmsException::get_error_message("Number of layers exceed the limit (" + std::to_string(serv->get_services_configuration()->map_max_layers_count) + ")", "InvalidParameterValue", 400);
+    if ( vector_layers.size() > services->map_max_layers_count ) {
+        throw WmsException::get_error_message("Number of layers exceed the limit (" + std::to_string(services->map_max_layers_count) + ")", "InvalidParameterValue", 400);
     }
 
     for (unsigned int i = 0 ; i < vector_layers.size(); i++ ) {
@@ -73,7 +73,7 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
             throw WmsException::get_error_message("Layer unknown", "LayerNotDefined", 400);
         }
 
-        Layer* layer = serv->get_server_configuration()->get_layer(vector_layers.at(i));
+        Layer* layer = services->get_layer(vector_layers.at(i));
         if (layer == NULL || ! layer->is_wms_enabled()) {
             throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "LayerNotDefined", 400);
         }
@@ -90,8 +90,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
     if ( width <= 0 )
         throw WmsException::get_error_message("WIDTH query parameter have to be a strictly positive integer", "InvalidParameterValue", 400);
-    if ( width > serv->get_services_configuration()->map_max_width )
-        throw WmsException::get_error_message("WIDTH query parameter exceed the limit (" + std::to_string(serv->get_services_configuration()->map_max_width) + ")", "InvalidParameterValue", 400);
+    if ( width > services->map_max_width )
+        throw WmsException::get_error_message("WIDTH query parameter exceed the limit (" + std::to_string(services->map_max_width) + ")", "InvalidParameterValue", 400);
 
     // La hauteur
     int height;
@@ -102,8 +102,8 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
     if ( height <= 0 )
         throw WmsException::get_error_message("HEIGHT query parameter have to be a strictly positive integer", "InvalidParameterValue", 400);
-    if ( height > serv->get_services_configuration()->map_max_height )
-        throw WmsException::get_error_message("HEIGHT query parameter exceed the limit (" + std::to_string(serv->get_services_configuration()->map_max_height) + ")", "InvalidParameterValue", 400);
+    if ( height > services->map_max_height )
+        throw WmsException::get_error_message("HEIGHT query parameter exceed the limit (" + std::to_string(services->map_max_height) + ")", "InvalidParameterValue", 400);
 
     // le CRS
     CRS* crs;
@@ -120,10 +120,10 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         throw WmsException::get_error_message("CRS " + str_crs + " unknown", "InvalidParameterValue", 400);
     }
 
-    if (! serv->get_services_configuration()->is_map_available_crs(str_crs) ) {
+    if (! services->is_map_available_crs(str_crs) ) {
         for ( unsigned int i = 0; i < layers.size() ; i++ ) {
-            bool crs_equals = serv->get_services_configuration()->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
-            if (! crs_equals && (! serv->get_services_configuration()->map_reprojection || ! layers.at ( i )->is_available_crs(str_crs)) ) {
+            bool crs_equals = services->are_crs_equals(crs->get_request_code(), layers.at(i)->get_pyramid()->get_tms()->get_crs()->get_request_code());
+            if (! crs_equals && (! services->map_reprojection || ! layers.at ( i )->is_available_crs(str_crs)) ) {
                 throw WmsException::get_error_message("CRS is not available for the layer " + layers.at ( i )->get_id(), "InvalidParameterValue", 400);
             }
         }
@@ -139,7 +139,7 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
         throw WmsException::get_error_message("Format unknown", "InvalidParameterValue", 400);
     }
 
-    if (! serv->get_services_configuration()->is_map_available_format(format)) {
+    if (! services->is_map_available_format(format)) {
         throw WmsException::get_error_message("Format " + format + " unknown", "InvalidParameterValue", 400);
     }
 
@@ -238,7 +238,7 @@ DataStream* WmsService::get_map ( Request* req, Rok4Server* serv ) {
 
     // Traitement de la requête
     std::string error;
-    DataStream* d = Map::get_map(serv->get_services_configuration(), serv->get_services_configuration()->map_reprojection, serv->get_services_configuration()->map_max_tile_x, serv->get_services_configuration()->map_max_tile_y, layers, width, height, crs, bbox, styles, format, format_options, dpi, &error);
+    DataStream* d = Map::get_map(services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, layers, width, height, crs, bbox, styles, format, format_options, dpi, &error);
     if (d == NULL) {
         throw WmsException::get_error_message(error, "InvalidParameterValue", 400);
     }

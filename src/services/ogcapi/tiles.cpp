@@ -62,7 +62,7 @@
 #include "core/Tile.h"
 
 
-DataStream* OgcApiService::get_tilesets ( Request* req, Rok4Server* serv, bool is_map_request ) {
+DataStream* OgcApiService::get_tilesets ( Request* req, ServicesConfiguration* services, bool is_map_request ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
@@ -76,7 +76,7 @@ DataStream* OgcApiService::get_tilesets ( Request* req, Rok4Server* serv, bool i
         throw OgcApiException::get_error_message("ResourceNotFound", "Layer unknown", 404);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_ogcapi_enabled() ) {
         throw OgcApiException::get_error_message("ResourceNotFound", "Layer "+str_layer+" unknown", 404);
     }
@@ -100,7 +100,7 @@ DataStream* OgcApiService::get_tilesets ( Request* req, Rok4Server* serv, bool i
 }
 
 
-DataStream* OgcApiService::get_tileset ( Request* req, Rok4Server* serv, bool is_map_request ) {
+DataStream* OgcApiService::get_tileset ( Request* req, ServicesConfiguration* services, bool is_map_request ) {
 
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
@@ -114,7 +114,7 @@ DataStream* OgcApiService::get_tileset ( Request* req, Rok4Server* serv, bool is
         throw OgcApiException::get_error_message("ResourceNotFound", "Layer unknown", 404);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_ogcapi_enabled() ) {
         throw OgcApiException::get_error_message("ResourceNotFound", "Layer "+str_layer+" unknown", 404);
     }
@@ -147,14 +147,14 @@ DataStream* OgcApiService::get_tileset ( Request* req, Rok4Server* serv, bool is
     }
 
     TileMatrixSetInfos* tmsi = layer->get_tilematrixset(str_tms);
-    if (tmsi == NULL || (! serv->get_services_configuration()->tile_reprojection && tmsi->tms->get_id() != layer->get_pyramid()->get_tms()->get_id())) {
+    if (tmsi == NULL || (! services->tile_reprojection && tmsi->tms->get_id() != layer->get_pyramid()->get_tms()->get_id())) {
         throw OgcApiException::get_error_message("InvalidParameter", "Tile matrix set " + str_tms + " unknown", 400);
     }
 
     return new MessageDataStream ( json11::Json{ layer->to_json_tileset(this, tmsi) }.dump(), "application/json", 200 );
 }
 
-DataStream* OgcApiService::get_tile ( Request* req, Rok4Server* serv, bool is_map_request ) {
+DataStream* OgcApiService::get_tile ( Request* req, ServicesConfiguration* services, bool is_map_request ) {
 
     // La couche
     std::string str_layer = req->path_params.at(0);
@@ -163,7 +163,7 @@ DataStream* OgcApiService::get_tile ( Request* req, Rok4Server* serv, bool is_ma
         throw OgcApiException::get_error_message("ResourceNotFound", "Layer unknown", 404);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_ogcapi_enabled() ) {
         throw OgcApiException::get_error_message("ResourceNotFound", "Layer "+str_layer+" unknown", 404);
     }
@@ -247,7 +247,7 @@ DataStream* OgcApiService::get_tile ( Request* req, Rok4Server* serv, bool is_ma
     if (tmsi == NULL) {
         throw OgcApiException::get_error_message("InvalidParameter", "Tile matrix set " + str_tms + " unknown", 400);
     }
-    if (tmsi->tms->get_id() != layer->get_pyramid()->get_tms()->get_id() && ! serv->get_services_configuration()->tile_reprojection) {
+    if (tmsi->tms->get_id() != layer->get_pyramid()->get_tms()->get_id() && ! services->tile_reprojection) {
         throw OgcApiException::get_error_message("InvalidParameter", "Tile matrix set " + str_tms + " unknown", 400);
     }
 
@@ -285,7 +285,7 @@ DataStream* OgcApiService::get_tile ( Request* req, Rok4Server* serv, bool is_ma
     }
 
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(serv->get_services_configuration(), layer, tmsi->tms, tm, column, row, format, style);
+    DataStream* d = Tile::get_tile(services, layer, tmsi->tms, tm, column, row, format, style);
     if (d == NULL) {
         throw OgcApiException::get_error_message("ResourceNotFound", "Not data found", 404);
     }

@@ -50,7 +50,7 @@
 #include "core/Rok4Server.h"
 
 
-DataStream* OgcApiService::get_landing_page ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_landing_page ( Request* req, ServicesConfiguration* services ) {
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
         throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
@@ -88,7 +88,7 @@ DataStream* OgcApiService::get_landing_page ( Request* req, Rok4Server* serv ) {
     return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );
 }
 
-DataStream* OgcApiService::get_conformance ( Request* req, Rok4Server* serv ) {
+DataStream* OgcApiService::get_conformance ( Request* req, ServicesConfiguration* services ) {
     std::string f = req->get_query_param("f");
     if (f != "" && f != "application/json" && f != "json") {
         throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);

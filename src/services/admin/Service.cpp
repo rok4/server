@@ -64,28 +64,28 @@ AdminService::AdminService (json11::Json& doc) : Service(doc, "ADMIN service", "
     keywords.push_back(Keyword ( "administration" ));
 }
 
-DataStream* AdminService::process_request(Request* req, Rok4Server* serv) {
+DataStream* AdminService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "ADMIN service";
 
     if ( match_route( "/layers/([^/]+)", {"POST"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "ADDLAYER request";
-        return add_layer(req, serv);
+        return add_layer(req, services);
     }
     else if ( match_route( "/layers/([^/]+)", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "UPDATELAYER request";
-        return update_layer(req, serv);
+        return update_layer(req, services);
     }
     else if ( match_route( "/layers/([^/]+)", {"DELETE"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "DELETELAYER request";
-        return delete_layer(req, serv);
+        return delete_layer(req, services);
     }
     else if ( match_route( "/on", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "TURNON request";
-        return turn_on(req, serv);
+        return turn_on(req, services);
     }
     else if ( match_route( "/off", {"PUT"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "TURNOFF request";
-        return turn_off(req, serv);
+        return turn_off(req, services);
     } else {
         throw AdminException::get_error_message("Unknown admin request path", "Operation not supported", 400);
     }

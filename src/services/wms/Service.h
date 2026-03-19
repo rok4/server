@@ -58,9 +58,9 @@ class WmsService;
 class WmsService : public Service {  
 
 private:
-    DataStream* get_capabilities ( Request* req, Rok4Server* serv );
-    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
-    DataStream* get_map ( Request* req, Rok4Server* serv );
+    DataStream* get_capabilities ( Request* req, ServicesConfiguration* services );
+    DataStream* get_feature_info ( Request* req, ServicesConfiguration* services );
+    DataStream* get_map ( Request* req, ServicesConfiguration* services );
 
     std::string name;
 
@@ -71,7 +71,7 @@ private:
     std::string cache_getcapabilities_inspire;
 
 public:
-    DataStream* process_request(Request* req, Rok4Server* serv);
+    DataStream* process_request(Request* req, ServicesConfiguration* services );
 
     /**
      * \~french

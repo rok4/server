@@ -88,6 +88,7 @@ namespace keywords = boost::log::keywords;
 namespace sinks = boost::log::sinks;
 
 #include "core/Rok4Server.h"
+#include "core/Process.h"
 #include "config.h"
 
 Rok4Server* rok4server_instance;
@@ -375,8 +376,8 @@ int main ( int argc, char** argv ) {
 
         auto start = std::chrono::system_clock::now();
         std::time_t time = std::chrono::system_clock::to_time_t(start);
-        rok4server_instance->set_pid(pid);
-        rok4server_instance->set_time(time);
+        Process::set_pid(pid);
+        Process::set_time(time);
 
         // Remove Event Lock
         defer_signal--;

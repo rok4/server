@@ -56,9 +56,7 @@ using boost::property_tree::xml_writer_settings;
 #include "services/wmts/Service.h"
 #include "core/Rok4Server.h"
 
-DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
-
-    ServicesConfiguration* services = serv->get_services_configuration();
+DataStream* WmtsService::get_capabilities ( Request* req, ServicesConfiguration* services ) {
 
     bool default_inspire = services->default_inspire;
 
@@ -149,7 +147,7 @@ DataStream* WmtsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     ptree& contents_node = root.add("Contents", "");
 
-    std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
+    std::map<std::string, Layer*>::iterator layers_iterator ( services->get_layers().begin() ), layers_end ( services->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
         layers_iterator->second->add_node_wmts(contents_node, this, req->is_inspire(default_inspire), &used_tms_list);
     }

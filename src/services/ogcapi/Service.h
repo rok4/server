@@ -58,28 +58,25 @@ class OgcApiService : public Service {
 
 private:
 
-    DataStream* get_landing_page ( Request* req, Rok4Server* serv );
-    DataStream* get_conformance ( Request* req, Rok4Server* serv );
+    DataStream* get_landing_page ( Request* req, ServicesConfiguration* services );
+    DataStream* get_conformance ( Request* req, ServicesConfiguration* services );
 
-    DataStream* get_api_collections ( Request* req, Rok4Server* serv );
-    DataStream* get_api_vector_collections ( Request* req, Rok4Server* serv );
-    DataStream* get_api_tilematrixsets ( Request* req, Rok4Server* serv );
-    DataStream* get_api_styles ( Request* req, Rok4Server* serv );
+    DataStream* get_api_collections ( Request* req, ServicesConfiguration* services );
+    DataStream* get_api_vector_collections ( Request* req, ServicesConfiguration* services );
+    DataStream* get_api_tilematrixsets ( Request* req, ServicesConfiguration* services );
+    DataStream* get_api_styles ( Request* req, ServicesConfiguration* services );
 
-    DataStream* get_tilematrixsets ( Request* req, Rok4Server* serv );
-    DataStream* get_tilematrixset ( Request* req, Rok4Server* serv );
+    DataStream* get_tilematrixsets ( Request* req, ServicesConfiguration* services );
+    DataStream* get_tilematrixset ( Request* req, ServicesConfiguration* services );
     /**
      * \todo Gérer la pagination
-     * \todo Filtrer selon la bbox
      */
-    DataStream* get_collections ( Request* req, Rok4Server* serv );
-    DataStream* get_collection ( Request* req, Rok4Server* serv );
+    DataStream* get_collections ( Request* req, ServicesConfiguration* services );
+    DataStream* get_collection ( Request* req, ServicesConfiguration* services );
     
-    DataStream* get_tilesets ( Request* req, Rok4Server* serv, bool is_map_request );
-    DataStream* get_tileset ( Request* req, Rok4Server* serv, bool is_map_request );
-    DataStream* get_tile ( Request* req, Rok4Server* serv, bool is_map_request );
-
-    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
+    DataStream* get_tilesets ( Request* req, ServicesConfiguration* services, bool is_map_request );
+    DataStream* get_tileset ( Request* req, ServicesConfiguration* services, bool is_map_request );
+    DataStream* get_tile ( Request* req, ServicesConfiguration* services, bool is_map_request );
 
     bool tiles;
     bool maps;
@@ -87,7 +84,7 @@ private:
     std::string cache_getcapabilities;
 
 public:
-    DataStream* process_request(Request* req, Rok4Server* serv);
+    DataStream* process_request(Request* req, ServicesConfiguration* services );
 
     /**
      * \~french

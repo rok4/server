@@ -65,7 +65,7 @@ WmtsService::WmtsService (json11::Json& doc) : Service(doc, "WMTS service", "WMT
     }
 }
 
-DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
+DataStream* WmtsService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "WMTS service";
 
     // On contrôle le service précisé en paramètre de requête
@@ -93,13 +93,13 @@ DataStream* WmtsService::process_request(Request* req, Rok4Server* serv) {
     
     if (param_request == "getcapabilities") {
         BOOST_LOG_TRIVIAL(debug) << "GETCAPABILITIES request";
-        return get_capabilities(req, serv);
+        return get_capabilities(req, services);
     } else if (param_request == "getfeatureinfo") {
         BOOST_LOG_TRIVIAL(debug) << "GETFEATUREINFO request";
-        return get_feature_info(req, serv);
+        return get_feature_info(req, services);
     } else if (param_request == "gettile") {
         BOOST_LOG_TRIVIAL(debug) << "GETTILE request";
-        return get_tile(req, serv);
+        return get_tile(req, services);
     } else {
         throw WmtsException::get_error_message("REQUEST query parameter unknown", "OperationNotSupported", 400);
     }

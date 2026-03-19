@@ -1,4 +1,5 @@
 {
+    "enabled": true,
     "global": {
         "provider": "Local",
         "site": "http://localhost",
