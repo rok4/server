@@ -195,4 +195,124 @@ static DataStream* get_map(
     }
     return NULL;
 }
+
+/**
+ * \~french
+ * \brief Retourne les informations du pixel demandé
+ * \return Flux de donnée
+ * \~english
+ * \brief Give the asked pixel's informations
+ * \return Data stream
+ */
+static DataStream* get_feature_info(
+    ServicesConfiguration* services, bool reprojection, int max_tile_x, int max_tile_y,
+    std::vector<Layer*> layers, std::vector<Layer*> query_layers, int width, int height, CRS* crs, BoundingBox<double> bbox, std::string str_bbox, 
+    std::vector<Style*> styles, std::string format, std::map<std::string, std::string> format_options, int dpi, 
+    int i, int j, int feature_count, std::string info_format,
+    std::string* error
+) {
+
+    Layer* layer = query_layers.at(0);
+
+    std::string gfi_type = layer->get_gfi_type();
+    if (gfi_type.compare("PYRAMID") == 0) {
+
+        // On cherche la valeur du pixel source sous le clique
+        bool crs_equals = services->are_crs_equals(crs->get_request_code(), layer->get_pyramid()->get_tms()->get_crs()->get_request_code());
+
+        if (! crs_equals && ! reprojection) {
+            *error = "Reprojection is not available";
+            return NULL;
+        }
+
+        Image* image = layer->get_pyramid()->getbbox(max_tile_x, max_tile_y, bbox, width, height, crs, crs_equals, layer->get_resampling(), dpi);
+
+        if (image == NULL) {
+            *error = "BBOX too big";
+            return NULL;
+        }
+
+        std::vector<std::string> gfi_data;
+        int bands = image->get_channels();
+        switch (layer->get_pyramid()->get_format()) {
+            case Rok4Format::TIFF_RAW_UINT8:
+            case Rok4Format::TIFF_JPG_UINT8:
+            case Rok4Format::TIFF_PNG_UINT8:
+            case Rok4Format::TIFF_LZW_UINT8:
+            case Rok4Format::TIFF_ZIP_UINT8:
+            case Rok4Format::TIFF_PKB_UINT8: {
+                uint8_t* data = new uint8_t[image->get_width() * bands * sizeof(uint8_t)];
+                image->get_line(data, j);
+                for (int b = 0; b < bands; b++) {
+                    std::stringstream ss;
+                    ss << (int)data[bands * i + b];
+                    gfi_data.push_back(ss.str());
+                }
+                delete[] data;
+                break;
+            }
+            case Rok4Format::TIFF_RAW_FLOAT32:
+            case Rok4Format::TIFF_LZW_FLOAT32:
+            case Rok4Format::TIFF_ZIP_FLOAT32:
+            case Rok4Format::TIFF_PKB_FLOAT32: {
+                float* data = new float[image->get_width() * bands * sizeof(float)];
+                image->get_line(data, j);
+                for (int b = 0; b < bands; b++) {
+                    std::stringstream ss;
+                    ss.setf(std::ios::fixed, std::ios::floatfield);
+                    ss.precision(2);
+                    ss << data[bands * i + b];
+                    gfi_data.push_back(ss.str());
+                }
+                delete[] data;
+                break;
+            }
+            default:
+                *error = "No readable data found";
+                return NULL;
+        }
+
+        delete image;
+
+        return Utils::format_get_feature_info(gfi_data, info_format);
+    } else if (gfi_type.compare("EXTERNALWMS") == 0) {
+        BOOST_LOG_TRIVIAL(debug) << "GFI sur WMS externe, en projection native ou non";
+
+        std::map<std::string, std::string> query_params;
+        query_params.emplace("VERSION", "1.3.0");
+        query_params.emplace("SERVICE", "WMS");
+        query_params.emplace("REQUEST", "GetFeatureInfo");
+        query_params.emplace("STYLES", "");
+        query_params.emplace("LAYERS", layer->get_gfi_layers());
+        query_params.emplace("QUERY_LAYERS", layer->get_gfi_query_layers());
+        query_params.emplace("INFO_FORMAT", info_format);
+        query_params.emplace("FORMAT", "image/tiff");
+        query_params.emplace("FEATURE_COUNT", std::to_string(feature_count));
+        query_params.emplace("CRS", crs->get_request_code());
+        query_params.emplace("WIDTH", std::to_string(width));
+        query_params.emplace("HEIGHT", std::to_string(height));
+        query_params.emplace("I", std::to_string(i));
+        query_params.emplace("J", std::to_string(j));
+        query_params.emplace("BBOX", str_bbox);
+
+        std::map<std::string, std::string> extra_query_params = layer->get_gfi_extra_params();
+        query_params.insert(extra_query_params.begin(), extra_query_params.end());
+
+        Request* gfi_request = new Request("GET", layer->get_gfi_url(), query_params);
+
+        RawDataStream* response = gfi_request->send();
+        delete gfi_request;
+
+        if (response == NULL) {
+            *error = "No readable data found";
+            return NULL;
+        }
+
+        return response;
+    }
+
+    BOOST_LOG_TRIVIAL(error) << "Get Feature Info badly configured for layer" << layer->get_id();
+    return NULL;
+}
+
 };  // namespace Map

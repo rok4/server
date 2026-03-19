@@ -3,76 +3,180 @@
     "title": "ROK4 Services configuration",
     "type": "object",
     "additionalProperties": false,
-    "required": [
-        "contact"
-    ],
     "properties": {
-        "provider": {
-            "type": "string",
-            "description": "Service provider"
+        "enabled": {
+            "type": "boolean",
+            "description": "Broadcast activation when all configuration is loaded",
+            "default": true
         },
-        "site": {
-            "type": "string",
-            "description": "Provider's website"
-        },
-        "fee": {
-            "type": "string",
-            "description": "Access costs"
-        },
-        "access_constraint": {
-            "type": "string",
-            "description": "Access conditions"
-        },
-        "crs_equivalences": {
-            "type": "string",
-            "description": "Path to JSON file with identical CRS (to avoid useless tranformation)"
-        },
-        "default_style": {
-            "type": "string",
-            "description": "Default style internal identifier",
-            "default": "normal"
-        },
-        "contact": {
+        "global": {
             "type": "object",
             "additionalProperties": false,
-            "description": "Provider's contact informations",
+            "required": [
+                "contact"
+            ],
             "properties": {
-                "name": {
-                    "type": "string"
+                "provider": {
+                    "type": "string",
+                    "description": "Service provider"
                 },
-                "position": {
-                    "type": "string"
+                "site": {
+                    "type": "string",
+                    "description": "Provider's website"
                 },
-                "voice": {
-                    "type": "string"
+                "fee": {
+                    "type": "string",
+                    "description": "Access costs"
                 },
-                "facsimile": {
-                    "type": "string"
+                "access_constraint": {
+                    "type": "string",
+                    "description": "Access conditions"
                 },
-                "address_type": {
-                    "type": "string"
+                "crs_equivalences": {
+                    "type": "string",
+                    "description": "Path to JSON file with identical CRS (to avoid useless tranformation)"
                 },
-                "delivery_point": {
-                    "type": "string"
+                "default_style": {
+                    "type": "string",
+                    "description": "Default style internal identifier",
+                    "default": "normal"
                 },
-                "city": {
-                    "type": "string"
+                "inspire": {
+                    "type": "boolean",
+                    "description": "Inspire mode as default response mode activation",
+                    "default": false
                 },
-                "administrative_area": {
-                    "type": "string"
+                "contact": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Provider's contact informations",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "position": {
+                            "type": "string"
+                        },
+                        "voice": {
+                            "type": "string"
+                        },
+                        "facsimile": {
+                            "type": "string"
+                        },
+                        "address_type": {
+                            "type": "string"
+                        },
+                        "delivery_point": {
+                            "type": "string"
+                        },
+                        "city": {
+                            "type": "string"
+                        },
+                        "administrative_area": {
+                            "type": "string"
+                        },
+                        "post_code": {
+                            "type": "string"
+                        },
+                        "country": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        }
+                    }
                 },
-                "post_code": {
-                    "type": "string"
+                "tile": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Configuration for tile broadcast (WMT, TMS and OGC API Tiles)",
+                    "properties": {
+                        "reprojection": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "WMTS reprojection activation"
+                        }
+                    }
                 },
-                "country": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
+                "map": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Configuration for map broadcast (WMS and OGC API Maps)",
+                    "properties": {
+                        "formats": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "image/jpeg",
+                                    "image/png",
+                                    "image/tiff",
+                                    "image/geotiff",
+                                    "image/x-bil;bits=32",
+                                    "text/asc"
+                                ]
+                            },
+                            "description": "WMS handled raster formats",
+                            "default": [
+                                "image/jpeg",
+                                "image/png",
+                                "image/tiff",
+                                "image/geotiff",
+                                "image/x-bil;bits=32"
+                            ]
+                        },
+                        "limits": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "layers_count": {
+                                    "type": "integer",
+                                    "description": "Maximum layers count in a WMS GetMap",
+                                    "minimum": 1,
+                                    "default": 1
+                                },
+                                "width": {
+                                    "type": "integer",
+                                    "description": "Maximum width in a WMS GetMap",
+                                    "minimum": 1,
+                                    "default": 5000
+                                },
+                                "height": {
+                                    "type": "integer",
+                                    "description": "Maximum height in a WMS GetMap",
+                                    "minimum": 1,
+                                    "default": 5000
+                                },
+                                "tile_x": {
+                                    "type": "integer",
+                                    "description": "Maximum source tiles count widthwise to build the response of a WMS GetMap",
+                                    "minimum": 1,
+                                    "default": 32
+                                },
+                                "tile_y": {
+                                    "type": "integer",
+                                    "description": "Maximum source tiles count heightwise to build the response of a WMS GetMap",
+                                    "minimum": 1,
+                                    "default": 32
+                                }
+                            }
+                        },
+                        "crs": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "description": "WMS global handled CRS"
+                        },
+                        "reprojection": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "WMS reprojection activation"
+                        }
+                    }
                 }
             }
         },
-
         "health": {
             "type": "object",
             "additionalProperties": false,
@@ -85,7 +189,6 @@
                 }
             }
         },
-
         "admin": {
             "type": "object",
             "additionalProperties": false,
@@ -98,7 +201,6 @@
                 }
             }
         },
-
         "wms": {
             "type": "object",
             "additionalProperties": false,
@@ -145,38 +247,6 @@
                     "$ref": "#/$defs/metadata",
                     "description": "WMS service's metadata"
                 },
-                "reprojection": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "WMS reprojection activation"
-                },
-                "inspire": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Inspire mode as WMS default response mode activation"
-                },
-                "formats": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "enum": [
-                            "image/jpeg",
-                            "image/png",
-                            "image/tiff",
-                            "image/geotiff",
-                            "image/x-bil;bits=32",
-                            "text/asc"
-                        ]
-                    },
-                    "description": "WMS handled raster formats",
-                    "default": [
-                        "image/jpeg",
-                        "image/png",
-                        "image/tiff",
-                        "image/geotiff",
-                        "image/x-bil;bits=32"
-                    ]
-                },
                 "root_layer": {
                     "type": "object",
                     "additionalProperties": false,
@@ -191,53 +261,9 @@
                             "default": "WMS layers"
                         }
                     }
-                },
-                "limits": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "layers_count": {
-                            "type": "integer",
-                            "description": "Maximum layers count in a WMS GetMap",
-                            "minimum": 1,
-                            "default": 1
-                        },
-                        "width": {
-                            "type": "integer",
-                            "description": "Maximum width in a WMS GetMap",
-                            "minimum": 1,
-                            "default": 5000
-                        },
-                        "height": {
-                            "type": "integer",
-                            "description": "Maximum height in a WMS GetMap",
-                            "minimum": 1,
-                            "default": 5000
-                        },
-                        "tile_x": {
-                            "type": "integer",
-                            "description": "Maximum source tiles count widthwise to build the response of a WMS GetMap",
-                            "minimum": 1,
-                            "default": 32
-                        },
-                        "tile_y": {
-                            "type": "integer",
-                            "description": "Maximum source tiles count heightwise to build the response of a WMS GetMap",
-                            "minimum": 1,
-                            "default": 32
-                        }
-                    }
-                },
-                "crs": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "description": "WMS global handled CRS"
                 }
             }
         },
-
         "wmts": {
             "type": "object",
             "additionalProperties": false,
@@ -278,20 +304,9 @@
                 "metadata": {
                     "$ref": "#/$defs/metadata",
                     "description": "WMTS service's metadata"
-                },
-                "reprojection": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "WMTS reprojection activation"
-                },
-                "inspire": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Inspire mode as WMTS default response mode activation"
                 }
             }
         },
-
         "tms": {
             "type": "object",
             "additionalProperties": false,
@@ -335,7 +350,6 @@
                 }
             }
         },
-
         "ogcapi": {
             "type": "object",
             "additionalProperties": false,
@@ -349,12 +363,12 @@
                 "title": {
                     "type": "string",
                     "description": "OGC API title",
-                    "default": "TMS service"
+                    "default": "OGC API service"
                 },
                 "abstract": {
                     "type": "string",
                     "description": "OGC API abstract",
-                    "default": "TMS service"
+                    "default": "OGC API service"
                 },
                 "endpoint_uri": {
                     "type": "string",
@@ -377,11 +391,6 @@
                     "$ref": "#/$defs/metadata",
                     "description": "OGC API service's metadata"
                 },
-                "reprojection": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "OGC API reprojection activation"
-                },
                 "tiles": {
                     "type": "boolean",
                     "default": true,
@@ -395,12 +404,15 @@
             }
         }
     },
-
     "$defs": {
         "metadata": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["format", "type", "url"],
+            "required": [
+                "format",
+                "type",
+                "url"
+            ],
             "properties": {
                 "format": {
                     "type": "string",

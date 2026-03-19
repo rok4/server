@@ -238,7 +238,11 @@ DataStream* WmsService::get_map ( Request* req, ServicesConfiguration* services 
 
     // Traitement de la requête
     std::string error;
-    DataStream* d = Map::get_map(services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, layers, width, height, crs, bbox, styles, format, format_options, dpi, &error);
+    DataStream* d = Map::get_map(
+        services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, 
+        layers, width, height, crs, bbox, styles, format, format_options, dpi,
+        &error
+    );
     if (d == NULL) {
         throw WmsException::get_error_message(error, "InvalidParameterValue", 400);
     }

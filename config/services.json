@@ -20,6 +20,7 @@
         },
         "crs_equivalences": "/etc/rok4/equals_crs.json",
         "default_style": "normal",
+        "inspire": true,
         "map": {
             "limits": {
                 "width": 10000,
@@ -40,8 +41,7 @@
                 "EPSG:3857",
                 "EPSG:4326"
             ],
-            "reprojection": true,
-            "inspire": false
+            "reprojection": true
         },
         "tile": {
             "reprojection": true

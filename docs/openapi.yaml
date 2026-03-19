@@ -2244,7 +2244,7 @@ components:
             pyramid:
               type: boolean
             
-        tiles:
+        ogcapi:
           type: object
           properties:
             pyramid:
