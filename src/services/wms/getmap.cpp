@@ -77,6 +77,9 @@ DataStream* WmsService::get_map ( Request* req, ServicesConfiguration* services 
         if (layer == NULL || ! layer->is_wms_enabled()) {
             throw WmsException::get_error_message("Layer " + vector_layers.at(i) + " unknown", "LayerNotDefined", 400);
         }
+        if (! layer->is_raster()) {
+            throw WmsException::get_error_message("Vector data " + vector_layers.at(i) + " cannot be requested with WMS GetMap", "InvalidParameterValue", 400);
+        }
        
         layers.push_back ( layer );
     }

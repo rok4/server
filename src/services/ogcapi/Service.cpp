@@ -49,6 +49,14 @@
 #include "services/ogcapi/Service.h"
 #include "core/Rok4Server.h"
 
+std::map<std::string, std::string> OgcApiService::ogcapi_format_to_mime_type = { 
+    { "png", "image/png" },
+    { "jpg", "image/jpeg" },
+    { "tiff", "image/geotiff" },
+    { "bil", "image/x-bil;bits=32" },
+    { "asc", "text/asc" }
+}; 
+
 OgcApiService::OgcApiService (json11::Json& doc) : Service(doc, "OGC API service", "OGC API service", "http://localhost/ogcapi", "/ogcapi") {
 
     if (! is_ok()) {
@@ -77,7 +85,7 @@ OgcApiService::OgcApiService (json11::Json& doc) : Service(doc, "OGC API service
         error_message = "OGC API service: maps have to be a boolean";
         return;
     } else {
-        maps = false;
+        maps = true;
     }
 }
 
@@ -158,7 +166,14 @@ DataStream* OgcApiService::process_request(Request* req, ServicesConfiguration* 
 
     // MAPS
     // Données raster
-    // à venir
+    else if ( maps && match_route( "/collections/([^/]+)/map", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GET MAP request";
+        return get_map(req, services);
+    }
+    else if ( maps && match_route( "/collections/([^/]+)/styles/([^/]+)/map", {"GET"}, req ) ) {
+        BOOST_LOG_TRIVIAL(debug) << "GET MAP request";
+        return get_map(req, services);
+    }
     
     else {
         throw OgcApiException::get_error_message("ResourceNotFound", "Unknown OGC API request path", 404);

@@ -58,6 +58,11 @@ class OgcApiService : public Service {
 
 private:
 
+    static std::vector<std::string> common_conformances;
+    static std::vector<std::string> maps_conformances;
+    static std::vector<std::string> tiles_conformances;
+    static std::map<std::string, std::string> ogcapi_format_to_mime_type;
+
     DataStream* get_landing_page ( Request* req, ServicesConfiguration* services );
     DataStream* get_conformance ( Request* req, ServicesConfiguration* services );
 
@@ -77,6 +82,8 @@ private:
     DataStream* get_tilesets ( Request* req, ServicesConfiguration* services, bool is_map_request );
     DataStream* get_tileset ( Request* req, ServicesConfiguration* services, bool is_map_request );
     DataStream* get_tile ( Request* req, ServicesConfiguration* services, bool is_map_request );
+
+    DataStream* get_map ( Request* req, ServicesConfiguration* services );
 
     bool tiles;
     bool maps;

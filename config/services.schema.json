@@ -398,7 +398,7 @@
                 },
                 "maps": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "OGC API Maps activation"
                 }
             }

@@ -49,6 +49,40 @@
 #include "services/ogcapi/Service.h"
 #include "core/Rok4Server.h"
 
+std::vector<std::string> OgcApiService::common_conformances = {
+    "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
+    "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/landing-page",
+    "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/json",
+    "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/oas30",
+    "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections"
+};
+
+std::vector<std::string> OgcApiService::maps_conformances = {
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/core",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/tilesets",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/collections-selection",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/crs",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/projection",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/collection-map",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/dataset-map",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/styled-map",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/png",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/jpeg",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/tiff",
+    "https://www.opengis.net/spec/ogcapi-maps-1/1.0/conf/api-operations"
+};
+
+std::vector<std::string> OgcApiService::tiles_conformances ={
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/core",
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tileset",
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tilesets-list",
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/geodata-tilesets",
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/dataset-tilesets",
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/jpeg",
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/png",
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/mvt",
+    "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tiff"
+};
 
 DataStream* OgcApiService::get_landing_page ( Request* req, ServicesConfiguration* services ) {
     std::string f = req->get_query_param("f");
@@ -94,22 +128,18 @@ DataStream* OgcApiService::get_conformance ( Request* req, ServicesConfiguration
         throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
+    std::vector<std::string> conformances = common_conformances;
+
+    if (maps) {
+        conformances.insert(conformances.end(), maps_conformances.begin(), maps_conformances.end());
+    }
+
+    if (tiles) {
+        conformances.insert(conformances.end(), tiles_conformances.begin(), tiles_conformances.end());
+    }
+
     json11::Json::object res = json11::Json::object {
-        { "conformsTo", json11::Json::array{
-            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core",
-            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/json",
-            "http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/oas30",
-            "http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/core",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tileset",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tilesets-list",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/geodata-tilesets",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/dataset-tilesets",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/jpeg",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/png",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/mvt",
-            "http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tiff"
-        } }
+        { "conformsTo", conformances }
     };
 
     return new MessageDataStream ( json11::Json{ res }.dump(), "application/json", 200 );

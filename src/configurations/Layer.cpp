@@ -957,6 +957,26 @@ json11::Json Layer::to_json_ogcapi(OgcApiService* service) {
         } else {
             res["mapTiles"] = false;
         }
+        if (service->maps_enabled()) {
+            links.push_back(json11::Json::object {
+                { "href", service->get_endpoint_uri() + "/collections/" + id + "/map?f={format}"},
+                { "rel", "map"},
+                { "type", "application/octet-stream"},
+                { "title", id + " as raster map with default style"},
+                { "templated", true}
+            });
+
+            // Lien vers l'image, pour chaque style disponible
+            for(auto const& s: available_styles) {
+                links.push_back(json11::Json::object {
+                    { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map?f={format}"},
+                    { "rel", "map"},
+                { "type", "application/octet-stream"},
+                    { "title", id + " as raster map with style " + s->get_identifier()},
+                    { "templated", true}
+                });
+            }
+        }
     } else {
         res["dataType"] = "vector";
         res["mapTiles"] = false;  
@@ -975,9 +995,15 @@ json11::Json Layer::to_json_ogcapi(OgcApiService* service) {
 
     res["links"] = links;
 
+    if (attribution != NULL) {
+        res["attribution"] = attribution->get_title();
+    }
+
     res["crs"] = json11::Json::array {
         pyramid->get_tms()->get_crs()->get_url()
     };
+
+    res["storageCrs"] = pyramid->get_tms()->get_crs()->get_url();
 
     res["minCellSize"] = pyramid->get_lowest_level()->get_res();
     res["maxCellSize"] = pyramid->get_highest_level()->get_res();
@@ -1075,7 +1101,7 @@ json11::Json Layer::to_json_tileset(OgcApiService* service, TileMatrixSetInfos* 
         for(auto const& s: available_styles) {
             links.push_back(json11::Json::object {
                 { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map/tiles/" + tmsi->tms->get_id() + "/{tileMatrix}/{tileRow}/{tileCol}?f=" + Rok4Format::to_ogcapi_format(pyramid->get_format())},
-                { "rel", "tile"},
+                { "rel", "tiles"},
                 { "type", Rok4Format::to_mime_type(pyramid->get_format())},
                 { "title", id + " as raster tile with style " + s->get_identifier()},
                 { "templated", true}
@@ -1094,7 +1120,7 @@ json11::Json Layer::to_json_tileset(OgcApiService* service, TileMatrixSetInfos* 
         // Lien vers la tuile
         links.push_back(json11::Json::object {
             { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + tmsi->tms->get_id() + "/{tileMatrix}/{tileRow}/{tileCol}?f=" + Rok4Format::to_ogcapi_format(pyramid->get_format())},
-            { "rel", "tile"},
+            { "rel", "tiles"},
             { "type", Rok4Format::to_mime_type(pyramid->get_format())},
             { "title", id + " as vector tile"},
             { "templated", true}

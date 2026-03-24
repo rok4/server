@@ -190,7 +190,7 @@ DataStream* OgcApiService::get_tile ( Request* req, ServicesConfiguration* servi
         }
     }
 
-    format = Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) );
+    format = ogcapi_format_to_mime_type.at(format);
 
     // Récupération des paramètre selon le type de route (raster ou vecteur)
     

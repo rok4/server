@@ -170,6 +170,14 @@ public:
     }
 
     /**
+     * \~french \brief Retourne le titre
+     * \~english \brief Get the title
+     */
+    std::string get_title() {
+        return title;
+    }
+
+    /**
      * \~french
      * \brief Destructeur par défaut
      * \~english
