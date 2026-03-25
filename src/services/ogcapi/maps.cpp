@@ -224,7 +224,7 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
     }
 
     // Le format
-    std::string str_format = req->get_query_param("format");
+    std::string str_format = req->get_query_param("f");
     std::string format;
     if (str_format != "") {
 
@@ -234,7 +234,7 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
             throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
         }
 
-        std::string format = ogcapi_format_to_mime_type.at(str_format);
+        format = ogcapi_format_to_mime_type.at(str_format);
 
         if (! services->is_map_available_format(format)) {
             throw OgcApiException::get_error_message("InvalidParameter", "Format " + str_format + " unknown", 400);
