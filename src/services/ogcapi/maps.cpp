@@ -206,11 +206,11 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
     }
 
     if (width == -1 && height == -1) {
-        // On a fourni aucune dimension, on met la plus grande à 1024 et l'autre en respectant le ratio
+        // On a fourni aucune dimension, on met la plus grande à default_size et l'autre en respectant le ratio
         if (bbox.xmax - bbox.xmin > bbox.ymax - bbox.ymin) {
-            width = 1024;
+            width = default_size;
         } else {
-            height = 1024;
+            height = default_size;
         }
     }
 

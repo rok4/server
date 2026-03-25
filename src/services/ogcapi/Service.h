@@ -88,6 +88,8 @@ private:
     bool tiles;
     bool maps;
 
+    int default_size;
+
     std::string cache_getcapabilities;
 
 public:

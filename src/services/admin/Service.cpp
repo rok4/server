@@ -61,11 +61,25 @@ AdminService::AdminService (json11::Json& doc) : Service(doc, "ADMIN service", "
         return;
     }
 
+    if (doc["secret"].is_string()) {
+        secret = doc["secret"].string_value();
+    } else if (! doc["secret"].is_null()) {
+        error_message = "ADMIN service: secret have to be a string";
+        return;
+    } else {
+        secret = "";
+    }
+
     keywords.push_back(Keyword ( "administration" ));
 }
 
 DataStream* AdminService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "ADMIN service";
+
+    // Contrôle du secret
+    if (secret != "" && req->secret != secret) {
+        throw AdminException::get_error_message("Not authorized request", "Operation forbidden", 403);
+    }
 
     if ( match_route( "/layers/([^/]+)", {"POST"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "ADDLAYER request";

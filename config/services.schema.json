@@ -198,6 +198,10 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Administration API activation"
+                },
+                "secret": {
+                    "type": "string",
+                    "description": "Secret token to use the administration API, no security if not provided or empty string"
                 }
             }
         },
@@ -400,6 +404,13 @@
                     "type": "boolean",
                     "default": true,
                     "description": "OGC API Maps activation"
+                },
+                "default_size": {
+                    "type": "integer",
+                    "minimum": 64,
+                    "maximum": 4096,
+                    "default": 256,
+                    "description": "Default dimension (width or height) for API Maps"
                 }
             }
         }

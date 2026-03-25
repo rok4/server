@@ -48,7 +48,8 @@
         }
     },
     "admin": {
-        "enabled": true
+        "enabled": true,
+        "secret": "password"
     },
     "health": {
         "enabled": true
@@ -98,6 +99,7 @@
             "OGC API Tiles"
         ],
         "tiles": true,
-        "maps": true
+        "maps": true,
+        "default_size": 256
     }
 }

@@ -99,6 +99,12 @@ Request::Request(FCGX_Request *fcgx) : fcgx_request(fcgx) {
         std::transform(key.begin(), key.end(), key.begin(), ::tolower);
         query_params.insert(std::pair<std::string, std::string>(key, it->second));
     }
+
+    // On stocke les paramètres de requête avec la clé en minuscule
+    char* tmp = FCGX_GetParam(SECRET_HEADER_NAME, fcgx->envp);
+    if (tmp != 0) {
+        secret = std::string(tmp);
+    }
 }
 
 Request::Request(std::string m, std::string u, std::map<std::string, std::string> qp) : fcgx_request(NULL), method(m), query_params(qp), url(u) {}

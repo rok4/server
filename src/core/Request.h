@@ -126,6 +126,12 @@ public:
     std::map<std::string, std::string> query_params;
 
     /**
+     * \~french \brief Secret
+     * \~english \brief Secret
+     */
+    std::string secret;
+
+    /**
      * \~french \brief Liste des paramètres extraits du chemin de la requête
      * \~english \brief Parameters list from request path
      */

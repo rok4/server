@@ -185,7 +185,8 @@ jq '
             keywords: .tiles.keywords,
             metadata: .tiles.metadata,
             tiles: true,
-            maps: true
+            maps: true,
+            default_size: 256
         }
     }
 ' services.json

@@ -5,6 +5,18 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ## [Unreleased]
 
+### Added
+- API Maps : implémentation intégrée au service OGC API
+- API Admin : sécurisation par secret
+
+### Changed
+- Configuration des services : les options sont regroupées quand elles concernent un même type de service (tuilé par exemple)
+- API Tiles : il n'est plus vu comme un service séparé mais est intégré au service OGC API
+- Factorisation du code de calcul d'une image ou d'une tuile
+
+### Removed
+- API Common : elle est intégrée au service OGC API
+
 ## [6.2.0] - 2026-03-16
 ### Added
 - Possibilité de définir un timeout via la variable d'environnement `ROK4_NETWORK_TIMEOUT` (valeur à fournir en seconde) pour les intéraction avec le un service WMS source (pour le getfeature info)
