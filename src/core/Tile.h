@@ -75,7 +75,7 @@ static DataStream* get_tile(ServicesConfiguration* services, Layer* layer, TileM
             return NULL;
         }
 
-        if (layer->get_pyramid()->get_channels() == 1 && format == "image/png" && style->get_palette() && !style->get_palette()->is_empty()) {
+        if (layer->is_raster() && layer->get_pyramid()->get_channels() == 1 && format == "image/png" && style->get_palette() && !style->get_palette()->is_empty()) {
             return new DataStreamFromDataSource(new PaletteDataSource(d, style->get_palette()));
         } else {
             return new DataStreamFromDataSource(d);

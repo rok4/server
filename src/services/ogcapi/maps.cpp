@@ -67,7 +67,7 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
     }
 
     if (! layer->is_raster()) {
-        throw OgcApiException::get_error_message("InvalidParameter", "Vector data " + str_layer + " cannot be requested with WMS GetMap", 400);
+        throw OgcApiException::get_error_message("InvalidParameter", "Vector data " + str_layer + " cannot be requested with OGC API Maps", 400);
     }
 
     std::vector<Layer*> layers = {layer};
@@ -76,8 +76,8 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
     CRS* crs;
     std::string str_crs = req->get_query_param("crs");
     if (str_crs != "") {
-        if (contain_chars(str_crs, "<>")) {
-            BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMS CRS: " << str_crs;
+        if (contain_chars(str_crs, "\"")) {
+            BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in CRS: " << str_crs;
             throw OgcApiException::get_error_message("InvalidParameter", "CRS unknown", 400);
         }
     } else {
@@ -102,8 +102,8 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
     CRS* bbox_crs;
     std::string str_bbox_crs = req->get_query_param("bbox-crs");
     if (str_bbox_crs != "") {
-        if (contain_chars(str_bbox_crs, "<>")) {
-            BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in WMS CRS: " << str_bbox_crs;
+        if (contain_chars(str_bbox_crs, "\"")) {
+            BOOST_LOG_TRIVIAL(warning) << "Forbidden char detected in CRS: " << str_bbox_crs;
             throw OgcApiException::get_error_message("InvalidParameter", "CRS unknown", 400);
         }
     } else {
@@ -166,6 +166,8 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
     } else {
         // On met la bbox globale de la donnée, dans le CRS natif des données
         bbox = layer->get_native_bbox();
+        bbox.crs = layer->get_pyramid()->get_tms()->get_crs()->get_request_code();
+        str_bbox_crs = layer->get_pyramid()->get_tms()->get_crs()->get_request_code();
         bbox_crs = layer->get_pyramid()->get_tms()->get_crs();
     }
 
@@ -234,6 +236,10 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
             throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
         }
 
+        if (ogcapi_format_to_mime_type.find(str_format) == ogcapi_format_to_mime_type.end()) {
+            throw OgcApiException::get_error_message("InvalidParameter", "Format " + str_format + " unknown", 400);
+        }
+
         format = ogcapi_format_to_mime_type.at(str_format);
 
         if (! services->is_map_available_format(format)) {
@@ -269,6 +275,7 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
 
     // La résolution
     double res = 0;
+    int dpi = 0;
     std::string str_res = req->get_query_param("mm-per-pixel");
     if (str_res != "") {
         if (sscanf(str_res.c_str(), "%lf", &res) != 1)
@@ -276,12 +283,12 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
 
         if ( res <= 0 )
             throw OgcApiException::get_error_message("InvalidParameter", "mm-per-pixel query parameter have to be a strictly positive number", 400);
+
+        dpi = (int) round(25.4 / res);
     } else {
         res = 0.28;
     }
 
-    // Le dpi
-    int dpi = (int) round(25.4 / res);
 
     // Traitement de la requête
     std::string error;

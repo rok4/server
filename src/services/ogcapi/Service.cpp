@@ -53,6 +53,7 @@
 std::map<std::string, std::string> OgcApiService::ogcapi_format_to_mime_type = {
     {"png", "image/png"},
     {"jpg", "image/jpeg"},
+    {"mvt", "application/x-protobuf"},
     {"tiff", "image/geotiff"},
     {"bil", "image/x-bil;bits=32"},
     {"asc", "text/asc"}};

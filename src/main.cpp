@@ -406,11 +406,12 @@ int main ( int argc, char** argv ) {
 
     TmsBook::empty_trash();
     StyleBook::empty_trash();
-    CurlPool::clean_curls();
-    ProjPool::clean_projs();
+    CrsBook::clean_crss();
     StoragePool::clean_storages();
     IndexCache::clean_indexes();
-    CrsBook::clean_crss();
+    
+    CurlPool::clean_curls();
+    ProjPool::clean_projs();
 
     //CRYPTO clean - one time for the whole program
     EVP_cleanup();

@@ -1599,6 +1599,116 @@ paths:
               schema:
                 $ref: '#/components/schemas/ogcapi_error'
 
+  /ogcapi/collections/{collection}/map:
+    get:
+      tags:
+      - OGC API
+      summary: Télécharge une image avec le style par défaut
+      operationId: ogc_maps_get_map_default_style
+      parameters:
+
+        - name: collection
+          required: true
+          in: path
+          description: collection demandée
+          schema:
+            type: string
+
+        - name: bbox
+          required: false
+          in: query
+          description: Rectangle englobant de l'image demandée en CRS84 (longitude/latitude) si bbox-crs n'est pas renseigné. On prend la bbox globale des données si non fournie.
+          schema:
+            type: array
+            minItems: 4
+            maxItems: 6
+            items:
+              type: number
+              format: double
+            example:
+              - -5
+              - 40
+              - 5
+              - 50
+          explode: false
+
+        - name: bbox-crs
+          required: false
+          in: query
+          description: Système de coordonnée du rectangle englobant dans le paramètre bbox, CRS84 par défaut si la bbox est fournie, celui de la donnée sinon
+          schema:
+            type: string
+            example:
+              EPSG:4326
+
+        - name: crs
+          required: false
+          in: query
+          description: Système de coordonnée de l'image retournée. Celui natif des données si non fourni.
+          schema:
+            type: string
+            example:
+              EPSG:3857
+
+        - name: width
+          required: false
+          in: query
+          description: largeur de l'image demandée. Si non fournie, on respecte le ratio de la bbox. Si aucune dimension n'est fournie, on met la plus grande à une valeur par défaut et l'autre en respectant le ratio de la bbox.
+          schema:
+            type: integer
+
+        - name: height
+          required: false
+          in: query
+          description: hauteur de l'image demandée. Si non fournie, on respecte le ratio de la bbox. Si aucune dimension n'est fournie, on met la plus grande à une valeur par défaut et l'autre en respectant le ratio de la bbox.
+          schema:
+            type: integer
+
+        - name: mm-per-pixel
+          required: false
+          in: query
+          description: résolution de l'image demandée
+          schema:
+            type: number
+            default:
+              0.28
+
+        - name: f
+          required: false
+          in: query
+          description: format demandé, celui natif des données si non fourni
+          schema:
+            type: string
+            enum: ["png", "jpg", "tiff", "bil", "asc"]
+
+        - name: filename
+          required: false
+          in: query
+          description: nom du fichier à enregistrer (mis dans le content-disposition de la réponse, avec le mode attachment)
+          schema:
+            type: string
+              
+      responses:
+        200:
+          description: Image demandée
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: La collection demandée correspond à de la donnée vecteur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogcapi_error'
+        404:
+          description: Collection inconnue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ogcapi_error'
+
 
 
   ######################################### ADMIN
