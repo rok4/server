@@ -5,6 +5,10 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ## [Unreleased]
 
+### Added
+
+- Compilation des artefacts sous ubuntu 24.04 (compatible debian 13 / trixie)
+
 ## [6.2.0] - 2026-03-16
 ### Added
 - Possibilité de définir un timeout via la variable d'environnement `ROK4_NETWORK_TIMEOUT` (valeur à fournir en seconde) pour les intéraction avec le un service WMS source (pour le getfeature info)

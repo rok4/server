@@ -29,22 +29,22 @@ Installations système requises (listées dans le paquet debian, installées ave
 
 ```bash
 ### librok4-dev
-curl -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/x.y.z/librok4-base-x.y.z-ubuntu-20.04-amd64.deb
+curl -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/x.y.z/librok4-base-x.y.z-ubuntu-24.04-amd64.deb
 # or, with ceph driver
-curl -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/x.y.z/librok4-ceph-x.y.z-ubuntu-20.04-amd64.deb
+curl -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/x.y.z/librok4-ceph-x.y.z-ubuntu-24.04-amd64.deb
 
 apt install ./librok4-dev.deb
 
 ### rok4-server
-curl -o rok4-server.deb https://github.com/rok4/server/releases/download/x.y.z/rok4-server-x.y.z-ubuntu-20.04-amd64.deb
+curl -o rok4-server.deb https://github.com/rok4/server/releases/download/x.y.z/rok4-server-x.y.z-ubuntu-24.04-amd64.deb
 
 apt install ./rok4-server.deb
 
 ### installation des styles et des tile matrix sets 
-curl -o tilematrixsets.deb https://github.com/rok4/tilematrixsets/releases/download/4.1/rok4-tilematrixsets-4.1-linux-all.deb
+curl -o tilematrixsets.deb https://github.com/rok4/tilematrixsets/releases/download/4.7/rok4-tilematrixsets-4.7-linux-all.deb
 apt install ./tilematrixsets.deb
 
-curl -o styles.deb https://github.com/rok4/styles/releases/download/4.1/rok4-styles-4.1-linux-all.deb
+curl -o styles.deb https://github.com/rok4/styles/releases/download/4.5/rok4-styles-4.5-linux-all.deb
 apt install ./rok4-styles.deb
 ```
 
