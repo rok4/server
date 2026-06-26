@@ -5,6 +5,19 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ## [Unreleased]
 
+### Added
+- API Maps : implémentation intégrée au service OGC API
+- OGC API : possibilité de filtrer les collections par bbox
+- API Admin : sécurisation par secret
+
+### Changed
+- Configuration des services : les options sont regroupées quand elles concernent un même type de service (tuilé par exemple)
+- API Tiles : il n'est plus vu comme un service séparé mais est intégré au service OGC API
+- Factorisation du code de calcul d'une image ou d'une tuile
+
+### Removed
+- API Common : elle est intégrée au service OGC API
+
 ## [6.2.1] - 2026-06-25
 
 ### Added

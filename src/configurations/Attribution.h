@@ -47,7 +47,7 @@
 
 #include <rok4/utils/ResourceLocator.h>
 
-#include "Utils.h"
+#include "core/Utils.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
@@ -167,6 +167,14 @@ public:
             node.add("LogoURL.OnlineResource.<xmlattr>.xlink:href", logo->get_href());
             node.add("LogoURL.OnlineResource.<xmlattr>.xlink:type", "simple");
         }
+    }
+
+    /**
+     * \~french \brief Retourne le titre
+     * \~english \brief Get the title
+     */
+    std::string get_title() {
+        return title;
     }
 
     /**

@@ -48,7 +48,7 @@ class Server;
 
 #pragma once
 
-#include "fcgiapp.h"
+#include <fcgiapp.h>
 #include <csignal>
 #include <stdio.h>
 #include <pthread.h>
@@ -61,7 +61,7 @@ class Server;
 
 #include <rok4/utils/IndexCache.h>
 
-#include "Request.h"
+#include "core/Request.h"
 
 #include "config.h"
 
@@ -98,18 +98,6 @@ private:
     int sock;
 
     /**
-     * \~french \brief Identifiant du process
-     * \~english \brief Process identifier
-     */
-    int pid;
-
-    /**
-     * \~french \brief TimeStamp du process
-     * \~english \brief Process timestamp
-     */
-    long time;
-
-    /**
      * \~french \brief Configurations des services
      * \~english \brief Services configuration
      */
@@ -144,18 +132,6 @@ public:
      * \~english Return the server configuration
      */
     ServerConfiguration* get_server_configuration() ;
-
-    /**
-     * \~french Active le serveur
-     * \~english Enable server
-     */
-    void turn_on() ;
-
-    /**
-     * \~french Désactive le serveur
-     * \~english Disable server
-     */
-    void turn_off() ;
 
     /**
      * \~french Retourne la liste des threads
@@ -200,38 +176,6 @@ public:
      */
     void set_fcgi_socket ( int socket_fcgi ) ;
     
-    /**
-     * \~french
-     * \brief Stocke le PId du process principal
-     * \~english
-     * \brief Set the main process PID
-     */
-    void set_pid ( int process_id );
-
-    /**
-     * \~french
-     * \brief Obtient le PID du process principal
-     * \~english
-     * \brief Get the main process PID
-     */
-    int get_pid();
-
-    /**
-     * \~french
-     * \brief Stocke la date du process principal
-     * \~english
-     * \brief Set the main process time
-     */
-    void set_time ( long process_time );
-
-    /**
-     * \~french
-     * \brief Obtient la date du process principal
-     * \~english
-     * \brief Get the main process time
-     */
-    long get_time();
-
      /**
      * \~french
      * \brief Demande l'arrêt du serveur

@@ -56,7 +56,7 @@ class ServerConfiguration;
 #include <rok4/style/Style.h>
 
 #include "configurations/Layer.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
 #include "config.h"
 
@@ -68,14 +68,10 @@ class ServerConfiguration;
 class ServerConfiguration : public Configuration
 {
     friend class Rok4Server;
-    friend class CommonService;
-    friend class TmsService;
 
     public:
         ServerConfiguration(std::string path);
         ~ServerConfiguration();
-
-        bool is_enabled();
 
         std::string get_log_output() ;
         int get_log_file_period() ;
@@ -83,14 +79,7 @@ class ServerConfiguration : public Configuration
         boost::log::v2_mt_posix::trivial::severity_level get_log_level() ;
 
         std::string get_services_configuration_file() ;
-
         std::string get_layers_list() ;
-        std::map<std::string, Layer*>& get_layers() ;
-        void add_layer(Layer* l) ;
-        void delete_layer(std::string id) ;
-        int get_layers_count() ;
-        Layer* get_layer(std::string id) ;
-
         
         int get_threads_count() ;
         std::string get_socket() ;
@@ -122,11 +111,6 @@ class ServerConfiguration : public Configuration
          * \~english \brief File or object containing layers' descriptors list
          */
         std::string layers_list;
-        /**
-         * \~french \brief Liste des couches disponibles
-         * \~english \brief Available layers list
-         */
-        std::map<std::string, Layer*> layers;
 
         /**
          * \~french \brief Adresse du socket d'écoute (vide si lancement géré par un tiers)
@@ -138,12 +122,6 @@ class ServerConfiguration : public Configuration
          * \~english \brief Socket listen queue depth
          */
         int backlog;
-
-        /**
-         * \~french \brief Définit si le serveur doit honorer les requêtes de consultation
-         * \~english \brief Define whether broadcast request should be honored
-         */
-        bool enabled;
 
     private:
 

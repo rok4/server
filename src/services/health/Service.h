@@ -58,13 +58,13 @@ class HealthService : public Service {
 
 private:
 
-    DataStream* get_dependencies ( Request* req, Rok4Server* serv );
-    DataStream* get_threads ( Request* req, Rok4Server* serv );
-    DataStream* get_infos ( Request* req, Rok4Server* serv );
-    DataStream* get_health ( Request* req, Rok4Server* serv );
+    DataStream* get_dependencies ( Request* req, ServicesConfiguration* services );
+    DataStream* get_threads ( Request* req, ServicesConfiguration* services );
+    DataStream* get_infos ( Request* req, ServicesConfiguration* services );
+    DataStream* get_health ( Request* req, ServicesConfiguration* services );
 
 public:
-    DataStream* process_request(Request* req, Rok4Server* serv);
+    DataStream* process_request(Request* req, ServicesConfiguration* services );
 
     /**
      * \~french

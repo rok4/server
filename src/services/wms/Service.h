@@ -48,7 +48,6 @@ class WmsService;
 #pragma once
 
 #include "services/Service.h"
-#include "configurations/Metadata.h"
 #include "configurations/Services.h"
 
 /**
@@ -59,34 +58,20 @@ class WmsService;
 class WmsService : public Service {  
 
 private:
-    DataStream* get_capabilities ( Request* req, Rok4Server* serv );
-    DataStream* get_feature_info ( Request* req, Rok4Server* serv );
-    DataStream* get_map ( Request* req, Rok4Server* serv );
+    DataStream* get_capabilities ( Request* req, ServicesConfiguration* services );
+    DataStream* get_feature_info ( Request* req, ServicesConfiguration* services );
+    DataStream* get_map ( Request* req, ServicesConfiguration* services );
 
     std::string name;
-    Metadata* metadata;
-    bool reprojection;
-    std::vector<std::string> info_formats;
-    std::vector<std::string> formats;
 
     std::string root_layer_title;
     std::string root_layer_abstract;
-
-    int max_layers_count;
-    int max_width;
-    int max_height;
-    int max_tile_x;
-    int max_tile_y;
-
-    std::vector<CRS*> crss;
-
-    bool default_inspire;
 
     std::string cache_getcapabilities;
     std::string cache_getcapabilities_inspire;
 
 public:
-    DataStream* process_request(Request* req, Rok4Server* serv);
+    DataStream* process_request(Request* req, ServicesConfiguration* services );
 
     /**
      * \~french
@@ -115,63 +100,7 @@ public:
      * \~english
      * \brief Destructor
      */
-    ~WmsService() {
-        if (metadata) delete metadata;
-    };
-
-    /**
-     * \~french
-     * \brief Teste la présence du CRS dans la liste
-     * \return Présent ou non
-     * \~english
-     * \brief Test if CRS is in the CRS list
-     * \return Present or not
-     */
-    bool is_available_crs(CRS* c) ;
-
-    /**
-     * \~french
-     * \brief Teste la présence du CRS dans la liste
-     * \return Présent ou non
-     * \~english
-     * \brief Test if CRS is in the CRS list
-     * \return Present or not
-     */
-    bool is_available_crs(std::string c) ;
-
-    /**
-     * \~french
-     * \brief Teste la validité du format
-     * \~english
-     * \brief Test if format is valid
-     */
-    bool is_available_format(std::string f) ;
-
-    /**
-     * \~french
-     * \brief Liste des CRS globaux du service
-     * \~english
-     * \brief Global service CRS list
-     */
-    std::vector<CRS*>* get_available_crs() ;
-
-    /**
-     * \~french
-     * \brief Teste la validité du info format
-     * \~english
-     * \brief Test if info format is valid
-     */
-    bool is_available_infoformat(std::string f) ;
-
-    /**
-     * \~french
-     * \brief La reprojection est-elle activée
-     * \~english
-     * \brief Is reprojection enabled
-     */
-    bool reprojection_enabled() {
-        return reprojection;
-    };
+    ~WmsService() {};
 
 };
 

@@ -56,9 +56,9 @@ using boost::property_tree::xml_writer_settings;
 
 #include "services/tms/Exception.h"
 #include "services/tms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
 
-DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
+DataStream* TmsService::get_capabilities ( Request* req, ServicesConfiguration* services ) {
 
     if ( req->path_params.at(0) != "1.0.0" ) {
         throw TmsException::get_error_message("Invalid version (only 1.0.0 available)", 400);
@@ -80,7 +80,7 @@ DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
         root.add("KeywordList", keywords.at(i).get_content() );
     }
 
-    serv->get_services_configuration()->contact->add_node_tms(root, serv->get_services_configuration()->service_provider);
+    services->contact->add_node_tms(root, services->service_provider);
 
     if (metadata) {
         metadata->add_node_tms(root);
@@ -88,7 +88,7 @@ DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
 
     ptree& contents_node = root.add("TileMaps", "");
 
-    std::map<std::string, Layer*>::iterator layers_iterator ( serv->get_server_configuration()->get_layers().begin() ), layers_end ( serv->get_server_configuration()->get_layers().end() );
+    std::map<std::string, Layer*>::iterator layers_iterator ( services->get_layers().begin() ), layers_end ( services->get_layers().end() );
     for ( ; layers_iterator != layers_end; ++layers_iterator ) {
         layers_iterator->second->add_node_tms(contents_node, this);
     }
@@ -101,7 +101,7 @@ DataStream* TmsService::get_capabilities ( Request* req, Rok4Server* serv ) {
     return new MessageDataStream ( ss.str(), "text/xml", 200 );
 }
 
-DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
+DataStream* TmsService::get_tiles ( Request* req, ServicesConfiguration* services ) {
 
     // La version
     if ( req->path_params.at(0) != "1.0.0" )
@@ -114,7 +114,7 @@ DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Layer unknown", 400);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_tms_enabled() ) {
         throw TmsException::get_error_message("Layer " +str_layer+" unknown", 400);
     }
@@ -122,7 +122,7 @@ DataStream* TmsService::get_tiles ( Request* req, Rok4Server* serv ) {
     return new MessageDataStream ( layer->get_description_tms(this), "text/xml", 200 );
 }
 
-DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
+DataStream* TmsService::get_metadata ( Request* req, ServicesConfiguration* services ) {
 
     // La version
     if ( req->path_params.at(0) != "1.0.0" )
@@ -135,7 +135,7 @@ DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Layer unknown", 400);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_tms_enabled() ) {
         throw TmsException::get_error_message("Layer " +str_layer+" unknown", 400);
     }
@@ -143,7 +143,7 @@ DataStream* TmsService::get_metadata ( Request* req, Rok4Server* serv ) {
     return new MessageDataStream ( layer->get_description_tilejson(this), "application/json", 200 );
 }
 
-DataStream* TmsService::get_gdal ( Request* req, Rok4Server* serv ) {
+DataStream* TmsService::get_gdal ( Request* req, ServicesConfiguration* services ) {
 
     // La version
     if ( req->path_params.at(0) != "1.0.0" )
@@ -156,12 +156,12 @@ DataStream* TmsService::get_gdal ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Layer unknown", 400);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_tms_enabled() ) {
         throw TmsException::get_error_message("Layer " +str_layer+" unknown", 400);
     }
 
-    if (! Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
+    if (! layer->is_raster()) {
         throw TmsException::get_error_message("Layer " +str_layer+" is vector data: cannot describe it with this format", 400);
     }
 
