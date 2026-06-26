@@ -41,7 +41,7 @@ jobs:
         include:
           - os: [ubuntu-22.04, ubuntu-24.04]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout project
@@ -57,18 +57,17 @@ jobs:
             jq gettext build-essential cmake libcppunit-dev doxygen graphviz
 
           core_cpp_version=$(curl --silent "https://api.github.com/repos/rok4/core-cpp/releases/latest" | jq -r ".tag_name")
-          curl -L -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/${core_cpp_version}/librok4-base-${core_cpp_version}-${{ matrix.os }}-amd64.deb
+          curl -L -o librok4-dev.deb https://github.com/rok4/core-cpp/releases/download/${core_cpp_version}/librok4-base-${core_cpp_version}-ubuntu-24.04-amd64.deb
           sudo apt install ./librok4-dev.deb
 
       - name: Build packages
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_VERSION=${{ github.ref_name }} -DCPACK_SYSTEM_NAME=${{ matrix.os }} ..
+          cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_VERSION=${{ github.ref_name }} -DCPACK_SYSTEM_NAME="ubuntu-24.04" ..
           make -j2
           make package
 
       - name: Run unit tests
-        if: "matrix.os == 'ubuntu-22.04'"
         run: |
           cd build
           make test
@@ -81,7 +80,6 @@ jobs:
           release-tag: ${{ github.ref_name }}
 
       - name: Build documentation
-        if: "matrix.os == 'ubuntu-22.04'"
         run: |
           cd build
           make doc
@@ -113,7 +111,6 @@ jobs:
         run: pip install -r docs/requirements.txt
 
       - name: Publish documentation
-        if: "matrix.os == 'ubuntu-22.04'"
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
