@@ -1,0 +1,2623 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://rok4.github.io/server/6.2.1/CHANGELOG/">
+      
+      
+        <link rel="prev" href="../documentation/">
+      
+      
+        <link rel="next" href="../CONTRIBUTING/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="https://rok4.github.io/assets/images/rok4-carre.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Historique des versions - Projet ROK4 - Serveur de diffusion WMS, WMTS et TMS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://rok4.github.io/assets/css/commun.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  🚨 Vous êtes sur la documentation d'une ancienne version. 🚨
+  <a href="../.."> 
+    <strong>Cliquez ici pour aller sur la dernière version.</strong>
+  </a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL(".."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href="https://rok4.github.io" title="Projet ROK4 - Serveur de diffusion WMS, WMTS et TMS" class="md-header__button md-logo" aria-label="Projet ROK4 - Serveur de diffusion WMS, WMTS et TMS" data-md-component="logo">
+      
+  <img src="https://rok4.github.io/assets/images/rok4-carre.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Projet ROK4 - Serveur de diffusion WMS, WMTS et TMS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Historique des versions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../openapi/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Spécification de l'API
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../documentation/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Documentation technique
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Historique des versions
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../CONTRIBUTING/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contribuer
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://rok4.github.io" title="Projet ROK4 - Serveur de diffusion WMS, WMTS et TMS" class="md-nav__button md-logo" aria-label="Projet ROK4 - Serveur de diffusion WMS, WMTS et TMS" data-md-component="logo">
+      
+  <img src="https://rok4.github.io/assets/images/rok4-carre.png" alt="logo">
+
+    </a>
+    Projet ROK4 - Serveur de diffusion WMS, WMTS et TMS
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spécification de l'API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation technique
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Historique des versions
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Historique des versions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#621-2026-06-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2.1 - 2026-06-25
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2.1 - 2026-06-25">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#620-2026-03-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2.0 - 2026-03-16
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2.0 - 2026-03-16">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#616-2025-05-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.6 - 2025-05-16
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.6 - 2025-05-16">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#615-2025-04-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.5 - 2025-04-08
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.5 - 2025-04-08">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#614-2025-02-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.4 - 2025-02-17
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.4 - 2025-02-17">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#613-2025-02-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.3 - 2025-02-10
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.3 - 2025-02-10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#612-2024-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.2 - 2024-11-26
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.2 - 2024-11-26">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#611-2024-10-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.1 - 2024-10-11
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.1 - 2024-10-11">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#610-2024-10-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.0 - 2024-10-01
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.0 - 2024-10-01">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#601-2024-09-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.0.1 - 2024-09-10
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.0.1 - 2024-09-10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#552-2024-06-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5.2 - 2024-06-27
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.5.2 - 2024-06-27">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#551-2024-06-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5.1 - 2024-06-07
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.5.1 - 2024-06-07">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#550-2024-04-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5.0 - 2024-04-10
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.5.0 - 2024-04-10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#541-2024-01-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4.1 - 2024-01-25
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.4.1 - 2024-01-25">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#530-2023-12-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.0 - 2023-12-06
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.3.0 - 2023-12-06">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#521-2023-11-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2.1 - 2023-11-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2.1 - 2023-11-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#520-2023-10-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2.0 - 2023-10-02
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2.0 - 2023-10-02">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#510-2023-09-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1.0 - 2023-09-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.1.0 - 2023-09-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#504-2023-03-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.0.4 - 2023-03-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.0.4 - 2023-03-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#501-2022-12-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.0.1 - 2022-12-13
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.0.1 - 2022-12-13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#500-2022-12-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.0.0 - 2022-12-06
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.0.0 - 2022-12-06">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#410-2022-12-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.0 - 2022-12-02
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1.0 - 2022-12-02">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#400-2022-06-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.0.0 - 2022-06-26
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.0.0 - 2022-06-26">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribuer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#unreleased" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unreleased
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#621-2026-06-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2.1 - 2026-06-25
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2.1 - 2026-06-25">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#620-2026-03-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2.0 - 2026-03-16
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.2.0 - 2026-03-16">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deprecated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#616-2025-05-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.6 - 2025-05-16
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.6 - 2025-05-16">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#615-2025-04-08" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.5 - 2025-04-08
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.5 - 2025-04-08">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#614-2025-02-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.4 - 2025-02-17
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.4 - 2025-02-17">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#613-2025-02-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.3 - 2025-02-10
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.3 - 2025-02-10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#612-2024-11-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.2 - 2024-11-26
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.2 - 2024-11-26">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#611-2024-10-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.1 - 2024-10-11
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.1 - 2024-10-11">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#610-2024-10-01" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1.0 - 2024-10-01
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.1.0 - 2024-10-01">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#601-2024-09-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.0.1 - 2024-09-10
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6.0.1 - 2024-09-10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#552-2024-06-27" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5.2 - 2024-06-27
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.5.2 - 2024-06-27">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#551-2024-06-07" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5.1 - 2024-06-07
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.5.1 - 2024-06-07">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#550-2024-04-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5.0 - 2024-04-10
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.5.0 - 2024-04-10">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#541-2024-01-25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4.1 - 2024-01-25
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.4.1 - 2024-01-25">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#530-2023-12-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3.0 - 2023-12-06
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.3.0 - 2023-12-06">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#521-2023-11-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2.1 - 2023-11-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2.1 - 2023-11-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#520-2023-10-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2.0 - 2023-10-02
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.2.0 - 2023-10-02">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#510-2023-09-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1.0 - 2023-09-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.1.0 - 2023-09-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#504-2023-03-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.0.4 - 2023-03-14
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.0.4 - 2023-03-14">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixed_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#501-2022-12-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.0.1 - 2022-12-13
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.0.1 - 2022-12-13">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#500-2022-12-06" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.0.0 - 2022-12-06
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5.0.0 - 2022-12-06">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#changed_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#410-2022-12-02" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1.0 - 2022-12-02
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.1.0 - 2022-12-02">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#400-2022-06-26" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.0.0 - 2022-06-26
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.0.0 - 2022-06-26">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Added
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changed_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removed_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Removed
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+  
+
+
+
+
+<h1 id="changelog">Changelog</h1>
+<p>Tous les changements sont consignés dans ce fichier.</p>
+<p>Le format est basé sur <a href="https://keepachangelog.com/">Keep a Changelog</a> et ce projet respecte le <a href="https://semver.org/">Semantic Versioning</a>.</p>
+<h2 id="unreleased"><a href="https://github.com/rok4/server/compare/v6.2.1...HEAD">Unreleased</a></h2>
+<h2 id="621-2026-06-25"><a href="https://github.com/rok4/server/compare/v6.2.0...v6.2.1">6.2.1</a> - 2026-06-25</h2>
+<h3 id="added">Added</h3>
+<ul>
+<li>Compilation des artefacts sous ubuntu 24.04 (compatible debian 13 / trixie)</li>
+</ul>
+<h2 id="620-2026-03-16"><a href="https://github.com/rok4/server/compare/v6.1.6...v6.2.0">6.2.0</a> - 2026-03-16</h2>
+<h3 id="added_1">Added</h3>
+<ul>
+<li>Possibilité de définir un timeout via la variable d'environnement <code>ROK4_NETWORK_TIMEOUT</code> (valeur à fournir en seconde) pour les intéraction avec le un service WMS source (pour le getfeature info)</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Refonte du CHANGELOG au format <a href="https://keepachangelog.com/">Keep a Changelog</a></li>
+<li>Changement des imports de Cache aux imports spécifiques des classes suite à la séparation du fichier Cache dans core-cpp.</li>
+<li>Changement de la manière de traiter le style dans le getmap permettant d'utiliser des styles sans palette.</li>
+</ul>
+<h3 id="deprecated">Deprecated</h3>
+<h3 id="removed">Removed</h3>
+<h3 id="fixed">Fixed</h3>
+<h3 id="security">Security</h3>
+<h2 id="616-2025-05-16"><a href="https://github.com/rok4/server/compare/v6.1.5...v6.1.6">6.1.6</a> - 2025-05-16</h2>
+<h3 id="fixed_1">Fixed</h3>
+<ul>
+<li><code>WMTS</code> :<ul>
+<li>dans le getcapabilities, le premier style possède l'attribut isDefault à <code>true</code></li>
+<li>pour la version inspire, peu importe l'identifiant du style et le nom de la couche</li>
+</ul>
+</li>
+<li><code>WMS</code> :<ul>
+<li>pour le getcapabilities inspire : si le nom est normalisé, son style doit être <code>&lt;name&gt;.Default</code>, sinon <code>DEFAULT</code></li>
+<li>si une dimension est nulle (et pas juste négative) pour le GetMap ou GetFeatureInfo, on sort en erreur immédiatement</li>
+</ul>
+</li>
+</ul>
+<h2 id="615-2025-04-08"><a href="https://github.com/rok4/server/compare/v6.1.4...v6.1.5">6.1.5</a> - 2025-04-08</h2>
+<h3 id="added_2">Added</h3>
+<ul>
+<li><code>WMS</code><ul>
+<li>Écriture de la valeur de nodata dans les header geotiff</li>
+</ul>
+</li>
+</ul>
+<h3 id="fixed_2">Fixed</h3>
+<ul>
+<li>Nettoyage et bascule des styles et TMS lors d'une extinction ou redémarrage du serveur</li>
+<li><code>WMTS</code><ul>
+<li>Pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant <code>&lt;nom de la couche&gt;:Default</code></li>
+</ul>
+</li>
+<li><code>WMS</code><ul>
+<li>Pour que la couche apparaisse dans les capacités Inspire, le style par défaut doit avoir l'identifiant <code>&lt;nom de la couche&gt;:Default</code></li>
+<li>On vérifie que la donnée a bien 3 canaux pour répondre une tuile en JPEG</li>
+<li>Dans le cas d'une couche inconnue, le code est <code>LayerNotDefined</code></li>
+</ul>
+</li>
+<li><code>TMS</code><ul>
+<li>Dans la description des couches, les niveaux (<code>TileSet</code>) doivent être définis dans la balise <code>TileSets</code> et non <code>TileMap</code> et <code>Origin</code> est le coin en bas à gauche et non en haut à gauche</li>
+</ul>
+</li>
+</ul>
+<h2 id="614-2025-02-17"><a href="https://github.com/rok4/server/compare/v6.1.3...v6.1.4">6.1.4</a> - 2025-02-17</h2>
+<h3 id="fixed_3">Fixed</h3>
+<ul>
+<li><code>WMS</code><ul>
+<li>Correction de l'attribution dans les capacités : contenu du logo et ordre des balises</li>
+<li>Correction du géoréférencement dans les réponses GeoTIFF</li>
+</ul>
+</li>
+<li><code>TMS</code><ul>
+<li>Correction de l'attribution dans les capacités : contenu du logo</li>
+<li>Ajout du header <code>Content-Encoding: deflate</code> pour les tuiles bil compressées</li>
+</ul>
+</li>
+<li><code>WMTS</code><ul>
+<li>Correction des balises de métadonnées dans les capacités</li>
+<li>Ajout du header <code>Content-Encoding: deflate</code> pour les tuiles bil compressées</li>
+</ul>
+</li>
+</ul>
+<h2 id="613-2025-02-10"><a href="https://github.com/rok4/server/compare/v6.1.2...v6.1.3">6.1.3</a> - 2025-02-10</h2>
+<h3 id="fixed_4">Fixed</h3>
+<ul>
+<li><code>WMTS</code> :<ul>
+<li>correction du calcul des tuiles limites pour le TMS natif lorsque les limites de la couche sont surchargées par une bbox</li>
+<li>pour que la couche apparaisse dans les capacités Inspire, le format de la tuile doit être le PNG</li>
+<li>dans les capacités inspire, <code>inspire_vs:ExtendedCapabilities</code> doit être dans <code>OperationsMetadata</code></li>
+</ul>
+</li>
+<li><code>WMS</code><ul>
+<li>Ajout des schémas XML dans les réponses en erreur</li>
+</ul>
+</li>
+</ul>
+<h2 id="612-2024-11-26"><a href="https://github.com/rok4/server/compare/v6.1.1...v6.1.2">6.1.2</a> - 2024-11-26</h2>
+<h3 id="added_3">Added</h3>
+<ul>
+<li><code>Layer</code> : rétablissement d'un style par défaut au chargement de la couche. L'identifiant de ce style par défaut peut être fourni via le champ <code>default_style</code> dans le fichier de configuration des services, à la racine (optionnel, <code>normal</code> par défaut)</li>
+</ul>
+<h2 id="611-2024-10-11"><a href="https://github.com/rok4/server/compare/v6.1.0...v6.1.1">6.1.1</a> - 2024-10-11</h2>
+<h3 id="fixed_5">Fixed</h3>
+<ul>
+<li><code>WMS</code> : correction de l'URL du site du fournisseur du service dans le GetCapabilities</li>
+<li><code>WMTS</code> : correction du nom du fournisseur du service dans le GetCapabilities</li>
+</ul>
+<h2 id="610-2024-10-01"><a href="https://github.com/rok4/server/compare/v6.0.1...v6.1.0">6.1.0</a> - 2024-10-01</h2>
+<h3 id="added_4">Added</h3>
+<ul>
+<li>OGC API Tiles :<ul>
+<li>ajout des routes de découvertes pour connaître les éventuels styles, TMS et tuiles limites pour les couches</li>
+<li>ajout des routes de lecture des TMS</li>
+<li>ajout d'une route de découverte de ce service</li>
+<li>ajout de la route de conformité aux classes</li>
+</ul>
+</li>
+</ul>
+<h3 id="changed_1">Changed</h3>
+<ul>
+<li>Les CRS et TMS additionnels dans le descripteur de couche sont à la racine pour pouvoir être exploités dans plusieurs services</li>
+</ul>
+<h2 id="601-2024-09-10"><a href="https://github.com/rok4/server/compare/v5.5.2...v6.0.1">6.0.1</a> - 2024-09-10</h2>
+<h3 id="added_5">Added</h3>
+<ul>
+<li>Tous les services sont désactivable, routes de santé incluses</li>
+<li>La racine de consultation des services de diffusion est configurable</li>
+<li>Titre, résumé et mots clés sont définis par service de diffusion</li>
+</ul>
+<h3 id="changed_2">Changed</h3>
+<ul>
+<li>Passage complet en snake case</li>
+<li>Plus de style par défaut au chargement d'une couche, il faut forcément en fournir un. Pas de détection du style Inspire : ce sera toujours le premier qui sera utilisé par défaut à l'interrogation de la couche</li>
+<li>La route globale des services devient une route du service COMMON (futur OGC API Common)</li>
+<li>OGC API Tiles : dans le fichier de configuration des services, la section devient 'tiles'</li>
+<li>Utilisation des librairies boost (property tree) pour écrire du XML et json11 pour écrire du JSON</li>
+<li>Changement du format des réponses au getFeatureInfo interne (JSON -&gt; FeatureCollection, XML -&gt; Pixel.Band)</li>
+<li>WMTS : on ne met dans le getcapabilities que les styles que l'on pourra effectivement appliquer lors d'un GetTile</li>
+<li>Les GetFeatureInfo sur un WMS externe se font toujours avec le format image/tiff</li>
+</ul>
+<h3 id="removed_1">Removed</h3>
+<ul>
+<li>Suppression de la classe WebService, l'envoi de requête est assuré par la classe Request</li>
+</ul>
+<h2 id="552-2024-06-27"><a href="https://github.com/rok4/server/compare/v5.5.1...v5.5.2">5.5.2</a> - 2024-06-27</h2>
+<h3 id="fixed_6">Fixed</h3>
+<ul>
+<li><code>TMS</code> : les backslash sont échappés dans l'abstract pour éviter la casse du metadata.json</li>
+</ul>
+<h2 id="551-2024-06-07"><a href="https://github.com/rok4/server/compare/v5.5.0...v5.5.1">5.5.1</a> - 2024-06-07</h2>
+<h3 id="added_6">Added</h3>
+<ul>
+<li>Services WMS, WMTS, TMS et Tiles : il est possible de fournir un filename en paramètre de requête et imposer le téléchargement dans un navigateur</li>
+</ul>
+<h2 id="550-2024-04-10"><a href="https://github.com/rok4/server/compare/v5.4.1...v5.5.0">5.5.0</a> - 2024-04-10</h2>
+<h3 id="added_7">Added</h3>
+<ul>
+<li><code>Layer</code> : lors de la configuration du get feature info de type EXTERNALWMS, il est possible de fournir des paramètres additionnels à ajouter à la requête vers le WMS source avec le champ "extra_query_params"</li>
+<li>WMTS :<ul>
+<li>On ajoute à la liste des TMS au niveau du getcapabilities les TMS "de base" en entier</li>
+</ul>
+</li>
+</ul>
+<h2 id="541-2024-01-25"><a href="https://github.com/rok4/server/compare/v5.3.0...v5.4.1">5.4.1</a> - 2024-01-25</h2>
+<h3 id="added_8">Added</h3>
+<ul>
+<li>WMS :<ul>
+<li>Ajout de la configuration du titre et nom de la couche racine dans le getCapabilities</li>
+</ul>
+</li>
+</ul>
+<h3 id="changed_3">Changed</h3>
+<ul>
+<li>WMS :<ul>
+<li>Déplacement des fonctions d'écriture d'une bbox du getCapabilities dans UtilsXML</li>
+<li>Ajout de bbox au niveau de la couche racine dans le getCapabilities</li>
+<li>L'attribution d'une couche est mise après les éventuelles métadonnées</li>
+</ul>
+</li>
+<li>WMTS :<ul>
+<li>On ne liste plus les couches de tuiles vectorielles dans le getCapabilities</li>
+<li>On exporte dans le getcapabilities un TMS différent pour chaque couple haut / bas présent dans les couches</li>
+</ul>
+</li>
+</ul>
+<h2 id="530-2023-12-06"><a href="https://github.com/rok4/server/compare/v5.2.1...v5.3.0">5.3.0</a> - 2023-12-06</h2>
+<h3 id="added_9">Added</h3>
+<ul>
+<li>Sur les routes admin de ajout, modification et suppression de couche, on peut demander que les capacités des services ne soient pas regénérés</li>
+<li>Un nouvelle route admin (PUT /admin/layers) sans paramètre permet de demander la réécriture des capacités des services</li>
+</ul>
+<h3 id="changed_4">Changed</h3>
+<ul>
+<li>Ajout de l'ID de thread dans les logs</li>
+</ul>
+<h2 id="521-2023-11-14"><a href="https://github.com/rok4/server/compare/v5.2.0...v5.2.1">5.2.1</a> - 2023-11-14</h2>
+<h3 id="changed_5">Changed</h3>
+<ul>
+<li>En WMS, si la requête ne précise pas de version, on met la version 1.3.0 par défaut</li>
+<li>En WMTS, si la requête ne précise pas de version, on met la version 1.0.0 par défaut</li>
+</ul>
+<h2 id="520-2023-10-02"><a href="https://github.com/rok4/server/compare/v5.1.0...v5.2.0">5.2.0</a> - 2023-10-02</h2>
+<h3 id="added_10">Added</h3>
+<ul>
+<li>Gestion de la métadonnée de service pour l'OGC API Tiles</li>
+</ul>
+<h3 id="changed_6">Changed</h3>
+<ul>
+<li>Pour le WMS, WMTS et OGC API Tiles, la fourniture d'une métadonnée de service est obligatoire dans le cas inspire</li>
+<li>Pour tous les services de diffusion, si une métadonnée de service est fournie, elle est mise dans la réponse au GetCapabilities</li>
+<li><code>Layer</code> : si aucune bbox n'est fournie, elle est déduite du niveau le mieux résolu des pyramides utilisées par la couche * Dans le getcapabilities WMTS, dans le cas de TMS additionnel pour une couche, on ajoute une marge de une tuile pour les tuiles limites calculées</li>
+</ul>
+<h3 id="fixed_7">Fixed</h3>
+<ul>
+<li>La fonction de copie d'une instance MetadataURL recopie bien le format et le href</li>
+<li>Lors de l'écriture de nombres flottants dans les réponses à un appel GetFeatureInfo, on précise les décimales</li>
+<li>Utils API Tiles<ul>
+<li>correction l'extraction de la collection et du style lors d'appels à la route <code>/tiles/collections/{}/styles/{}/map/tiles/{}/{}/{}/{}(/info)?</code></li>
+<li>le style par défaut de la couche est bien utilisée lors d'appels sans précision de style</li>
+</ul>
+</li>
+</ul>
+<h2 id="510-2023-09-14"><a href="https://github.com/rok4/server/compare/v5.0.4...v5.1.0">5.1.0</a> - 2023-09-14</h2>
+<p>Implémentation partielle de l'API OGC Tiles - Part 1 <a href="https://github.com/opengeospatial/ogcapi-tiles/releases/tag/1.0.0">v1.0.0 final release</a></p>
+<h3 id="added_11">Added</h3>
+<ul>
+<li>Liste de nouvelles routes pour obtenir le <strong>GetCapabilities</strong>:<ul>
+<li>/tiles/collections avec les paramètres facultatifs :<ul>
+<li>bbox</li>
+<li>limit</li>
+</ul>
+</li>
+<li>/tiles/collections/{layer}/map/tiles</li>
+<li>/tiles/collections/{layer}/tiles</li>
+<li>/tiles/tilematrixsets</li>
+<li>/tiles/tilematrixsets/{tms}</li>
+</ul>
+</li>
+<li>Liste des nouvelles routes pour obtenir le <strong>GetTile</strong> :<ul>
+<li>Raster<ul>
+<li>/tiles/map/tiles/{tms}/{level}/{row}/{col} avec le paramètre obligatoire : collections={layer}</li>
+<li>/tiles/styles/{style}/map/tiles/{tms}/{level}/{row}/{col} avec le paramètre obligatoire : collections={layer}</li>
+<li>/tiles/collections/{layer}/styles/{style}/map/tiles/{tms}/{level}/{row}/{col}</li>
+<li>/tiles/collections/{layer}/map/tiles/{tms}/{level}/{row}/{col}</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Vecteur
+        * /tiles/tiles/{tms}/{level}/{row}/{col}?collections={layer}
+        * /tiles/collections/{layer}/tiles/{tms}/{level}/{row}/{col}</li>
+</ul>
+<h3 id="changed_7">Changed</h3>
+<ul>
+<li>Si la liste des styles est fournie mais vide, on le traite comme si rien n'était fourni : on ajoute le style par défaut</li>
+</ul>
+<h2 id="504-2023-03-14"><a href="https://github.com/rok4/server/compare/v5.0.1...v5.0.4">5.0.4</a> - 2023-03-14</h2>
+<h3 id="fixed_8">Fixed</h3>
+<ul>
+<li>SwiftContext : lecture des header insensible à la casse</li>
+</ul>
+<h2 id="501-2022-12-13"><a href="https://github.com/rok4/server/compare/v5.0.0...v5.0.1">5.0.1</a> - 2022-12-13</h2>
+<h3 id="changed_8">Changed</h3>
+<ul>
+<li>Le style par défaut d'une couche est défini comme le premier style défini au niveau de la couche</li>
+</ul>
+<h3 id="fixed_9">Fixed</h3>
+<ul>
+<li>Pas de récupération du style lors de l'interrogation en TMS d'une couche de tuiles vectorielles</li>
+</ul>
+<h2 id="500-2022-12-06"><a href="https://github.com/rok4/server/compare/v4.1.0...v5.0.0">5.0.0</a> - 2022-12-06</h2>
+<p>Les configurations des couches, styles et tile matrix sets peuvent être des objets. Styles et TMS sont chargé à l'utilisation dans des couches, et les descripteurs des couches à charger sont listés.</p>
+<h3 id="changed_9">Changed</h3>
+<ul>
+<li>Chargement des styles et des TMS au besoin : ce n'est que lors de l'utilisation du style dans une couche ou d'un TMS dans une pyramide que l'on charge le fichier correspondant.</li>
+<li>Styles et TMS peuvent être stockés en mode fichier ou objet. Dans la configuration du serveur, le répertoire précisé est préfixé par le type de stockage (<code>file://</code>, <code>s3://</code>, <code>swift://</code>, <code>ceph://</code>, mode fichier sinon).</li>
+<li>Initialisation des couches à partir d'une liste de descripteurs</li>
+<li>La configuration de la sortie de log en standard passe de <code>standard_output_stream_for_errors</code> à <code>standard_output</code></li>
+</ul>
+<h3 id="removed_2">Removed</h3>
+<ul>
+<li>Chargement de tous les descripteurs de couche d'un dossier</li>
+<li>Gestion de la persistence lors de l'ajout/modification/suppression d'une couche via l'API admin</li>
+</ul>
+<h2 id="410-2022-12-02"><a href="https://github.com/rok4/server/compare/v4.0.0...v4.1.0">4.1.0</a> - 2022-12-02</h2>
+<h3 id="added_12">Added</h3>
+<ul>
+<li>Implémentation de routes de santé<ul>
+<li><code>/healthcheck</code> : informations générales, version, date de lancement, statut général</li>
+<li><code>/healthcheck/info</code> : informations détaillées, listes de couches, styles et tile matrix sets</li>
+<li><code>/healthcheck/depends</code> : informations sur les stockages, nombres de contextes par type</li>
+<li><code>/healthcheck/threads</code> : informations sur les threads, statut, requêtes prises en charge, dernier temps de réponse</li>
+</ul>
+</li>
+</ul>
+<h3 id="fixed_10">Fixed</h3>
+<ul>
+<li>Passage du nombre de jours sur 2 chiffres dans les appels S3</li>
+</ul>
+<h2 id="400-2022-06-26"><a href="https://github.com/rok4/server/releases/tag/v4.0.0">4.0.0</a> - 2022-06-26</h2>
+<p>Le projet ROK4 a été totalement refondu, dans son organisation et sa mise à disposition. Les composants sont désormais disponibles dans des releases sur GitHub au format debian.</p>
+<p>Cette release contient le serveur de diffusion de données raster ou vecteur stockées dans des pyramides ROK4.</p>
+<h3 id="added_13">Added</h3>
+<ul>
+<li>Ajout d'une API d'administration permettant la création, la modification et la suppression de couches. Le dossier des couches peut être vide au démarrage. Corps de requête</li>
+<li>Les descripteurs de pyramide peuvent être lus directement sur un stockage objet</li>
+<li>Une couche peut exploiter plusieurs pyramides, sur des niveaux différents</li>
+<li>Gestion d'un cache des en-têtes des dalles, permettant d'éviter des lectures lors de la récupération de tuiles par le serveur.</li>
+<li>Possibilité de configurer des attributions et des métadonnées au niveau des couches, afin qu'elles apparaissent dans les réponses au GetCapabilities TMS et WMS</li>
+<li>Possibilité de lire des liens symboliques inter contenants sur des stockages objets</li>
+<li>La configuration d'une couche peut ne pas préciser de bbox : on considère alors l'étendue maximale des pyramides utilisées. Préciser une bbox permet de limiter cette étendue de définition de la couche.</li>
+<li>Les URL d'exposition du serveur sont précisées dans la configuration, pour être injectées au besoin dans les réponses.</li>
+<li>Le descripteur de couche peut préciser une liste de TMS additionnels différents de celui natif des pyramides exploitées. Cela permet d'interroger les données en WMTS selon ces TMS non natifs</li>
+</ul>
+<h3 id="changed_10">Changed</h3>
+<ul>
+<li>Réorganisation des configurations et passage en JSON, dont les spécifications sont décrites sous forme de schémas JSON. Le passage en JSON concerne les configurations du serveur et des services, les descripteurs de couches, les styles et les TMS.</li>
+<li>Passage de la librairie PROJ à la version 6</li>
+</ul>
+<h3 id="removed_3">Removed</h3>
+<ul>
+<li>Suppression du support du WMS 1.1.1</li>
+<li>Suppression de la gestion de styles complexes (quand le valeur finale d'un pixel dépend des valeurs initiales du voisinage, comme le calcul de pente ou d'ombrage) à la volée</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
