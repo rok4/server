@@ -1,0 +1,105 @@
+{
+    "enabled": true,
+    "global": {
+        "provider": "Local",
+        "site": "http://localhost",
+        "fee": "none",
+        "access_constraint": "none",
+        "contact": {
+            "name": "SAV",
+            "position": "custodian",
+            "voice": "",
+            "facsimile": "",
+            "address_type": "",
+            "delivery_point": "",
+            "city": "",
+            "administrative_area": "",
+            "post_code": "",
+            "country": "",
+            "email": ""
+        },
+        "crs_equivalences": "/etc/rok4/equals_crs.json",
+        "default_style": "normal",
+        "inspire": true,
+        "map": {
+            "limits": {
+                "width": 10000,
+                "height": 10000,
+                "tile_x": 256,
+                "tile_y": 256,
+                "layers_count": 2
+            },
+            "formats": [
+                "image/jpeg",
+                "image/png",
+                "image/tiff",
+                "image/geotiff",
+                "image/x-bil;bits=32"
+            ],
+            "crs": [
+                "CRS:84",
+                "EPSG:3857",
+                "EPSG:4326"
+            ],
+            "reprojection": true
+        },
+        "tile": {
+            "reprojection": true
+        }
+    },
+    "admin": {
+        "enabled": true,
+        "secret": "password"
+    },
+    "health": {
+        "enabled": true
+    },
+    "wms": {
+        "enabled": true,
+        "endpoint_uri": "http://localhost/rok4/wms",
+        "root_path": "/wms",
+        "root_layer": {
+            "title": "Couches WMS",
+            "abstract": "Données servies en WMS"
+        },
+        "name": "WMS",
+        "title": "Service de visualisation WMS",
+        "abstract": "Ce service permet la visulation de couches de données raster au travers d'un flux WMS",
+        "keywords": [
+            "WMS"
+        ]
+    },
+    "wmts": {
+        "enabled": true,
+        "endpoint_uri": "http://localhost/rok4/wmts",
+        "title": "Service de visualisation WMTS",
+        "abstract": "Ce service permet la visulation de couches de données raster au travers d'un flux WMTS",
+        "keywords": [
+            "WMTS"
+        ],
+        "root_path": "/wmts"
+    },
+    "tms": {
+        "enabled": true,
+        "endpoint_uri": "http://localhost/rok4/tms",
+        "root_path": "/tms",
+        "title": "Service de visualisation TMS",
+        "abstract": "Ce service permet la visulation de couches de données au travers d'un flux TMS",
+        "keywords": [
+            "TMS"
+        ]
+    },
+    "ogcapi": {
+        "enabled": true,
+        "endpoint_uri": "http://localhost/rok4/ogcapi",
+        "root_path": "/ogcapi",
+        "title": "Service de visualisation selon les API OGC",
+        "abstract": "Ce service permet la visulation de couches de données au travers de flux OGC API Tiles",
+        "keywords": [
+            "OGC API Tiles"
+        ],
+        "tiles": true,
+        "maps": true,
+        "default_size": 256
+    }
+}
