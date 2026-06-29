@@ -36,11 +36,11 @@
  */
 
 /**
- * \file services/health/Threads.h
+ * \file core/Process.h
  ** \~french
- * \brief Définition des classes InfoThread et Threads
+ * \brief Définition des classes InfoThread et Process
  ** \~english
- * \brief Define classes InfoThread and Threads
+ * \brief Define classes InfoThread and Process
  */
 
 #pragma once
@@ -50,7 +50,7 @@
 
 #include <rok4/thirdparty/json11.hpp>
 
-#include "Request.h"
+#include "core/Request.h"
 
 enum eThreadStatus {
     UNKNOWN,
@@ -190,7 +190,7 @@ class InfoThread {
 
 };
 
-class Threads {
+class Process {
     private:
         /**
          * @brief Thread list information
@@ -199,17 +199,50 @@ class Threads {
         static std::map<long unsigned int, InfoThread> threads;
 
         /**
+         * @brief Process ID
+         * 
+         */
+        static long unsigned int pid;
+
+        /**
+         * \~french \brief TimeStamp du process
+         * \~english \brief Process timestamp
+         */
+        static long time;
+
+        /**
          * @brief Construct a new Stats object
          * 
          */
-        Threads(){};
+        Process(){};
 
     public:
         /**
          * @brief Destroy the Stats object
          * 
          */
-        ~Threads(){};
+        ~Process(){};
+
+        /**
+         * @brief Get the process ID
+         * 
+         * @return std::string
+         */
+        static long unsigned int get_pid();
+
+        /**
+         * @brief Get the number of threads
+         * 
+         * @return int
+         */
+        static int get_threads_count();
+
+        /**
+         * @brief Set the process ID
+         * 
+         * @return std::string
+         */
+        static void set_pid(long unsigned int);
 
         /**
          * @brief Add a new thread to the map
@@ -217,7 +250,7 @@ class Threads {
          * or else in main thread !
          * 
          */
-        static void add();
+        //static void add();
         static void add(long unsigned int);
 
         /**
@@ -257,5 +290,21 @@ class Threads {
         static std::string to_string (eThreadStatus st) {
             return std::string ( threadstatus_name[st] );
         }
+
+        /**
+         * \~french
+         * \brief Stocke la date du process principal
+         * \~english
+         * \brief Set the main process time
+         */
+        static void set_time ( long process_time );
+
+        /**
+         * \~french
+         * \brief Obtient la date du process principal
+         * \~english
+         * \brief Get the main process time
+         */
+        static long get_time();
 };
 

@@ -52,7 +52,9 @@
 #include <utils/Keyword.h>
 #include <rok4/datastream/DataStream.h>
 
-class Rok4Server;
+#include "configurations/Metadata.h"
+
+class ServicesConfiguration;
 class Request;
 
 /**
@@ -69,6 +71,7 @@ protected:
     std::vector<Keyword> keywords;
     std::string endpoint_uri;
     std::string root_path;
+    Metadata* metadata;
     bool enabled;
 
     /**
@@ -100,13 +103,23 @@ public:
      * \~english
      * \brief Service constructor
      */
-    Service (json11::Json& doc);
+    Service (json11::Json& doc, std::string default_title, std::string default_abstract, std::string default_endpoint_uri, std::string default_root_path);
 
-    virtual DataStream* process_request(Request* req, Rok4Server* serv) = 0;
+    virtual DataStream* process_request(Request* req, ServicesConfiguration* services) = 0;
 
     std::string get_endpoint_uri() {return endpoint_uri;};
     bool is_enabled() {return enabled;};
     bool match_request(Request* req);
+
+    /**
+     * \~french
+     * \brief Destructeur
+     * \~english
+     * \brief Destructor
+     */
+    ~Service() {
+        if (metadata) delete metadata;
+    };
 };
 
 

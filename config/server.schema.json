@@ -16,11 +16,6 @@
             "type": "integer",
             "description": "Socket's backlog size"
         },
-        "enabled": {
-            "type": "boolean",
-            "description": "Broadcast activation when all configuration is loaded",
-            "default": true
-        },
         "logger": {
             "type": "object",
             "description": "Logger configuration",

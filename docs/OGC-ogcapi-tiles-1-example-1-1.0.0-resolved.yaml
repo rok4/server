@@ -1,0 +1,4324 @@
+openapi: 3.0.0
+info:
+  title: "A sample API conforming to version 1.0.0 of the OGC API - Tiles - Part 1: Core Standard"
+  description: |-
+    Common components used in the
+      ["OGC API - Tiles - Part 1: Core standard"](https://docs.opengeospatial.org/is/20-057/20-057.html).
+
+      OGC API - Tiles - Part 1: Core 1.0.0 is an OGC Standard.
+      Copyright (c) 2022 Open Geospatial Consortium.
+      To obtain additional rights of use, visit http://www.opengeospatial.org/legal/ .
+
+      This is an informative document. The building blocks in this document are also available on the
+      [OGC](https://schemas.opengis.net/ogcapi/tiles/part1/1.0/openapi/ogcapi-tiles-1.yaml) schema repository.
+  contact:
+    name: Open Geospatial Consortium (OGC)
+    url: https://www.ogc.org/contacts
+    email: standards-team@ogc.org
+  license:
+    name: OGC License
+    url: http://www.opengeospatial.org/legal/
+  version: 1.0.0
+  x-logo:
+    url: https://www.ogc.org/pub/www/files/OGC_Logo_2D_Blue_x_0_0.png
+servers:
+- url: /
+paths:
+  /:
+    get:
+      tags:
+      - Landing Page
+      summary: Retrieve the OGC API landing page for this service.
+      operationId: getLandingPage
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/LandingPage"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /conformance:
+    get:
+      tags:
+      - Conformance
+      summary: Retrieve the set of OGC API conformance classes that are supported by this service.
+      operationId: getConformance
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/Conformance"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api:
+    get:
+      tags:
+      - API
+      summary: Retrieve this API definition.
+      operationId: getAPI
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/API"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api/all-collections:
+    get:
+      tags:
+      - API
+      summary: Retrieve the list of collections available from this API implementation & deployment.
+      operationId: getAPICollections
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/Enumeration"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api/coverage-collections:
+    get:
+      tags:
+      - API
+      summary: Retrieve the list of coverages collections available from this API implementation & deployment.
+      operationId: getAPICoverageCollections
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/Enumeration"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api/vectorTiles-collections:
+    get:
+      tags:
+      - API
+      summary: Retrieve the list of collections supporting vector tiles available from this API implementation & deployment.
+      operationId: getAPIVectorTileCollections
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/Enumeration"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api/tileMatrixSets:
+    get:
+      tags:
+      - API
+      summary: Retrieve the list of shared TileMatrixSets available from this API implementation & deployment.
+      operationId: getAPITileMatrixSets
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/Enumeration"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /api/styles:
+    get:
+      tags:
+      - API
+      summary: Retrieve the list of dataset styles available from this API implementation & deployment.
+      operationId: getAPIStyles
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/Enumeration"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections:
+    get:
+      tags:
+      - Data Collections
+      summary: Retrieve the list of geospatial data collections available from this service.
+      operationId: getCollectionsList
+      parameters:
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: bbox
+        in: query
+        description: |-
+          Only features that have a geometry that intersects the bounding box are selected. The bounding box is provided as four or six numbers, depending on whether the coordinate reference system includes a vertical axis (height or depth):
+          * Lower left corner, coordinate axis 1 * Lower left corner, coordinate axis 2 * Minimum value, coordinate axis 3 (optional) * Upper right corner, coordinate axis 1 * Upper right corner, coordinate axis 2 * Maximum value, coordinate axis 3 (optional)
+          The coordinate reference system of the values is WGS 84 longitude/latitude (http://www.opengis.net/def/crs/OGC/1.3/CRS84) unless a different coordinate reference system is specified in the parameter `bbox-crs`.
+          For WGS 84 longitude/latitude the values are in most cases the sequence of minimum longitude, minimum latitude, maximum longitude and maximum latitude. However, in cases where the box spans the antimeridian the first value (west-most box edge) is larger than the third value (east-most box edge).
+          If the vertical axis is included, the third and the sixth number are the bottom and the top of the 3-dimensional bounding box.
+          If a feature has multiple spatial geometry properties, it is the decision of the server whether only a single spatial geometry property is used to determine the extent or all relevant geometries.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: number
+            format: double
+      - name: limit
+        in: query
+        description: |-
+          The optional limit parameter limits the number of collections that are presented in the response document.
+          Only items are counted that are on the first level of the collection in the response document. Nested objects contained within the explicitly requested items shall not be counted.
+          * Minimum = 1 * Maximum = 10000 * Default = 10
+        required: false
+        style: form
+        explode: false
+        schema:
+          maximum: 10000
+          minimum: 1
+          type: integer
+          default: 10
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/CollectionsList"
+  /collections/{collectionId}:
+    get:
+      tags:
+      - Data Collections
+      summary: Retrieve the description of a collection available from this service.
+      operationId: getCollection
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/all-collections"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/Collection"
+  /tileMatrixSets:
+    get:
+      tags:
+      - Tiling Schemes
+      summary: Retrieve the list of available tiling schemes (tile matrix sets)
+      operationId: getTileMatrixSetsList
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileMatrixSetsList"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /tileMatrixSets/{tileMatrixSetId}:
+    get:
+      tags:
+      - Tiling Schemes
+      summary: Retrieve the definition of the specified tiling scheme (tile matrix set)
+      operationId: getTileMatrixSet
+      parameters:
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileMatrixSet"
+        "404":
+          description: The requested tile matrix set id was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/exception"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /tiles:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve a list of available vector tilesets for the dataset
+      operationId: .dataset.vector.getTileSetsList
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve the vector tileset metadata for the whole dataset and the specified tiling scheme (tile matrix set)
+      operationId: .dataset.vector.getTileSet
+      parameters:
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve a vector tile including one or more collections from the dataset.
+      operationId: .dataset.vector.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/vectorTiles-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: The format of the vector tile response (e.g. json). Accepted values are 'mvt' (Mapbox Vector Tiles) or 'json' (GeoJSON).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - mvt
+          - json
+      responses:
+        "200":
+          $ref: "#/components/responses/VectorTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /styles/{styleId}/tiles:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve the list of vector tilesets intended for use with a specified style for the whole dataset
+      operationId: .dataset.style.vector.getTileSetsList
+      parameters:
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          $ref: "#/components/schemas/styles"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /styles/{styleId}/tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve a vector tileset intended for use with a specified style of the whole dataset for the specified tiling scheme (tile matrix set)
+      operationId: .dataset.style.vector.getTileSet
+      parameters:
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          $ref: "#/components/schemas/styles"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /styles/{styleId}/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve vector tiles intended for use with a specified style
+      operationId: .dataset.style.vector.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/vectorTiles-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          $ref: "#/components/schemas/styles"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: The format of the vector tile response (e.g. json). Accepted values are 'mvt' (Mapbox Vector Tiles) or 'json' (GeoJSON).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - mvt
+          - json
+      responses:
+        "200":
+          $ref: "#/components/responses/VectorTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/tiles:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve a list of available vector tilesets for the specified collection.
+      operationId: .collection.vector.getTileSetsList
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a vector tile collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/vectorTiles-collections"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve the vector tileset metadata for the specified collection and tiling scheme (tile matrix set)
+      operationId: .collection.vector.getTileSet
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a vector tile collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/vectorTiles-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/vectorTiles-collections"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve a vector tile from a collection.
+      operationId: .collection.vector.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collectionId
+        in: path
+        description: Local identifier of a vector tile collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/vectorTiles-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/vectorTiles-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: The format of the vector tile response (e.g. json). Accepted values are 'mvt' (Mapbox Vector Tiles) or 'json' (GeoJSON).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - mvt
+          - json
+      responses:
+        "200":
+          $ref: "#/components/responses/VectorTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/styles/{styleId}/tiles:
+    get:
+      tags:
+      - Vector Tiles
+      summary: Retrieve a list of vector tilesets for the specified collection intended for use with a specified style
+      operationId: .collection.style.vector.getTileSetsList
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a vector tile collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/vectorTiles-collections"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/styles/{styleId}/tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Vector Tiles
+      summary: "Retrieve the vector tileset metadata for the specified collection, style and tiling scheme (tile matrix set)."
+      operationId: .collection.style.vector.getTileSet
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a vector tile collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/vectorTiles-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/vectorTiles-collections"
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          type: string
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/styles/{styleId}/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Vector Tiles
+      summary: "Retrieve vector tiles for a specified collection, intended for use with a specified style"
+      operationId: .collection.style.vector.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collectionId
+        in: path
+        description: Local identifier of a vector tile collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/vectorTiles-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/vectorTiles-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: bgcolor
+        in: query
+        description: "Web color name or hexadecimal 0x[AA]RRGGBB color value for the background color (default to 0x9C9C9C gray). If alpha is not specified, full opacity is assumed."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          default: 0xFFFFFF
+      - name: transparent
+        in: query
+        description: Background transparency of map (default=true).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          default: true
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          type: string
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: The format of the vector tile response (e.g. json). Accepted values are 'mvt' (Mapbox Vector Tiles) or 'json' (GeoJSON).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - mvt
+          - json
+      responses:
+        "200":
+          $ref: "#/components/responses/VectorTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/coverage/tiles:
+    get:
+      tags:
+      - Coverage Tiles
+      summary: Retrieve the list of available coverage tilesets for the specified collection.
+      operationId: .collection.coverage.getTileSetsList
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a coverage collection
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: "#/components/schemas/coverage-collections"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/coverage/tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Coverage Tiles
+      summary: Retrieve the coverage tileset metadata for the specified collection and tiling scheme (tile matrix set)
+      operationId: .collection.coverage.getTileSet
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a coverage collection
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: "#/components/schemas/coverage-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/coverage-collections"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/coverage/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Coverage Tiles
+      summary: Retrieve coverage tiles
+      operationId: .collection.coverage.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collectionId
+        in: path
+        description: Local identifier of a coverage collection
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: "#/components/schemas/coverage-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/coverage-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the coverage tile response (e.g. tiff). Accepted values are 'tiff' (GeoTIFF), 'netcdf', or 'png'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - tiff
+          - netcdf
+          - png
+      responses:
+        "200":
+          $ref: "#/components/responses/CoverageTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /map/tiles:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve the list of all default map tilesets for the whole dataset
+      operationId: .dataset.map.getTileSetsList
+      parameters:
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /map/tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a default map tileset of the whole dataset for the specified tiling scheme (tile matrix set)
+      operationId: .dataset.map.getTileSet
+      parameters:
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a default map tile of the whole dataset
+      operationId: .dataset.map.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: bgcolor
+        in: query
+        description: "Web color name or hexadecimal 0x[AA]RRGGBB color value for the background color (default to 0x9C9C9C gray). If alpha is not specified, full opacity is assumed."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          default: 0xFFFFFF
+      - name: transparent
+        in: query
+        description: Background transparency of map (default=true).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          default: true
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the map tile response (e.g. png). Accepted values are 'png', 'jpg' or 'tiff' (GeoTIFF)."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - png
+          - jpg
+          - tiff
+      responses:
+        "200":
+          $ref: "#/components/responses/MapTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /styles/{styleId}/map/tiles:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve the list of styled map tilesets for the whole dataset
+      operationId: .dataset.style.map.getTileSetsList
+      parameters:
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          $ref: "#/components/schemas/styles"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /styles/{styleId}/map/tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a styled map tileset of the whole dataset for the specified tiling scheme (tile matrix set)
+      operationId: .dataset.style.map.getTileSet
+      parameters:
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          $ref: "#/components/schemas/styles"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /styles/{styleId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a styled map tiles
+      operationId: .dataset.style.map.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: bgcolor
+        in: query
+        description: "Web color name or hexadecimal 0x[AA]RRGGBB color value for the background color (default to 0x9C9C9C gray). If alpha is not specified, full opacity is assumed."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          default: 0xFFFFFF
+      - name: transparent
+        in: query
+        description: Background transparency of map (default=true).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          default: true
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          $ref: "#/components/schemas/styles"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the map tile response (e.g. png). Accepted values are 'png', 'jpg' or 'tiff' (GeoTIFF)."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - png
+          - jpg
+          - tiff
+      responses:
+        "200":
+          $ref: "#/components/responses/MapTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/map/tiles:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a list of all map tilesets for specified collection.
+      operationId: .collection.map.getTileSetsList
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/all-collections"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/map/tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a map tile set metadata for the specified collection and tiling scheme (tile matrix set)
+      operationId: .collection.map.getTileSet
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/all-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a map tile from the specified collection
+      operationId: .collection.map.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collectionId
+        in: path
+        description: Local identifier of a collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/all-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: bgcolor
+        in: query
+        description: "Web color name or hexadecimal 0x[AA]RRGGBB color value for the background color (default to 0x9C9C9C gray). If alpha is not specified, full opacity is assumed."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          default: 0xFFFFFF
+      - name: transparent
+        in: query
+        description: Background transparency of map (default=true).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          default: true
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the map tile response (e.g. png). Accepted values are 'png', 'jpg' or 'tiff' (GeoTIFF)."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - png
+          - jpg
+          - tiff
+      responses:
+        "200":
+          $ref: "#/components/responses/MapTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/styles/{styleId}/map/tiles:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a list of styled map tilesets for the specified collection
+      operationId: .collection.style.map.getTileSetsList
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/all-collections"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSetsList"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/styles/{styleId}/map/tiles/{tileMatrixSetId}:
+    get:
+      tags:
+      - Map Tiles
+      summary: "Retrieve the map tileset metadata for the specified collection, style and tiling scheme (tile matrix set)."
+      operationId: .collection.style.map.getTileSet
+      parameters:
+      - name: collectionId
+        in: path
+        description: Local identifier of a collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/all-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          type: string
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - json
+          - html
+      responses:
+        "200":
+          $ref: "#/components/responses/TileSet"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+  /collections/{collectionId}/styles/{styleId}/map/tiles/{tileMatrixSetId}/{tileMatrix}/{tileRow}/{tileCol}:
+    get:
+      tags:
+      - Map Tiles
+      summary: Retrieve a map tile for a specified collection and style
+      operationId: .collection.style.map.getTile
+      parameters:
+      - name: tileMatrix
+        in: path
+        description: |-
+          Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+          Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+        required: true
+        schema:
+          type: string
+        example: "5"
+      - name: tileRow
+        in: path
+        description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 10
+      - name: tileCol
+        in: path
+        description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+        required: true
+        schema:
+          minimum: 0
+          type: integer
+        example: 15
+      - name: datetime
+        in: query
+        description: |-
+          Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+          adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+          Examples:
+
+          * A date-time: "2018-02-12T23:20:50Z"
+          * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+          * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+          Only features that have a temporal property that intersects the value of
+          `datetime` are selected.
+
+          If a feature has multiple temporal properties, it is the decision of the
+          server whether only a single temporal property is used to determine
+          the extent or all relevant temporal properties.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+      - name: collectionId
+        in: path
+        description: Local identifier of a collection
+        required: true
+        schema:
+          $ref: "#/components/schemas/all-collections"
+      - name: collections
+        in: query
+        description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/all-collections"
+      - name: subset
+        in: query
+        description: |
+          Retrieve only part of the data by slicing or trimming along one or more axis
+          For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+             An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+          For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: crs
+        in: query
+        description: reproject the output to the given crs
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: subset-crs
+        in: query
+        description: crs for the specified subset
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: bgcolor
+        in: query
+        description: "Web color name or hexadecimal 0x[AA]RRGGBB color value for the background color (default to 0x9C9C9C gray). If alpha is not specified, full opacity is assumed."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          default: 0xFFFFFF
+      - name: transparent
+        in: query
+        description: Background transparency of map (default=true).
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: boolean
+          default: true
+      - name: styleId
+        in: path
+        description: An identifier representing a specific style.
+        required: true
+        schema:
+          type: string
+      - name: tileMatrixSetId
+        in: path
+        description: Identifier for a supported TileMatrixSet
+        required: true
+        schema:
+          $ref: "#/components/schemas/tileMatrixSets"
+      - name: f
+        in: query
+        description: "The format of the map tile response (e.g. png). Accepted values are 'png', 'jpg' or 'tiff' (GeoTIFF)."
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: string
+          enum:
+          - png
+          - jpg
+          - tiff
+      responses:
+        "200":
+          $ref: "#/components/responses/MapTile"
+        "204":
+          $ref: "#/components/responses/EmptyTile"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "406":
+          $ref: "#/components/responses/NotAcceptable"
+        "500":
+          $ref: "#/components/responses/ServerError"
+components:
+  schemas:
+    confClasses:
+      required:
+      - conformsTo
+      type: object
+      properties:
+        conformsTo:
+          type: array
+          items:
+            type: string
+    link:
+      required:
+      - href
+      - rel
+      type: object
+      properties:
+        href:
+          type: string
+          description: Supplies the URI to a remote resource (or resource fragment).
+          example: http://data.example.com/buildings/123
+        rel:
+          type: string
+          description: The type or semantics of the relation.
+          example: alternate
+        type:
+          type: string
+          description: A hint indicating what the media type of the result of dereferencing the link should be.
+          example: application/geo+json
+        templated:
+          type: boolean
+          description: This flag set to true if the link is a URL template.
+        varBase:
+          type: string
+          description: A base path to retrieve semantic information about the variables used in URL template.
+          example: /ogcapi/vars/
+        hreflang:
+          type: string
+          description: A hint indicating what the language of the result of dereferencing the link should be.
+          example: en
+        title:
+          type: string
+          description: Used to label the destination of a link such that it can be used as a human-readable identifier.
+          example: "Trierer Strasse 70, 53115 Bonn"
+        length:
+          type: integer
+    landingPage:
+      required:
+      - links
+      type: object
+      properties:
+        title:
+          title: The title of the API.
+          type: string
+          description: "While a title is not required, implementors are strongly advised to include one."
+          example: Buildings in Bonn
+        description:
+          type: string
+          example: Access to data about buildings in the city of Bonn via a Web API that conforms to the OGC API Common specification.
+        attribution:
+          title: attribution for the API
+          type: string
+          description: "The `attribution` should be short and intended for presentation to a user, for example, in a corner of a map. Parts of the text can be links to other resources if additional information is needed. The string can include HTML markup."
+        links:
+          type: array
+          items:
+            $ref: "#/components/schemas/link"
+    exception:
+      title: Exception Schema
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+      description: JSON schema for exceptions based on RFC 7807
+    collections:
+      required:
+      - collections
+      - links
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: "#/components/schemas/link"
+        timeStamp:
+          type: string
+          format: date-time
+        numberMatched:
+          minimum: 0
+          type: integer
+          example: 1
+        numberReturned:
+          minimum: 0
+          type: integer
+          example: 1
+        collections:
+          type: array
+          items:
+            $ref: "#/components/schemas/collectionInfo"
+    collectionInfo:
+      required:
+      - id
+      - links
+      type: object
+      properties:
+        id:
+          type: string
+          description: "identifier of the collection used, for example, in URIs"
+          example: dem
+        title:
+          type: string
+          description: human readable title of the collection
+          example: Digital Elevation Model
+        description:
+          type: string
+          description: a description of the data in the collection
+          example: A Digital Elevation Model.
+        links:
+          type: array
+          example:
+          - href: http://data.example.org/collections/dem?f=json
+            rel: self
+            type: application/json
+            title: Digital Elevation Model
+          - href: http://data.example.org/collections/dem?f=html
+            rel: alternate
+            type: application/json
+            title: Digital Elevation Model
+          - href: http://data.example.org/collections/dem/coverage
+            rel: coverage
+            type: image/tiff; application=geotiff
+            title: Digital Elevation Model
+          - href: http://data.example.org/collections/dem/coverage/domainset
+            rel: domainset
+            type: application/json
+            title: Digital Elevation Model
+          - href: http://data.example.org/collections/dem/coverage/rangetype
+            rel: rangetype
+            type: application/json
+            title: Digital Elevation Model
+          - href: http://data.example.org/collections/dem/coverage/metadata
+            rel: metadata
+            type: application/json
+            title: Digital Elevation Model
+          items:
+            $ref: "#/components/schemas/link"
+        extent:
+          $ref: "#/components/schemas/extent-uad"
+        itemType:
+          type: string
+          description: "indicator about the type of the items in the collection if the collection has an accessible /collections/{collectionId}/items endpoint"
+          default: unknown
+        crs:
+          type: array
+          description: the list of coordinate reference systems supported by the API; the first item is the default coordinate reference system
+          example:
+          - http://www.opengis.net/def/crs/OGC/1.3/CRS84
+          - http://www.opengis.net/def/crs/EPSG/0/4326
+          items:
+            type: string
+          default:
+          - http://www.opengis.net/def/crs/OGC/1.3/CRS84
+        dataType:
+          allOf:
+          - description: Type of data represented in the collection
+          - $ref: "#/components/schemas/dataType"
+        geometryDimension:
+          maximum: 3
+          minimum: 0
+          type: integer
+          description: "The geometry dimension of the features shown in this layer (0: points, 1: curves, 2: surfaces, 3: solids), unspecified: mixed or unknown"
+        minScaleDenominator:
+          type: number
+          description: Minimum scale denominator for usage of the collection
+        maxScaleDenominator:
+          type: number
+          description: Maximum scale denominator for usage of the collection
+        minCellSize:
+          type: number
+          description: Minimum cell size for usage of the collection
+        maxCellSize:
+          type: number
+          description: Maximum cell size for usage of the collection
+    extent:
+      type: object
+      properties:
+        spatial:
+          $ref: "#/components/schemas/extent_spatial"
+        temporal:
+          $ref: "#/components/schemas/extent_temporal"
+      description: |-
+        The extent of the data in the collection. In the Core only spatial and temporal
+        extents are specified. Extensions may add additional members to represent other
+        extents, for example, thermal or pressure ranges.
+
+        The first item in the array describes the overall extent of
+        the data. All subsequent items describe more precise extents,
+        e.g., to identify clusters of data.
+        Clients only interested in the overall extent will only need to
+        access the first item in each array.
+    extent-uad:
+      title: Extent with Uniform Additional Dimensions Schema
+      description: |-
+        The extent module only addresses spatial and temporal extents. This module extends extent by specifying how
+        intervals and crs properties can be used to specify additional geometries.
+      allOf:
+      - $ref: "#/components/schemas/extent"
+      - type: object
+        additionalProperties:
+          type: object
+          properties:
+            interval:
+              minItems: 1
+              type: array
+              description: |-
+                One or more intervals that describe the extent for this dimension of the dataset.
+                The value `null` is supported and indicates an unbounded or half-bounded interval.
+                The first interval describes the overall extent of the data for this dimension.
+                All subsequent intervals describe more precise intervals, e.g., to identify clusters of data.
+                Clients only interested in the overall extent will only need
+                to access the first item (a pair of lower and upper bound values).
+              items:
+                maxItems: 2
+                minItems: 2
+                type: array
+                description: |-
+                  Lower and upper bound values of the interval. The values
+                  are in the coordinate reference system specified in `crs`, `trs` or `vrs`.
+                example:
+                - 2011-11-11T12:22:11Z
+                - 32.5
+                - null
+                items:
+                  oneOf:
+                  - type: string
+                    nullable: true
+                  - type: number
+            crs:
+              type: string
+              description: generic coordinate reference system suitable for any type of dimensions
+            trs:
+              type: string
+              description: temporal coordinate reference system (e.g. as defined by Features for 'temporal')
+            vrs:
+              type: string
+              description: vertical coordinate reference system (e.g. as defined in EDR for 'vertical')
+            grid:
+              type: object
+              properties:
+                coordinates:
+                  minItems: 1
+                  type: array
+                  description: |-
+                    List of coordinates along the temporal dimension for which data organized as an irregular grid in the collection is available
+                    (e.g., 2, 10, 80, 100).
+                  example:
+                  - 2
+                  - 10
+                  - 80
+                  - 100
+                  items:
+                    oneOf:
+                    - type: string
+                      nullable: true
+                    - type: number
+                cellsCount:
+                  type: integer
+                  description: |-
+                    Number of samples available along the dimension for data organized as a regular grid.
+                    For values representing the whole area of contiguous cells spanning _resolution_ units along the dimension, this will be (_upperBound_ - _lowerBound_) / _resolution_.
+                    For values representing infinitely small point cells spaced by _resolution_ units along the dimension, this will be (_upperBound_ - _lowerBound_) / _resolution_ + 1.
+                  example: 50
+                resolution:
+                  description: Resolution of regularly gridded data along the dimension in the collection
+                  example:
+                  - PT1H
+                  - 0.0006866455078
+                  oneOf:
+                  - type: string
+                    nullable: true
+                  - type: number
+              description: Provides information about the limited availability of data within the collection organized as a grid (regular or irregular) along the dimension.
+          description: The domain intervals for any additional dimensions of the extent (envelope) beyond those described in temporal and spatial.
+          oneOf:
+          - required:
+            - crs
+            - interval
+          - required:
+            - interval
+            - trs
+          - required:
+            - interval
+            - vrs
+    crs:
+      title: CRS
+      oneOf:
+      - type: string
+        description: Simplification of the object into a url if the other properties are not present
+      - type: object
+        oneOf:
+        - required:
+          - uri
+          properties:
+            uri:
+              type: string
+              description: Reference to one coordinate reference system (CRS)
+              format: uri
+        - required:
+          - wkt
+          properties:
+            wkt:
+              allOf:
+              - description: An object defining the CRS using the JSON encoding for Well-known text representation of coordinate reference systems 2.0
+              - type: object
+        - required:
+          - referenceSystem
+          properties:
+            referenceSystem:
+              type: object
+              description: A reference system data structure as defined in the MD_ReferenceSystem of the ISO 19115
+    dataType:
+      oneOf:
+      - type: string
+      - type: string
+        enum:
+        - map
+        - vector
+        - coverage
+    timeStamp:
+      type: string
+      description: This property indicates the time and date when the response was generated using RFC 3339 notation.
+      format: date-time
+      example: 2017-08-17T08:05:32Z
+    numberReturned:
+      minimum: 0
+      type: integer
+      description: |-
+        The number of features in the feature collection.
+        A server may omit this information in a response, if the information
+        about the number of features is not known or difficult to compute.
+        If the value is provided, the value shall be identical to the number
+        of items in the "features" array.
+      example: 10
+    numberMatched:
+      minimum: 0
+      type: integer
+      description: |-
+        The number of features of the feature type that match the selection
+        parameters like `bbox`.
+      example: 127
+    tileSet:
+      title: Tile Set Metadata
+      required:
+      - crs
+      - dataType
+      - links
+      type: object
+      properties:
+        title:
+          type: string
+          description: A title for this tileset
+        description:
+          type: string
+          description: Brief narrative description of this tile set
+        dataType:
+          allOf:
+          - description: Type of data represented in the tileset
+          - $ref: "#/components/schemas/dataType"
+        crs:
+          allOf:
+          - description: Coordinate Reference System (CRS)
+          - $ref: "#/components/schemas/crs"
+        tileMatrixSetURI:
+          type: string
+          description: Reference to a Tile Matrix Set on an offical source for Tile Matrix Sets such as the OGC NA definition server (http://www.opengis.net/def/tms/). Required if the tile matrix set is registered on an open official source.
+          format: uri
+        links:
+          type: array
+          description: "Links to related resources. Possible link 'rel' values are: 'http://www.opengis.net/def/rel/ogc/1.0/dataset' for a URL pointing to the dataset, 'item' for a URL template to get a tile; 'alternate' for a URL pointing to another representation of the TileSetMetadata (e.g a TileJSON file); 'http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme' for a definition of the TileMatrixSet; 'http://www.opengis.net/def/rel/ogc/1.0/geodata' for pointing to a single collection (if the tileset represents a single collection)"
+          items:
+            $ref: "#/components/schemas/link"
+        tileMatrixSetLimits:
+          type: array
+          description: "Limits for the TileRow and TileCol values for each TileMatrix in the tileMatrixSet. If missing, there are no limits other that the ones imposed by the TileMatrixSet. If present the TileMatrices listed are limited and the rest not available at all"
+          items:
+            $ref: "#/components/schemas/tileMatrixLimits"
+        epoch:
+          type: number
+          description: Epoch of the Coordinate Reference System (CRS)
+        layers:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/tileSet_layers"
+        boundingBox:
+          allOf:
+          - description: "Minimum bounding rectangle surrounding the tile matrix set, in the supported CRS"
+          - $ref: "#/components/schemas/2DBoundingBox"
+        centerPoint:
+          allOf:
+          - description: Location of a tile that nicely represents the tileset. Implementations may use this center value to set the default location or to present a representative tile in a user interface
+          - required:
+            - coordinates
+            type: object
+            properties:
+              coordinates:
+                maxItems: 2
+                minItems: 2
+                type: array
+                items:
+                  type: number
+              crs:
+                allOf:
+                - description: Coordinate Reference System (CRS) of the coordinates
+                - $ref: "#/components/schemas/crs"
+              tileMatrix:
+                type: string
+                description: TileMatrix identifier associated with the scaleDenominator
+              scaleDenominator:
+                type: number
+                description: Scale denominator of the tile matrix selected
+              cellSize:
+                type: number
+                description: Cell size of the tile matrix selected
+        style:
+          allOf:
+          - description: Style involving all layers used to generate the tileset
+          - required:
+            - id
+            type: object
+            properties:
+              id:
+                type: string
+                description: An identifier for this style. Implementation of 'identifier'
+              title:
+                type: string
+                description: A title for this style
+              description:
+                type: string
+                description: Brief narrative description of this style
+              keywords:
+                type: array
+                description: keywords about this style
+                items:
+                  type: string
+              links:
+                minItems: 1
+                type: array
+                description: "Links to style related resources. Possible link 'rel' values are: 'style' for a URL pointing to the style description, 'styleSpec' for a URL pointing to the specification or standard used to define the style."
+                items:
+                  $ref: "#/components/schemas/link"
+        attribution:
+          type: string
+          description: Short reference to recognize the author or provider
+        license:
+          type: string
+          description: License applicable to the tiles
+        accessConstraints:
+          type: string
+          description: Restrictions on the availability of the Tile Set that the user needs to be aware of before using or redistributing the Tile Set
+          enum:
+          - unclassified
+          - restricted
+          - confidential
+          - secret
+          - topSecret
+          default: unclassified
+        keywords:
+          type: array
+          description: keywords about this tileset
+          items:
+            type: string
+        version:
+          type: string
+          description: Version of the Tile Set. Changes if the data behind the tiles has been changed
+        created:
+          allOf:
+          - description: When the Tile Set was first produced
+          - $ref: "#/components/schemas/timeStamp"
+        updated:
+          allOf:
+          - description: Last Tile Set change/revision
+          - $ref: "#/components/schemas/timeStamp"
+        pointOfContact:
+          type: string
+          description: Useful information to contact the authors or custodians for the Tile Set
+        mediaTypes:
+          type: array
+          description: Media types available for the tiles
+          items:
+            type: string
+      description: "A resource describing a tileset based on the OGC TileSet Metadata Standard. At least one of the 'TileMatrixSet',  or a link with 'rel' http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme"
+    tileSet-item:
+      title: Tile Set Metadata item
+      required:
+      - crs
+      - dataType
+      - links
+      type: object
+      properties:
+        title:
+          type: string
+          description: A title for this tileset
+        dataType:
+          allOf:
+          - description: Type of data represented in the tileset
+          - $ref: "#/components/schemas/dataType"
+        crs:
+          allOf:
+          - description: Coordinate Reference System (CRS)
+          - $ref: "#/components/schemas/crs"
+        tileMatrixSetURI:
+          type: string
+          description: Reference to a Tile Matrix Set on an offical source for Tile Matrix Sets such as the OGC NA definition server (http://www.opengis.net/def/tms/). Required if the tile matrix set is registered on an open official source.
+          format: uri
+        links:
+          type: array
+          description: Links to related resources. A 'self' link to the tileset as well as a 'http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme' link to a definition of the TileMatrixSet are required.
+          items:
+            $ref: "#/components/schemas/link"
+      description: A minimal tileset element for use within a list of tilesets linking to full description of those tilesets.
+    tileMatrixSet:
+      title: Tile Matrix Set Definition
+      required:
+      - crs
+      - tileMatrices
+      type: object
+      properties:
+        title:
+          type: string
+          description: "Title of this tile matrix set, normally used for display to a human"
+        description:
+          type: string
+          description: "Brief narrative description of this tile matrix set, normally available for display to a human"
+        keywords:
+          type: array
+          description: Unordered list of one or more commonly used or formalized word(s) or phrase(s) used to describe this tile matrix set
+          items:
+            type: string
+        id:
+          type: string
+          description: Tile matrix set identifier. Implementation of 'identifier'
+        uri:
+          type: string
+          description: Reference to an official source for this tileMatrixSet
+          format: uri
+        orderedAxes:
+          minItems: 1
+          type: array
+          items:
+            type: string
+        crs:
+          allOf:
+          - description: Coordinate Reference System (CRS)
+          - $ref: "#/components/schemas/crs"
+        wellKnownScaleSet:
+          type: string
+          description: Reference to a well-known scale set
+          format: uri
+        boundingBox:
+          allOf:
+          - description: "Minimum bounding rectangle surrounding the tile matrix set, in the supported CRS"
+          - $ref: "#/components/schemas/2DBoundingBox"
+        tileMatrices:
+          type: array
+          description: Describes scale levels and its tile matrices
+          items:
+            $ref: "#/components/schemas/tileMatrixSet_tileMatrices"
+      description: "A definition of a tile matrix set following the Tile Matrix Set standard. For tileset metadata, such a description (in `tileMatrixSet` property) is only required for offline use, as an alternative to a link with a `http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme` relation type."
+    tileMatrixSet-item:
+      title: Tile Matrix Set Item
+      required:
+      - links
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Optional local tile matrix set identifier, e.g. for use as unspecified `{tileMatrixSetId}` parameter. Implementation of 'identifier'"
+        title:
+          type: string
+          description: "Title of this tile matrix set, normally used for display to a human"
+        uri:
+          type: string
+          description: Reference to an official source for this tileMatrixSet
+          format: uri
+        crs:
+          allOf:
+          - description: Coordinate Reference System (CRS)
+          - $ref: "#/components/schemas/crs"
+        links:
+          type: array
+          description: Links to related resources. A 'self' link to the tile matrix set definition is required.
+          items:
+            $ref: "#/components/schemas/link"
+      description: A minimal tile matrix set element for use within a list of tile matrix sets linking to a full definition.
+    tileMatrixLimits:
+      title: TileMatrixLimits
+      required:
+      - maxTileCol
+      - maxTileRow
+      - minTileCol
+      - minTileRow
+      - tileMatrix
+      type: object
+      properties:
+        tileMatrix:
+          type: string
+        minTileRow:
+          minimum: 0
+          type: integer
+        maxTileRow:
+          minimum: 0
+          type: integer
+        minTileCol:
+          minimum: 0
+          type: integer
+        maxTileCol:
+          minimum: 0
+          type: integer
+      description: "The limits for an individual tile matrix of a TileSet's TileMatrixSet, as defined in the OGC 2D TileMatrixSet and TileSet Metadata Standard"
+    "2DPoint":
+      maxItems: 2
+      minItems: 2
+      type: array
+      description: A 2D Point in the CRS indicated elsewhere
+      items:
+        type: number
+    "2DBoundingBox":
+      required:
+      - lowerLeft
+      - upperRight
+      type: object
+      properties:
+        lowerLeft:
+          $ref: "#/components/schemas/2DPoint"
+        upperRight:
+          $ref: "#/components/schemas/2DPoint"
+        crs:
+          $ref: "#/components/schemas/crs"
+        orderedAxes:
+          maxItems: 2
+          minItems: 2
+          type: array
+          items:
+            type: string
+      description: Minimum bounding rectangle surrounding a 2D resource in the CRS indicated elsewhere
+    FeatureCollection:
+      title: GeoJSON FeatureCollection
+      required:
+      - features
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: "#/components/schemas/GeoJSON Feature"
+        bbox:
+          minItems: 4
+          type: array
+          items:
+            type: number
+    enumeration:
+      required:
+      - enum
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - enum
+        enum:
+          type: array
+          items:
+            type: string
+    all-collections:
+      type: string
+      enum:
+      - blueMarble
+      - NaturalEarth:raster:HYP_HR_SR_OB_DR
+      - NaturalEarth:cultural:ne_10m_admin_0_countries
+      - NaturalEarth:physical:bathymetry
+      - SRTM_ViewFinderPanorama
+      - HRDEM-Ottawa
+      - HRDEM-RedRiver
+    vectorTiles-collections:
+      type: string
+      enum:
+      - NaturalEarth:cultural:ne_10m_admin_0_countries
+      - NaturalEarth:physical:bathymetry
+    coverage-collections:
+      type: string
+      enum:
+      - SRTM_ViewFinderPanorama
+      - HRDEM-Ottawa
+      - HRDEM-RedRiver
+    styles:
+      type: string
+      enum:
+      - default
+    tileMatrixSets:
+      type: string
+      enum:
+      - WebMercatorQuad
+      - WorldCRS84Quad
+      - GNOSISGlobalGrid
+      - WorldMercatorWGS84Quad
+    extent_spatial_grid:
+      type: object
+      properties:
+        coordinates:
+          minItems: 1
+          type: array
+          description: |-
+            List of coordinates along the dimension for which data organized as an irregular grid in the collection is available
+            (e.g., 2, 10, 80, 100).
+          example:
+          - 2
+          - 10
+          - 80
+          - 100
+          items:
+            oneOf:
+            - type: string
+              nullable: true
+            - type: number
+        cellsCount:
+          type: integer
+          description: |-
+            Number of samples available along the dimension for data organized as a regular grid.
+            For values representing the whole area of contiguous cells spanning _resolution_ units along the dimension, this will be (_upperBound_ - _lowerBound_) / _resolution_.
+            For values representing infinitely small point cells spaced by _resolution_ units along the dimension, this will be (_upperBound_ - _lowerBound_) / _resolution_ + 1.
+          example: 50
+        resolution:
+          description: Resolution of regularly gridded data along the dimension in the collection
+          example: 0.0006866455078
+          oneOf:
+          - type: string
+            nullable: true
+          - type: number
+    extent_spatial:
+      type: object
+      properties:
+        bbox:
+          minItems: 1
+          type: array
+          description: |-
+            One or more bounding boxes that describe the spatial extent of the dataset.
+            In the Core only a single bounding box is supported.
+
+            Extensions may support additional areas.
+            The first bounding box describes the overall spatial
+            extent of the data. All subsequent bounding boxes describe
+            more precise bounding boxes, e.g., to identify clusters of data.
+            Clients only interested in the overall spatial extent will
+            only need to access the first item in each array.
+          items:
+            type: array
+            description: |-
+              Each bounding box is provided as four or six numbers, depending on
+              whether the coordinate reference system includes a vertical axis
+              (height or depth):
+
+              * Lower left corner, coordinate axis 1
+              * Lower left corner, coordinate axis 2
+              * Minimum value, coordinate axis 3 (optional)
+              * Upper right corner, coordinate axis 1
+              * Upper right corner, coordinate axis 2
+              * Maximum value, coordinate axis 3 (optional)
+
+              If the value consists of four numbers, the coordinate reference system is
+              WGS 84 longitude/latitude (http://www.opengis.net/def/crs/OGC/1.3/CRS84)
+              unless a different coordinate reference system is specified in a parameter `bbox-crs`.
+
+              If the value consists of six numbers, the coordinate reference system is WGS 84
+              longitude/latitude/ellipsoidal height (http://www.opengis.net/def/crs/OGC/0/CRS84h)
+              unless a different coordinate reference system is specified in a parameter `bbox-crs`.
+
+              For WGS 84 longitude/latitude the values are in most cases the sequence of
+              minimum longitude, minimum latitude, maximum longitude and maximum latitude.
+              However, in cases where the box spans the antimeridian the first value
+              (west-most box edge) is larger than the third value (east-most box edge).
+
+              If the vertical axis is included, the third and the sixth number are
+              the bottom and the top of the 3-dimensional bounding box.
+
+              If a feature has multiple spatial geometry properties, it is the decision of the
+              server whether only a single spatial geometry property is used to determine
+              the extent or all relevant geometries.
+            example:
+            - -180
+            - -90
+            - 180
+            - 90
+            items:
+              type: number
+        crs:
+          type: string
+          description: |-
+            Coordinate reference system of the coordinates in the spatial extent
+            (property `bbox`). The default reference system is WGS 84 longitude/latitude.
+            In the Core the only other supported coordinate reference system is
+            WGS 84 longitude/latitude/ellipsoidal height for coordinates with height.
+            Extensions may support additional coordinate reference systems and add
+            additional enum values.
+          enum:
+          - http://www.opengis.net/def/crs/OGC/1.3/CRS84
+          - http://www.opengis.net/def/crs/OGC/0/CRS84h
+          default: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+        grid:
+          maxItems: 3
+          minItems: 2
+          type: array
+          description: |-
+            Provides information about the limited availability of data within the collection organized
+            as a grid (regular or irregular) along each spatial dimension.
+          items:
+            $ref: "#/components/schemas/extent_spatial_grid"
+      description: The spatial extent of the data in the collection.
+    extent_temporal_grid:
+      type: object
+      properties:
+        coordinates:
+          minItems: 1
+          type: array
+          description: |-
+            List of coordinates along the temporal dimension for which data organized as an irregular grid in the collection is available
+            (e.g., "2017-11-14T09:00Z","2017-11-14T12:00Z","2017-11-14T15:00Z","2017-11-14T18:00Z","2017-11-14T21:00Z").
+          example:
+          - - 2020-11-12T12:15Z
+            - 2020-11-12T12:30Z
+            - 2020-11-12T12:45Z
+          items:
+            type: string
+            nullable: true
+        cellsCount:
+          type: integer
+          description: |-
+            Number of samples available along the temporal dimension for data organized as a regular grid.
+            For values representing the whole area of contiguous cells spanning _resolution_ units along the dimension, this will be (_upperBound_ - _lowerBound_) / _resolution_.
+            For values representing infinitely small point cells spaced by _resolution_ units along the dimension, this will be (_upperBound_ - _lowerBound_) / _resolution_ + 1.
+          example: 50
+        resolution:
+          description: Resolution of regularly gridded data along the temporal dimension in the collection
+          example: PT1H
+          oneOf:
+          - type: string
+            nullable: true
+          - type: number
+      description: Provides information about the limited availability of data within the collection organized as a grid (regular or irregular) along the temporal dimension.
+    extent_temporal:
+      type: object
+      properties:
+        interval:
+          minItems: 1
+          type: array
+          description: |-
+            One or more time intervals that describe the temporal extent of the dataset.
+            In the Core only a single time interval is supported.
+
+            Extensions may support multiple intervals.
+            The first time interval describes the overall
+            temporal extent of the data. All subsequent time intervals describe
+            more precise time intervals, e.g., to identify clusters of data.
+            Clients only interested in the overall extent will only need
+            to access the first item in each array.
+          items:
+            maxItems: 2
+            minItems: 2
+            type: array
+            description: |-
+              Begin and end times of the time interval. The timestamps are in the
+              temporal coordinate reference system specified in `trs`. By default
+              this is the Gregorian calendar.
+
+              The value `null` for start or end time is supported and indicates a half-bounded time interval.
+            example:
+            - 2011-11-11T12:22:11Z
+            - null
+            items:
+              type: string
+              format: date-time
+              nullable: true
+        trs:
+          type: string
+          description: |-
+            Coordinate reference system of the coordinates in the temporal extent
+            (property `interval`). The default reference system is the Gregorian calendar.
+            In the Core this is the only supported temporal coordinate reference system.
+            Extensions may support additional temporal coordinate reference systems and add
+            additional enum values.
+          enum:
+          - http://www.opengis.net/def/uom/ISO-8601/0/Gregorian
+          default: http://www.opengis.net/def/uom/ISO-8601/0/Gregorian
+        grid:
+          $ref: "#/components/schemas/extent_temporal_grid"
+      description: The temporal extent of the features in the collection.
+    tileSet_layers:
+      required:
+      - dataType
+      - id
+      type: object
+      properties:
+        title:
+          type: string
+          description: "Title of this tile matrix set, normally used for display to a human"
+        description:
+          type: string
+          description: "Brief narrative description of this tile matrix set, normally available for display to a human"
+        keywords:
+          type: string
+          description: Unordered list of one or more commonly used or formalized word(s) or phrase(s) used to describe this layer
+        id:
+          type: string
+          description: Unique identifier of the Layer. Implementation of 'identifier'
+        dataType:
+          allOf:
+          - description: Type of data represented in the layer
+          - $ref: "#/components/schemas/dataType"
+        geometryDimension:
+          maximum: 3
+          minimum: 0
+          type: integer
+          description: "The geometry dimension of the features shown in this layer (0: points, 1: curves, 2: surfaces, 3: solids), unspecified: mixed or unknown"
+        featureType:
+          type: string
+          description: Feature type identifier. Only applicable to layers of datatype 'geometries'
+        attribution:
+          type: string
+          description: Short reference to recognize the author or provider
+        license:
+          type: string
+          description: License applicable to the tiles
+        pointOfContact:
+          type: string
+          description: "Useful information to contact the authors or custodians for the layer (e.g. e-mail address, a physical address,  phone numbers, etc)"
+        publisher:
+          type: string
+          description: Organization or individual responsible for making the layer available
+        theme:
+          type: string
+          description: Category where the layer can be grouped
+        crs:
+          allOf:
+          - description: Coordinate Reference System (CRS)
+          - $ref: "#/components/schemas/crs"
+        epoch:
+          type: number
+          description: Epoch of the Coordinate Reference System (CRS)
+        minScaleDenominator:
+          type: number
+          description: Minimum scale denominator for usage of the layer
+        maxScaleDenominator:
+          type: number
+          description: Maximum scale denominator for usage of the layer
+        minCellSize:
+          type: number
+          description: Minimum cell size for usage of the layer
+        maxCellSize:
+          type: number
+          description: Maximum cell size for usage of the layer
+        maxTileMatrix:
+          type: string
+          description: TileMatrix identifier associated with the minScaleDenominator
+        minTileMatrix:
+          type: string
+          description: TileMatrix identifier associated with the maxScaleDenominator
+        boundingBox:
+          allOf:
+          - description: Minimum bounding rectangle surrounding the layer
+          - $ref: "#/components/schemas/2DBoundingBox"
+        created:
+          allOf:
+          - description: When the layer was first produced
+          - $ref: "#/components/schemas/timeStamp"
+        updated:
+          allOf:
+          - description: Last layer change/revision
+          - $ref: "#/components/schemas/timeStamp"
+        style:
+          allOf:
+          - description: Style used to generate the layer in the tileset
+          - $ref: "#/components/schemas/tileSet/properties/style/allOf/1"
+        geoDataClasses:
+          type: array
+          description: URI identifying a class of data contained in this layer (useful to determine compatibility with styles or processes)
+          items:
+            type: string
+        propertiesSchema:
+          allOf:
+          - description: Properties represented by the features in this layer. Can be the attributes of a feature dataset (datatype=geometries) or the rangeType of a coverage (datatype=coverage)
+          - required:
+            - properties
+            - type
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - object
+              required:
+                minItems: 1
+                type: array
+                description: Implements 'multiplicity' by citing property 'name' defined as 'additionalProperties'
+                items:
+                  type: string
+              properties:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    description:
+                      type: string
+                      description: Implements 'description'
+                    type:
+                      type: string
+                      enum:
+                      - array
+                      - boolean
+                      - integer
+                      - "null"
+                      - number
+                      - object
+                      - string
+                    enum:
+                      minItems: 1
+                      uniqueItems: true
+                      type: array
+                      description: Implements 'acceptedValues'
+                      items: {}
+                    format:
+                      type: string
+                      description: Complements implementation of 'type'
+                    contentMediaType:
+                      type: string
+                      description: Implements 'mediaType'
+                    maximum:
+                      type: number
+                      description: Implements 'range'
+                    exclusiveMaximum:
+                      type: number
+                      description: Implements 'range'
+                    minimum:
+                      type: number
+                      description: Implements 'range'
+                    exclusiveMinimum:
+                      type: number
+                      description: Implements 'range'
+                    pattern:
+                      type: string
+                      format: regex
+                    maxItems:
+                      minimum: 0
+                      type: integer
+                      description: Implements 'upperMultiplicity'
+                    minItems:
+                      minimum: 0
+                      type: integer
+                      description: Implements 'lowerMultiplicity'
+                      default: 0
+                    observedProperty:
+                      type: string
+                    observedPropertyURI:
+                      type: string
+                      format: uri
+                    uom:
+                      type: string
+                    uomURI:
+                      type: string
+                      format: uri
+                  description: No property names are defined but any property name they should be described by JSON Schema. So 'additionalProperties' implements 'name'.
+                default: {}
+            description: Attributes of the features or rangetypes of a coverage. Defined by a subset of the JSON Schema for the properties of a feature
+        links:
+          minItems: 1
+          type: array
+          description: "Links related to this layer. Possible link 'rel' values are: 'geodata' for a URL pointing to the collection of geospatial data."
+          items:
+            $ref: "#/components/schemas/link"
+    tileMatrixSet_variableMatrixWidths:
+      required:
+      - coalesce
+      - maxTileRow
+      - minTileRow
+      type: object
+      properties:
+        coalesce:
+          multipleOf: 1
+          minimum: 2
+          type: number
+          description: Number of tiles in width that coalesce in a single tile for these rows
+          format: integer
+        minTileRow:
+          multipleOf: 1
+          minimum: 0
+          type: number
+          description: First tile row where the coalescence factor applies for this tilematrix
+          format: integer
+        maxTileRow:
+          multipleOf: 1
+          minimum: 0
+          type: number
+          description: Last tile row where the coalescence factor applies for this tilematrix
+          format: integer
+      description: Variable Matrix Width data structure
+    tileMatrixSet_tileMatrices:
+      required:
+      - cellSize
+      - id
+      - matrixHeight
+      - matrixWidth
+      - pointOfOrigin
+      - scaleDenominator
+      - tileHeight
+      - tileWidth
+      type: object
+      properties:
+        title:
+          type: string
+          description: "Title of this tile matrix, normally used for display to a human"
+        description:
+          type: string
+          description: "Brief narrative description of this tile matrix set, normally available for display to a human"
+        keywords:
+          type: array
+          description: Unordered list of one or more commonly used or formalized word(s) or phrase(s) used to describe this dataset
+          items:
+            type: string
+        id:
+          type: string
+          description: Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. Implementation of 'identifier'
+        scaleDenominator:
+          type: number
+          description: Scale denominator of this tile matrix
+        cellSize:
+          type: number
+          description: Cell size of this tile matrix
+        cornerOfOrigin:
+          type: string
+          description: "The corner of the tile matrix (_topLeft_ or _bottomLeft_) used as the origin for numbering tile rows and columns. This corner is also a corner of the (0, 0) tile."
+          enum:
+          - topLeft
+          - bottomLeft
+          default: topLeft
+        pointOfOrigin:
+          allOf:
+          - description: "Precise position in CRS coordinates of the corner of origin (e.g. the top-left corner) for this tile matrix. This position is also a corner of the (0, 0) tile. In previous version, this was 'topLeftCorner' and 'cornerOfOrigin' did not exist."
+          - $ref: "#/components/schemas/2DPoint"
+        tileWidth:
+          multipleOf: 1
+          minimum: 1
+          type: number
+          description: Width of each tile of this tile matrix in pixels
+          format: integer
+        tileHeight:
+          multipleOf: 1
+          minimum: 1
+          type: number
+          description: Height of each tile of this tile matrix in pixels
+          format: integer
+        matrixHeight:
+          multipleOf: 1
+          minimum: 1
+          type: number
+          description: Width of the matrix (number of tiles in width)
+          format: integer
+        matrixWidth:
+          multipleOf: 1
+          minimum: 1
+          type: number
+          description: Height of the matrix (number of tiles in height)
+          format: integer
+        variableMatrixWidths:
+          type: array
+          description: Describes the rows that has variable matrix width
+          items:
+            $ref: "#/components/schemas/tileMatrixSet_variableMatrixWidths"
+      description: "A tile matrix, usually corresponding to a particular zoom level of a TileMatrixSet."
+    GeoJSON Feature:
+      title: GeoJSON Feature
+      required:
+      - geometry
+      - properties
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - Feature
+        id:
+          oneOf:
+          - type: number
+          - type: string
+        properties:
+          type: object
+          nullable: true
+        geometry:
+          oneOf:
+          - title: GeoJSON Point
+            required:
+            - coordinates
+            - type
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - Point
+              coordinates:
+                minItems: 2
+                type: array
+                items:
+                  type: number
+              bbox:
+                minItems: 4
+                type: array
+                items:
+                  type: number
+            nullable: true
+          - title: GeoJSON LineString
+            required:
+            - coordinates
+            - type
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - LineString
+              coordinates:
+                minItems: 2
+                type: array
+                items:
+                  minItems: 2
+                  type: array
+                  items:
+                    type: number
+              bbox:
+                minItems: 4
+                type: array
+                items:
+                  type: number
+          - title: GeoJSON Polygon
+            required:
+            - coordinates
+            - type
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - Polygon
+              coordinates:
+                type: array
+                items:
+                  minItems: 4
+                  type: array
+                  items:
+                    minItems: 2
+                    type: array
+                    items:
+                      type: number
+              bbox:
+                minItems: 4
+                type: array
+                items:
+                  type: number
+          - title: GeoJSON MultiPoint
+            required:
+            - coordinates
+            - type
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - MultiPoint
+              coordinates:
+                type: array
+                items:
+                  minItems: 2
+                  type: array
+                  items:
+                    type: number
+              bbox:
+                minItems: 4
+                type: array
+                items:
+                  type: number
+          - title: GeoJSON MultiLineString
+            required:
+            - coordinates
+            - type
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - MultiLineString
+              coordinates:
+                type: array
+                items:
+                  minItems: 2
+                  type: array
+                  items:
+                    minItems: 2
+                    type: array
+                    items:
+                      type: number
+              bbox:
+                minItems: 4
+                type: array
+                items:
+                  type: number
+          - title: GeoJSON MultiPolygon
+            required:
+            - coordinates
+            - type
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - MultiPolygon
+              coordinates:
+                type: array
+                items:
+                  type: array
+                  items:
+                    minItems: 4
+                    type: array
+                    items:
+                      minItems: 2
+                      type: array
+                      items:
+                        type: number
+              bbox:
+                minItems: 4
+                type: array
+                items:
+                  type: number
+        bbox:
+          minItems: 4
+          type: array
+          items:
+            type: number
+  responses:
+    NotFound:
+      description: "The requested resource does not exist on the server. For example, a path parameter had an incorrect value."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/exception"
+        text/html:
+          schema:
+            type: string
+    NotAcceptable:
+      description: "Content negotiation failed. For example, the `Accept` header submitted in the request did not support any of the media types supported by the server for the requested resource."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/exception"
+        text/html:
+          schema:
+            type: string
+    ServerError:
+      description: A server error occurred.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/exception"
+        text/html:
+          schema:
+            type: string
+    InvalidParameter:
+      description: A query parameter has an invalid value.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/exception"
+        text/html:
+          schema:
+            type: string
+    Exception:
+      description: An error occured.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/exception"
+        text/html:
+          schema:
+            type: string
+    LandingPage:
+      description: |-
+        The landing page provides links to the API definition (link relation `service-desc`, in this case path `/api`),
+        to the Conformance declaration (path `/conformance`, link relation `conformance`), and to the Collections of geospatial data (path `/collections`, link relation `data`).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/landingPage"
+          example:
+            title: Buildings in Bonn
+            description: Access to data about buildings in the city of Bonn via a Web API that conforms to the OGC API Tiles specification.
+            links:
+            - href: http://data.example.org/
+              rel: self
+              type: application/json
+              title: this document
+            - href: http://data.example.org/api
+              rel: service-desc
+              type: application/vnd.oai.openapi+json;version=3.0
+              title: the API definition
+            - href: http://data.example.org/api.html
+              rel: service-doc
+              type: text/html
+              title: the API documentation
+            - href: http://data.example.org/conformance
+              rel: conformance
+              type: application/json
+              title: OGC API conformance classes implemented by this service
+            - href: http://data.example.org/collections
+              rel: data
+              type: application/json
+              title: Information about the collections
+        text/html:
+          schema:
+            type: string
+    Conformance:
+      description: The URIs of all conformance classes supported by the server
+      content:
+        application/json:
+          schema:
+            example:
+              conformsTo:
+              - http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/core
+              - http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/json
+              - http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/html
+              - http://www.opengis.net/spec/ogcapi-common-1/1.0/conf/oas30
+              - http://www.opengis.net/spec/ogcapi-common-2/1.0/conf/collections
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/core
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tileset
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tilesets-list
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/geodata-tilesets
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/dataset-tilesets
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/geodata-selection
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/jpeg
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/png
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/mvt
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/geojson
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/tiff
+              - http://www.opengis.net/spec/ogcapi-tiles-1/1.0/conf/netcdf
+            allOf:
+            - $ref: "#/components/schemas/confClasses"
+    API:
+      description: The OpenAPI definition of the API.
+      content:
+        application/vnd.oai.openapi+json;version=3.0:
+          schema:
+            type: object
+        text/html:
+          schema:
+            type: string
+    Enumeration:
+      description: An enumerated list of valid string values for API parameters.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/enumeration"
+        text/html:
+          schema:
+            type: string
+    CollectionsList:
+      description: |-
+        The collections of (mostly geospatial) data available from this API. The dataset contains one or more collections. This resource provides information about and access to the collections. The response contains the list of collections. Each collection is accessible via one or more OGC API set of specifications, for which a link to relevant accessible resources, e.g. /collections/{collectionId}/(items, coverage, map, tiles...) is provided, with the corresponding relation type, as well as key information about the collection. This information includes:
+        * a local identifier for the collection that is unique for the dataset;
+        * a list of coordinate reference systems (CRS) in which data may be returned by the server. The first CRS is the default coordinate reference system (the default is always WGS 84 with axis order longitude/latitude);
+        * an optional title and description for the collection;
+        * an optional extent that can be used to provide an indication of the spatial and temporal extent of the collection - typically derived from the data;
+        * for collections accessible via the Features or Records API, an optional indicator about the type of the items in the collection (the default value, if the indicator is not provided, is 'feature').
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/collections"
+          example:
+            links:
+            - href: http://data.example.org/collections.json
+              rel: self
+              type: application/json
+              title: this document
+            - href: http://data.example.org/collections.html
+              rel: alternate
+              type: text/html
+              title: this document as HTML
+            - href: http://schemas.example.org/1.0/buildings.xsd
+              rel: describedby
+              type: application/xml
+              title: GML application schema for Acme Corporation building data
+            - href: http://download.example.org/buildings.gpkg
+              rel: enclosure
+              type: application/geopackage+sqlite3
+              title: Bulk download (GeoPackage)
+              length: 472546
+            collections:
+            - id: buildings
+              title: Buildings
+              description: Buildings in the city of Bonn.
+              extent:
+                spatial:
+                  bbox:
+                  - - 7.01
+                    - 50.63
+                    - 7.22
+                    - 50.78
+                temporal:
+                  interval:
+                  - - 2010-02-15T12:34:56Z
+                    - null
+              links:
+              - href: http://data.example.org/collections/buildings/items
+                rel: items
+                type: application/geo+json
+                title: Buildings
+              - href: http://data.example.org/collections/buildings/items.html
+                rel: items
+                type: text/html
+                title: Buildings
+              - href: https://creativecommons.org/publicdomain/zero/1.0/
+                rel: license
+                type: text/html
+                title: CC0-1.0
+              - href: https://creativecommons.org/publicdomain/zero/1.0/rdf
+                rel: license
+                type: application/rdf+xml
+                title: CC0-1.0
+        text/html:
+          schema:
+            type: string
+    Collection:
+      description: |-
+        Information about a particular collection of (mostly geospatial) data available from this API. The collection is accessible via one or more OGC API set of specifications, for which a link to relevant accessible resources, e.g. /collections/{collectionId}/(items, coverage, map, tiles...) is contained in the response, with the corresponding relation type, as well as key information about the collection. This information includes:
+        * a local identifier for the collection that is unique for the dataset;
+        * a list of coordinate reference systems (CRS) in which data may be returned by the server. The first CRS is the default coordinate reference system (the default is always WGS 84 with axis order longitude/latitude);
+        * an optional title and description for the collection;
+        * an optional extent that can be used to provide an indication of the spatial and temporal extent of the collection - typically derived from the data;
+        * for collections accessible via the Features or Records API, an optional indicator about the type of the items in the collection (the default value, if the indicator is not provided, is 'feature').
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/collectionInfo"
+          example:
+            id: buildings
+            title: Buildings
+            description: Buildings in the city of Bonn.
+            extent:
+              spatial:
+                bbox:
+                - - 7.01
+                  - 50.63
+                  - 7.22
+                  - 50.78
+              temporal:
+                interval:
+                - - 2010-02-15T12:34:56Z
+                  - null
+            links:
+            - href: http://data.example.org/collections/buildings/items
+              rel: items
+              type: application/geo+json
+              title: Buildings
+            - href: http://data.example.org/collections/buildings/items.html
+              rel: items
+              type: text/html
+              title: Buildings
+            - href: https://creativecommons.org/publicdomain/zero/1.0/
+              rel: license
+              type: text/html
+              title: CC0-1.0
+            - href: https://creativecommons.org/publicdomain/zero/1.0/rdf
+              rel: license
+              type: application/rdf+xml
+              title: CC0-1.0
+        text/html:
+          schema:
+            type: string
+    TileSetsList:
+      description: List of available tilesets.
+      content:
+        application/json:
+          schema:
+            required:
+            - tilesets
+            type: object
+            properties:
+              links:
+                type: array
+                items:
+                  $ref: "#/components/schemas/link"
+              tilesets:
+                type: array
+                items:
+                  $ref: "#/components/schemas/tileSet-item"
+        text/html:
+          schema:
+            type: string
+    TileSet:
+      description: Description of the tileset
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tileSet"
+        text/html:
+          schema:
+            type: string
+    MapTile:
+      description: A map tile image returned as a response.
+      content:
+        image/png:
+          schema:
+            type: string
+            format: binary
+        image/jpeg:
+          schema:
+            type: string
+            format: binary
+        image/tiff; application=geotiff:
+          schema:
+            type: string
+            format: binary
+    CoverageTile:
+      description: A coverage tile returned as a response.
+      content:
+        application/netcdf:
+          schema:
+            type: string
+            format: binary
+        image/tiff; application=geotiff:
+          schema:
+            type: string
+            format: binary
+    VectorTile:
+      description: A vector tile returned as a response.
+      content:
+        application/vnd.mapbox-vector-tile:
+          schema:
+            type: string
+            format: binary
+        application/geo+json:
+          schema:
+            allOf:
+            - format: geojson-feature-collection
+            - $ref: "#/components/schemas/FeatureCollection"
+    EmptyTile:
+      description: No data available for this tile.
+    TileMatrixSetsList:
+      description: List of tile matrix sets (tiling schemes).
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              tileMatrixSets:
+                type: array
+                items:
+                  $ref: "#/components/schemas/tileMatrixSet-item"
+        text/html:
+          schema:
+            type: string
+    TileMatrixSet:
+      description: tile matrix set
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tileMatrixSet"
+  parameters:
+    f-metadata:
+      name: f
+      in: query
+      description: "The format of the response. If no value is provided, the accept header is used to determine the format. Accepted values are 'json' or 'html'."
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string
+        enum:
+        - json
+        - html
+    collectionId-all:
+      name: collectionId
+      in: path
+      description: Local identifier of a collection
+      required: true
+      schema:
+        $ref: "#/components/schemas/all-collections"
+    collectionId-coverage:
+      name: collectionId
+      in: path
+      description: Local identifier of a coverage collection
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: "#/components/schemas/coverage-collections"
+    collectionId-vectorTiles:
+      name: collectionId
+      in: path
+      description: Local identifier of a vector tile collection
+      required: true
+      schema:
+        $ref: "#/components/schemas/vectorTiles-collections"
+    collections:
+      name: collections
+      in: query
+      description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          $ref: "#/components/schemas/all-collections"
+    collections-coverage:
+      name: collections
+      in: query
+      description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          $ref: "#/components/schemas/coverage-collections"
+    collections-vectorTiles:
+      name: collections
+      in: query
+      description: "The collections that should be included in the response. The parameter value is a comma-separated list of collection identifiers. If the parameters is missing, some or all collections will be included. The collection will be rendered in the order specified, with the last one showing on top, unless the priority is overridden by styling rules."
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          $ref: "#/components/schemas/vectorTiles-collections"
+    datetime:
+      name: datetime
+      in: query
+      description: |-
+        Either a date-time or an interval, half-bounded or bounded. Date and time expressions
+        adhere to RFC 3339. Half-bounded intervals are expressed using double-dots.
+
+        Examples:
+
+        * A date-time: "2018-02-12T23:20:50Z"
+        * A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+        * Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+
+        Only features that have a temporal property that intersects the value of
+        `datetime` are selected.
+
+        If a feature has multiple temporal properties, it is the decision of the
+        server whether only a single temporal property is used to determine
+        the extent or all relevant temporal properties.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string
+    subset:
+      name: subset
+      in: query
+      description: |
+        Retrieve only part of the data by slicing or trimming along one or more axis
+        For trimming: {axisAbbrev}({low}:{high}) (preserves dimensionality)
+           An asterisk (`*`) can be used instead of {low} or {high} to indicate the minimum/maximum value.
+        For slicing:  {axisAbbrev}({value})      (reduces dimensionality)
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    crs:
+      name: crs
+      in: query
+      description: reproject the output to the given crs
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+    subset-crs:
+      name: subset-crs
+      in: query
+      description: crs for the specified subset
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+    tileMatrix:
+      name: tileMatrix
+      in: path
+      description: |-
+        Identifier selecting one of the scales defined in the TileMatrixSet and representing the scaleDenominator the tile. For example,
+        Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15.
+      required: true
+      schema:
+        type: string
+      example: "5"
+    tileRow:
+      name: tileRow
+      in: path
+      description: "Row index of the tile on the selected TileMatrix. It cannot exceed the MatrixWidth-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+      required: true
+      schema:
+        minimum: 0
+        type: integer
+      example: 10
+    tileCol:
+      name: tileCol
+      in: path
+      description: "Column index of the tile on the selected TileMatrix. It cannot exceed the MatrixHeight-1 for the selected TileMatrix. For example, Ireland is fully within the Tile at WebMercatorQuad tileMatrix=5, tileRow=10 and tileCol=15."
+      required: true
+      schema:
+        minimum: 0
+        type: integer
+      example: 15
+    tileMatrixSetId:
+      name: tileMatrixSetId
+      in: path
+      description: Identifier for a supported TileMatrixSet
+      required: true
+      schema:
+        $ref: "#/components/schemas/tileMatrixSets"
+    f-mapTile:
+      name: f
+      in: query
+      description: "The format of the map tile response (e.g. png). Accepted values are 'png', 'jpg' or 'tiff' (GeoTIFF)."
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string
+        enum:
+        - png
+        - jpg
+        - tiff
+    f-vectorTile:
+      name: f
+      in: query
+      description: The format of the vector tile response (e.g. json). Accepted values are 'mvt' (Mapbox Vector Tiles) or 'json' (GeoJSON).
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string
+        enum:
+        - mvt
+        - json
+    f-coverageTile:
+      name: f
+      in: query
+      description: "The format of the coverage tile response (e.g. tiff). Accepted values are 'tiff' (GeoTIFF), 'netcdf', or 'png'."
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string
+        enum:
+        - tiff
+        - netcdf
+        - png
+    bgcolor:
+      name: bgcolor
+      in: query
+      description: "Web color name or hexadecimal 0x[AA]RRGGBB color value for the background color (default to 0x9C9C9C gray). If alpha is not specified, full opacity is assumed."
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string
+        default: 0xFFFFFF
+    transparent:
+      name: transparent
+      in: query
+      description: Background transparency of map (default=true).
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: boolean
+        default: true
+    styleId:
+      name: styleId
+      in: path
+      description: An identifier representing a specific style.
+      required: true
+      schema:
+        $ref: "#/components/schemas/styles"
+    styleId-collection:
+      name: styleId
+      in: path
+      description: An identifier representing a specific style.
+      required: true
+      schema:
+        type: string

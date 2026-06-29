@@ -36,20 +36,17 @@
  */
 
 /**
- * \file services/tiles/getfeatureinfo.cpp
+ * \file services/ogcapi/Exception.cpp
  ** \~french
- * \brief Implémentation de la classe TilesService
+ * \brief Implémentation de la classe OgcApiException
  ** \~english
- * \brief Implements classe TilesService
+ * \brief Implements classe OgcApiException
  */
 
-#include <iostream>
+#include "services/ogcapi/Exception.h"
 
-#include "services/tiles/Exception.h"
-#include "services/tiles/Service.h"
-#include "Rok4Server.h"
+std::string OgcApiException::json_template = "{ \"type\": \"%s\", \"title\": \"%s\", \"status\": %s }";
 
-DataStream* TilesService::get_feature_info ( Request* req, Rok4Server* serv ) {
-
-    throw TilesException::get_error_message("NotImplemented", "Coming soon !", 501);
+MessageDataStream* OgcApiException::get_error_message(std::string type, std::string title, int status) {
+    return new MessageDataStream(str(boost::format(json_template) % type % title % status), "application/json", status);
 }

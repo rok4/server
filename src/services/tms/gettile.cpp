@@ -49,9 +49,10 @@
 
 #include "services/tms/Exception.h"
 #include "services/tms/Service.h"
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
+#include "core/Tile.h"
 
-DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
+DataStream* TmsService::get_tile ( Request* req, ServicesConfiguration* services ) {
 
     // La version
     if ( req->path_params.at(0) != "1.0.0" )
@@ -64,7 +65,7 @@ DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
         throw TmsException::get_error_message("Layer unknown", 400);
     }
 
-    Layer* layer = serv->get_server_configuration()->get_layer(str_layer);
+    Layer* layer = services->get_layer(str_layer);
     if ( layer == NULL || ! layer->is_tms_enabled() ) {
         throw TmsException::get_error_message("Layer " + str_layer + " unknown", 400);
     }
@@ -111,7 +112,7 @@ DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
 
     // Le style
     Style* style;
-    if (Rok4Format::is_raster(layer->get_pyramid()->get_format())) {
+    if (layer->is_raster()) {
         style = layer->get_default_style();
     }
 
@@ -131,14 +132,10 @@ DataStream* TmsService::get_tile ( Request* req, Rok4Server* serv ) {
 
     std::string format = Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) );
 
-    DataSource* d = layer->get_pyramid()->get_level(tm->get_id())->get_tile(column, row);
+    // Traitement de la requête
+    DataStream* d = Tile::get_tile(services, layer, tms, tm, column, row, format, style);
     if (d == NULL) {
         throw TmsException::get_error_message("No data found", 404);
     }
-
-    if (format == "image/png" && style->get_palette() && ! style->get_palette()->is_empty()) {
-        return new DataStreamFromDataSource(new PaletteDataSource(d, style->get_palette()));
-    } else {
-        return new DataStreamFromDataSource(d);
-    }
+    return d;
 }

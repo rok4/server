@@ -46,12 +46,12 @@
 #include <chrono>
 
 #include "services/health/Service.h"
-#include "services/health/Threads.h"
 #include "services/health/Exception.h"
 
-#include "Rok4Server.h"
+#include "core/Rok4Server.h"
+#include "core/Process.h"
 
-HealthService::HealthService (json11::Json& doc) : Service(doc) {
+HealthService::HealthService (json11::Json& doc) : Service(doc, "HEALTH service", "HEALTH service", "http://localhost/healthcheck", "/healthcheck") {
 
     if (! is_ok()) {
         // Le constructeur du service générique a détecté une erreur, on ajoute simplement le service concerné dans le message
@@ -64,31 +64,28 @@ HealthService::HealthService (json11::Json& doc) : Service(doc) {
         return;
     }
 
-    title = "HEALTH service";
-    abstract = "HEALTH service";
     keywords.push_back(Keyword ( "health" ));
     keywords.push_back(Keyword ( "check" ));
-    root_path = "/healthcheck";
 }
 
-DataStream* HealthService::process_request(Request* req, Rok4Server* serv) {
+DataStream* HealthService::process_request(Request* req, ServicesConfiguration* services) {
     BOOST_LOG_TRIVIAL(debug) << "HEALTH service";
 
     if ( match_route( "", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETHEALTH request";
-        return get_health(req, serv);
+        return get_health(req, services);
     }
     else if ( match_route( "/info", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETINFOS request";
-        return get_infos(req, serv);
+        return get_infos(req, services);
     }
     else if ( match_route( "/threads", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETTHREADS request";
-        return get_threads(req, serv);
+        return get_threads(req, services);
     }
     else if ( match_route( "/depends", {"GET"}, req ) ) {
         BOOST_LOG_TRIVIAL(debug) << "GETDEPENDENCIES request";
-        return get_dependencies(req, serv);
+        return get_dependencies(req, services);
     } else {
         throw HealthException::get_error_message("Unknown health request path", 400);
     }

@@ -36,11 +36,11 @@
  */
 
 /**
- * \file services/health/Threads.cpp
+ * \file core/Process.cpp
  ** \~french
- * \brief Implémentation des classes Threads et InfoThread
+ * \brief Implémentation des classes Threads et Process
  ** \~english
- * \brief Implements classes Threads and InfoThread
+ * \brief Implements classes Threads and Process
  */
 #include <iostream>
 #include <stdio.h>
@@ -48,34 +48,36 @@
 #include <sstream>
 #include <boost/log/trivial.hpp>
 
-#include "services/health/Threads.h"
+#include "core/Process.h"
 
-std::map<long unsigned int, InfoThread> Threads::threads;
+std::map<long unsigned int, InfoThread> Process::threads;
+long unsigned int Process::pid;
+long Process::time;
 
-void Threads::add() {
-    pthread_t i = pthread_self();
-    Threads::add(i);
-}
+// void Process::add() {
+//     pthread_t i = pthread_self();
+//     Process::add(i);
+// }
 
-void Threads::add(long unsigned int i) {
+void Process::add(long unsigned int i) {
     BOOST_LOG_TRIVIAL(debug) << "add" << "(call thread " << i << ")";
     threads.insert(std::make_pair<long unsigned int, InfoThread>(std::move(i), InfoThread(i)));
 }
 
-void Threads::status(eThreadStatus value) {
+void Process::status(eThreadStatus value) {
     pthread_t i = pthread_self();
-    Threads::status(i, value);
+    Process::status(i, value);
 }
 
-void Threads::status(long unsigned int i, eThreadStatus value) {
-    BOOST_LOG_TRIVIAL(debug) << "status : " << Threads::to_string(value) << "(call thread " << i << ")";
+void Process::status(long unsigned int i, eThreadStatus value) {
+    BOOST_LOG_TRIVIAL(debug) << "status : " << Process::to_string(value) << "(call thread " << i << ")";
     std::map<long unsigned int, InfoThread>::iterator it;
     it = threads.find(i);
     if (it == threads.end()) {
         BOOST_LOG_TRIVIAL(debug) << "thread " << i << " not found !?";
         return;
     }
-    it->second.set_status(Threads::to_string(value));
+    it->second.set_status(Process::to_string(value));
     BOOST_LOG_TRIVIAL(debug) << "status update : " << it->second.get_status();
 
     if (value == eThreadStatus::PENDING) {
@@ -106,9 +108,18 @@ void Threads::status(long unsigned int i, eThreadStatus value) {
 
 }
 
+int Process::get_threads_count() {
+    return threads.size();
+}
+
+long unsigned int Process::get_pid() { return pid; }
+void Process::set_pid(long unsigned int p) { pid = p; }
+long Process::get_time() { return time; }
+void Process::set_time(long processTime) { time = processTime; }
+
 InfoThread::InfoThread(long unsigned int& i) {
     pid = i;
-    status = Threads::to_string(eThreadStatus::PENDING);
+    status = Process::to_string(eThreadStatus::PENDING);
     count = 0;
     duration = 0;
     time = 0;

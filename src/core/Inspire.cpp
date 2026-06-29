@@ -47,7 +47,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "Inspire.h"
+#include "core/Inspire.h"
 
 namespace Inspire {
 

@@ -36,24 +36,24 @@
  */
 
 /**
- * \file services/tiles/Exception.h
+ * \file services/ogcapi/Exception.h
  ** \~french
- * \brief Définition de la classe TilesException
+ * \brief Définition de la classe OgcApiException
  ** \~english
- * \brief Define classe TilesException
+ * \brief Define classe OgcApiException
  */
 
 #pragma once
 
 #include <string>
-#include "boost/format.hpp"
+#include <boost/format.hpp>
 
-#include "DataStreams.h"
+#include "core/DataStreams.h"
 
 /**
  * \author Institut national de l'information géographique et forestière
  * \~french
- * \brief Gestion des erreurs du service OGC API Tiles
+ * \brief Gestion des erreurs du service OGC API
  * \details Cette classe est prévue pour être utilisée sans instance. Les erreurs ont le formalisme suivant :
  * \code{.json}
  * {
@@ -62,7 +62,7 @@
  * }
  * \endcode
  */
-class TilesException {
+class OgcApiException {
 private:
     static std::string json_template;
 
