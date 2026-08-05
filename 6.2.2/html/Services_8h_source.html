@@ -1,0 +1,240 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+    <meta name="generator" content="Doxygen 1.8.17" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Serveur de diffusion WMS, WMTS et TMS</title>
+    <link href="tabs.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="resize.js"></script>
+    <script type="text/javascript" src="navtreedata.js"></script>
+    <script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="search/searchdata.js"></script>
+    <script type="text/javascript" src="search/search.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css" />
+</head>
+<body><!-- Généré par Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Recherche');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('Services_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Chargement...</div>
+<div class="SRStatus" id="Searching">Recherche...</div>
+<div class="SRStatus" id="NoMatches">Aucune correspondance</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">Services.h</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="Services_8h.html">Aller à la documentation de ce fichier.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * Copyright © (2011-2013) Institut national de l&#39;information</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *                    géographique et forestière</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> * Géoportail SAV &lt;contact.geoservices@ign.fr&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * This software is a computer program whose purpose is to publish geographic</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * data using OGC WMS and WMTS protocol.</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * This software is governed by the CeCILL-C license under French law and</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * abiding by the rules of distribution of free software.  You can  use,</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * modify and/ or redistribute the software under the terms of the CeCILL-C</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * license as circulated by CEA, CNRS and INRIA at the following URL</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> * &quot;http://www.cecill.info&quot;.</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * As a counterpart to the access to the source code and  rights to copy,</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * modify and redistribute granted by the license, users are provided only</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * with a limited warranty  and the software&#39;s author,  the holder of the</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> * economic rights,  and the successive licensors  have only  limited</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * liability.</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> * In this respect, the user&#39;s attention is drawn to the risks associated</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment"> * with loading,  using,  modifying and/or developing or reproducing the</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"> * software by the user in light of its specific status of free software,</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> * that may mean  that it is complicated to manipulate,  and  that  also</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> * therefore means  that it is reserved for developers  and  experienced</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * professionals having in-depth computer knowledge. Users are therefore</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> * encouraged to load and test the software&#39;s suitability as regards their</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> * requirements in conditions enabling the security of their systems and/or</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> * data to be ensured and,  more generally, to use and operate it in the</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> * same conditions as regards security.</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> * The fact that you are presently reading this means that you have had</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * knowledge of the CeCILL-C license and that you accept its terms.</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &lt;rok4/utils/CRS.h&gt;</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#include &lt;rok4/utils/Configuration.h&gt;</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#include &lt;rok4/utils/Keyword.h&gt;</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#include &quot;<a class="code" href="Rok4Server_8h.html">Rok4Server.h</a>&quot;</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#include &quot;<a class="code" href="Metadata_8h.html">configurations/Metadata.h</a>&quot;</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">#include &quot;configurations/Contact.h&quot;</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#include &quot;<a class="code" href="common_2Service_8h.html">services/common/Service.h</a>&quot;</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="preprocessor">#include &quot;<a class="code" href="health_2Service_8h.html">services/health/Service.h</a>&quot;</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="preprocessor">#include &quot;<a class="code" href="tms_2Service_8h.html">services/tms/Service.h</a>&quot;</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="preprocessor">#include &quot;<a class="code" href="wmts_2Service_8h.html">services/wmts/Service.h</a>&quot;</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#include &quot;<a class="code" href="wms_2Service_8h.html">services/wms/Service.h</a>&quot;</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#include &quot;<a class="code" href="tiles_2Service_8h.html">services/tiles/Service.h</a>&quot;</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="preprocessor">#include &quot;<a class="code" href="admin_2Service_8h.html">services/admin/Service.h</a>&quot;</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">#include &quot;config.h&quot;</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="foldopen" id="foldopen00073" data-start="{" data-end="};">
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno"><a class="line" href="classServicesConfiguration.html">   73</a></span><span class="keyword">class </span><a class="code hl_class" href="classServicesConfiguration.html">ServicesConfiguration</a> : <span class="keyword">public</span> Configuration</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>{</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="classRok4Server.html">Rok4Server</a>;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="classWmtsService.html">WmtsService</a>;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="classTmsService.html">TmsService</a>;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="classWmsService.html">WmsService</a>;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="classTilesService.html">TilesService</a>;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        <a class="code hl_class" href="classServicesConfiguration.html">ServicesConfiguration</a>(std::string path);</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <a class="code hl_class" href="classServicesConfiguration.html">~ServicesConfiguration</a>();</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        <a class="code hl_class" href="classCommonService.html">CommonService</a>* get_common_service() {<span class="keywordflow">return</span> common_service;};</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <a class="code hl_class" href="classHealthService.html">HealthService</a>* get_health_service() {<span class="keywordflow">return</span> health_service;};</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <a class="code hl_class" href="classTmsService.html">TmsService</a>* get_tms_service() {<span class="keywordflow">return</span> tms_service;};</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        <a class="code hl_class" href="classWmtsService.html">WmtsService</a>* get_wmts_service() {<span class="keywordflow">return</span> wmts_service;};</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>        <a class="code hl_class" href="classWmsService.html">WmsService</a>* get_wms_service() {<span class="keywordflow">return</span> wms_service;};</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>        <a class="code hl_class" href="classAdminService.html">AdminService</a>* get_admin_service() {<span class="keywordflow">return</span> admin_service;};</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        <a class="code hl_class" href="classTilesService.html">TilesService</a>* get_tiles_service() {<span class="keywordflow">return</span> tiles_service;};</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        std::vector&lt;CRS*&gt; <a class="code hl_function" href="classServicesConfiguration.html#a156cc027ddbab56515fb9ca5a3e063ce">get_equals_crs</a>(std::string crs);</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <span class="keywordtype">bool</span> handle_crs_equivalences() {</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>            <span class="keywordflow">return</span> ! crs_equivalences.empty();</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        };</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        <span class="keywordtype">bool</span> are_crs_equals( std::string crs1, std::string crs2 );</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        std::string get_default_style_id();</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classServicesConfiguration.html#a7571aa4d8b27055c66611cd67ebf618a">clean_cache</a>();</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        </div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    <span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        <span class="comment">// ----------------------- Global </span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        std::string service_provider;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        std::string provider_site;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        std::string fee;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        std::string access_constraint;</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        <a class="code hl_class" href="classContact.html">Contact</a>* contact;</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>        std::string default_style;</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>        <span class="keywordtype">bool</span> load_crs_equivalences(std::string file);</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span> </div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        <span class="keywordtype">bool</span> parse(json11::Json&amp; doc);</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>        <a class="code hl_class" href="classCommonService.html">CommonService</a>* common_service;</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        <a class="code hl_class" href="classHealthService.html">HealthService</a>* health_service;</div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>        <a class="code hl_class" href="classTmsService.html">TmsService</a>* tms_service;</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>        <a class="code hl_class" href="classWmtsService.html">WmtsService</a>* wmts_service;</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        <a class="code hl_class" href="classWmsService.html">WmsService</a>* wms_service;</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>        <a class="code hl_class" href="classAdminService.html">AdminService</a>* admin_service;</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>        <a class="code hl_class" href="classTilesService.html">TilesService</a>* tiles_service;</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span> </div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        std::map&lt;std::string, std::vector&lt;CRS*&gt; &gt; crs_equivalences;</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>};</div>
+</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span> </div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="ttc" id="aMetadata_8h_html"><div class="ttname"><a href="Metadata_8h.html">Metadata.h</a></div><div class="ttdoc">Définition de la classe Metadata gérant les liens vers les métadonnées dans les documents de capacité...</div></div>
+<div class="ttc" id="aRok4Server_8h_html"><div class="ttname"><a href="Rok4Server_8h.html">Rok4Server.h</a></div><div class="ttdoc">Definition de la classe Rok4Server et du programme principal.</div></div>
+<div class="ttc" id="aadmin_2Service_8h_html"><div class="ttname"><a href="admin_2Service_8h.html">Service.h</a></div><div class="ttdoc">Définition de la classe AdminService.</div></div>
+<div class="ttc" id="aclassAdminService_html"><div class="ttname"><a href="classAdminService.html">AdminService</a></div><div class="ttdoc">Gestion du service d'administration du serveur.</div><div class="ttdef"><b>Definition</b> Service.h:57</div></div>
+<div class="ttc" id="aclassCommonService_html"><div class="ttname"><a href="classCommonService.html">CommonService</a></div><div class="ttdoc">Gestion du service global du serveur.</div><div class="ttdef"><b>Definition</b> Service.h:57</div></div>
+<div class="ttc" id="aclassContact_html"><div class="ttname"><a href="classContact.html">Contact</a></div><div class="ttdoc">Gestion des informations de contact.</div><div class="ttdef"><b>Definition</b> Contact.h:62</div></div>
+<div class="ttc" id="aclassHealthService_html"><div class="ttname"><a href="classHealthService.html">HealthService</a></div><div class="ttdoc">Gestion du service de santé du serveur.</div><div class="ttdef"><b>Definition</b> Service.h:57</div></div>
+<div class="ttc" id="aclassRok4Server_html"><div class="ttname"><a href="classRok4Server.html">Rok4Server</a></div><div class="ttdoc">Gestion du programme principal, lien entre les modules.</div><div class="ttdef"><b>Definition</b> Rok4Server.h:79</div></div>
+<div class="ttc" id="aclassServicesConfiguration_html"><div class="ttname"><a href="classServicesConfiguration.html">ServicesConfiguration</a></div><div class="ttdoc">Gestion de la configuration des services assurés par le serveur.</div><div class="ttdef"><b>Definition</b> Services.h:74</div></div>
+<div class="ttc" id="aclassServicesConfiguration_html_a156cc027ddbab56515fb9ca5a3e063ce"><div class="ttname"><a href="classServicesConfiguration.html#a156cc027ddbab56515fb9ca5a3e063ce">ServicesConfiguration::get_equals_crs</a></div><div class="ttdeci">std::vector&lt; CRS * &gt; get_equals_crs(std::string crs)</div><div class="ttdoc">Retourne la liste des CRS équivalents et valable dans PROJ.</div><div class="ttdef"><b>Definition</b> Services.cpp:289</div></div>
+<div class="ttc" id="aclassServicesConfiguration_html_a7571aa4d8b27055c66611cd67ebf618a"><div class="ttname"><a href="classServicesConfiguration.html#a7571aa4d8b27055c66611cd67ebf618a">ServicesConfiguration::clean_cache</a></div><div class="ttdeci">void clean_cache()</div><div class="ttdoc">Supprime les réponses cachées.</div><div class="ttdef"><b>Definition</b> Services.cpp:337</div></div>
+<div class="ttc" id="aclassTilesService_html"><div class="ttname"><a href="classTilesService.html">TilesService</a></div><div class="ttdoc">Gestion du service OGC API Tiles du serveur.</div><div class="ttdef"><b>Definition</b> Service.h:58</div></div>
+<div class="ttc" id="aclassTmsService_html"><div class="ttname"><a href="classTmsService.html">TmsService</a></div><div class="ttdoc">Gestion du service TMS du serveur.</div><div class="ttdef"><b>Definition</b> Service.h:57</div></div>
+<div class="ttc" id="aclassWmsService_html"><div class="ttname"><a href="classWmsService.html">WmsService</a></div><div class="ttdoc">Gestion du service WMS du serveur.</div><div class="ttdef"><b>Definition</b> Service.h:59</div></div>
+<div class="ttc" id="aclassWmtsService_html"><div class="ttname"><a href="classWmtsService.html">WmtsService</a></div><div class="ttdoc">Gestion du service WMTS du serveur.</div><div class="ttdef"><b>Definition</b> Service.h:58</div></div>
+<div class="ttc" id="acommon_2Service_8h_html"><div class="ttname"><a href="common_2Service_8h.html">Service.h</a></div><div class="ttdoc">Définition de la classe CommonService.</div></div>
+<div class="ttc" id="ahealth_2Service_8h_html"><div class="ttname"><a href="health_2Service_8h.html">Service.h</a></div><div class="ttdoc">Définition de la classe HealthService.</div></div>
+<div class="ttc" id="atiles_2Service_8h_html"><div class="ttname"><a href="tiles_2Service_8h.html">Service.h</a></div><div class="ttdoc">Définition de la classe TilesService.</div></div>
+<div class="ttc" id="atms_2Service_8h_html"><div class="ttname"><a href="tms_2Service_8h.html">Service.h</a></div><div class="ttdoc">Définition de la classe TmsService.</div></div>
+<div class="ttc" id="awms_2Service_8h_html"><div class="ttname"><a href="wms_2Service_8h.html">Service.h</a></div><div class="ttdoc">Définition de la classe WmsService.</div></div>
+<div class="ttc" id="awmts_2Service_8h_html"><div class="ttname"><a href="wmts_2Service_8h.html">Service.h</a></div><div class="ttdoc">Définition de la classe WmtsService.</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_e9757f1129b0ea30054c5776a32aaabc.html">configurations</a></li><li class="navelem"><a class="el" href="Services_8h.html">Services.h</a></li>
+    <li class="footer">Généré par <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

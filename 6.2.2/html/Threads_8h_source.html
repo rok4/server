@@ -1,0 +1,272 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+    <meta name="generator" content="Doxygen 1.8.17" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Serveur de diffusion WMS, WMTS et TMS</title>
+    <link href="tabs.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="resize.js"></script>
+    <script type="text/javascript" src="navtreedata.js"></script>
+    <script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="search/searchdata.js"></script>
+    <script type="text/javascript" src="search/search.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css" />
+</head>
+<body><!-- Généré par Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','Recherche');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function() { init_codefold(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('Threads_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Chargement...</div>
+<div class="SRStatus" id="Searching">Recherche...</div>
+<div class="SRStatus" id="NoMatches">Aucune correspondance</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">Threads.h</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="Threads_8h.html">Aller à la documentation de ce fichier.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * Copyright © (2011-2013) Institut national de l&#39;information</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> *                    géographique et forestière</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> * Géoportail SAV &lt;contact.geoservices@ign.fr&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment"> * This software is a computer program whose purpose is to publish geographic</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment"> * data using OGC WMS and WMTS protocol.</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment"> * This software is governed by the CeCILL-C license under French law and</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment"> * abiding by the rules of distribution of free software.  You can  use,</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment"> * modify and/ or redistribute the software under the terms of the CeCILL-C</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment"> * license as circulated by CEA, CNRS and INRIA at the following URL</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment"> * &quot;http://www.cecill.info&quot;.</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment"> * As a counterpart to the access to the source code and  rights to copy,</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment"> * modify and redistribute granted by the license, users are provided only</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment"> * with a limited warranty  and the software&#39;s author,  the holder of the</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment"> * economic rights,  and the successive licensors  have only  limited</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment"> * liability.</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment"> * In this respect, the user&#39;s attention is drawn to the risks associated</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment"> * with loading,  using,  modifying and/or developing or reproducing the</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="comment"> * software by the user in light of its specific status of free software,</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment"> * that may mean  that it is complicated to manipulate,  and  that  also</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment"> * therefore means  that it is reserved for developers  and  experienced</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment"> * professionals having in-depth computer knowledge. Users are therefore</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment"> * encouraged to load and test the software&#39;s suitability as regards their</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment"> * requirements in conditions enabling the security of their systems and/or</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="comment"> * data to be ensured and,  more generally, to use and operate it in the</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="comment"> * same conditions as regards security.</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment"> * The fact that you are presently reading this means that you have had</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment"> *</span></div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment"> * knowledge of the CeCILL-C license and that you accept its terms.</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment"> */</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#pragma once</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &lt;map&gt;</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &lt;chrono&gt;</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &lt;rok4/thirdparty/json11.hpp&gt;</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#include &quot;<a class="code" href="Request_8h.html">Request.h</a>&quot;</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="keyword">enum</span> eThreadStatus {</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    UNKNOWN,</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    RUNNING,</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    PENDING,</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    AVAILABLE</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>};</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> threadstatus_name[] = {</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="stringliteral">&quot;UNKNOWN&quot;</span>,</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="stringliteral">&quot;RUNNING&quot;</span>,</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="stringliteral">&quot;PENDING&quot;</span>,</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="stringliteral">&quot;AVAILABLE&quot;</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>};</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="foldopen" id="foldopen00069" data-start="{" data-end="};">
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="classInfoThread.html">   69</a></span><span class="keyword">class </span><a class="code hl_class" href="classInfoThread.html">InfoThread</a> {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        <span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> pid;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        std::string status;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        <span class="keywordtype">int</span> count;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        std::time_t time;</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        <span class="keywordtype">long</span> <span class="keywordtype">double</span> duration;</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno"><a class="line" href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">  107</a></span>        <a class="code hl_function" href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">InfoThread</a>(){};</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        <a class="code hl_function" href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">InfoThread</a>(<span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>&amp;);</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        <a class="code hl_function" href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">InfoThread</a>(<span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>&amp;, std::string);</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span> </div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        json11::Json to_json()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>            <span class="keywordflow">return</span> json11::Json::object {</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>                { <span class="stringliteral">&quot;pid&quot;</span>, (int) pid },</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>                { <span class="stringliteral">&quot;status&quot;</span>, status },</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>                { <span class="stringliteral">&quot;count&quot;</span>, count },</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>                { <span class="stringliteral">&quot;time&quot;</span>, (int) time },</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>                { <span class="stringliteral">&quot;duration&quot;</span>, (double) duration }</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>            };</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        }</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> </div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno"><a class="line" href="classInfoThread.html#a066353fea40b3cd8757e70127e6644fd">  125</a></span>        <a class="code hl_function" href="classInfoThread.html#a066353fea40b3cd8757e70127e6644fd">~InfoThread</a>(){};</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span> </div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        <span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classInfoThread.html#a3dab06c870c48527576b8f486dfadb3d">get_pid</a>();</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        std::string <a class="code hl_function" href="classInfoThread.html#a1436eb39cdc3fce03d9328b0f29685a2">get_status</a>();</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span> </div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classInfoThread.html#ae6114646f31c3b78fb42b53fb7a01f32">set_status</a>(std::string);</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> </div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        <span class="keywordtype">int</span> <a class="code hl_function" href="classInfoThread.html#ac22a37905c5a305d4b42184045d45434">get_count</a>();</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classInfoThread.html#ac1e64ed9b096e06a6ba956bff822c6ad">set_count</a>();</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classInfoThread.html#a78de79deef907e78765638694115d297">set_time</a>(std::time_t);</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
+<div class="foldopen" id="foldopen00171" data-start="{" data-end="}">
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno"><a class="line" href="classInfoThread.html#af588346a100a831c95d3ea450a20a217">  171</a></span>        std::time_t <a class="code hl_function" href="classInfoThread.html#af588346a100a831c95d3ea450a20a217">get_time</a>() {</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>            <span class="keywordflow">return</span> time;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>        }</div>
+</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span> </div>
+<div class="foldopen" id="foldopen00180" data-start="{" data-end="}">
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno"><a class="line" href="classInfoThread.html#a7cbc135b0e4f80a5d514f63003c81683">  180</a></span>        <span class="keywordtype">long</span> <span class="keywordtype">double</span> <a class="code hl_function" href="classInfoThread.html#a7cbc135b0e4f80a5d514f63003c81683">get_duration</a>() {</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>            <span class="keywordflow">return</span> duration;</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>        }</div>
+</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span> </div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classInfoThread.html#ac73bec9c7a905724fbf0906eb4df664a">set_duration</a>(<span class="keywordtype">long</span> <span class="keywordtype">double</span>);</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span> </div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>};</div>
+</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span> </div>
+<div class="foldopen" id="foldopen00193" data-start="{" data-end="};">
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno"><a class="line" href="classThreads.html">  193</a></span><span class="keyword">class </span><a class="code hl_class" href="classThreads.html">Threads</a> {</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>        <span class="keyword">static</span> std::map&lt;long unsigned int, InfoThread&gt; threads;</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span> </div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>        <a class="code hl_class" href="classThreads.html">Threads</a>(){};</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno"><a class="line" href="classThreads.html#a2b4399a2f8fc2b507f118c27fba9eca4">  212</a></span>        <a class="code hl_function" href="classThreads.html#a2b4399a2f8fc2b507f118c27fba9eca4">~Threads</a>(){};</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span> </div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>        <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classThreads.html#ae0828fb96c8ea39631991131fa292a55">add</a>();</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>        <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classThreads.html#ae0828fb96c8ea39631991131fa292a55">add</a>(<span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>);</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span> </div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno"><a class="line" href="classThreads.html#a195cf61491b6f9d5560c846f273de1a1">  229</a></span>        <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classThreads.html#a195cf61491b6f9d5560c846f273de1a1">update</a>(<a class="code hl_class" href="classRequest.html">Request</a>*);</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>        <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classThreads.html#a195cf61491b6f9d5560c846f273de1a1">update</a>(<span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>, <a class="code hl_class" href="classRequest.html">Request</a>*);</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span> </div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classThreads.html#a85095f7c3bf109807863a43e15d65b94">status</a>(eThreadStatus);</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classThreads.html#a85095f7c3bf109807863a43e15d65b94">status</a>(<span class="keywordtype">long</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>, eThreadStatus);</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span> </div>
+<div class="foldopen" id="foldopen00247" data-start="{" data-end="}">
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno"><a class="line" href="classThreads.html#ae1d2b47c3391db198fc54cbc3794be36">  247</a></span>        <span class="keyword">static</span> json11::Json <a class="code hl_function" href="classThreads.html#ae1d2b47c3391db198fc54cbc3794be36">to_json</a>() {</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>            std::vector&lt;InfoThread&gt; res;</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span> <span class="keyword">const</span>&amp; t: threads) {</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>                res.push_back(t.second);</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>            }</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span> </div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>            <span class="keywordflow">return</span> json11::Json(res);</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>        };</div>
+</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span> </div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>        <span class="keyword">static</span> std::string to_string (eThreadStatus st) {</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>            <span class="keywordflow">return</span> std::string ( threadstatus_name[st] );</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        }</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>};</div>
+</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span> </div>
+<div class="ttc" id="aRequest_8h_html"><div class="ttname"><a href="Request_8h.html">Request.h</a></div><div class="ttdoc">Définition de la classe Request, analysant les requêtes HTTP.</div></div>
+<div class="ttc" id="aclassInfoThread_html"><div class="ttname"><a href="classInfoThread.html">InfoThread</a></div><div class="ttdef"><b>Definition</b> Threads.h:69</div></div>
+<div class="ttc" id="aclassInfoThread_html_a066353fea40b3cd8757e70127e6644fd"><div class="ttname"><a href="classInfoThread.html#a066353fea40b3cd8757e70127e6644fd">InfoThread::~InfoThread</a></div><div class="ttdeci">~InfoThread()</div><div class="ttdoc">Destroy the Stat object.</div><div class="ttdef"><b>Definition</b> Threads.h:125</div></div>
+<div class="ttc" id="aclassInfoThread_html_a1436eb39cdc3fce03d9328b0f29685a2"><div class="ttname"><a href="classInfoThread.html#a1436eb39cdc3fce03d9328b0f29685a2">InfoThread::get_status</a></div><div class="ttdeci">std::string get_status()</div><div class="ttdoc">Get the Status object.</div><div class="ttdef"><b>Definition</b> Threads.cpp:129</div></div>
+<div class="ttc" id="aclassInfoThread_html_a3dab06c870c48527576b8f486dfadb3d"><div class="ttname"><a href="classInfoThread.html#a3dab06c870c48527576b8f486dfadb3d">InfoThread::get_pid</a></div><div class="ttdeci">long unsigned int get_pid()</div><div class="ttdef"><b>Definition</b> Threads.cpp:125</div></div>
+<div class="ttc" id="aclassInfoThread_html_a5e60e05990f056fdfccbb8bc8308ae2b"><div class="ttname"><a href="classInfoThread.html#a5e60e05990f056fdfccbb8bc8308ae2b">InfoThread::InfoThread</a></div><div class="ttdeci">InfoThread()</div><div class="ttdoc">Construct a new Stat object.</div><div class="ttdef"><b>Definition</b> Threads.h:107</div></div>
+<div class="ttc" id="aclassInfoThread_html_a78de79deef907e78765638694115d297"><div class="ttname"><a href="classInfoThread.html#a78de79deef907e78765638694115d297">InfoThread::set_time</a></div><div class="ttdeci">void set_time(std::time_t)</div><div class="ttdoc">Set the Time object.</div><div class="ttdef"><b>Definition</b> Threads.cpp:145</div></div>
+<div class="ttc" id="aclassInfoThread_html_a7cbc135b0e4f80a5d514f63003c81683"><div class="ttname"><a href="classInfoThread.html#a7cbc135b0e4f80a5d514f63003c81683">InfoThread::get_duration</a></div><div class="ttdeci">long double get_duration()</div><div class="ttdoc">Get the Duration object.</div><div class="ttdef"><b>Definition</b> Threads.h:180</div></div>
+<div class="ttc" id="aclassInfoThread_html_ac1e64ed9b096e06a6ba956bff822c6ad"><div class="ttname"><a href="classInfoThread.html#ac1e64ed9b096e06a6ba956bff822c6ad">InfoThread::set_count</a></div><div class="ttdeci">void set_count()</div><div class="ttdoc">Set the Count object.</div><div class="ttdef"><b>Definition</b> Threads.cpp:141</div></div>
+<div class="ttc" id="aclassInfoThread_html_ac22a37905c5a305d4b42184045d45434"><div class="ttname"><a href="classInfoThread.html#ac22a37905c5a305d4b42184045d45434">InfoThread::get_count</a></div><div class="ttdeci">int get_count()</div><div class="ttdoc">Get the Count object.</div><div class="ttdef"><b>Definition</b> Threads.cpp:137</div></div>
+<div class="ttc" id="aclassInfoThread_html_ac73bec9c7a905724fbf0906eb4df664a"><div class="ttname"><a href="classInfoThread.html#ac73bec9c7a905724fbf0906eb4df664a">InfoThread::set_duration</a></div><div class="ttdeci">void set_duration(long double)</div><div class="ttdoc">Set the Duration object.</div><div class="ttdef"><b>Definition</b> Threads.cpp:149</div></div>
+<div class="ttc" id="aclassInfoThread_html_ae6114646f31c3b78fb42b53fb7a01f32"><div class="ttname"><a href="classInfoThread.html#ae6114646f31c3b78fb42b53fb7a01f32">InfoThread::set_status</a></div><div class="ttdeci">void set_status(std::string)</div><div class="ttdoc">Set the Status object.</div><div class="ttdef"><b>Definition</b> Threads.cpp:133</div></div>
+<div class="ttc" id="aclassInfoThread_html_af588346a100a831c95d3ea450a20a217"><div class="ttname"><a href="classInfoThread.html#af588346a100a831c95d3ea450a20a217">InfoThread::get_time</a></div><div class="ttdeci">std::time_t get_time()</div><div class="ttdoc">Get the Time object.</div><div class="ttdef"><b>Definition</b> Threads.h:171</div></div>
+<div class="ttc" id="aclassRequest_html"><div class="ttname"><a href="classRequest.html">Request</a></div><div class="ttdoc">Gestion des requêtes HTTP.</div><div class="ttdef"><b>Definition</b> Request.h:74</div></div>
+<div class="ttc" id="aclassThreads_html"><div class="ttname"><a href="classThreads.html">Threads</a></div><div class="ttdef"><b>Definition</b> Threads.h:193</div></div>
+<div class="ttc" id="aclassThreads_html_a195cf61491b6f9d5560c846f273de1a1"><div class="ttname"><a href="classThreads.html#a195cf61491b6f9d5560c846f273de1a1">Threads::update</a></div><div class="ttdeci">static void update(Request *)</div><div class="ttdoc">Update thread information (request, ...)</div></div>
+<div class="ttc" id="aclassThreads_html_a2b4399a2f8fc2b507f118c27fba9eca4"><div class="ttname"><a href="classThreads.html#a2b4399a2f8fc2b507f118c27fba9eca4">Threads::~Threads</a></div><div class="ttdeci">~Threads()</div><div class="ttdoc">Destroy the Stats object.</div><div class="ttdef"><b>Definition</b> Threads.h:212</div></div>
+<div class="ttc" id="aclassThreads_html_a85095f7c3bf109807863a43e15d65b94"><div class="ttname"><a href="classThreads.html#a85095f7c3bf109807863a43e15d65b94">Threads::status</a></div><div class="ttdeci">static void status(eThreadStatus)</div><div class="ttdoc">Update thread status.</div><div class="ttdef"><b>Definition</b> Threads.cpp:65</div></div>
+<div class="ttc" id="aclassThreads_html_ae0828fb96c8ea39631991131fa292a55"><div class="ttname"><a href="classThreads.html#ae0828fb96c8ea39631991131fa292a55">Threads::add</a></div><div class="ttdeci">static void add()</div><div class="ttdoc">Add a new thread to the map.</div><div class="ttdef"><b>Definition</b> Threads.cpp:55</div></div>
+<div class="ttc" id="aclassThreads_html_ae1d2b47c3391db198fc54cbc3794be36"><div class="ttname"><a href="classThreads.html#ae1d2b47c3391db198fc54cbc3794be36">Threads::to_json</a></div><div class="ttdeci">static json11::Json to_json()</div><div class="ttdoc">Show status of all threads in JSON format.</div><div class="ttdef"><b>Definition</b> Threads.h:247</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_1826a32a9d780ddbaf96ec88be56c4cd.html">services</a></li><li class="navelem"><a class="el" href="dir_b16240bc42f1b995af3f15b0b15b285f.html">health</a></li><li class="navelem"><a class="el" href="Threads_8h.html">Threads.h</a></li>
+    <li class="footer">Généré par <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>
