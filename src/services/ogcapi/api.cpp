@@ -143,8 +143,6 @@ DataStream* OgcApiService::get_tilematrixsets ( Request* req, ServicesConfigurat
         throw OgcApiException::get_error_message("InvalidParameter", "Format unknown", 400);
     }
 
-    json11::Json::object res = json11::Json::object {};
-
     std::vector<json11::Json::object> tmss;
     
     for(auto const& t: TmsBook::get_book()) {
@@ -155,13 +153,27 @@ DataStream* OgcApiService::get_tilematrixsets ( Request* req, ServicesConfigurat
             { "links", json11::Json::array {
                 json11::Json::object {
                     { "href", endpoint_uri + "/tileMatrixSets/" + t.second->get_id() + "?f=json"},
-                    { "rel", "describedby"},
+                    { "rel", "http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme"},
                     { "type", "application/json"},
                     { "title", t.second->get_id() + " definition as application/json"}
                 }
             }}
         });
     }
+
+    std::vector<json11::Json> links;
+    links.push_back(json11::Json::object {
+        { "href", endpoint_uri + "/tileMatrixSets?f=json"},
+        { "rel", "self"},
+        { "type", "application/json"},
+        { "title", "this document"}
+    });
+
+    json11::Json::object res = json11::Json::object {
+        { "links", links },
+        { "numberMatched", (int) tmss.size() },
+        { "numberReturned", (int) tmss.size() }
+    };
 
     res["tileMatrixSets"] = tmss;
 

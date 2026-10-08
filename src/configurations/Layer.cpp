@@ -580,7 +580,7 @@ Layer::Layer(std::string path, ServicesConfiguration* s) : Configuration(path), 
     uint8_t* data = context->read_full(size, fo_name);
 
     if (size < 0) {
-        error_message = "Cannot read style "  + path ;
+        error_message = "Cannot read layer file/object "  + path ;
         if (data != NULL) delete[] data;
         return;
     }
@@ -949,7 +949,7 @@ json11::Json Layer::to_json_ogcapi(OgcApiService* service) {
         if (service->tiles_enabled()) {
             links.push_back(json11::Json::object {
                 { "href", service->get_endpoint_uri() + "/collections/" + id + "/map/tiles?f=json"},
-                { "rel", "describedby"},
+                { "rel", "http://www.opengis.net/def/rel/ogc/1.0/tilesets-raster"},
                 { "type", "application/json"},
                 { "title", "Tilesets list for " + id}
             });
@@ -960,7 +960,7 @@ json11::Json Layer::to_json_ogcapi(OgcApiService* service) {
         if (service->maps_enabled()) {
             links.push_back(json11::Json::object {
                 { "href", service->get_endpoint_uri() + "/collections/" + id + "/map?f={format}"},
-                { "rel", "map"},
+                { "rel", "http://www.opengis.net/def/rel/ogc/1.0/map"},
                 { "type", "application/octet-stream"},
                 { "title", id + " as raster map with default style"},
                 { "templated", true}
@@ -970,7 +970,7 @@ json11::Json Layer::to_json_ogcapi(OgcApiService* service) {
             for(auto const& s: available_styles) {
                 links.push_back(json11::Json::object {
                     { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map?f={format}"},
-                    { "rel", "map"},
+                    { "rel", "http://www.opengis.net/def/rel/ogc/1.0/map"},
                 { "type", "application/octet-stream"},
                     { "title", id + " as raster map with style " + s->get_identifier()},
                     { "templated", true}
@@ -983,7 +983,7 @@ json11::Json Layer::to_json_ogcapi(OgcApiService* service) {
         if (service->tiles_enabled()) {
             links.push_back(json11::Json::object {
                 { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles?f=json"},
-                { "rel", "describedby"},
+                { "rel", "http://www.opengis.net/def/rel/ogc/1.0/tilesets-vector"},
                 { "type", "application/json"},
                 { "title", "Tilesets list for " + id}
             });
@@ -1059,7 +1059,7 @@ json11::Json Layer::to_json_tilesets(OgcApiService* service) {
             { "links", json11::Json::array {
                 json11::Json::object {
                     { "href", tileset_uri},
-                    { "rel", "describedby"},
+                    { "rel", "self"},
                     { "type", "application/json"},
                     { "title", "Tileset " + t->tms->get_id() + " for " + id}
                 }

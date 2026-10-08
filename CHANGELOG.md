@@ -5,9 +5,14 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ## [Unreleased]
 
+### Fixed
+
+- Mise en conformité OGC API Tiles
+
 ## [7.0.0] - 2026-06-29
 
 ### Added
+
 - API Maps : implémentation intégrée au service OGC API
 - OGC API : possibilité de filtrer les collections par bbox
 - API Admin : sécurisation par secret
