@@ -251,7 +251,7 @@ DataStream* WmsService::get_map ( Request* req, ServicesConfiguration* services 
             throw WmsException::get_error_message(error, "InvalidParameterValue", 400);
         }
         return d;
-    } catch (UnreachableStorageException& err) {
+    } catch (StorageException& err) {
         throw WmsException::get_error_message("Internal storage error", "InternalServerError", 500);
     }
 

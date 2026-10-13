@@ -302,7 +302,7 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
             throw OgcApiException::get_error_message("InvalidParameter", error, 400);
         }
         return d;
-    } catch (UnreachableStorageException& err) {
+    } catch (StorageException& err) {
         throw OgcApiException::get_error_message("InternalError", "Internal storage error", 500);
     }
 }
