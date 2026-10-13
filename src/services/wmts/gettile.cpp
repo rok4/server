@@ -161,9 +161,15 @@ DataStream* WmtsService::get_tile(Request* req, ServicesConfiguration* services 
     }
 
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(services, layer, tmsi->tms, tm, column, row, format, style);
-    if (d == NULL) {
+    try {
+        DataStream* d = Tile::get_tile(services, layer, tmsi->tms, tm, column, row, format, style);
+        if (d == NULL) {
+            throw WmtsException::get_error_message("No data found", "Not Found", 404);
+        }
+        return d;
+    } catch (NotFoundStorageException& err) {
         throw WmtsException::get_error_message("No data found", "Not Found", 404);
+    } catch (UnreachableStorageException& err) {
+        throw WmtsException::get_error_message("Internal storage error", "Internal Server Error", 500);
     }
-    return d;
 }

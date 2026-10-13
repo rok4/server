@@ -575,11 +575,12 @@ Layer::Layer(std::string path, ServicesConfiguration* s) : Configuration(path), 
         return;
     }
 
-
     int size = -1;
-    uint8_t* data = context->read_full(size, fo_name);
-
-    if (size < 0) {
+    uint8_t* data;
+    
+    try {
+        data = context->read_full(size, fo_name);
+    } catch (StorageException err) {
         error_message = "Cannot read layer file/object "  + path ;
         if (data != NULL) delete[] data;
         return;

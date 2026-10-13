@@ -325,16 +325,19 @@ DataStream* WmsService::get_feature_info ( Request* req, ServicesConfiguration* 
     }
 
     // Traitement de la requête
-    std::string error;
-    DataStream* d = Map::get_feature_info(
-        services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, 
-        layers, query_layers, width, height, crs, bbox, str_bbox, styles, format, format_options, dpi,
-        i, j, feature_count, info_format,
-        &error
-    );
-    if (d == NULL) {
-        throw WmsException::get_error_message(error, "InvalidParameterValue", 400);
+    try {
+        std::string error;
+        DataStream* d = Map::get_feature_info(
+            services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, 
+            layers, query_layers, width, height, crs, bbox, str_bbox, styles, format, format_options, dpi,
+            i, j, feature_count, info_format,
+            &error
+        );
+        if (d == NULL) {
+            throw WmsException::get_error_message(error, "InvalidParameterValue", 400);
+        }
+        return d;
+    } catch (UnreachableStorageException& err) {
+        throw WmsException::get_error_message("Internal storage error", "InternalServerError", 500);
     }
-    return d;
-
 }

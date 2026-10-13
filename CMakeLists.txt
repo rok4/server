@@ -73,7 +73,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "rok4")
 
 # Lien des librairies dépendantes
-target_link_libraries(${PROJECT_NAME} PUBLIC rok4 fcgi zlib boostlog boostlogsetup boostthread boostfilesystem boostsystem curl openssl crypto proj)
+target_link_libraries(${PROJECT_NAME} PUBLIC rok4 fcgi zlib boostlog boostlogsetup boostthread boostfilesystem curl openssl crypto proj)
 
 ################### TESTS UNITAIRES
 
