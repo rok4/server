@@ -17,6 +17,17 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v3
 
+      - name: Get latest release info
+        id: query_release_info
+        uses: release-flow/keep-a-changelog-action@v2
+        with:
+          command: query
+          version: latest
+
+      - name: Write release notes 
+        run: |
+          echo "${{ steps.query_release_info.outputs.release-notes }}" >notes.txt
+
       - name: Create Release
         id: create_release
         uses: ncipollo/release-action@v1
@@ -24,7 +35,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          generateReleaseNotes: true
+          bodyFile: notes.txt
           draft: false
           prerelease: false
 
@@ -34,12 +45,6 @@ jobs:
     needs: create_release
     outputs:
       job_status: ${{ job.status }}
-    strategy:
-      max-parallel: 2
-      fail-fast: true
-      matrix:
-        include:
-          - os: [ubuntu-22.04, ubuntu-24.04]
 
     runs-on: ubuntu-24.04
 
