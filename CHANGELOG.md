@@ -5,6 +5,9 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ## [Unreleased]
 
+### Changed
+- Les erreurs d'accès au stockage sont détectées sous forme d'exception
+
 ### Fixed
 
 - Mise en conformité OGC API Tiles

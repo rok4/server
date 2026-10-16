@@ -183,11 +183,15 @@ DataStream* WmtsService::get_feature_info ( Request* req, ServicesConfiguration*
     if (gfi_type.compare("PYRAMID") == 0 && tmsi->tms->get_id() == layer->get_pyramid()->get_tms()->get_id() ) {
         BOOST_LOG_TRIVIAL(debug) << "GFI sur pyramide dans le TMS natif";
 
-        Image* image = level->get_tile(column, row, 0, 0, 0, 0, true);
-        if (image == NULL) {
+        Image* image;
+        try {
+            image = level->get_tile(column, row, 0, 0, 0, 0, true);
+        } catch (NotFoundStorageException& err) {
             throw WmtsException::get_error_message("No data found", "Not Found", 404);
+        } catch (UnreachableStorageException& err) {
+            throw WmtsException::get_error_message("Internal storage error", "Internal Server Error", 500);
         }
-
+        
         std::vector<std::string> gfi_data;
 
         int bands = image->get_channels();

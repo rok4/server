@@ -46,6 +46,7 @@
 #include <iostream>
 
 #include <rok4/datasource/PaletteDataSource.h>
+#include <rok4/utils/Exception.h>
 
 #include "services/tms/Exception.h"
 #include "services/tms/Service.h"
@@ -133,9 +134,15 @@ DataStream* TmsService::get_tile ( Request* req, ServicesConfiguration* services
     std::string format = Rok4Format::to_mime_type ( ( layer->get_pyramid()->get_format() ) );
 
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(services, layer, tms, tm, column, row, format, style);
-    if (d == NULL) {
+    try {
+        DataStream* d = Tile::get_tile(services, layer, tms, tm, column, row, format, style);
+        if (d == NULL) {
+            throw TmsException::get_error_message("No data found", 404);
+        }
+        return d;
+    } catch (NotFoundStorageException& err) {
         throw TmsException::get_error_message("No data found", 404);
+    } catch (UnreachableStorageException& err) {
+        throw TmsException::get_error_message("Internal storage error", 500);
     }
-    return d;
 }

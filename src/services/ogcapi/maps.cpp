@@ -291,14 +291,18 @@ DataStream* OgcApiService::get_map ( Request* req, ServicesConfiguration* servic
 
 
     // Traitement de la requête
-    std::string error;
-    DataStream* d = Map::get_map(
-        services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, 
-        layers, width, height, crs, bbox, styles, format, format_options, dpi,
-        &error
-    );
-    if (d == NULL) {
-        throw OgcApiException::get_error_message("InvalidParameter", error, 400);
+    try {
+        std::string error;
+        DataStream* d = Map::get_map(
+            services, services->map_reprojection, services->map_max_tile_x, services->map_max_tile_y, 
+            layers, width, height, crs, bbox, styles, format, format_options, dpi,
+            &error
+        );
+        if (d == NULL) {
+            throw OgcApiException::get_error_message("InvalidParameter", error, 400);
+        }
+        return d;
+    } catch (StorageException& err) {
+        throw OgcApiException::get_error_message("InternalError", "Internal storage error", 500);
     }
-    return d;
 }

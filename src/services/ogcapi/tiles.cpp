@@ -285,9 +285,15 @@ DataStream* OgcApiService::get_tile ( Request* req, ServicesConfiguration* servi
     }
 
     // Traitement de la requête
-    DataStream* d = Tile::get_tile(services, layer, tmsi->tms, tm, column, row, format, style);
-    if (d == NULL) {
+    try {
+        DataStream* d = Tile::get_tile(services, layer, tmsi->tms, tm, column, row, format, style);
+        if (d == NULL) {
+            throw OgcApiException::get_error_message("ResourceNotFound", "Not data found", 404);
+        }
+        return d;
+    } catch (NotFoundStorageException& err) {
         throw OgcApiException::get_error_message("ResourceNotFound", "Not data found", 404);
+    } catch (UnreachableStorageException& err) {
+        throw OgcApiException::get_error_message("InternalError", "Internal storage error", 500);
     }
-    return d;
 }
