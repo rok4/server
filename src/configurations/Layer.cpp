@@ -1089,6 +1089,13 @@ json11::Json Layer::to_json_tileset(OgcApiService* service, TileMatrixSetInfos* 
 
     std::vector<json11::Json> links;
 
+    links.push_back(json11::Json::object {
+        { "href", service->get_endpoint_uri() + "/tileMatrixSets/" + tmsi->tms->get_id() + "?f=json"},
+        { "rel", "http://www.opengis.net/def/rel/ogc/1.0/tiling-scheme"},
+        { "type", "application/json"},
+        { "title", tmsi->tms->get_id() + " definition as application/json"}
+    });
+
     if (raster) {
         // Interrogation de donnée raster
         res["dataType"] = "map";
@@ -1102,7 +1109,7 @@ json11::Json Layer::to_json_tileset(OgcApiService* service, TileMatrixSetInfos* 
         for(auto const& s: available_styles) {
             links.push_back(json11::Json::object {
                 { "href", service->get_endpoint_uri() + "/collections/" + id + "/styles/" + s->get_identifier() + "/map/tiles/" + tmsi->tms->get_id() + "/{tileMatrix}/{tileRow}/{tileCol}?f=" + Rok4Format::to_ogcapi_format(pyramid->get_format())},
-                { "rel", "tiles"},
+                { "rel", "item"},
                 { "type", Rok4Format::to_mime_type(pyramid->get_format())},
                 { "title", id + " as raster tile with style " + s->get_identifier()},
                 { "templated", true}
@@ -1121,7 +1128,7 @@ json11::Json Layer::to_json_tileset(OgcApiService* service, TileMatrixSetInfos* 
         // Lien vers la tuile
         links.push_back(json11::Json::object {
             { "href", service->get_endpoint_uri() + "/collections/" + id + "/tiles/" + tmsi->tms->get_id() + "/{tileMatrix}/{tileRow}/{tileCol}?f=" + Rok4Format::to_ogcapi_format(pyramid->get_format())},
-            { "rel", "tiles"},
+            { "rel", "item"},
             { "type", Rok4Format::to_mime_type(pyramid->get_format())},
             { "title", id + " as vector tile"},
             { "templated", true}

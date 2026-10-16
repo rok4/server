@@ -5,6 +5,11 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ## [Unreleased]
 
+## [7.1.1] - 2026-10-16
+
+### Fixed
+- API Tiles : les liens vers les tuiles sont avec ref = item et on ajoute un lien vers le TMS
+
 ## [7.1.0] - 2026-10-16
 
 ### Changed
