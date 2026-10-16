@@ -5,6 +5,8 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ## [Unreleased]
 
+## [7.1.0] - 2026-10-16
+
 ### Changed
 - Les erreurs d'accès au stockage sont détectées sous forme d'exception
 
@@ -274,7 +276,8 @@ Cette release contient le serveur de diffusion de données raster ou vecteur sto
 - Suppression du support du WMS 1.1.1
 - Suppression de la gestion de styles complexes (quand le valeur finale d'un pixel dépend des valeurs initiales du voisinage, comme le calcul de pente ou d'ombrage) à la volée
 
-[Unreleased]: https://github.com/rok4/server/compare/v7.0.0...HEAD
+[Unreleased]: https://github.com/rok4/server/compare/v7.1.0...HEAD
+[7.1.0]: https://github.com/rok4/server/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/rok4/server/compare/v6.2.1...v7.0.0
 [6.2.1]: https://github.com/rok4/server/compare/v6.2.0...v6.2.1
 [6.2.0]: https://github.com/rok4/server/compare/v6.1.6...v6.2.0
