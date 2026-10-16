@@ -296,8 +296,8 @@ void Router::process_request(Request* req, ServicesConfiguration* services) {
     }
     catch (...) {
         // On ne devrait pas passer là, c'est un bug du serveur
-        BOOST_LOG_TRIVIAL(error) << "Routing issue";
+        BOOST_LOG_TRIVIAL(error) << "Internal issue";
         BOOST_LOG_TRIVIAL(error) << req->method << " " << req->path;
-        sendresponse(new MessageDataStream("{\"error\": \"Internal issue\", \"error_description\": \"Routing error\"}", "application/json", 500), req);
+        sendresponse(new MessageDataStream("{\"error\": \"Internal issue\", \"error_description\": \"Internal error\"}", "application/json", 500), req);
     }
 }

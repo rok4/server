@@ -101,17 +101,26 @@ DataStream* OgcApiService::get_landing_page ( Request* req, ServicesConfiguratio
 
     links.push_back(json11::Json::object {
         { "href", endpoint_uri + "/collections?f=json"},
-        { "rel", "data"},
+        { "rel", "http://www.opengis.net/def/rel/ogc/1.0/data"},
         { "type", "application/json"},
         { "title", "Information about the collections"}
     });
 
     links.push_back(json11::Json::object {
         { "href", endpoint_uri + "/conformance?f=json"},
-        { "rel", "data"},
+        { "rel", "http://www.opengis.net/def/rel/ogc/1.0/conformance"},
         { "type", "application/json"},
         { "title", "OGC API conformance classes implemented by this service"}
     });
+
+    if (tiles) {
+        links.push_back(json11::Json::object {
+            { "href", endpoint_uri + "/tileMatrixSets?f=json"},
+            { "rel", "http://www.opengis.net/def/rel/ogc/1.0/tiling-schemes"},
+            { "type", "application/json"},
+            { "title", "Information about the available tile matrix sets"}
+        });
+    }
 
     json11::Json::object res = json11::Json::object {
         { "title", title },

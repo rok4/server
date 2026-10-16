@@ -191,14 +191,16 @@ Rok4Server* load_configuration() {
         }
 
         int size = -1;
-        uint8_t* data = context->read_full(size, fo_name);
+        uint8_t* data;
 
-        if (size < 0) {
+        try {
+            data = context->read_full(size, fo_name);
+        } catch (StorageException err) {
             BOOST_LOG_TRIVIAL(fatal) << "Cannot read layers list " + list_path << std::endl;
             if (data != NULL) delete[] data;
             return NULL;
         }
-        
+
         std::istringstream list_content(std::string((char*) data, size));
         delete[] data; 
         std::string layer_desc;    
