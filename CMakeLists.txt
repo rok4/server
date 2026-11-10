@@ -14,6 +14,7 @@ set(BUILD_VERSION "0.0.0" CACHE STRING "Build version")
 set(CPACK_SYSTEM_NAME "ubuntu-22.04" CACHE STRING "Building OS, to deduce package format to generate")
 set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Installation location")
 set(DEBUG_BUILD 0 CACHE BOOL "Debug mode compilation")
+set(ALLOCATOR "" CACHE STRING "Build with allocator")
 set(UNITTEST_ENABLED 1 CACHE BOOL "Unit tests compilation")
 set(DOC_ENABLED 1 CACHE BOOL "Documentation compilation")
 
@@ -58,6 +59,12 @@ include(cmake/modules/dependencies.cmake)
 # Dossiers contenant les headers nécessaires
 include_directories(${PROJECT_BINARY_DIR} ${ROK4_INCLUDE_DIR} ${BOOSTLOG_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${FCGI_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${PROJ_INCLUDE_DIR})
 
+IF(ALLOCATOR STREQUAL "jemalloc")
+    include_directories(${JEMALLOC_INCLUDE_DIR})
+ELSEIF(ALLOCATOR STREQUAL "tcmalloc")
+    include_directories(${TCMALLOC_INCLUDE_DIR})
+ENDIF()
+
 message(STATUS "Building ROK4 Server")
 
 file(GLOB ROK4SERVER_SRCS 
@@ -74,6 +81,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "rok4")
 
 # Lien des librairies dépendantes
 target_link_libraries(${PROJECT_NAME} PUBLIC rok4 fcgi zlib boostlog boostlogsetup boostthread boostfilesystem curl openssl crypto proj)
+
+IF(ALLOCATOR STREQUAL "jemalloc")
+    target_link_libraries(${PROJECT_NAME} PUBLIC jemalloc)
+ELSEIF(ALLOCATOR STREQUAL "tcmalloc")
+    target_link_libraries(${PROJECT_NAME} PUBLIC tcmalloc)
+ENDIF()
 
 ################### TESTS UNITAIRES
 
@@ -160,6 +173,11 @@ if(CPACK_SYSTEM_NAME AND CPACK_SYSTEM_NAME STREQUAL "ubuntu-20.04" OR CPACK_SYST
     set(CPACK_DEBIAN_PACKAGE_SECTION "science")
     set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "librok4-dev, libfcgi-dev ,libcurl4-openssl-dev ,libproj-dev ,libssl-dev ,libboost-log-dev ,libboost-filesystem-dev ,libboost-system-dev")
+    IF(ALLOCATOR STREQUAL "jemalloc")
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libjemalloc-dev")
+    ELSEIF(ALLOCATOR STREQUAL "tcmalloc")
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libtcmalloc-minimal4t64")
+    ENDIF()
     set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_SOURCE_DIR}/cmake/debian/postinst;" )
     set(CPACK_BINARY_DEB "ON")
 endif()

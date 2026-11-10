@@ -5,6 +5,12 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/) et ce pr
 
 ## [Unreleased]
 
+## [7.1.2] - 2026-11-10
+
+### Added
+
+- Possibilité de compiler en changeant l'allocateur mémoire (`tcmalloc` et `jemalloc` disponibles)
+
 ## [7.1.1] - 2026-10-16
 
 ### Fixed
@@ -282,6 +288,7 @@ Cette release contient le serveur de diffusion de données raster ou vecteur sto
 - Suppression de la gestion de styles complexes (quand le valeur finale d'un pixel dépend des valeurs initiales du voisinage, comme le calcul de pente ou d'ombrage) à la volée
 
 [Unreleased]: https://github.com/rok4/server/compare/v7.1.0...HEAD
+[7.1.2]: https://github.com/rok4/server/compare/v7.1.0...v7.1.0
 [7.1.0]: https://github.com/rok4/server/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/rok4/server/compare/v6.2.1...v7.0.0
 [6.2.1]: https://github.com/rok4/server/compare/v6.2.0...v6.2.1

@@ -342,6 +342,7 @@ Pour que les URLs présentes dans les réponses des services soient correctes ma
 * `DOC_ENABLED` : active la compilation de la documentation. Valeur par défaut : `1`, `0` pour désactiver.
 * `BUILD_VERSION` : version de la librairie compilée. Valeur par défaut : `0.0.0`. Utile pour la compilation de la documentation.
 * `DEBUG_BUILD` : active la compilation en mode debug. Valeur par défaut : `0`, `1` pour activer.
+* `ALLOCATOR` : modifie l'implémentation des fonctions d'allocation. Valeurs possibles : `jemalloc`, `tcmalloc`. Valeur par défaut : ``
 
 ### Compilation, tests unitaires et documentation et installation
 

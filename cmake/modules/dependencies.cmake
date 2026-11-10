@@ -85,6 +85,23 @@ if(NOT TARGET zlib)
     endif(ZLIB_FOUND)
 endif(NOT TARGET zlib)
 
+
+IF(ALLOCATOR STREQUAL "jemalloc")
+    if(NOT TARGET jemalloc)
+        find_package(Jemalloc)
+        if(NOT JEMALLOC_FOUND)
+            message(FATAL_ERROR "Cannot find extern library jemalloc")
+        endif()
+    endif(NOT TARGET jemalloc)
+ELSEIF(ALLOCATOR STREQUAL "tcmalloc")
+    if(NOT TARGET tcmalloc)
+        find_package(Tcmalloc)
+        if(NOT TCMALLOC_FOUND)
+            message(FATAL_ERROR "Cannot find extern library tcmalloc")
+        endif()
+    endif(NOT TARGET tcmalloc)
+ENDIF()
+
 if(UNITTEST_ENABLED)
   
   # Extern libraries, shared

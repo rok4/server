@@ -68,7 +68,7 @@ jobs:
       - name: Build packages
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/ -DBUILD_VERSION=${{ github.ref_name }} -DCPACK_SYSTEM_NAME="ubuntu-24.04" ..
+          cmake -DCMAKE_INSTALL_PREFIX=/ -DALLOCATOR=jemalloc -DBUILD_VERSION=${{ github.ref_name }} -DCPACK_SYSTEM_NAME="ubuntu-24.04" ..
           make -j2
           make package
 
